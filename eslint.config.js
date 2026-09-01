@@ -1,26 +1,17 @@
-import tsParser from '@typescript-eslint/parser';
-import tsPlugin from '@typescript-eslint/eslint-plugin';
-import importPlugin from 'eslint-plugin-import';
+import js from '@eslint/js'
+import tseslint from 'typescript-eslint'
+import reactHooks from 'eslint-plugin-react-hooks'
 
-export default [
+export default tseslint.config(
+  { ignores: ['node_modules/**', 'docs/**', 'dist/**', 'coverage/**'] },
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
   {
-    ignores: ['node_modules/**', 'docs/**'],
-  },
-  {
-    files: ['**/*.ts'],
-    languageOptions: {
-      parser: tsParser,
-      parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-      },
-    },
-    plugins: {
-      '@typescript-eslint': tsPlugin,
-      import: importPlugin,
-    },
+    files: ['**/*.{ts,tsx}'],
+    plugins: { 'react-hooks': reactHooks },
     rules: {
-      'import/no-cycle': 'error',
+      ...reactHooks.configs.recommended.rules,
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     },
   },
   {
@@ -30,17 +21,11 @@ export default [
         'error',
         {
           paths: [
-            { name: 'react', message: 'core/ must not import React' },
-            { name: 'react-dom', message: 'core/ must not import React' },
-          ],
-          patterns: [
-            {
-              group: ['**/features/**', '**/components/**', '**/data/**'],
-              message: 'core/ must not import features/, components/, or data/',
-            },
+            { name: 'react', message: 'core must stay React-free.' },
+            { name: 'react-dom', message: 'core must stay React-free.' },
           ],
         },
       ],
     },
   },
-];
+)

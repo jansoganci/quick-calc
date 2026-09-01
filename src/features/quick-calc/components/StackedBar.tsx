@@ -1,0 +1,49 @@
+import { cn } from '../../../lib/cn.ts'
+import type { QuickView } from '../viewModel.ts'
+
+type StackedBarProps = {
+  bar: QuickView['bar']
+  ticketFormatted: string
+}
+
+export function StackedBar({ bar, ticketFormatted }: StackedBarProps) {
+  if (bar.length === 0) {
+    return (
+      <div>
+        <div className="mt-[18px] flex h-[38px] border border-[#D6D9DD] lg:h-[44px]" aria-hidden="true" />
+        <div className="mt-1.5 flex justify-between font-mono text-[11px] tabular-nums text-[#8A9199]">
+          <span>0,00 TL</span>
+          <span>—</span>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <div className="mt-[18px] flex h-[38px] overflow-hidden border border-[#D6D9DD] lg:mt-[22px] lg:h-[44px]">
+        {bar.map((segment) => (
+          <div
+            key={segment.key}
+            className={cn(
+              'flex min-w-0 items-center overflow-hidden',
+              segment.width >= 15 && 'pl-2.5',
+            )}
+            style={{ width: `${segment.width}%`, background: segment.color }}
+            title={`${segment.label} ${segment.amountFormatted}`}
+          >
+            {segment.showLabel ? (
+              <span className="hidden whitespace-nowrap text-[11px] text-white lg:inline">
+                {segment.label}
+              </span>
+            ) : null}
+          </div>
+        ))}
+      </div>
+      <div className="mt-1.5 flex justify-between font-mono text-[11px] tabular-nums text-[#8A9199]">
+        <span>0,00 TL</span>
+        <span>{ticketFormatted}</span>
+      </div>
+    </div>
+  )
+}
