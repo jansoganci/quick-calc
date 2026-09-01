@@ -21,7 +21,6 @@ import {
   FIELD_LABELS,
   FIELD_UNITS,
   SIM_LABELS,
-  ZERO_VOLUME_HEADLINE,
   type FieldUnit,
 } from './labels.ts'
 
@@ -184,27 +183,31 @@ function toPercents(shares: number[]): number[] {
   if (shares.length === 0) return []
   const rounded = shares.map((share) => Math.round(share * 1000) / 10)
   const total = rounded.reduce((sum, value) => sum + value, 0)
-  rounded[rounded.length - 1] = Math.round((rounded[rounded.length - 1] + (100 - total)) * 10) / 10
+  const lastIndex = rounded.length - 1
+  const last = rounded[lastIndex]
+  if (last === undefined) return rounded
+  rounded[lastIndex] = Math.round((last + (100 - total)) * 10) / 10
   return rounded
 }
 
 function paybackDisplay(payback: QuickCalculationResult['payback']): { value: string; unit: string } {
   if ('available' in payback && payback.available === false) return { value: '—', unit: '' }
-  return { value: formatTryExact(payback.months, 1), unit: 'ay' }
+  if ('months' in payback) return { value: formatTryExact(payback.months, 1), unit: 'ay' }
+  return { value: '—', unit: '' }
 }
 
 export function buildQuickView(
   result: QuickCalculationResult,
   simulation: QuickSimulationRow[],
 ): QuickView {
-  const ticket = result.monthly.averageSale
   const perSale = result.perSale
   const breakdown = result.breakdownPerSale
+  const ticket = breakdown?.averageSale ?? perSale?.grossTicket ?? 0
 
   if (perSale === null || breakdown === null) {
     const payback = paybackDisplay(result.payback)
     return {
-      headline: ZERO_VOLUME_HEADLINE,
+      headline: COPY.zeroVolume,
       copyText: [
         `${COPY.headlineTicket}: ${formatTryExact(ticket, 2)} TL`,
         `${COPY.simCost}: —`,
@@ -279,7 +282,7 @@ export function buildQuickView(
   }))
 
   const breakdownRows: BreakdownRow[] = keys.map((key, index) => {
-    const amount = key === 'remaining' ? remaining : costAmounts[index]
+    const amount = key === 'remaining' ? remaining : (costAmounts[index] ?? 0)
     const isLastCost = key === 'investmentRecovery'
     const isRemaining = key === 'remaining'
     return {
