@@ -16,11 +16,10 @@ import { formatTry, formatTryExact } from '../../lib/money.ts'
 import { parseTurkishNumber } from './parse.ts'
 import {
   BREAKDOWN_LABELS,
-  COPY_LABELS,
+  COPY,
   ERROR_COPY,
   FIELD_LABELS,
   FIELD_UNITS,
-  OUTPUT_LABELS,
   SIM_LABELS,
   ZERO_VOLUME_HEADLINE,
   type FieldUnit,
@@ -207,11 +206,11 @@ export function buildQuickView(
     return {
       headline: ZERO_VOLUME_HEADLINE,
       copyText: [
-        `${COPY_LABELS.ticket}: ${formatTryExact(ticket, 2)} TL`,
-        `${COPY_LABELS.cost}: —`,
-        `${COPY_LABELS.remaining}: —`,
-        `${COPY_LABELS.earnings}: ${formatTry(result.monthly.operatingEarnings)} TL`,
-        `${COPY_LABELS.payback}: ${payback.unit ? `${payback.value} ${payback.unit}` : payback.value}`,
+        `${COPY.headlineTicket}: ${formatTryExact(ticket, 2)} TL`,
+        `${COPY.simCost}: —`,
+        `${BREAKDOWN_LABELS.remaining}: —`,
+        `${COPY.monthlyEarnings}: ${formatTry(result.monthly.operatingEarnings)} TL`,
+        `${COPY.payback}: ${payback.unit ? `${payback.value} ${payback.unit}` : payback.value}`,
       ].join('\n'),
       costHeadline: '—',
       ticketHeadline: `${formatTryExact(ticket, 2)} TL`,
@@ -220,26 +219,26 @@ export function buildQuickView(
       outputs: [
         {
           key: 'earnings',
-          label: OUTPUT_LABELS.monthlyEarnings,
+          label: COPY.monthlyEarnings,
           value: formatTry(result.monthly.operatingEarnings),
           unit: 'TL',
         },
         {
           key: 'gross',
-          label: OUTPUT_LABELS.grossMargin,
+          label: COPY.grossMargin,
           value: result.grossProfitMargin === null ? '—' : formatPercentValue(result.grossProfitMargin * 100),
           unit: '',
         },
         {
           key: 'operating',
-          label: OUTPUT_LABELS.operatingMargin,
+          label: COPY.operatingMargin,
           value:
             result.operatingProfitMargin === null ? '—' : formatPercentValue(result.operatingProfitMargin * 100),
           unit: '',
         },
         {
           key: 'payback',
-          label: OUTPUT_LABELS.payback,
+          label: COPY.payback,
           value: payback.value,
           unit: payback.unit,
         },
@@ -302,11 +301,11 @@ export function buildQuickView(
   return {
     headline: `${ticketText}’lik ortalama satışın ${costText}’si maliyete gidiyor, ${remainingText}’si işletmede kalıyor.`,
     copyText: [
-      `${COPY_LABELS.ticket}: ${ticketText}`,
-      `${COPY_LABELS.cost}: ${costText}`,
-      `${COPY_LABELS.remaining}: ${remainingText}`,
-      `${COPY_LABELS.earnings}: ${formatTry(result.monthly.operatingEarnings)} TL`,
-      `${COPY_LABELS.payback}: ${payback.unit ? `${payback.value} ${payback.unit}` : payback.value}`,
+      `${COPY.headlineTicket}: ${ticketText}`,
+      `${COPY.simCost}: ${costText}`,
+      `${BREAKDOWN_LABELS.remaining}: ${remainingText}`,
+      `${COPY.monthlyEarnings}: ${formatTry(result.monthly.operatingEarnings)} TL`,
+      `${COPY.payback}: ${payback.unit ? `${payback.value} ${payback.unit}` : payback.value}`,
     ].join('\n'),
     costHeadline: costText,
     ticketHeadline: ticketText,
@@ -315,26 +314,26 @@ export function buildQuickView(
     outputs: [
       {
         key: 'earnings',
-        label: OUTPUT_LABELS.monthlyEarnings,
+        label: COPY.monthlyEarnings,
         value: formatTry(result.monthly.operatingEarnings),
         unit: 'TL',
       },
       {
         key: 'gross',
-        label: OUTPUT_LABELS.grossMargin,
+        label: COPY.grossMargin,
         value: result.grossProfitMargin === null ? '—' : formatPercentValue(result.grossProfitMargin * 100),
         unit: '',
       },
       {
         key: 'operating',
-        label: OUTPUT_LABELS.operatingMargin,
+        label: COPY.operatingMargin,
         value:
           result.operatingProfitMargin === null ? '—' : formatPercentValue(result.operatingProfitMargin * 100),
         unit: '',
       },
       {
         key: 'payback',
-        label: OUTPUT_LABELS.payback,
+        label: COPY.payback,
         value: payback.value,
         unit: payback.unit,
       },
