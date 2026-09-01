@@ -16,5 +16,5 @@
     "types": ["vitest/globals"]
   },
   "include": ["src/**/*.ts", "vitest.config.ts"],
-  "exclude": ["src/vite-env.d.ts", "src/features/**/hooks/**"]
+  "exclude": ["src/vite-env.d.ts", "src/features/quick-calc/hooks/**/*.ts"]
 }

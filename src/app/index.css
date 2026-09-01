@@ -95,6 +95,11 @@
     color: #a0503c;
   }
 
+  .qc-error {
+    font-size: 11px;
+    color: #a0503c;
+  }
+
   .qc-assumptions.collapse {
     border-radius: 0;
   }

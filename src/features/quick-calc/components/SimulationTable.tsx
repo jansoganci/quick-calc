@@ -17,7 +17,7 @@ export function SimulationTable({ rows }: SimulationTableProps) {
         <div className="text-right text-xs text-[#8A9199]">Aylık kazanç</div>
         <div className="col-span-full mt-2 h-px bg-[#16181C]" />
         {rows.map((row) => (
-          <div key={row.label} className="contents">
+          <div key={row.key} className="contents">
             <div className={`py-2.5 ${row.isCurrent ? 'font-semibold text-[#16181C]' : 'text-[#5B6169]'}`}>
               {row.scenario}
             </div>
@@ -30,7 +30,10 @@ export function SimulationTable({ rows }: SimulationTableProps) {
             <div className={`py-2.5 text-right font-mono tabular-nums ${row.isCurrent ? 'font-semibold text-[#16181C]' : 'text-[#5B6169]'}`}>
               {row.earnings}
             </div>
-            <div className="col-span-full h-px" style={{ background: row.rule }} />
+            <div
+              className="col-span-full h-px"
+              style={{ background: row.isCurrent ? '#D6D9DD' : '#EEF0F2' }}
+            />
           </div>
         ))}
       </div>
@@ -40,7 +43,7 @@ export function SimulationTable({ rows }: SimulationTableProps) {
         <div className="text-right text-[11px] text-[#8A9199]">Aylık kazanç</div>
         <div className="col-span-full mt-1.5 h-px bg-[#16181C]" />
         {rows.map((row) => (
-          <div key={row.label} className="contents">
+          <div key={row.key} className="contents">
             <div className={`py-[11px] font-mono tabular-nums ${row.isCurrent ? 'font-semibold text-[#16181C]' : 'text-[#5B6169]'}`}>
               {row.volume}
             </div>
@@ -50,7 +53,10 @@ export function SimulationTable({ rows }: SimulationTableProps) {
             <div className={`py-[11px] text-right font-mono tabular-nums ${row.isCurrent ? 'font-semibold text-[#16181C]' : 'text-[#5B6169]'}`}>
               {row.earnings}
             </div>
-            <div className="col-span-full h-px" style={{ background: row.rule }} />
+            <div
+              className="col-span-full h-px"
+              style={{ background: row.isCurrent ? '#D6D9DD' : '#EEF0F2' }}
+            />
           </div>
         ))}
       </div>

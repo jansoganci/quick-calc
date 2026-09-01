@@ -35,7 +35,7 @@ export function QuickCalcForm({
         İşletme bilgileri
       </div>
       <div className="grid grid-cols-2 gap-x-[13px] gap-y-[15px]">
-        {FIELD_LAYOUT.map((field) => (
+        {FIELD_LAYOUT.map(({ field, span }) => (
           <NumberField
             key={field}
             id={field}
@@ -46,7 +46,7 @@ export function QuickCalcForm({
             unit={fieldUnit(field)}
             error={dirty[field] ? errors[field] ?? null : null}
             hint={fieldHint(field)}
-            span={field === 'variableCostPerSale' || field === 'initialCapex' ? 'full' : 'half'}
+            span={span}
           />
         ))}
       </div>

@@ -38,9 +38,6 @@ export function QuickCalcResults({
           <p className="max-w-[610px] text-lg leading-normal tracking-tight text-[#16181C] text-pretty lg:text-[21px] lg:leading-normal">
             {view.headline}
           </p>
-          {view.zeroVolumeNote ? (
-            <p className="mt-3 text-[13px] leading-relaxed text-[#5B6169]">{view.zeroVolumeNote}</p>
-          ) : null}
           <div className="mt-3.5 lg:mt-3.5">
             <button
               type="button"
@@ -53,25 +50,25 @@ export function QuickCalcResults({
 
           <div className="my-5 h-px bg-[#E3E5E8] lg:my-[26px]" />
 
-          {view.headlineCost ? (
+          {view.bar.length > 0 ? (
             <div className="flex items-end justify-between gap-[30px]">
               <div>
                 <div className="mb-1.5 text-[13px] text-[#5B6169] lg:mb-[7px]">
                   Satış başına tahmini toplam maliyet
                 </div>
                 <div className="font-mono text-4xl font-medium leading-none tracking-tight text-[#1D3A5F] tabular-nums lg:text-[44px]">
-                  {view.headlineCost.replace(' TL', '')}{' '}
+                  {view.costHeadline.replace(' TL', '')}{' '}
                   <span className="text-lg font-normal text-[#5B6169] lg:text-[21px]">TL</span>
                 </div>
               </div>
               <div className="hidden pb-[3px] text-right lg:block">
                 <div className="mb-1.5 text-[13px] text-[#5B6169]">Ortalama satış</div>
-                <div className="font-mono text-[19px] tabular-nums text-[#16181C]">{view.ticketFormatted}</div>
+                <div className="font-mono text-[19px] tabular-nums text-[#16181C]">{view.ticketHeadline}</div>
               </div>
             </div>
           ) : null}
 
-          <StackedBar bar={view.bar} ticketFormatted={view.ticketFormatted} />
+          <StackedBar bar={view.bar} ticketFormatted={view.ticketHeadline} />
           <BreakdownTable rows={view.breakdown} />
 
           <div className="mb-[18px] mt-6 h-px bg-[#E3E5E8] lg:mb-6 lg:mt-[30px]" />

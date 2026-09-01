@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { COPY } from '../labels.ts'
 import {
   EMPTY_FORM,
   PRIMARY_FIELDS,
@@ -25,7 +26,9 @@ export function useQuickCalc() {
   const previousViewKeyRef = useRef<string | null>(null)
 
   const evaluation = useMemo(() => evaluateForm(form), [form])
-  const canCalculate = evaluation.ok && allPrimaryFilled(form)
+  const filled = allPrimaryFilled(form)
+  const canSubmit = evaluation.ok && filled
+  const submitHint = canSubmit ? null : filled ? COPY.calculateInvalid : COPY.calculateDisabled
 
   useEffect(() => {
     if (!hasCalculated || !evaluation.ok) return
@@ -81,7 +84,8 @@ export function useQuickCalc() {
     evaluation,
     view,
     hasCalculated,
-    canCalculate,
+    canSubmit,
+    submitHint,
     liveFlash,
     copied,
     resultsRef,

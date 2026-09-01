@@ -30,7 +30,7 @@ export function StackedBar({ bar, ticketFormatted }: StackedBarProps) {
               segment.width >= 15 && 'pl-2.5',
             )}
             style={{ width: `${segment.width}%`, background: segment.color }}
-            title={`${segment.label} ${segment.amountFormatted}`}
+            title={segment.label}
           >
             {segment.showLabel ? (
               <span className="hidden whitespace-nowrap text-[11px] text-white lg:inline">

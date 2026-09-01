@@ -25,7 +25,7 @@ export function NumberField({
 }: NumberFieldProps) {
   return (
     <label className={cn('qc-field', span === 'full' && 'col-span-full')} htmlFor={id}>
-      <span>{label}</span>
+      <span className="qc-field-label">{label}</span>
       <span className={cn('qc-input-wrap', error && 'is-error')}>
         <input
           id={id}
