@@ -9,7 +9,7 @@ export function QuickCalcPage() {
 
   return (
     <div className="min-h-screen bg-qc-page">
-      <div className="mx-auto max-w-[1152px] overflow-hidden border-x border-qc-rule bg-qc-surface">
+      <div className="mx-auto max-w-[1152px] overflow-x-clip border-x border-qc-rule bg-qc-surface">
         <AppHeader />
         <main className="lg:grid lg:grid-cols-[392px_1px_1fr]">
           <QuickCalcForm

@@ -34,7 +34,9 @@ Bar cost ramp, in locked order: `#C3C8CE` KDV · `#3F4650` product · `#545C68` 
 
 ## 2. Desktop layout
 
-`max-w-[1152px] mx-auto`, grid `392px 1px 1fr`. Left column inputs (`p-[30px]`), 1px hairline, right column result (`p-[30px_34px]`, `bg-[#FCFCFD]`). Result column `sticky top-0 self-start max-h-screen overflow-y-auto`.
+`max-w-[1152px] mx-auto`, grid `392px 1px 1fr`. Left column inputs (`p-[30px]`), 1px hairline, right column result (`p-[30px_34px]`, `bg-[#FCFCFD]`). Result column `sticky top-0 max-h-screen overflow-y-auto`.
+
+> **Corrected.** This previously read `sticky top-0 self-start max-h-screen overflow-y-auto`, and `self-start` prevents the sticky behaviour it was meant to support. `align-self: start` shrinks the grid item to its content, so the pane exactly fills its containing block and has zero travel — measured at 1710px, the pane scrolled to −540px instead of pinning. With the item left to stretch (the grid default) the pane has real travel and pins at the top. The page frame also had `overflow-hidden`, which makes it a scroll container and defeats `position: sticky` outright; it is now `overflow-x-clip`, which still clips horizontally but creates no scroll container. Sticky engages whenever the form column is taller than the viewport-capped result pane.
 
 Inputs sit in a 2-column grid, `gap-y-[15px] gap-x-[13px]`; product cost and initial investment span both columns. Input row: `h-10` **from the `lg` breakpoint up**; below it the row is 44px, because DESIGN_DIRECTION.md §1.1 locks "no interactive target below 44px" and that rule governs the mobile state. The same split applies to the `Özeti Kopyala` control (§3.1b). Value right-aligned in Mono, unit suffix in muted 12px. daisyUI: `input input-bordered` with `!rounded` `!h-10` and the border token; hint/error text as `label-text-alt`.
 

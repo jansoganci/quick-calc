@@ -24,7 +24,7 @@ export function QuickCalcResults({
   return (
     <div
       className={cn(
-        'bg-qc-surface-result px-[18px] py-5 lg:sticky lg:top-0 lg:max-h-screen lg:self-start lg:overflow-y-auto lg:px-[34px] lg:py-[30px] lg:pb-[34px]',
+        'bg-qc-surface-result px-[18px] py-5 lg:sticky lg:top-0 lg:max-h-screen lg:overflow-y-auto lg:px-[34px] lg:py-[30px] lg:pb-[34px]',
         hasCalculated && view && 'qc-enter',
         liveFlash && 'qc-live',
       )}
