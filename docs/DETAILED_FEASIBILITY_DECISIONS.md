@@ -1,7 +1,7 @@
 # Detailed Feasibility — Locked Decisions
 
-**Version:** v0.6
-**Status:** Decision log for product decisions that are **LOCKED / AGREED**. Remaining mechanics are intentionally open.
+**Version:** v0.7
+**Status:** Decision log. Major Detailed v1 **calculation-model** decisions are sufficiently locked to begin the dedicated Detailed Financial Specification. This file is still **not** that specification and **not** implementation.
 **Phase:** Planning — **not** a financial specification and **not** implementation
 **Currency:** TRY · **Country:** Turkey · **Preset context:** Coffee Shop / Cafe (same product family as Quick / Lite)
 **Language for v1:** Turkish-first
@@ -416,6 +416,8 @@ Unit product cost **stays constant** when sales volume changes. Total product CO
 
 This also applies when comparing sales-volume scenarios (DF-37).
 
+Time-based **annual COGS increase** in the projection is a separate mechanism (DF-43). It does not reopen this volume rule.
+
 #### DF-52 — Channel Variable Costs are separate from Product COGS **[LOCKED]**
 
 Channel-specific variable costs are **not** Product COGS.
@@ -450,6 +452,19 @@ Do **not** include in channel-variable cost:
 Do not add any other standard channel-variable cost unless separately approved.
 
 Campaigns, Joker, promotional subsidies, and listing / reklam charges are out of v1 (X13).
+
+#### DF-62 — Waste / fire modelling is out of Detailed v1 **[LOCKED]**
+
+Waste / fire modelling is **out of Detailed v1**.
+
+Do **not** add:
+
+- waste percentage;
+- spoilage percentage;
+- recipe loss;
+- waste-adjusted COGS.
+
+If needed later, it will be a separate feature.
 
 ---
 
@@ -504,7 +519,11 @@ Do **not** model POS cost as a fixed monthly TL expense.
 
 The rate is editable because commercial rates vary over time and by agreement.
 
-**DEFERRED:** the default Detailed POS percentage. Lite's locked 3.56% default is a Lite assumption. It is **not** copied into Detailed by this document.
+**v1 editable default: 3.59%.**
+
+This is a default only. Do **not** hardcode it as an immutable constant.
+
+Lite's locked POS default remains **3.56%** in the Lite spec. Detailed's 3.59% default does **not** change Lite.
 
 #### DF-09 — Meal-card commission is a percentage **[LOCKED]**
 
@@ -514,11 +533,11 @@ Meal-card commission follows the same principle as POS:
 - editable by the user;
 - not a fixed monthly TL expense.
 
-A provisional figure such as 15% was discussed. There is **not** yet enough confidence to lock that as the product default.
+**v1 editable default: 10%.**
 
-Do **not** hardcode a 15% default merely because it was mentioned in discussion.
+This is a default only. Do **not** hardcode it as an immutable constant.
 
-**DEFERRED:** the approved default meal-card commission. It must be researched and approved separately.
+A provisional 15% figure was discussed earlier. It is **not** the v1 default.
 
 ---
 
@@ -689,7 +708,7 @@ This is a **shared product convention**, not a licence to import Lite code. When
 
 **DEFERRED for Detailed:** whether the 20% rate remains a non-editable system assumption (as in Lite); landlord-type branching.
 
-Rent KDV / rent escalation are not being invented here. Inflation / escalation treatment is **DEFERRED** (DF-43).
+Rent KDV is not being invented here. Any rent increase over the projection uses the **fixed operating cost annual increase** (DF-43), not a separate rent-inflation input.
 
 #### DF-13 — Aidat is a standard occupancy expense **[LOCKED]**
 
@@ -939,7 +958,9 @@ This is **not**:
 - a working-capital model;
 - a payment-settlement timing model;
 - a supplier-credit model;
-- a daily cash-flow model.
+- a daily cash-flow model;
+- financing schedules;
+- seasonality.
 
 **DEFERRED:** the projection statement shape and line list; opening-cash presentation; exact CAPEX timing vs. month 1; horizon control UX (free number vs. presets). Do not invent those here.
 
@@ -951,27 +972,60 @@ The projection period should be **user-editable**.
 
 **DEFERRED:** the precise UX — free numeric input versus presets such as 12 / 24 / 36 months. Do not decide that here.
 
-#### DF-25 — Ramp-up is preset-driven **[LOCKED]**
+#### DF-25 — Ramp-up presets **[LOCKED]**
 
 Opening-period ramp-up is part of Detailed v1.
 
 It must remain **simple and preset-driven**.
 
-The user should **not** enter a month-by-month sales table.
+The product sales quantities entered by the user represent the **stabilized / target** sales volume of the business.
 
-Conceptually the user chooses an opening sales maturation profile such as:
+The user should **not** enter a month-by-month sales table. Do **not** create custom monthly ramp-up editing in v1.
 
-- cautious / slow
-- normal
-- strong / fast
+Use these three presets:
 
-The engine then applies **predefined monthly sales-volume multipliers** until the store reaches its stabilized / base sales level.
+**Slow / Yavaş**
 
-Ramp-up **feeds the multi-month projection** and therefore **affects estimated payback**.
+| Month | % of stabilized quantity |
+| --- | --- |
+| 1 | 40% |
+| 2 | 55% |
+| 3 | 70% |
+| 4 | 80% |
+| 5 | 90% |
+| 6+ | 100% |
 
-**Exact preset names, percentages, and duration remain OPEN.** Do not invent them in this update.
+**Normal**
 
-**DEFERRED:** how ramp-up combines with Bad / Base / Good scenario multipliers. Do not invent that interaction here.
+| Month | % of stabilized quantity |
+| --- | --- |
+| 1 | 60% |
+| 2 | 75% |
+| 3 | 85% |
+| 4 | 95% |
+| 5+ | 100% |
+
+**Fast / Hızlı**
+
+| Month | % of stabilized quantity |
+| --- | --- |
+| 1 | 80% |
+| 2 | 90% |
+| 3+ | 100% |
+
+Ramp-up changes **sales volume only**.
+
+It should naturally flow through:
+
+- revenue
+- Product COGS
+- Channel Variable Costs
+- Payment / Platform Fees
+- operating result
+- multi-month projection
+- estimated payback
+
+**DEFERRED for the financial spec (not a product-model gap):** composing ramp-up × scenario, since both act only on sales quantity relative to the entered stabilized target.
 
 #### DF-26 — Seasonality is not part of Detailed v1 **[LOCKED]**
 
@@ -981,11 +1035,45 @@ This was explicitly decided against for now because the model is already suffici
 
 Seasonality may be considered in a future version.
 
-#### DF-43 — Inflation / escalation treatment is not decided **[DEFERRED]**
+#### DF-43 — Three annual increase assumptions **[LOCKED model; default rates OPEN]**
 
-Inflation / annual escalation remains **OPEN**.
+Detailed v1 will **not** use one generic inflation percentage for everything.
 
-Do not invent an inflation engine, index, or default escalation rate in this document.
+Use **three separate annual assumptions**:
+
+1. Sales price annual increase
+2. Product COGS annual increase
+3. Fixed operating cost annual increase
+
+The third group includes concepts such as:
+
+- payroll
+- owner / operator cost
+- Bağ-Kur
+- rent
+- aidat
+- regular OPEX
+
+Do **not** split that third group into separate inflation assumptions in v1.
+
+**CAPEX** is an initial investment and **does not escalate** after opening.
+
+For the monthly projection, annual rates are converted into monthly compound factors:
+
+```
+monthlyFactor = (1 + annualRate) ^ (1 / 12)
+```
+
+Then the relevant value evolves month by month using that factor.
+
+Conceptual treatment:
+
+- selling prices follow Sales Price Annual Increase
+- unit Product COGS follows Product COGS Annual Increase
+- payroll / rent / OPEX follow Fixed Operating Cost Annual Increase
+- CAPEX remains unchanged
+
+**Exact default percentages for these three annual assumptions are not locked.** Keep them user-editable. Do not invent defaults here.
 
 ---
 
@@ -1030,7 +1118,21 @@ The following assumptions remain **fixed** across scenarios:
 
 Total Product COGS and other variable costs still change naturally because sales quantity changes.
 
-**Exact scenario multipliers remain OPEN** and will be decided separately. Do not invent them.
+#### DF-37a — Editable scenario volume defaults **[LOCKED]**
+
+v1 editable defaults:
+
+| Scenario | Sales-volume change vs. entered stabilized quantities |
+| --- | --- |
+| Bad / Kötü | **−25%** |
+| Base / Baz | **0%** |
+| Good / İyi | **+25%** |
+
+These are **editable defaults**, not immutable constants.
+
+Scenario multipliers apply **proportionally to product sales quantities**.
+
+Do **not** create per-field scenario override machinery.
 
 ---
 
@@ -1173,6 +1275,7 @@ These are decided exclusions, not open questions.
 | X14 | Per-input scenario overrides | Scenarios scale sales quantities only (DF-37). |
 | X15 | Month-by-month ramp-up sales table | Preset-driven ramp-up only (DF-25). |
 | X16 | Extra break-even or payback inputs | Derived automatically from the business description (DF-35, DF-36, DF-61). |
+| X17 | Waste / fire / spoilage / waste-adjusted COGS | Out of Detailed v1 (DF-62). |
 
 ---
 
@@ -1186,8 +1289,8 @@ These are known open questions. They are listed so they are not silently closed.
 | Product quantity time basis | One expected quantity per product | Daily vs. monthly (and similar) |
 | Category grouping | Optional organisation only; not the revenue engine | Whether grouping is required; default labels; user-addable groups |
 | Channel mix defaults | One business-level split; must equal 100%; not per product | The default 50/20/30-style mix; 100% enforcement UX; delivery-mode interaction |
-| POS default rate | Percentage, editable; not a fixed monthly TL amount; not applied again to platform-collected delivery | The default percentage |
-| Meal-card default rate | Percentage, editable; not a fixed monthly TL amount; not applied again to platform-collected delivery | The default percentage (15% was discussed only) |
+| POS default rate | Editable percentage; v1 default **3.59%**; not an immutable constant; not applied again to platform-collected delivery | — |
+| Meal-card default rate | Editable percentage; v1 default **10%**; not an immutable constant; not applied again to platform-collected delivery | — |
 | Payment mix | Percentage-based; cash / card / meal card; must equal 100%; applies to direct store sales (salon and takeaway) | The default mix; 100% enforcement UX |
 | Delivery defaults | Two percentage-based commercial modes; online price unchanged across modes | Mode-selection UX; whether both modes can coexist |
 | Platform fee rates | Editable effective VAT-inclusive deduction; v1 defaults 15% (platform only) and 38% (platform + courier) | Nothing remaining on the rate meaning or v1 defaults. Do not treat defaults as market constants |
@@ -1199,13 +1302,13 @@ These are known open questions. They are listed so they are not silently closed.
 | Custom OPEX | `+ Gider Ekle`; name + average monthly amount | — |
 | Company-type control | No v1 tax engine | Whether şahıs vs. limited still appears as a non-calculating input |
 | Projection internals | Simple monthly projection; 24-month default; editable horizon; not working-capital / settlement / supplier-credit / daily cash | Statement shape; CAPEX timing vs. month 1; horizon control UX |
-| Ramp-up | Preset-driven; no month-by-month sales table; conceptual slow / normal / fast; feeds projection and payback | Exact preset names, percentages, duration; how ramp-up combines with Bad / Base / Good |
-| Scenario multipliers | Bad / Kötü, Base / Baz, Good / İyi; sales volume only, proportional to product quantities; listed assumptions stay fixed; no per-input overrides | Exact multipliers |
-| Inflation / escalation | Out of invented scope for now | Whether and how prices, rent, or OPEX escalate |
+| Ramp-up | Locked Slow / Normal / Fast monthly % of stabilized quantity; sales volume only; no custom monthly table | Composing ramp-up × scenario in the financial spec (both scale quantity vs. entered target) |
+| Scenario multipliers | Bad −25% / Base 0% / Good +25%; editable defaults; proportional to product quantities; listed assumptions stay fixed | — |
+| Inflation / escalation | Three annual assumptions (sales price, product COGS, fixed operating costs); monthly compound `(1+r)^(1/12)`; CAPEX does not escalate | **Default percentages** for the three rates |
 | CAPEX recovery presentation | No accounting depreciation; payback uses cumulative operating profit vs. investment | Whether any other recovery-allocation figure is shown |
 | Operating break-even | Automatic; `fixed / weightedContributionPerSale`; CAPEX excluded; monthly and daily counts; optional monthly revenue; unreachable if contribution ≤ 0 | Exact contribution weighting algebra; operating-days basis for the daily count |
 | Payback | Automatic from projection; first month cumulative operating profit ≥ total CAPEX; ramp-up affects it; not reached / unavailable edge states | — |
-| Waste modelling | Not part of Product COGS, Channel Variable Costs, or Platform Fees as locked here | Whether waste is modelled at all in Detailed v1 |
+| Waste modelling | Out of Detailed v1 (DF-62) | — |
 | Channel-variable placement | Takeaway packaging, delivery packaging, own-courier variable payment if applicable | Whether packaging is business-level or per product; when own-courier payment is shown |
 
 ---
@@ -1259,8 +1362,8 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 | DF-06a | Payment mix | Percentage-based. Must equal 100%. |
 | DF-49 | No double-count | Do not apply POS / meal-card commission to platform-collected delivery. Payment mix applies to salon and takeaway. |
 | DF-07 | Cash | No payment-processing commission. |
-| DF-08 | POS | Editable percentage. Not a fixed monthly TL amount. Default rate not locked. |
-| DF-09 | Meal card | Editable percentage. Not a fixed monthly TL amount. Default rate not locked. |
+| DF-08 | POS | Editable percentage. v1 default **3.59%**. Not an immutable constant. Does not change Lite's 3.56%. |
+| DF-09 | Meal card | Editable percentage. v1 default **10%**. Not an immutable constant. Earlier 15% discussion is not the default. |
 | DF-10 | Delivery modes | Mode 1 platform only / merchant courier; Mode 2 platform + courier. Online price unchanged across modes. |
 | DF-10a | Platform fee defaults | Editable. v1 defaults 15% and 38%. Not market constants. |
 | DF-53 | Platform fee formula | `platformFee = deliveryGrossRevenue × effectivePlatformFeeRate` on VAT-inclusive gross. Not Product COGS. |
@@ -1284,16 +1387,19 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 | DF-31 | VAT engine | No full accounting VAT engine; no per-expense deductible VAT / carry-forward / VAT-return machinery. Prices stay VAT-inclusive. |
 | DF-23 | Projection | Simple monthly projection. Not working-capital, settlement, supplier-credit, or daily cash. Supports payback. |
 | DF-24 | Horizon | Default 24 months, user-editable. Horizon UX not locked. |
-| DF-25 | Ramp-up | Preset-driven (conceptually slow / normal / fast). No month-by-month sales table. Feeds projection and payback. Exact curves OPEN. |
+| DF-25 | Ramp-up | Slow / Normal / Fast presets with locked monthly % of stabilized quantity. Sales volume only. No custom monthly table. |
 | DF-26 | Seasonality | Out of v1. |
+| DF-43 | Annual increase | Three user-editable annual rates (sales price, product COGS, fixed opex). Monthly compound. CAPEX does not escalate. **Default % OPEN.** |
 | DF-27 | Scenarios | Bad / Kötü, Base / Baz, Good / İyi. No per-input overrides. |
-| DF-37 | Scenario variable | Sales volume, proportional to product quantities. Listed prices/mixes/rates/fixed costs stay fixed. Variable totals follow quantity. Multipliers OPEN. |
+| DF-37 | Scenario variable | Sales volume, proportional to product quantities. Listed prices/mixes/rates/fixed costs stay fixed. Variable totals follow quantity. |
+| DF-37a | Scenario defaults | Editable: Bad −25%, Base 0%, Good +25%. |
 | DF-35 | Break-even | Automatic operating break-even. `fixed / weightedContributionPerSale`. CAPEX excluded. Monthly and daily counts. Unreachable if contribution ≤ 0. |
 | DF-36 | Payback | Automatic. Cumulative projected operating profit vs. total CAPEX. First month ≥ investment. Ramp-up affects it. Horizon / non-positive edge states locked. |
 | DF-61 | Analysis UX principle | User describes the business once; engine derives operating result, break-even, investment, payback, scenarios, projection. |
+| DF-62 | Waste / fire | Out of v1. |
 | DF-40 | Financing | Out of v1. |
 | DF-41 | Working-capital timing | Out of v1. |
-| X1–X16 | v1 exclusions | See §6. |
+| X1–X17 | v1 exclusions | See §6. |
 
 ### 9.2 SUPERSEDED
 
@@ -1311,7 +1417,7 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 
 ### 9.3 DEFERRED (non-exhaustive; see §7)
 
-DF-43 (inflation / escalation), exact scenario multipliers, exact ramp-up preset curves, break-even contribution-weighting algebra, daily-break-even operating-days basis, and every other **DEFERRED** row in §7 remain open. They will be resolved in follow-up tasks, then recorded in a future Detailed financial specification.
+DF-43 **default percentages**, break-even contribution-weighting algebra, daily-break-even operating-days basis, and every other **DEFERRED** row in §7 remain for the Detailed Financial Specification. They do not reopen locked product decisions.
 
 ---
 
@@ -1327,7 +1433,7 @@ Once a Detailed financial specification exists, the following still need a later
 | --- | --- |
 | `docs/APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md` D4 | Currently says there is no router yet; tab navigation may later require an explicit routing/navigation decision |
 | `docs/TECH_STACK_AND_CONSTRAINTS.md` §4.2 | Persistence rules already cover Detailed and should remain the technical authority |
-| `docs/quick-calculation-scope-v1.md` §21 / §6.2 | Lite currently says waste modelling and recipe-level costing "belong to Detailed Feasibility". Detailed v1 has now **excluded** the recipe/SKU engine. Lite also deferred detailed VAT accounting and tax to Detailed; Detailed v1 has now **excluded** a full VAT engine and a company-tax model, and treats platform fee as an effective VAT-inclusive deduction. Waste is still undecided for Detailed. The Lite document should later distinguish "out of Lite" from "in Detailed v1" |
+| `docs/quick-calculation-scope-v1.md` §21 / §6.2 | Lite currently says waste modelling and recipe-level costing "belong to Detailed Feasibility". Detailed v1 has now **excluded** the recipe/SKU engine **and** waste/fire modelling (DF-62). Lite also deferred detailed VAT accounting and tax to Detailed; Detailed v1 has now **excluded** a full VAT engine and a company-tax model, and treats platform fee as an effective VAT-inclusive deduction. The Lite document should later distinguish "out of Lite" from "in Detailed v1" |
 | `docs/DESIGN_DIRECTION.md` and `docs/FRONTEND_IMPLEMENTATION_SPEC.md` | Visual inheritance is locked; Detailed screen structure is a later Claude Design pass (§3.1). The Quick masthead currently assumes no navigation |
 
 None of the above is a reason to change Lite behaviour now.
@@ -1345,3 +1451,14 @@ None of the above is a reason to change Lite behaviour now.
 | v0.4 | Locked the three-way cost structure: Product COGS, Channel Variable Costs, Payment / Platform Fees. Per-product unit cost in TL; `productCOGS = unitsSold × unitProductCost`. Standard channel-variable fields: takeaway packaging, delivery packaging, own-courier variable payment if applicable. Platform fee is a percentage of VAT-inclusive delivery gross. v1 editable defaults 15% and 38%. Entered platform rate is effective total deduction, KDV dahil; do not add 20% VAT on top. Campaigns / Joker out of v1. Superseded DF-11 and the previous “platform defaults remain open” clause of DF-10. |
 | v0.5 | Locked position fields (name, headcount, monthly employer cost, meal, transport, average monthly bonus) and `positionMonthlyCost`. Owner/operator is a separate section with owner monthly amount and Bağ-Kur monthly cost; no owner PIT or payroll engine. OPEX is monthly-only average amounts; standard lines listed; custom expense is name + monthly amount. No annual/quarterly/per-sqm/stepped OPEX. Rent unchanged. |
 | v0.6 | Locked automatic operating break-even (`fixed / weightedContributionPerSale`; CAPEX excluded; monthly and daily counts). Locked payback from cumulative projected operating profit vs. total CAPEX, including ramp-up and horizon edge states. Locked Bad/Base/Good as sales-volume-only scenarios with an expanded fixed-assumption list. Ramp-up is preset-driven (slow/normal/fast conceptually); exact curves remain open. Projection purpose restated. Cursor implements the engine; Claude Design designs UI. Engine-derived analysis principle locked. |
+| v0.7 | Locked waste/fire out of v1. Locked editable payment defaults: POS 3.59%, meal card 10%. Locked editable scenario defaults −25% / 0% / +25%. Locked Slow / Normal / Fast ramp-up monthly percentages. Locked three-way annual increase model with monthly compounding; default rates remain open. Major calculation-model decisions are sufficient to begin the Detailed Financial Specification (not written in this task). |
+
+---
+
+## 12. Readiness for the Detailed Financial Specification
+
+The major Detailed v1 **calculation-model** decisions in this file are sufficiently locked to begin writing the dedicated Detailed Financial Specification.
+
+**Do not write that specification in this document or in this task.**
+
+Remaining items (contribution-weighting algebra, daily-break-even operating-days basis, three annual-increase **default percentages**, projection statement shape, some UX labels) belong **inside** that specification. They are not blockers for starting it, and they do not reopen the locked model.
