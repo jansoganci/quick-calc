@@ -1,6 +1,6 @@
 # Detailed Feasibility — Locked Decisions
 
-**Version:** v0.2
+**Version:** v0.3
 **Status:** Decision log for product decisions that are **LOCKED / AGREED**. Remaining mechanics are intentionally open.
 **Phase:** Planning — **not** a financial specification and **not** implementation
 **Currency:** TRY · **Country:** Turkey · **Preset context:** Coffee Shop / Cafe (same product family as Quick / Lite)
@@ -171,34 +171,61 @@ Numbering below is the product decision register for Detailed. It is independent
 
 ### 5.1 Revenue model
 
-#### DF-01 — Category-based sales volume **[LOCKED]**
+#### DF-01 — Category-based sales as the engine input **[SUPERSEDED by DF-44]**
 
-Unlike Lite, Detailed must not force the entire store into one average product cost / one blended COGS number.
+Earlier lock: sales volume was category-based, with addable categories as the economic unit.
 
-Sales volume is **category-based**. Users can add categories. There should be an interaction similar to:
+**v1 lock:** revenue is **product-based**. Category is no longer the financial engine's sales unit.
 
-`+ Kategori Ekle`
+#### DF-44 — Revenue is product-based **[LOCKED]**
 
-Illustrative examples (not a locked default set):
+Detailed v1 revenue is **product-based**, not only category-based.
 
-- Coffee / beverages
-- Food
-- Desserts
-- Other
+The user can add individual products / sales items. Examples (illustrative, not a locked catalogue):
 
-#### DF-01a — Category economics fields for v1 **[LOCKED]**
+- Americano
+- Poğaça
+- Bütün tavuk
 
-Each category uses:
+The financial engine must calculate revenue **from products**, not from a single blended category average.
 
-- an average **VAT-inclusive** selling price;
-- an average **unit cost in TL**;
-- an **expected sales quantity**.
+Unlike Lite, Detailed must not force the entire store into one average ticket.
 
-These are the v1 category fields. Do not expand them into a recipe, SKU, or ingredient model.
+#### DF-44a — Category is optional grouping only **[LOCKED]**
 
-**DEFERRED:** the exact default category list; the exact quantity basis (per day vs. per month, and similar); labels and grouping.
+Category may exist only as an **optional grouping / organisation** field. Illustrative labels (not a locked default set):
 
-#### DF-02 — No recipe / SKU engine in Detailed v1 **[LOCKED]**
+- İçecek
+- Pastane
+- Yemek
+- Diğer
+
+Category is not the v1 revenue-calculation unit.
+
+**DEFERRED:** whether grouping is required or optional in the UI; the default grouping list; whether users can add their own grouping labels.
+
+#### DF-01a — Category economics fields **[SUPERSEDED by DF-45]**
+
+Earlier lock: each category carried an average VAT-inclusive price, an average unit cost in TL, and an expected quantity.
+
+**v1 lock:** those fields belong to **products** for revenue (DF-45). Unit cost / COGS is **not** being decided in this revenue update (see §5.2).
+
+#### DF-45 — Product fields for v1 revenue **[LOCKED]**
+
+Each product has at minimum:
+
+- product name
+- **normal** selling price
+- **online / delivery** selling price
+- expected sales quantity
+
+All customer-facing selling prices are VAT-inclusive (DF-03).
+
+This is not a recipe / SKU ingredient engine (DF-02). A “product” here is a selling item the owner already sells, not a bill of materials.
+
+**DEFERRED:** quantity time basis (per day vs. per month, and similar). It is not locked. Do not invent it here.
+
+#### DF-02 — No recipe / SKU ingredient engine in Detailed v1 **[LOCKED]**
 
 Detailed v1 is **not** a recipe or SKU costing engine.
 
@@ -210,61 +237,118 @@ The user must not be required to define ingredient-level recipes such as:
 - lid
 - individual ingredient bills of materials
 
-Category-based economics are sufficient for the initial version.
+Product-level selling items are sufficient for v1 revenue. Packaging cost, channel-specific product cost, waste, and recipe costing are **not** decided in this update.
 
 #### DF-03 — Customer-facing sales prices are VAT-inclusive **[LOCKED]**
 
 All user-entered customer-facing sales prices in Detailed are entered as **VAT-inclusive** amounts.
 
-If a product/category price is entered as 400 TL, the customer pays 400 TL.
+This includes each product's normal price and online / delivery price.
+
+If a price is entered as 150 TL or 200 TL, the customer pays that amount.
 
 Do **not** silently gross this value up again.
 
 A full accounting VAT engine is **out of Detailed v1** (DF-31). Do not invent an output-VAT extraction formula here.
 
-#### DF-04 — Sales channel modelling exists **[LOCKED]**
+#### DF-04 — Three sales channels **[LOCKED]**
 
-Detailed distinguishes sales channels. Not every sale is treated identically.
+Detailed v1 uses three sales channels:
 
-Core channel concepts agreed for modelling:
+- salon / on-premise
+- al-götür / takeaway
+- paket servis / delivery
 
-- on-premise / salon
-- takeaway / al-götür
-- delivery / paket servis
+A separate "dükkan" wording was discussed earlier. The v1 channel set above is locked. Do not add a fourth channel in this update.
 
-A separate "dükkan" wording was discussed. The exact semantic distinction between **"dükkan"** and **"salon"** is **not** finalized.
+#### DF-04a — Channel mix is one business-level split totalling 100% **[LOCKED]**
 
-**Do not resolve that naming issue here.** The locked decision is that channel economics exist.
+The user enters **one business-level percentage mix**.
 
-#### DF-04a — Channel mix is business-level **[LOCKED]**
+Example (illustrative, not a locked default):
 
-Channel mix is **percentage-based at business level**.
+- salon 50%
+- al-götür 20%
+- paket servis 30%
 
-It is **not** separately configured for every category in v1.
+**The three percentages must equal 100%.**
 
-**DEFERRED:** the exact default mix; validation when percentages do not sum to 100%; how the delivery-channel slice interacts with delivery Mode A vs. Mode B.
+Do **not** require a separate channel mix for every product in v1. Do **not** require a separate channel mix for every category.
 
-#### DF-05 — Channel-specific pricing is allowed **[LOCKED]**
+**DEFERRED:** the exact default mix; how the UI enforces the 100% total; how the delivery-channel slice interacts with delivery Mode 1 vs. Mode 2.
 
-The same category economics may have different customer-facing prices by sales channel.
+#### DF-05 — Independent price per channel **[SUPERSEDED by DF-46]**
 
-Example (illustrative, not a default):
+Earlier lock: optional channel-specific price overrides, with a possible distinct takeaway price.
 
-| Channel | Price |
-| --- | --- |
-| Base / on-premise | 400 TL |
-| Takeaway | 400 TL |
-| Delivery | 480 TL |
+**v1 lock:** only two customer-facing prices per product — normal and online (DF-46). Salon and takeaway share the normal price.
 
-This matters because delivery commissions may require a higher delivery-menu price.
+#### DF-46 — Normal price vs online price **[LOCKED]**
 
-**UX principle [LOCKED]:** use a base price where possible, with optional channel-specific overrides, rather than forcing the user to re-enter every value repeatedly.
+Each product has:
 
-**DEFERRED:** exact UI mechanics for base price vs. overrides; whether overrides are absolute prices or deltas.
+- a **normal** selling price, used by **salon** and **al-götür**;
+- an **online / delivery** selling price, used by **paket servis**.
+
+The online price is a **fixed user-entered** selling price for that product.
+
+The online price does **not** change based on whether the merchant uses:
+
+1. platform only, or
+2. platform + platform courier.
+
+Example (illustrative):
+
+Americano:
+
+- normal price: 150 TL
+- online price: 200 TL
+
+The customer pays **200 TL** online in either delivery mode.
+
+What changes between delivery modes is the **platform / service deduction**, not the customer-facing online price.
+
+#### DF-47 — One expected quantity per product, split by business mix **[LOCKED]**
+
+Each product has **one** expected sales quantity.
+
+The same business-level channel mix is applied to that product's quantity.
+
+Conceptual example:
+
+Americano quantity = 100
+
+Channel mix: salon 50% · takeaway 20% · delivery 30%
+
+Then:
+
+- salon quantity = 50
+- takeaway quantity = 20
+- delivery quantity = 30
+
+Quantity time basis (daily vs. monthly) remains **DEFERRED**. Do not invent it here.
+
+#### DF-48 — Product revenue by channel **[LOCKED]**
+
+For each product, conceptual revenue is:
+
+```
+salonRevenue     = salonQuantity     × normalPrice
+takeawayRevenue  = takeawayQuantity  × normalPrice
+deliveryGross    = deliveryQuantity  × onlinePrice
+```
+
+Total gross customer sales are the sum of those channel revenues across products.
+
+All of these customer sales values are **VAT-inclusive**.
+
+Platform / service deductions are applied to delivery revenue under DF-10. They do not change `onlinePrice`.
 
 ---
 
 ### 5.2 COGS
+
+**This revenue update does not resolve COGS.** Packaging cost, takeaway packaging, delivery packaging, channel-specific product cost, waste, and recipe costing remain for the next decision step. DF-28 and DF-29 stay as previously locked and are not reopened or extended here.
 
 #### DF-28 — Unit COGS is entered directly in TL **[LOCKED]**
 
@@ -292,6 +376,8 @@ Do not confuse:
 - **how the order was sold** (channel), with
 - **how the customer paid** (payment method).
 
+For **direct store sales** (salon and takeaway), payment methods are cash, card, and meal card.
+
 #### DF-06 — Payment methods modelled in Detailed **[LOCKED]**
 
 Detailed will model:
@@ -300,11 +386,25 @@ Detailed will model:
 - credit/debit card
 - meal card / yemek kartı
 
-#### DF-06a — Payment mix is percentage-based **[LOCKED]**
+#### DF-06a — Payment mix is percentage-based and totals 100% **[LOCKED]**
 
-Payment mix is **percentage-based**.
+For **direct store sales**, the user enters a percentage payment mix across:
 
-**DEFERRED:** the exact default mix; whether the mix is a single business-level split or can vary by channel; validation when percentages do not sum to 100%.
+- cash
+- card
+- meal card
+
+**The three percentages must equal 100%.**
+
+**DEFERRED:** the exact default mix; how the UI enforces the 100% total.
+
+#### DF-49 — Do not double-count payment commissions on platform delivery **[LOCKED]**
+
+Do **not** apply store POS or meal-card commission again to delivery sales that are already collected through the delivery platform.
+
+Platform-collected delivery revenue is handled through the **platform deduction** model (DF-10).
+
+The payment mix applies to **direct store sales** such as salon and takeaway, unless a later financial specification explicitly defines another treatment.
 
 #### DF-07 — Cash has no payment-processing commission **[LOCKED]**
 
@@ -356,9 +456,13 @@ The combined commercial burden is substantially higher.
 
 This cost is also **percentage-based and editable**.
 
+The product's **online selling price stays the same** in both modes (DF-46).
+
+The difference between modes is the **percentage-based platform / service deduction** applied to delivery revenue, not the customer-facing online price.
+
 Approximate market figures discussed in planning (roughly 12–15% for one model, roughly 38% for platform + courier) are **not** approved benchmark or product defaults.
 
-Do **not** encode them as authoritative defaults. They require separate validation.
+Do **not** encode them as authoritative defaults. Exact default percentages remain **OPEN**.
 
 **DEFERRED:** default rates for Mode 1 and Mode 2; how the user chooses a mode; whether both modes can coexist.
 
@@ -772,7 +876,7 @@ These are decided exclusions, not open questions.
 
 | # | Exclusion | Notes |
 | --- | --- | --- |
-| X1 | Recipe / SKU ingredient engine | Category-based economics only (DF-02). |
+| X1 | Recipe / SKU ingredient engine | Product-level selling items only; no ingredient recipes (DF-02). |
 | X2 | Capacity / seat-turnover engine | Do not model seat count, table turnover, hourly capacity / throughput, or theoretical customer throughput. |
 | X3 | Seasonality model | No 12-month seasonality matrix in v1 (DF-26). |
 | X4 | AVM-specific rent model | Do not create a separate mall model containing turnover rent, mall marketing contribution, AVM-specific common charges, or mandatory opening-hour economics. May become a later preset / module. |
@@ -793,14 +897,14 @@ These are known open questions. They are listed so they are not silently closed.
 
 | Area | What is locked | What is not locked |
 | --- | --- | --- |
-| Default categories | Categories exist and are user-addable; each has VAT-inclusive price, unit cost in TL, and expected quantity | The default category list; quantity time basis |
-| "Dükkan" vs. "salon" | Channel economics exist | Naming / semantic distinction |
-| Channel mix | Business-level percentages, not per category | Default mix; sum-to-100% UX; interaction with delivery modes |
-| Channel pricing UX | Base price + optional overrides | Exact interaction and storage |
-| POS default rate | Percentage, editable; not a fixed monthly TL amount | The default percentage |
-| Meal-card default rate | Percentage, editable; not a fixed monthly TL amount | The default percentage (15% was discussed only) |
-| Payment mix | Percentage-based; three methods | Default mix; business-level vs. per-channel mix |
-| Delivery defaults | Two percentage-based commercial modes | Approved default rates; mode-selection UX; coexistence of both modes |
+| Default product list | User can add products; revenue is calculated from products | No locked starter catalogue |
+| Product quantity time basis | One expected quantity per product | Daily vs. monthly (and similar) |
+| Category grouping | Optional organisation only; not the revenue engine | Whether grouping is required; default labels; user-addable groups |
+| Channel mix defaults | One business-level split; must equal 100%; not per product | The default 50/20/30-style mix; 100% enforcement UX; delivery-mode interaction |
+| POS default rate | Percentage, editable; not a fixed monthly TL amount; not applied again to platform-collected delivery | The default percentage |
+| Meal-card default rate | Percentage, editable; not a fixed monthly TL amount; not applied again to platform-collected delivery | The default percentage (15% was discussed only) |
+| Payment mix | Percentage-based; cash / card / meal card; must equal 100%; applies to direct store sales (salon and takeaway) | The default mix; 100% enforcement UX |
+| Delivery defaults | Two percentage-based commercial modes; online price unchanged across modes | Approved default rates; mode-selection UX; coexistence of both modes |
 | Platform / courier VAT | Must be researched; not invented here | The treatment itself (DF-11) |
 | Aidat default | Standard line; may start empty | Label grouping only |
 | Personnel additional costs | Meals, transport, bonus are in scope | Input granularity |
@@ -815,7 +919,8 @@ These are known open questions. They are listed so they are not silently closed.
 | CAPEX recovery presentation | No accounting depreciation | Whether any simplified recovery allocation is shown |
 | Operating break-even formula | Simple operating break-even; CAPEX excluded | Exact formula |
 | Payback formula | Approximate investment payback is shown | Exact formula; interaction with ramp-up |
-| Waste modelling | — | Not decided for Detailed v1 (Lite deferred it to Detailed; Detailed v1 has not accepted or excluded it) |
+| Waste modelling | — | Not decided in this revenue update. Explicitly out of this step along with packaging and channel-specific product cost |
+| Product COGS attachment | Unit COGS previously locked as a direct TL amount (DF-28, DF-29) | How COGS attaches to the product list; packaging; takeaway vs delivery packaging; channel-specific product cost |
 
 ---
 
@@ -845,21 +950,28 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 | --- | --- | --- |
 | DF-00 | Product shape | Detailed, but usable. Not accounting, ERP, payroll, or tax-advisory software. Challenge inputs a normal owner would not know. |
 | DF-UI | Navigation and visual system | Tab-style access. Detailed inherits Lite's visual language, typography philosophy, near-monochrome system, accent discipline, hairlines/whitespace, mobile quality, and Turkish-first v1 copy. Form/result structure may differ. |
-| DF-01 | Sales volume | Category-based; user-addable categories. |
-| DF-01a | Category fields | Average VAT-inclusive selling price, average unit cost in TL, expected sales quantity. |
+| DF-01 | Category as sales engine | **Superseded by DF-44.** |
+| DF-44 | Sales unit | Product-based. User adds selling items. Engine calculates from products, not a blended category average. |
+| DF-44a | Category | Optional grouping / organisation only. |
+| DF-01a | Category price / cost / qty fields | **Superseded by DF-45** for revenue. COGS not decided in this update. |
+| DF-45 | Product fields | Name, normal price, online price, expected quantity. All prices VAT-inclusive. |
 | DF-02 | Recipe / SKU engine | Out of Detailed v1. |
-| DF-03 | Sales prices | VAT-inclusive as entered. Never silently grossed up. |
-| DF-04 | Sales channels | On-premise / salon, takeaway / al-götür, delivery / paket servis. "Dükkan" vs. "salon" unnamed. |
-| DF-04a | Channel mix | Percentage-based at business level, not per category. |
-| DF-05 | Channel pricing | Allowed. Base price + optional channel overrides. |
-| DF-28 | Unit COGS | Entered directly in TL. |
-| DF-29 | COGS vs. volume | Unit COGS constant; total COGS follows units sold. |
-| DF-06 | Payment methods | Cash, card, meal card — distinct from channels. |
-| DF-06a | Payment mix | Percentage-based. |
+| DF-03 | Sales prices | VAT-inclusive as entered, including normal and online prices. Never silently grossed up. |
+| DF-04 | Sales channels | Salon / on-premise, al-götür / takeaway, paket servis / delivery. |
+| DF-04a | Channel mix | One business-level split. Must equal 100%. Not per product. |
+| DF-05 | Independent takeaway price | **Superseded by DF-46.** |
+| DF-46 | Normal vs online price | Salon and takeaway use normal price. Delivery uses online price. Online price is fixed and does not change with delivery mode. |
+| DF-47 | Quantity split | One quantity per product, multiplied by the business-level channel mix. Time basis not locked. |
+| DF-48 | Channel revenue | `qty × normalPrice` for salon and takeaway; `qty × onlinePrice` for delivery. Gross customer sales are VAT-inclusive. |
+| DF-28 | Unit COGS | Entered directly in TL. Not extended by this revenue update. |
+| DF-29 | COGS vs. volume | Unit COGS constant; total COGS follows units sold. Not extended by this revenue update. |
+| DF-06 | Payment methods | Cash, card, meal card — distinct from channels. Direct store sales. |
+| DF-06a | Payment mix | Percentage-based. Must equal 100%. |
+| DF-49 | No double-count | Do not apply POS / meal-card commission to platform-collected delivery. Payment mix applies to salon and takeaway. |
 | DF-07 | Cash | No payment-processing commission. |
 | DF-08 | POS | Editable percentage. Not a fixed monthly TL amount. Default rate not locked. |
 | DF-09 | Meal card | Editable percentage. Not a fixed monthly TL amount. Default rate not locked. |
-| DF-10 | Delivery modes | Mode 1 platform only / merchant delivery; Mode 2 platform + courier. Both percentage-based and editable. Discussed market rates are not defaults. |
+| DF-10 | Delivery modes | Mode 1 platform only; Mode 2 platform + courier. Both percentage-based and editable. Online price unchanged across modes. Discussed market rates are not defaults. |
 | DF-12 | Rent | Same net/gross 20% withholding math as Lite. Gross-up is `net / 0.80`, never `net × 1.20`. Implemented later in the Detailed engine, not by importing Lite. |
 | DF-13 | Aidat | Standard occupancy expense; may start empty; no forced default. |
 | DF-14 | Personnel | Position-based; user-addable positions. |
@@ -894,6 +1006,9 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 | --- | --- | --- |
 | DF-21 | Model şahıs vs. limited because tax economics differ; tax formulas to be specified later | DF-30 — no v1 income / corporate / distribution tax engine |
 | DF-22 | Real VAT layer (output / input / payable / cash-flow) behind an advanced UX | DF-31 — no full accounting VAT engine in v1 |
+| DF-01 | Category-based sales as the engine input | DF-44 — product-based revenue |
+| DF-01a | Category average price, unit cost, and quantity | DF-45 — product name, normal price, online price, quantity. COGS left to the next step |
+| DF-05 | Optional per-channel price overrides, including a distinct takeaway price | DF-46 — two prices only: normal (salon + takeaway) and online (delivery) |
 
 ### 9.3 DEFERRED (non-exhaustive; see §7)
 
@@ -927,3 +1042,4 @@ None of the above is a reason to change Lite behaviour now.
 | v0.1 | Initial locked decision log for Detailed Feasibility: two-mode product structure, architecture boundary, visual inheritance, category-based revenue, VAT-inclusive prices, channels and channel pricing, payment methods, delivery modes, rent net/gross convention, aidat, position-based personnel, operating expenses, company type, VAT layer, monthly cash flow, 24-month horizon, ramp-up concept, scenario requirement, and explicit v1 exclusions. Deferred mechanics recorded without being resolved. |
 | v0.1.1 | Companion paths updated after docs cleanup: finished Quick execution plans now live under `docs/archive/`. |
 | v0.2 | Locked Detailed v1 simplification principle; category fields (VAT-inclusive price, unit cost in TL, quantity); business-level channel mix; percentage payment mix; COGS volume behaviour; CAPEX as initial investment including opening stock; no depreciation engine; no financing or working-capital timing; no income/corporate/distribution tax model; no full VAT accounting engine; simple operating break-even (CAPEX excluded); approximate payback; simple sales-volume scenarios with fixed cost assumptions; preset-driven ramp-up; multi-month projection. Superseded DF-21 and DF-22 for v1. Inflation/escalation and platform VAT treatment remain open. |
+| v0.3 | Revenue is product-based. Category is optional grouping only. Each product has name, VAT-inclusive normal price, VAT-inclusive online price, and one expected quantity. Salon and takeaway use the normal price; delivery uses the online price. Online price does not vary by delivery mode. Business-level channel mix must equal 100% and is applied to each product's quantity. Channel revenue concept locked. Payment mix must equal 100% and applies to direct store sales; do not also apply POS/meal-card commission to platform-collected delivery. COGS, packaging, waste, and recipe costing not decided in this update. Superseded DF-01, DF-01a, and DF-05. |
