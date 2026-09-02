@@ -1,7 +1,7 @@
 # Detailed Feasibility — Locked Decisions
 
-**Version:** v0.9
-**Status:** Decision log. The six calculation-model review blockers remain **RESOLVED**. This pass **removes** unused v1 complexity and records reviewer ideas as **LATER**, not as missing requirements. This file is still **not** a financial specification and **not** implementation.
+**Version:** v0.10
+**Status:** Decision log. Major Detailed v1 **product-scope** decisions are **locked**. Major calculation-model review blockers are **resolved**. Remaining implementation details belong in a dedicated Detailed Financial Specification. This file is still **not** that specification and **not** implementation.
 **Phase:** Planning — **not** a financial specification and **not** implementation
 **Currency:** TRY · **Country:** Turkey · **Preset context:** Coffee Shop / Cafe (same product family as Quick / Lite)
 **Language for v1:** Turkish-first
@@ -112,7 +112,11 @@ The v1 goal remains:
 - no enterprise-style modelling;
 - no feature expansion just because a more realistic model is theoretically possible.
 
+**Product principle:** Detailed must be materially more useful than Lite while remaining understandable and completable by a normal small F&B owner without financial-modeling expertise.
+
 Do **not** add a reviewer idea to the specification or implementation unless this log later locks it as in-scope.
+
+After v0.10, this decision log should **no longer be expanded casually during implementation**. Any new feature or input proposed later is a **scope change**, not an implementation detail.
 
 ### 2.3 What the two modes may and may not share
 
@@ -631,7 +635,17 @@ Do **not** include in channel-variable cost:
 | Motorcycle purchase | CAPEX |
 | Platform commission | Payment / Platform Fees |
 
-**DEFERRED:** the exact input placement and labels; when own-courier variable payment is shown (it is “if applicable”); whether packaging is a single business-level amount or can vary by product. Do not add further standard channel-variable fields in this update.
+**DEFERRED:** the exact input placement and labels; whether packaging is a single business-level amount or can vary by product. Do not add further standard channel-variable fields in this update.
+
+Own-courier visibility is locked in DF-81. It is no longer deferred.
+
+#### DF-81 — Own-courier variable payment is Mode 1 only **[LOCKED]**
+
+Own-courier variable payment is only relevant when the merchant uses its **own courier** model (Mode 1 — platform only / merchant courier).
+
+When **platform courier** is selected (Mode 2), hide or disable the own-courier variable-payment input.
+
+Do **not** add extra delivery complexity, a second delivery mix, or a new cost engine for this. It is a show/hide rule on the already locked field.
 
 #### DF-56 — No extra standard channel-variable costs in v1 **[LOCKED]**
 
@@ -691,7 +705,14 @@ Do **not** apply store POS or meal-card commission again to delivery sales that 
 
 Platform-collected delivery revenue is handled through the **platform deduction** model (DF-10).
 
-The payment mix applies to **direct store sales** such as salon and takeaway, unless a later financial specification explicitly defines another treatment.
+The payment mix applies **only** to **direct store sales**:
+
+- salon
+- takeaway
+
+Delivery sales collected through the platform must **not** receive card or meal-card fees again.
+
+This double-fee prevention rule is **locked**. Do **not** reopen it in the financial specification.
 
 #### DF-07 — Cash has no payment-processing commission **[LOCKED]**
 
@@ -783,6 +804,8 @@ These are **default assumptions only**. The user must be able to edit them becau
 
 Do **not** treat these defaults as authoritative market constants.
 
+The entered platform / service fee rate **must allow 0%** (DF-82).
+
 Earlier planning figures such as “roughly 12–15%” and “roughly 38%” are superseded **as open defaults** by this table. They were never market constants, and these v1 defaults are still not market constants.
 
 **DEFERRED:** how the user chooses a mode; whether both modes can coexist. That does not reopen a delivery-volume split (DF-77).
@@ -814,6 +837,20 @@ Seller remainder **before** Product COGS and other channel costs:
 
 ```
 100 − 38.40 = 61.60 TL
+```
+
+#### DF-82 — Platform / service fee rate may be 0% **[LOCKED]**
+
+The platform / service fee rate must allow **0%**.
+
+This supports simple own-phone / WhatsApp / direct-order delivery cases where no platform commission applies.
+
+Do **not** introduce a separate delivery-channel split in v1 to cover those cases (DF-77). Setting the locked rate to 0% is enough.
+
+A 0% rate means:
+
+```
+platformFee = deliveryGrossRevenue × 0 = 0
 ```
 
 #### DF-11 — Platform commission VAT as a separate accounting split **[SUPERSEDED for v1 by DF-54]**
@@ -923,6 +960,14 @@ Common-area / maintenance fee (**aidat**) is included as a standard occupancy-re
 
 It can start **empty**. Do not force a benchmark or default number.
 
+#### DF-80 — Do not enter aidat again under generic OPEX **[LOCKED]**
+
+Aidat / common-area fee belongs to the **rent / occupancy** section (DF-13).
+
+It should **not** be entered again under generic OPEX.
+
+Handle this later with **UI copy / guardrails**, not extra calculation machinery. Do not add a second aidat field.
+
 ---
 
 ### 5.6 Personnel
@@ -993,7 +1038,15 @@ This replaces the earlier deferred UX for DF-17 / DF-42 (optional toggle vs. lin
 
 Do not invent Bağ-Kur rates, brackets, or a Bağ-Kur calculator. The user enters the monthly Bağ-Kur cost.
 
-**DEFERRED:** exact Turkish labels; whether either amount may start empty / zero; whether more than one owner is modelled.
+#### DF-79 — Do not count the owner twice **[LOCKED]**
+
+Prevent conceptual double-entry of the owner.
+
+If owner / operator salary is entered in the dedicated owner section (DF-59), the same person should **not** also be counted as a normal employee position.
+
+Handle this later with **clear UI copy / guardrails**, not new calculation complexity. Do not add an owner-payroll engine or a matching algorithm.
+
+**DEFERRED:** exact Turkish labels; whether either owner amount may start empty / zero; whether more than one owner is modelled.
 
 ---
 
@@ -1497,6 +1550,10 @@ Primary user-facing break-even outputs:
 - approximate **units / day** required to break even
 - approximate **units / month** required to break even
 
+Break-even must be labeled in **product / unit** terms, **not customers**.
+
+Do **not** call this customer count. Do **not** add extra break-even basis variants (customers, seats, tickets, or similar).
+
 A TL revenue equivalent may exist **only as a secondary derived value** if the later design benefits from it.
 
 Do **not** make break-even revenue another primary KPI. Do **not** make it an input.
@@ -1534,6 +1591,8 @@ If cumulative operating profit **never** reaches the investment within the model
 If operating economics remain **non-positive**, payback is **unavailable**.
 
 Do **not** add accounting depreciation / useful-life machinery for this.
+
+Do **not** decouple payback from the display horizon in v1. Do **not** add complex payback-horizon mechanics, a cash-needed-to-open calculation, pre-opening payroll, or pre-opening rent. Those are **LATER** / out of v1 (§6.1).
 
 #### DF-61 — Engine-derived analysis, not extra finance fields **[LOCKED]**
 
@@ -1613,10 +1672,14 @@ These are decided exclusions, not open questions.
 | X22 | Platform vs own-channel delivery volume split | Out of v1 (DF-77). Delivery mode stays DF-10. |
 | X23 | Per-product channel mix | Out of v1. One business-level mix only (DF-04a). **LATER**, not a missing requirement. |
 | X24 | Extra standard OPEX micro-lines | Camera/alarm/security are one line; no separate water-treatment line (DF-18/19/20). Use `+ Gider Ekle`. |
+| X25 | Payback decoupled from display horizon | Out of v1. Payback uses the selected 12/24/36 projection (DF-36, DF-71). |
+| X26 | Cash-needed-to-open / pre-opening payroll or rent | Out of v1. |
+| X27 | Extra break-even basis variants (customers, seats, tickets) | Out of v1. Break-even is units/day and units/month (DF-35). |
+| X28 | COGS percentage helper | Out of v1. Product COGS is unit TL cost only (DF-28). |
 
 ---
 
-## 6.1 LATER — reviewer ideas that must not enter v1 **[LOCKED]**
+## 6.1 LATER / rejected for v1 — do not add during spec or implementation **[LOCKED]**
 
 These were mentioned in external review. They were **not** requested as part of Detailed v1. Record them so they cannot accidentally enter the specification or implementation.
 
@@ -1624,11 +1687,18 @@ These were mentioned in external review. They were **not** requested as part of 
 | --- | --- | --- |
 | Seasonality / monthly seasonal coefficients | **LATER** / already excluded | DF-26, X3. No matrix in v1. |
 | Basket size / items per order / customer count | **LATER** / already excluded | DF-67, X18. `deliveryUnitCount = deliveryOrderCount`; same for takeaway. |
-| Delivery split between platform and own channel (phone / WhatsApp / own-site) | **LATER** / never a v1 requirement | DF-77, X22. Keep the locked Mode 1 / Mode 2 model. |
+| Delivery split between platform and own channel (phone / WhatsApp / own-site) | **LATER** / never a v1 requirement | DF-77, X22. Keep the locked Mode 1 / Mode 2 model. Use 0% platform fee when needed (DF-82). |
 | Per-product salon / takeaway / delivery mix | **LATER** / never a v1 requirement | DF-04a, X23. One business-level mix applied to all products. |
 | Category grouping as a product-organisation feature | **LATER** | DF-72, X21. Not an input in v1. |
+| Payback calculation decoupled from display horizon | **Rejected for v1** | Payback uses the selected projection preset. |
+| Complex payback horizon mechanics | **Rejected for v1** | DF-36. |
+| Additional break-even basis variants | **Rejected for v1** | Units only, not customers (DF-35). |
+| Cash-needed-to-open calculation | **Rejected for v1** | X26. |
+| Pre-opening payroll modelling | **Rejected for v1** | X26. |
+| Pre-opening rent modelling | **Rejected for v1** | X26. |
+| COGS percentage helper | **Rejected for v1** | Unit TL cost only (DF-28). |
 
-External review suggestions marked **LATER** must not be treated as missing v1 requirements (DF-00a).
+External review suggestions marked **LATER** or **Rejected for v1** must not be treated as missing v1 requirements (DF-00a).
 
 ---
 
@@ -1648,13 +1718,13 @@ These are known open questions. They are listed so they are not silently closed.
 | Delivery volume split | Delivery quantity is the delivery slice of the business mix; Mode 1 / Mode 2 is the deduction model (DF-10, DF-77) | No platform vs own-channel volume split — **LATER** |
 | POS default rate | Editable percentage; v1 default **3.59%**; not an immutable constant; not applied again to platform-collected delivery | — |
 | Meal-card default rate | Editable percentage; v1 default **10%**; not an immutable constant; not applied again to platform-collected delivery | — |
-| Payment mix | Percentage-based; cash / card / meal card; must equal 100%; applies to direct store sales (salon and takeaway) | The default mix; 100% enforcement UX |
-| Delivery defaults | Two percentage-based commercial modes; online price unchanged across modes | Mode-selection UX; whether both modes can coexist |
-| Platform fee rates | Editable effective VAT-inclusive deduction; v1 defaults 15% (platform only) and 38% (platform + courier) | Nothing remaining on the rate meaning or v1 defaults. Do not treat defaults as market constants |
+| Payment mix | Percentage-based; cash / card / meal card; must equal 100%; applies **only** to salon and takeaway; **not** to platform-collected delivery (DF-49) | The default mix; 100% enforcement UX |
+| Delivery defaults | Two percentage-based commercial modes; online price unchanged across modes; own-courier variable payment **Mode 1 only** (DF-81) | Mode-selection UX; whether both modes can coexist |
+| Platform fee rates | Editable effective VAT-inclusive deduction; v1 defaults 15% and 38%; **0% allowed** (DF-82) | Do not treat defaults as market constants |
 | Platform commission VAT | User-entered rate is the effective total deduction, KDV dahil (DF-54) | Accounting split of service-base vs VAT — out of v1, not a remaining v1 design task |
-| Aidat default | Standard line; may start empty | Label grouping only |
+| Aidat default | Standard occupancy line; may start empty; **do not re-enter under OPEX** (DF-80) | Exact occupancy labels |
 | Personnel additional costs | Per-person monthly meal, transport, and average monthly bonus on each position | Default roster; which fields start empty / zero; Turkish labels |
-| Owner / operator | Separate section: owner monthly amount + Bağ-Kur monthly cost; both operating costs; no owner PIT / payroll engine | Exact labels; empty/zero start; more than one owner |
+| Owner / operator | Separate section: owner monthly amount + Bağ-Kur monthly cost; both operating costs; no owner PIT / payroll engine; **do not also count the owner as an employee** (DF-79) | Exact labels; empty/zero start; more than one owner |
 | Standard OPEX list | Merged security line; no separate camera or water-treatment lines; monthly average amounts; `+ Gider Ekle` for business-specific costs | Exact Turkish labels; which remaining lines start empty vs suggested |
 | Custom OPEX | `+ Gider Ekle`; name + average monthly amount | — |
 | Company-type control | **Removed.** No şahıs / limited input (DF-70). Owner / Bağ-Kur remain | — |
@@ -1664,10 +1734,10 @@ These are known open questions. They are listed so they are not silently closed.
 | Scenario × ramp-up order | `stabilizedDaily × scenarioMultiplier × rampUpMultiplier`, then × `operatingDaysPerMonth` (DF-69) | — |
 | Inflation / escalation | Three annual assumptions stay in the **model**; Month 1 = entered values; CAPEX does not escalate; **not** prominent in the primary input flow (DF-74) | **Default percentages** for the three rates; exact advanced-area UI |
 | CAPEX recovery presentation | No accounting depreciation; payback uses cumulative operating profit vs. investment | Whether any other recovery-allocation figure is shown |
-| Operating break-even | Automatic; `fixed / weightedContributionPerSale`; CAPEX excluded; primary outputs **units/day** and **units/month**; daily conversion uses `operatingDaysPerMonth`; unreachable if contribution ≤ 0 | Exact contribution weighting algebra; whether a secondary TL revenue figure is shown |
-| Payback | Automatic from projection; first month cumulative operating profit ≥ total CAPEX; ramp-up affects it; not reached / unavailable edge states | — |
+| Operating break-even | Automatic; `fixed / weightedContributionPerSale`; CAPEX excluded; primary outputs **units/day** and **units/month**; **not customer count**; daily conversion uses `operatingDaysPerMonth`; unreachable if contribution ≤ 0 | Exact contribution weighting algebra; whether a secondary TL revenue figure is shown |
+| Payback | Automatic from projection; first month cumulative operating profit ≥ total CAPEX; ramp-up affects it; not reached / unavailable edge states; not decoupled from display horizon | — |
 | Waste modelling | Out of Detailed v1 (DF-62) | — |
-| Channel-variable placement | Takeaway packaging, delivery packaging, own-courier variable payment if applicable | Whether packaging is business-level or per product; when own-courier payment is shown |
+| Channel-variable placement | Takeaway packaging, delivery packaging; own-courier variable payment **Mode 1 only** (DF-81) | Whether packaging is business-level or per product |
 
 ---
 
@@ -1685,6 +1755,8 @@ Do **not** create, from this file:
 - any Detailed UI (that is a later Claude Design pass — §3.1);
 - any Detailed calculation engine **until implementation is explicitly requested**;
 - any change to the Quick / Lite financial engine.
+
+From v0.10, do **not** expand this decision log casually during specification or implementation. New features and inputs are **scope changes**.
 
 Generic utilities and visual primitives may be shared later when reuse is genuine. That reuse is not being designed now.
 
@@ -1720,26 +1792,30 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 | DF-28 | Product COGS | Per-product unit cost in TL. `productCOGS = unitsSold × unitProductCost`. No COGS %. Direct product cost only (DF-68). |
 | DF-68 | Product COGS boundary | Excludes takeaway/delivery packaging, own-courier variable payment, platform/card/meal-card commissions. |
 | DF-29 | COGS vs. volume | Unit product cost constant; total product COGS follows units sold. |
-| DF-52 | Channel variable costs | Takeaway packaging / order; delivery packaging / order; own-courier variable payment / delivery order if applicable. Per-order = per-unit (DF-67). Not payroll, OPEX vehicle running costs, CAPEX, or platform commission. |
+| DF-52 | Channel variable costs | Takeaway packaging / order; delivery packaging / order; own-courier variable payment / delivery order **Mode 1 only** (DF-81). Per-order = per-unit (DF-67). Not payroll, OPEX vehicle running costs, CAPEX, or platform commission. |
+| DF-81 | Own-courier visibility | Hide/disable own-courier variable payment when platform courier (Mode 2) is selected. No extra delivery model. |
 | DF-56 | Extra channel-variable fields | Do not add other standard channel-variable costs unless separately approved. |
 | DF-06 | Payment methods | Cash, card, meal card — distinct from channels. Direct store sales. |
-| DF-06a | Payment mix | Percentage-based. Must equal 100%. |
-| DF-49 | No double-count | Do not apply POS / meal-card commission to platform-collected delivery. Payment mix applies to salon and takeaway. |
+| DF-06a | Payment mix | Percentage-based. Must equal 100%. Direct store sales only. |
+| DF-49 | No double-count | Locked. Do not apply POS / meal-card commission to platform-collected delivery. Payment mix applies only to salon and takeaway. |
 | DF-07 | Cash | No payment-processing commission. |
 | DF-08 | POS | Editable percentage. v1 default **3.59%**. Applied to VAT-inclusive gross direct-store card sales. Not an immutable constant. Does not change Lite's 3.56%. |
 | DF-09 | Meal card | Editable percentage. v1 default **10%**. Applied to VAT-inclusive gross direct-store meal-card sales. Not an immutable constant. Earlier 15% discussion is not the default. |
 | DF-10 | Delivery modes | Mode 1 platform only / merchant courier; Mode 2 platform + courier. Online price unchanged across modes. |
 | DF-77 | Delivery volume split | No platform vs own-channel (phone / WhatsApp / own-site) split. LATER, not a v1 requirement. |
-| DF-10a | Platform fee defaults | Editable. v1 defaults 15% and 38%. Not market constants. |
+| DF-10a | Platform fee defaults | Editable. v1 defaults 15% and 38%. **0% allowed.** Not market constants. |
+| DF-82 | Zero platform fee | Allowed. Covers own-phone / WhatsApp / direct delivery without a second channel split. |
 | DF-53 | Platform fee formula | `platformFee = deliveryGrossRevenue × effectivePlatformFeeRate` on VAT-inclusive gross. Not Product COGS. |
 | DF-11 | Platform VAT as open research | **Superseded for v1 by DF-54.** |
 | DF-54 | Platform fee VAT | Entered rate is effective total deduction, KDV dahil. Do not add 20% on top. Do not split service-base vs VAT in v1. |
 | DF-55 | Campaigns / Joker | Out of v1. |
 | DF-12 | Rent | Same net/gross 20% withholding math as Lite. Gross-up is `net / 0.80`, never `net × 1.20`. Implemented later in the Detailed engine, not by importing Lite. |
 | DF-13 | Aidat | Standard occupancy expense; may start empty; no forced default. |
+| DF-80 | Aidat not in OPEX | Do not re-enter aidat under generic OPEX. UI copy/guardrails later. |
 | DF-14 | Personnel | Position-based; user-addable positions. Owner is not an employee position. |
 | DF-15 / DF-16 / DF-60 | Position cost | Name, headcount, monthly employer cost, meal, transport, average monthly bonus — all per person. `positionMonthlyCost = headcount × (employer + meal + transport + bonus)`. No payroll engine. No bonus frequency logic. |
 | DF-59 | Owner / operator | Separate section: owner monthly amount + Bağ-Kur monthly cost. Both operating costs. No owner PIT or payroll engine. |
+| DF-79 | Owner not double-counted | If owner salary is in the owner section, do not also count that person as an employee. UI copy/guardrails later. No extra calc. |
 | DF-17 / DF-42 | Owner UX / Bağ-Kur placement | **Superseded in shape by DF-59.** |
 | DF-57 | OPEX timing | Simple monthly amounts only. Annual/occasional costs entered as monthly equivalents. No annual/quarterly/per-sqm/stepped/recurrence logic. |
 | DF-18 / DF-19 / DF-20 | Standard OPEX | Utilities, **one** security line (alarm/camera/surveillance), software, accountant, cleaning, maintenance/repair (covers water treatment if needed), insurance, consumables, pest control. No extra micro-lines. |
@@ -1762,13 +1838,13 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 | DF-27 | Scenarios | Bad / Kötü, Base / Baz, Good / İyi. No per-input overrides. |
 | DF-37 | Scenario variable | Sales volume, proportional to product quantities, applied before ramp-up (DF-69). Listed prices/mixes/rates/fixed costs stay fixed. Variable totals follow quantity. |
 | DF-37a | Scenario defaults | Editable: Bad −25%, Base 0%, Good +25%. |
-| DF-35 | Break-even | Automatic operating break-even. `fixed / weightedContributionPerSale`. CAPEX excluded. Primary outputs **units/day** and **units/month**. TL revenue only secondary if design needs it. Unreachable if contribution ≤ 0. |
+| DF-35 | Break-even | Automatic operating break-even. `fixed / weightedContributionPerSale`. CAPEX excluded. Primary outputs **units/day** and **units/month**. **Not customer count.** TL revenue only secondary if design needs it. Unreachable if contribution ≤ 0. |
 | DF-36 | Payback | Automatic. Cumulative projected operating profit vs. total CAPEX. First month ≥ investment. Ramp-up affects it. Horizon / non-positive edge states locked. |
 | DF-61 | Analysis UX principle | User describes the business once; engine derives operating result, break-even, investment, payback, scenarios, projection. |
 | DF-62 | Waste / fire | Out of v1. |
 | DF-40 | Financing | Out of v1. |
 | DF-41 | Working-capital timing | Out of v1. |
-| X1–X24 | v1 exclusions | See §6. LATER reviewer ideas in §6.1. |
+| X1–X28 | v1 exclusions | See §6. LATER / rejected reviewer ideas in §6.1. |
 
 ### 9.2 SUPERSEDED
 
@@ -1789,7 +1865,7 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 
 ### 9.3 DEFERRED (non-exhaustive; see §7)
 
-DF-43 **default percentages**, break-even contribution-weighting algebra, and every other **DEFERRED** row in §7 remain for the Detailed Financial Specification. They do not reopen locked product decisions. Company type, category grouping, free-form horizon, and extra OPEX micro-lines are **no longer deferred** — they are removed or simplified as locked above.
+DF-43 **default percentages**, break-even contribution-weighting algebra, and remaining **DEFERRED** rows in §7 belong inside the Detailed Financial Specification or the later Claude Design pass. They do not reopen locked product decisions. Do not treat §6.1 as v1 backlog.
 
 ---
 
@@ -1826,12 +1902,15 @@ None of the above is a reason to change Lite behaviour now.
 | v0.7 | Locked waste/fire out of v1. Locked editable payment defaults: POS 3.59%, meal card 10%. Locked editable scenario defaults −25% / 0% / +25%. Locked Slow / Normal / Fast ramp-up monthly percentages. Locked three-way annual increase model with monthly compounding; default rates remain open. |
 | v0.8 | Closed the six calculation-model review blockers. Sales VAT netting: default 10% editable; `netRevenue = gross / (1 + vatRate)`; commissions stay on VAT-inclusive gross; still not a full VAT engine. Per-order = per-unit. Product COGS excludes packaging, courier, and commissions. Escalation: Month 1 = entered values; exponent `(m−1)/12`. Quantity is daily; `operatingDaysPerMonth` default 30. Order of operations: scenario then ramp-up. |
 | v0.9 | Scope cut: remove company-type input; horizon presets 12/24/36 only (default 24); no category grouping; merge security OPEX; drop separate water-treatment line; escalation stays in the model but secondary/advanced in UI; break-even primary outputs are units/day and units/month. Record seasonality, basket size, platform vs own-channel delivery split, and per-product channel mix as LATER — not missing v1 requirements. |
+| v0.10 | Final accepted review fixes. Break-even is units not customers. Payment mix locked to salon/takeaway only. Owner and aidat double-count are UI-guardrail rules. Own-courier cost is Mode 1 only. Platform fee may be 0%. Rejected extra payback/cash/pre-opening/COGS-% ideas. Product scope is complete enough to hand off to the Detailed Financial Specification. |
 
 ---
 
 ## 12. Readiness for the Detailed Financial Specification
 
-The six calculation-model **review blockers** remain **RESOLVED**. This pass does not reopen them.
+Major Detailed v1 **product-scope** decisions are now **locked**.
+
+Major calculation-model blockers from the external review are **resolved**.
 
 | Review blocker | Status | Lock |
 | --- | --- | --- |
@@ -1842,12 +1921,14 @@ The six calculation-model **review blockers** remain **RESOLVED**. This pass doe
 | Sales quantity time basis | **Closed** | DF-66 |
 | Scenario → ramp-up order of operations | **Closed** | DF-69 |
 
-v0.9 removes unused v1 complexity. It does **not** add reviewer-suggested features.
+Remaining implementation details should now be defined in a dedicated **Detailed Financial Specification**.
 
-The major Detailed v1 **calculation-model** decisions in this file are sufficiently locked to begin writing the dedicated Detailed Financial Specification.
+This decision log should **no longer be expanded casually during implementation**. Any new feature or input proposed later is a **scope change**, not an implementation detail.
 
 **Do not write that specification in this document or in this task.**
 
-Remaining items (contribution-weighting algebra, three annual-increase **default percentages**, projection statement shape, some UX labels, packaging business-level vs per-product placement) belong **inside** that specification or a later UX pass. They are not calculation-model blockers for starting it, and they do not reopen the locked model.
+What still belongs *inside* the financial spec or later UI (not blockers, not new product features): contribution-weighting algebra, three annual-increase **default percentages**, projection statement shape, some labels, packaging business-level vs per-product placement, and the owner/aidat copy/guardrails.
 
-Do **not** treat §6.1 LATER rows as specification backlog for v1.
+Do **not** treat §6.1 LATER / rejected rows as specification backlog for v1.
+
+**Product principle:** Detailed must be materially more useful than Lite while remaining understandable and completable by a normal small F&B owner without financial-modeling expertise.
