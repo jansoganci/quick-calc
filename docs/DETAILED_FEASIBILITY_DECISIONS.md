@@ -1,6 +1,6 @@
 # Detailed Feasibility — Locked Decisions
 
-**Version:** v0.4
+**Version:** v0.5
 **Status:** Decision log for product decisions that are **LOCKED / AGREED**. Remaining mechanics are intentionally open.
 **Phase:** Planning — **not** a financial specification and **not** implementation
 **Currency:** TRY · **Country:** Turkey · **Preset context:** Coffee Shop / Cafe (same product family as Quick / Lite)
@@ -610,6 +610,8 @@ Do not add them to the engine or the standard input set.
 
 ### 5.5 Rent / occupancy
 
+This update does **not** change the rent model. DF-12 and DF-13 remain as locked.
+
 #### DF-12 — Rent uses the same net / gross withholding logic as Lite **[LOCKED]**
 
 Detailed will use a Net / Gross rent control similar to Lite.
@@ -677,9 +679,9 @@ It can start **empty**. Do not force a benchmark or default number.
 
 #### DF-14 — Personnel is position-based **[LOCKED]**
 
-Detailed must not ask for only one generic employee count.
+Detailed v1 personnel is **position-based**.
 
-Personnel is created by **position**. Users can add positions. There should be an interaction similar to:
+Users can add positions with an interaction such as:
 
 `+ Pozisyon Ekle`
 
@@ -693,108 +695,134 @@ Illustrative examples (not a locked default roster):
 
 Every business can have a different team structure.
 
-#### DF-15 — Core personnel cost basis for v1 **[LOCKED]**
+Owner / operator economics are **not** an employee position (DF-59).
 
-For Detailed v1, the financial input is:
+#### DF-15 / DF-16 / DF-60 — Position fields and monthly cost **[LOCKED]**
 
-**headcount × monthly employer cost per person**
+Each position contains:
 
-(plus the position that those people belong to).
+- position name
+- headcount
+- monthly employer cost per person
+- monthly meal cost per person
+- monthly transportation cost per person
+- monthly average bonus / ikramiye per person
 
 Do **not** build a gross-salary-to-employer-cost payroll engine in v1.
 
-This is not payroll software (DF-00).
+The user enters the **monthly employer cost directly**.
 
-#### DF-16 — Additional personnel costs **[LOCKED]**
+Bonus / ikramiye is entered as an **average monthly amount**. Do **not** add annual / quarterly bonus frequency logic.
 
-Detailed must support additional employee-related costs such as:
+Conceptual formula:
 
-- meals
-- transportation
-- bonus / ikramiye
+```
+positionMonthlyCost = headcount × (employerCostPerPerson + mealPerPerson + transportPerPerson + averageBonusPerPerson)
+```
 
-These belong in the personnel economics. They must not be silently ignored.
+Total payroll is the **sum of all position monthly costs**.
 
-**DEFERRED:** exact input granularity (per person vs. per position vs. a single additional-cost total; monthly vs. annual bonus).
+This extends the earlier DF-15 / DF-16 locks: meals, transportation, and bonus are per-person monthly fields on each position, not a later unspecified granularity.
 
-#### DF-17 — Owner / operator labour may be included **[LOCKED]**
+**DEFERRED:** default position roster; which per-person cost fields may start empty / zero; exact Turkish field labels.
 
-The business owner's own labour can be entered as an **operating cost**.
+#### DF-59 — Owner / operator section is separate **[LOCKED]**
 
-The user must be able to represent:
+Owner / operator economics are **separate from employee positions**.
 
-> I work in this business myself, and my time has a cost.
+Include a separate owner / operator section with:
 
-This must not be ignored automatically simply because the owner is not technically an employee.
+- owner monthly salary / amount allocated to the owner
+- Bağ-Kur monthly cost
 
-The eventual UX may use an option such as:
+Both are treated as **monthly operating costs**.
 
-`İşletmecinin emeğini giderlere dahil et`
+Do **not** calculate personal income tax. Do **not** create a payroll engine for the owner.
 
-Exact presentation is **DEFERRED**.
+This replaces the earlier deferred UX for DF-17 / DF-42 (optional toggle vs. line placement). The v1 shape is this separate section with those two monthly amounts.
 
-#### DF-42 — Bağ-Kur is intended as an operating cost **[LOCKED intent; mechanics DEFERRED]**
+Do not invent Bağ-Kur rates, brackets, or a Bağ-Kur calculator. The user enters the monthly Bağ-Kur cost.
 
-Bağ-Kur is intended to be represented as an operating cost.
-
-Exact UX, default, and whether it is a distinct line vs. folded into owner labour / another personnel line are **DEFERRED**. Do not invent a Bağ-Kur calculator.
+**DEFERRED:** exact Turkish labels; whether either amount may start empty / zero; whether more than one owner is modelled.
 
 ---
 
 ### 5.7 Operating expenses
 
-#### DF-18 — Common expenses by default, plus custom lines **[LOCKED]**
+#### DF-57 — OPEX is a simple monthly model **[LOCKED]**
+
+Detailed v1 uses a simple **monthly** OPEX model.
+
+Do **not** add:
+
+- annual frequency;
+- quarterly frequency;
+- per-sqm drivers;
+- stepped costs;
+- semi-variable driver systems;
+- complex recurrence logic.
+
+All OPEX values are entered as **average monthly amounts**.
+
+If the real expense occurs annually or occasionally, the user enters its **average monthly equivalent**.
+
+Example:
+
+Annual pest-control cost = 24,000 TL
+
+User enters:
+
+`2,000 TL / month`
+
+The calculation engine uses that monthly amount. This is the same scope principle as DF-00: deeper than Lite, without accounting-style recurrence rules.
+
+#### DF-18 / DF-19 / DF-20 — Standard monthly OPEX lines **[LOCKED]**
 
 Detailed must not start with a completely blank expense sheet.
 
-Common F&B operating expenses are provided as standard lines / categories.
-
-Users must also be able to add expenses specific to their own operation. There should be an interaction such as:
-
-`+ Gider Ekle`
-
-**Principle:** common expenses provided by the product + custom expenses added by the user.
-
-Custom expenses are supported.
-
-**DEFERRED:** the exact standard line list, labels, grouping, and which lines start empty vs. with a suggested amount.
-
-#### DF-19 — Utilities / facility-related standard expenses **[LOCKED]**
-
-The standard set should include concepts such as:
+Provide common monthly expense lines such as:
 
 - electricity
 - water
-- natural gas where applicable
+- natural gas
 - internet
-- camera / surveillance
 - alarm / security
-
-Exact labels and grouping can be refined during UI specification.
-
-#### DF-20 — Operational standard expenses **[LOCKED]**
-
-The operating-expense model should support normal recurring F&B costs such as:
-
+- camera / surveillance subscription or rental
+- software subscriptions
 - accountant / mali müşavir
 - cleaning
-- pest-control / ilaçlama
-- maintenance and repair
-- water treatment / filter maintenance where applicable
+- maintenance / repair
 - insurance
-- software subscriptions
 - consumables
-- other normal operational expenses
+- pest control / ilaçlama
+- other
 
-Pest control is **explicitly** part of the model.
+Pest control is **explicitly** part of the model. Do **not** treat cleaning as meaning pest control is automatically included.
 
-Do **not** treat cleaning as meaning pest control is automatically included.
+Water treatment / filter maintenance remains in scope from the earlier DF-20 lock, as an applicable facility line. It is not removed by this list.
+
+Exact Turkish UI labels can be refined later.
+
+**DEFERRED:** which standard lines start empty vs. with a suggested amount; grouping / section headings in the UI.
+
+#### DF-58 — Custom OPEX **[LOCKED]**
+
+Users can add additional operating expenses with:
+
+`+ Gider Ekle`
+
+A custom expense only needs:
+
+- expense name
+- average monthly amount
+
+Do **not** create a complex expense-driver system for custom expenses in v1.
 
 #### DF-39 — No complex OPEX driver system in v1 **[LOCKED]**
 
-Do not introduce an unnecessarily complex driver system in v1 (for example allocating every expense to a sales, headcount, or square-metre driver).
+Do not introduce an unnecessarily complex driver system in v1.
 
-OPEX lines are ordinary recurring amounts unless a later decision says otherwise.
+All regular operating expenses ultimately resolve to a **simple monthly amount** used by the calculation engine.
 
 ---
 
@@ -1014,7 +1042,7 @@ These are decided exclusions, not open questions.
 | X8 | Full accounting VAT engine | No per-OPEX/per-CAPEX deductible VAT, VAT carry-forward, or VAT-return machinery (DF-31). Platform fee is an effective VAT-inclusive deduction rate (DF-54); no extra 20% on top. |
 | X9 | Payroll engine | No gross-salary-to-employer-cost conversion (DF-15). Detailed is not payroll software. |
 | X10 | Accounting depreciation / tax useful-life machinery | CAPEX is initial investment (DF-34). |
-| X11 | Complex OPEX driver system | Ordinary recurring amounts in v1 (DF-39). |
+| X11 | Complex OPEX driver / recurrence system | Monthly amounts only (DF-39, DF-57). No annual/quarterly/per-sqm/stepped drivers. |
 | X12 | Accounting / ERP / tax-advisory product shape | DF-00. |
 | X13 | Platform campaigns / Joker / listing ads | Out of v1 (DF-55). |
 
@@ -1037,10 +1065,10 @@ These are known open questions. They are listed so they are not silently closed.
 | Platform fee rates | Editable effective VAT-inclusive deduction; v1 defaults 15% (platform only) and 38% (platform + courier) | Nothing remaining on the rate meaning or v1 defaults. Do not treat defaults as market constants |
 | Platform commission VAT | User-entered rate is the effective total deduction, KDV dahil (DF-54) | Accounting split of service-base vs VAT — out of v1, not a remaining v1 design task |
 | Aidat default | Standard line; may start empty | Label grouping only |
-| Personnel additional costs | Meals, transport, bonus are in scope | Input granularity |
-| Owner labour UX | Can be entered as an operating cost | Exact control and cost basis |
-| Bağ-Kur | Intended as an operating cost | UX, default, and line placement |
-| Standard OPEX list | Concepts listed in DF-19 and DF-20 | Final labels, grouping, empty vs. suggested amounts |
+| Personnel additional costs | Per-person monthly meal, transport, and average monthly bonus on each position | Default roster; which fields start empty / zero; Turkish labels |
+| Owner / operator | Separate section: owner monthly amount + Bağ-Kur monthly cost; both operating costs; no owner PIT / payroll engine | Exact labels; empty/zero start; more than one owner |
+| Standard OPEX list | Common monthly lines as listed in DF-18/19/20; monthly average amounts only | Exact Turkish labels; grouping; which lines start empty vs suggested |
+| Custom OPEX | `+ Gider Ekle`; name + average monthly amount | — |
 | Company-type control | No v1 tax engine | Whether şahıs vs. limited still appears as a non-calculating input |
 | Projection internals | Multi-month model; 24-month default; editable horizon | Statement shape; CAPEX timing vs. month 1; horizon UX |
 | Ramp-up | Concept exists; simple; preset-driven | Preset curves, duration, percentages; relationship to scenarios |
@@ -1112,15 +1140,14 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 | DF-55 | Campaigns / Joker | Out of v1. |
 | DF-12 | Rent | Same net/gross 20% withholding math as Lite. Gross-up is `net / 0.80`, never `net × 1.20`. Implemented later in the Detailed engine, not by importing Lite. |
 | DF-13 | Aidat | Standard occupancy expense; may start empty; no forced default. |
-| DF-14 | Personnel | Position-based; user-addable positions. |
-| DF-15 | Personnel cost basis | Headcount × monthly employer cost per person. No gross-to-employer-cost payroll engine. |
-| DF-16 | Additional personnel costs | Meals, transportation, bonus / ikramiye must be includable. |
-| DF-17 | Owner labour | Can be entered as an operating cost. |
-| DF-42 | Bağ-Kur | Intended as an operating cost. UX / default still open. |
-| DF-18 | OPEX sheet | Product-provided common lines + user-added custom lines. |
-| DF-19 | Facility utilities | Electricity, water, natural gas where applicable, internet, camera, alarm/security. |
-| DF-20 | Operational OPEX | Includes accountant, cleaning, pest control (separate from cleaning), maintenance, water treatment, insurance, software, consumables, and other normal operating expenses. |
-| DF-39 | OPEX drivers | No unnecessarily complex driver system in v1. |
+| DF-14 | Personnel | Position-based; user-addable positions. Owner is not an employee position. |
+| DF-15 / DF-16 / DF-60 | Position cost | Name, headcount, monthly employer cost, meal, transport, average monthly bonus — all per person. `positionMonthlyCost = headcount × (employer + meal + transport + bonus)`. No payroll engine. No bonus frequency logic. |
+| DF-59 | Owner / operator | Separate section: owner monthly amount + Bağ-Kur monthly cost. Both operating costs. No owner PIT or payroll engine. |
+| DF-17 / DF-42 | Owner UX / Bağ-Kur placement | **Superseded in shape by DF-59.** |
+| DF-57 | OPEX timing | Simple monthly amounts only. Annual/occasional costs entered as monthly equivalents. No annual/quarterly/per-sqm/stepped/recurrence logic. |
+| DF-18 / DF-19 / DF-20 | Standard OPEX | Common monthly lines as listed (utilities, accountant, cleaning, pest control separate from cleaning, etc.). Turkish labels later. |
+| DF-58 | Custom OPEX | `+ Gider Ekle`; name + average monthly amount. |
+| DF-39 | OPEX drivers | No complex driver system. Engine uses simple monthly amounts. |
 | DF-32 | CAPEX | Treated primarily as initial investment. Common items include fit-out, equipment, furniture, signage, opening stock, setup/opening expenses, and custom items. |
 | DF-33 | Opening stock | Explicitly included in the investment set. |
 | DF-34 | Depreciation | No accounting depreciation / tax useful-life machinery in v1. |
@@ -1149,10 +1176,12 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 | DF-05 | Optional per-channel price overrides, including a distinct takeaway price | DF-46 — two prices only: normal (salon + takeaway) and online (delivery) |
 | DF-10 open defaults | Exact platform percentages left open; discussed 12–15% / 38% not to be encoded as defaults | DF-10a — v1 editable defaults 15% and 38%, still not market constants |
 | DF-11 | Platform / courier VAT treatment left open for research | DF-54 — entered rate is effective total deduction, VAT included; no extra 20%; no v1 VAT split line |
+| DF-16 granularity | Meals / transport / bonus in scope, input grain left open | DF-60 — per-person monthly fields on each position; bonus is average monthly |
+| DF-17 / DF-42 | Optional owner-labour UX and Bağ-Kur line placement left open | DF-59 — separate owner section with owner monthly amount and Bağ-Kur monthly cost |
 
 ### 9.3 DEFERRED (non-exhaustive; see §7)
 
-DF-43 (inflation / escalation), DF-42 mechanics, break-even and payback formulas, scenario multipliers, ramp-up presets, and every other **DEFERRED** row in §7 remain open. They will be resolved in follow-up tasks, then recorded in a future Detailed financial specification.
+DF-43 (inflation / escalation), break-even and payback formulas, scenario multipliers, ramp-up presets, and every other **DEFERRED** row in §7 remain open. They will be resolved in follow-up tasks, then recorded in a future Detailed financial specification.
 
 ---
 
@@ -1184,3 +1213,4 @@ None of the above is a reason to change Lite behaviour now.
 | v0.2 | Locked Detailed v1 simplification principle; category fields (VAT-inclusive price, unit cost in TL, quantity); business-level channel mix; percentage payment mix; COGS volume behaviour; CAPEX as initial investment including opening stock; no depreciation engine; no financing or working-capital timing; no income/corporate/distribution tax model; no full VAT accounting engine; simple operating break-even (CAPEX excluded); approximate payback; simple sales-volume scenarios with fixed cost assumptions; preset-driven ramp-up; multi-month projection. Superseded DF-21 and DF-22 for v1. Inflation/escalation and platform VAT treatment remain open. |
 | v0.3 | Revenue is product-based. Category is optional grouping only. Each product has name, VAT-inclusive normal price, VAT-inclusive online price, and one expected quantity. Salon and takeaway use the normal price; delivery uses the online price. Online price does not vary by delivery mode. Business-level channel mix must equal 100% and is applied to each product's quantity. Channel revenue concept locked. Payment mix must equal 100% and applies to direct store sales; do not also apply POS/meal-card commission to platform-collected delivery. COGS, packaging, waste, and recipe costing not decided in this update. Superseded DF-01, DF-01a, and DF-05. |
 | v0.4 | Locked the three-way cost structure: Product COGS, Channel Variable Costs, Payment / Platform Fees. Per-product unit cost in TL; `productCOGS = unitsSold × unitProductCost`. Standard channel-variable fields: takeaway packaging, delivery packaging, own-courier variable payment if applicable. Platform fee is a percentage of VAT-inclusive delivery gross. v1 editable defaults 15% and 38%. Entered platform rate is effective total deduction, KDV dahil; do not add 20% VAT on top. Campaigns / Joker out of v1. Superseded DF-11 and the previous “platform defaults remain open” clause of DF-10. |
+| v0.5 | Locked position fields (name, headcount, monthly employer cost, meal, transport, average monthly bonus) and `positionMonthlyCost`. Owner/operator is a separate section with owner monthly amount and Bağ-Kur monthly cost; no owner PIT or payroll engine. OPEX is monthly-only average amounts; standard lines listed; custom expense is name + monthly amount. No annual/quarterly/per-sqm/stepped OPEX. Rent unchanged. |
