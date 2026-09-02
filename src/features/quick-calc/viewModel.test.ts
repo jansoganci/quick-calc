@@ -13,6 +13,7 @@ import {
   calculateQuick,
   validateQuickInput,
   simulateQuick,
+  QUICK_DEFAULTS,
   type ValidationError,
 } from '../../core/quick/index.ts'
 
@@ -279,5 +280,24 @@ describe('rentCostHint', () => {
     expect(rentCostHint({ ...GOLDEN, rentInputBasis: 'gross' })).toBe(
       'Mülk sahibine 360.000 TL · stopaj 90.000 TL · toplam 450.000 TL',
     )
+  })
+})
+
+describe('masthead and colophon', () => {
+  it('names the product and the current mode', () => {
+    expect(COPY.productName.trim().length).toBeGreaterThan(0)
+    expect(COPY.modeName).toBe('Hızlı Hesap')
+  })
+
+  it('renders the engine version from the engine, never a typed literal', () => {
+    expect(COPY.footerVersion(QUICK_DEFAULTS.quickEngineVersion)).toBe(
+      `Hesap motoru ${QUICK_DEFAULTS.quickEngineVersion}`,
+    )
+  })
+
+  it('states the v1 scope without repeating the §10.1 limitation statement', () => {
+    expect(COPY.footerScope).toContain('TRY')
+    expect(COPY.footerNature).not.toContain('vergi')
+    expect(COPY.footerNature.length).toBeLessThan(60)
   })
 })

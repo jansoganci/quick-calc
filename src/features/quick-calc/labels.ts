@@ -73,6 +73,12 @@ export type HeadlineTone = 'text' | 'amount' | 'accent'
 export type HeadlineSegment = { text: string; tone: HeadlineTone }
 
 export const COPY = {
+  // Placeholder product name — swap this one string when the real name is decided.
+  productName: 'Fizibilite',
+  modeName: 'Hızlı Hesap',
+  footerScope: 'TRY · Türkiye · Kafe',
+  footerNature: 'Basitleştirilmiş bir ön değerlendirmedir.',
+  footerVersion: (version: string) => `Hesap motoru ${version}`,
   formSection: 'İşletme bilgileri',
   assumptions: 'Varsayımlar',
   calculate: 'Hesapla',

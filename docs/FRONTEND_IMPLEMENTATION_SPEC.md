@@ -42,6 +42,18 @@ Assumptions: one row, label left, current values as a Mono summary right, `▾`.
 
 `Hesapla`: `btn btn-primary w-full h-[46px] !rounded`, disabled until all 8 primary inputs validate, with `Sonucu görmek için tüm alanları doldurun` beneath in 12px muted.
 
+## 2.1 Masthead and colophon
+
+**Added after the original spec.** No document previously described a header or footer; both are recorded here as a new product surface. They carry only what the locked rules permit: there is no router (ARCH D4), so no navigation; no icons outside the assumptions chevron (§7), so no mark; and the accent stays reserved for the headline figure and focus states (DIRECTION V2), so neither is filled or coloured.
+
+**Masthead.** One hairline-separated row inside the same `1152px` frame as the form and result, so the page reads as a single sheet. `h-14` from `lg`, 52px below it; padding `30px` / `18px` to match the form column. Product name left in Plex Sans 600 15px ink; mode label right in the 11px uppercase eyebrow style already used for `İŞLETME BİLGİLERİ` and `SONUÇ`. Bottom rule `--qc-rule`. **Not sticky** — it must not compete with the result column's own `lg:top-0`.
+
+**Colophon.** Above a `--qc-rule` top rule, `18px` padding, 12px `--qc-muted`. One row with `space-between` from `lg`, stacked with a 5px gap below it. Three items: the v1 scope (scope §26), a six-word statement of what the tool is, and the engine version in Plex Mono 11px `--qc-subtle`. The version is read from `meta.quickEngineVersion`, never typed — scope §18 requires a formula change to be detectable as a version difference.
+
+The §10.1 limitation statement deliberately stays with the earnings figure and is **not** repeated in the colophon.
+
+Both elements are rendered as `<header>`, `<main>` and `<footer>`, which are also the document's only landmarks.
+
 ## 3. Result (locked order — R1…R5)
 
 1. **Summary sentence (R1).** 21px, `leading-[1.5]`, `max-w-[610px]`, `text-wrap:pretty`. Amounts inline in Mono 500; the remaining amount in accent. Nothing else on the screen uses accent text.
@@ -81,6 +93,7 @@ Breakpoint: single column below `lg` (1024px), two columns at and above.
 
 ## 6. Turkish copy — draft for review
 
+**Masthead / colophon:** Product name *(placeholder — pending a product decision)* · `Hızlı Hesap` · `TRY · Türkiye · Kafe` · `Basitleştirilmiş bir ön değerlendirmedir.` · `Hesap motoru {version}`.
 **Input labels:** Ortalama satış tutarı (hint *KDV dahil*) · Günlük satış adedi · Satış başına ürün maliyeti · Aylık kira (Net kira / Brüt kira control; default Brüt) · Diğer aylık giderler · Çalışan sayısı · Kişi başı aylık maliyet · Başlangıç yatırımı.
 **Assumptions:** Ayda çalışılan gün · Yatırım geri kazanım süresi (ay) · Kartlı ödeme oranı · POS komisyon oranı.
 **Breakdown rows:** KDV · Ürün maliyeti · Personel · Kira · Diğer giderler · POS komisyonu · Yatırım geri kazanımı · **İşletmede kalan** · Toplam.
