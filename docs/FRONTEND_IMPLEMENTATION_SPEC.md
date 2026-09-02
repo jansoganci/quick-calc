@@ -1,6 +1,6 @@
 # Quick Calculation — Frontend Implementation Spec
 
-**Status:** design reference for implementation. Authority order: `quick-calculation-scope-v1.md` (model, terminology) → `DESIGN_DIRECTION.md` (locked visual/UX rules) → this document (measurements, classes, copy).
+**Status:** Active Quick / Lite UI specification. Authority order: `quick-calculation-scope-v1.md` (model, terminology) → `DESIGN_DIRECTION.md` (locked visual/UX rules) → this document (measurements, classes, copy).
 **Visual reference:** `Quick Calculation Reference.dc.html` — 1a desktop result, 1b mobile result, 1c pre-calculation and error states. The reference is hand-written HTML for looks only; implementation is Tailwind + daisyUI.
 
 ---

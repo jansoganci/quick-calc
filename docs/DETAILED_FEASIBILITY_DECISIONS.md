@@ -1,12 +1,12 @@
 # Detailed Feasibility — Locked Decisions
 
-**Version:** v0.1
+**Version:** v0.1.1
 **Status:** Decision log for product decisions that are **LOCKED / AGREED**. Remaining mechanics are intentionally open.
 **Phase:** Planning — **not** a financial specification and **not** implementation
 **Currency:** TRY · **Country:** Turkey · **Preset context:** Coffee Shop / Cafe (same product family as Quick / Lite)
 **Language for v1:** Turkish-first
 
-**Companion documents (existing, unchanged by this file):**
+**Companion documents:**
 
 | Document | Owns |
 | --- | --- |
@@ -16,8 +16,8 @@
 | `docs/DESIGN_DIRECTION.md` | Visual & UX direction established for Quick / Lite |
 | `docs/design.md` | Design source-of-truth index and frame notes |
 | `docs/FRONTEND_IMPLEMENTATION_SPEC.md` | Quick / Lite frontend measurements, tokens, copy |
-| `docs/FRONTEND_IMPLEMENTATION_PLAN.md` | Quick / Lite frontend execution plan |
-| `docs/QUICK_CALCULATION_CORE_IMPLEMENTATION_PLAN.md` | Quick / Lite engine execution |
+| `docs/archive/FRONTEND_IMPLEMENTATION_PLAN.md` | Archived Quick / Lite frontend execution plan |
+| `docs/archive/QUICK_CALCULATION_CORE_IMPLEMENTATION_PLAN.md` | Archived Quick / Lite engine execution plan |
 
 This document records **only** the Detailed Feasibility decisions that have already been made. It does not invent formulas, defaults, schemas, or UX mechanics that have not been approved.
 
@@ -708,20 +708,18 @@ DF-11 (platform commission VAT treatment) and every **DEFERRED** row in §7 rema
 
 ## 10. Relationship to existing planning documents
 
-This file fills the "not yet written" Detailed slot mentioned in the architecture and tech-stack documents — but only as a **decision log**, not as the Detailed product & financial scope.
+This file is the active **decision log** for Detailed Feasibility. It is not the Detailed product & financial specification.
 
-No existing document is modified by this revision.
+Companion indexes in `docs/README.md`, `CLAUDE.md`, the architecture document, and the tech-stack document now point here.
 
-Once a Detailed financial specification exists, the following documents will likely need a **future** cross-reference or scope-boundary update. That work is not part of this task:
+Once a Detailed financial specification exists, the following still need a later scope-boundary update:
 
-| Document | Why a future update is likely |
+| Document | Remaining follow-up |
 | --- | --- |
-| `CLAUDE.md` | Source-of-truth table currently lists only Quick financial scope. |
-| `docs/APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md` §10.3 | Companion list still says Detailed scope is not yet written. Architecture D4 currently says there is no router yet; tab navigation may later require an explicit routing/navigation decision. |
-| `docs/TECH_STACK_AND_CONSTRAINTS.md` §10 | Companion list still says Detailed scope is not yet written. Persistence rules in §4.2 already cover Detailed and should remain the technical authority. |
-| `docs/quick-calculation-scope-v1.md` §21 / §6.2 | Lite currently says waste modelling and recipe-level costing "belong to Detailed Feasibility". Detailed v1 has now **excluded** the recipe/SKU engine. Waste is still undecided for Detailed. The Lite document should later distinguish "out of Lite" from "in Detailed v1". |
-| `docs/DESIGN_DIRECTION.md` and `docs/FRONTEND_IMPLEMENTATION_SPEC.md` | Visual inheritance is locked; Detailed screen structure, tabs, and result hierarchy are not. The Quick masthead currently assumes no navigation. |
-| `README.md` | Documentation index and status table still describe Detailed as entirely unplanned. |
+| `docs/APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md` D4 | Currently says there is no router yet; tab navigation may later require an explicit routing/navigation decision |
+| `docs/TECH_STACK_AND_CONSTRAINTS.md` §4.2 | Persistence rules already cover Detailed and should remain the technical authority |
+| `docs/quick-calculation-scope-v1.md` §21 / §6.2 | Lite currently says waste modelling and recipe-level costing "belong to Detailed Feasibility". Detailed v1 has now **excluded** the recipe/SKU engine. Waste is still undecided for Detailed. The Lite document should later distinguish "out of Lite" from "in Detailed v1" |
+| `docs/DESIGN_DIRECTION.md` and `docs/FRONTEND_IMPLEMENTATION_SPEC.md` | Visual inheritance is locked; Detailed screen structure, tabs, and result hierarchy are not. The Quick masthead currently assumes no navigation |
 
 None of the above is a reason to change Lite behaviour now.
 
@@ -732,3 +730,4 @@ None of the above is a reason to change Lite behaviour now.
 | Version | Change |
 | --- | --- |
 | v0.1 | Initial locked decision log for Detailed Feasibility: two-mode product structure, architecture boundary, visual inheritance, category-based revenue, VAT-inclusive prices, channels and channel pricing, payment methods, delivery modes, rent net/gross convention, aidat, position-based personnel, operating expenses, company type, VAT layer, monthly cash flow, 24-month horizon, ramp-up concept, scenario requirement, and explicit v1 exclusions. Deferred mechanics recorded without being resolved. |
+| v0.1.1 | Companion paths updated after docs cleanup: finished Quick execution plans now live under `docs/archive/`. |

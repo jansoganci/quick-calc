@@ -1,7 +1,9 @@
 # Quick Calculation Core — Implementation Plan
 
+> **Archived.** This execution plan has been carried out. It is kept for history and is **not** an active source of truth. Formulas are owned by `docs/quick-calculation-scope-v1.md`. See `docs/README.md`.
+
 **Version:** v1.1
-**Status:** Approved for execution
+**Status:** Archived — execution complete
 **Implementation model:** **Grok 4.6 High** (approved — no model change needed)
 **Phase:** Non-visual application core — **no UI in this phase**
 
