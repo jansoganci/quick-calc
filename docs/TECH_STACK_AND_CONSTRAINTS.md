@@ -311,7 +311,8 @@ Notes that are **not** contradictions:
 | --- | --- |
 | `docs/quick-calculation-scope-v1.md` | Quick Calculation product scope, inputs, formulas, outputs |
 | `docs/TECH_STACK_AND_CONSTRAINTS.md` (this file) | Stack, runtime, calculation *placement*, persistence, exclusions, engineering constraints |
-| *(not yet written)* | Detailed Feasibility product & financial scope |
+| `docs/DETAILED_FEASIBILITY_DECISIONS.md` | Detailed Feasibility locked decisions (not yet a full financial specification) |
+| `docs/README.md` | Index of active vs archived documentation |
 
 If this document and the Quick Calculation spec ever appear to disagree about **financial** behaviour, the Quick Calculation spec wins. If they appear to disagree about **stack, runtime or persistence**, this document wins.
 

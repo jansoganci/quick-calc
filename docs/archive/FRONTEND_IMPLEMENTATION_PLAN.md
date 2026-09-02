@@ -1,6 +1,8 @@
 # Frontend implementation plan (Quick Calculation)
 
-**Status:** planning only. Do not write React, CSS, or Worker UI code until the product owner asks.
+> **Archived.** This execution plan has been carried out. It is kept for history and is **not** an active source of truth. Visual rules live in `docs/DESIGN_DIRECTION.md`, `docs/FRONTEND_IMPLEMENTATION_SPEC.md`, and `docs/design.md`. See `docs/README.md`.
+
+**Status:** Archived — execution complete
 
 This plan tells a later agent **how** to implement the Claude Design UI on top of the existing Quick core. It does not change financial behaviour.
 
@@ -9,7 +11,7 @@ This plan tells a later agent **how** to implement the Claude Design UI on top o
 1. `docs/quick-calculation-scope-v1.md` — numbers, validation, simulation, copy meaning  
 2. `docs/TECH_STACK_AND_CONSTRAINTS.md` — Vite, React, Tailwind, daisyUI, Workers Static Assets, no DB  
 3. `docs/APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md` — folders and import arrows  
-4. `docs/QUICK_CALCULATION_CORE_IMPLEMENTATION_PLAN.md` — engine already shipped  
+4. `docs/archive/QUICK_CALCULATION_CORE_IMPLEMENTATION_PLAN.md` — engine already shipped  
 5. `docs/DESIGN_DIRECTION.md` + `docs/FRONTEND_IMPLEMENTATION_SPEC.md` + `docs/design.md` — look and screen behaviour  
 
 If a mock number disagrees with the engine, **the engine wins**.

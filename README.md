@@ -4,8 +4,8 @@ A Turkey-focused financial calculator and feasibility tool for food & beverage b
 
 The product will offer two separate calculation experiences:
 
-- **Quick Calculation** — a short, directional estimate from a handful of inputs. Intentionally simple: it answers "roughly, does this work?" and nothing more.
-- **Detailed Feasibility** — a later, deeper financial model with richer inputs, scenario storage and fuller simulation.
+- **Quick / Lite Calculation** — a short, directional estimate from a handful of inputs. Intentionally simple: it answers "roughly, does this work?" and nothing more.
+- **Detailed Feasibility** — a deeper financial model with its own input model, engine, and business logic. Planning is in progress; implementation has not started.
 
 The two are **separate business logics** by design. They may reasonably produce different numbers, and they are not unified into one engine.
 
@@ -13,19 +13,16 @@ The two are **separate business logics** by design. They may reasonably produce 
 
 ## Current status
 
-Planning is complete. Implementation has **not started**.
-
 | Area | Status |
 | --- | --- |
-| Product / financial scope (Quick Calculation) | Planned and approved |
-| Tech stack | Approved |
-| Architecture and project structure | Approved |
-| Quick Calculation core implementation plan | Approved |
-| Quick Calculation core (code) | **Not implemented yet** |
-| Visual design / frontend | **Not implemented yet** |
-| Detailed Feasibility | **Not implemented yet** |
+| Product / financial scope (Quick / Lite) | Approved — `docs/quick-calculation-scope-v1.md` |
+| Tech stack | Approved — `docs/TECH_STACK_AND_CONSTRAINTS.md` |
+| Architecture and project structure | Approved — `docs/APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md` |
+| Quick / Lite core | Implemented |
+| Quick / Lite frontend | Implemented |
+| Detailed Feasibility | Decision log only — `docs/DETAILED_FEASIBILITY_DECISIONS.md`. Not implemented |
 
-The repository currently contains planning documents only.
+Documentation index: [`docs/README.md`](docs/README.md).
 
 ---
 
@@ -62,21 +59,31 @@ Full rules, dependency direction and naming conventions: `docs/APP_ARCHITECTURE_
 
 ## Documentation
 
+Active specifications live in `docs/`. Finished execution plans live in `docs/archive/`.
+
 | Document | Owns |
 | --- | --- |
-| [`docs/quick-calculation-scope-v1.md`](docs/quick-calculation-scope-v1.md) | Quick Calculation product & financial scope: inputs, formulas, outputs, terminology |
-| [`docs/TECH_STACK_AND_CONSTRAINTS.md`](docs/TECH_STACK_AND_CONSTRAINTS.md) | Stack, runtime, deployment, persistence, technical exclusions |
-| [`docs/APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md`](docs/APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md) | Folder structure, layer boundaries, reuse rules, testing boundaries, naming |
-| [`docs/QUICK_CALCULATION_CORE_IMPLEMENTATION_PLAN.md`](docs/QUICK_CALCULATION_CORE_IMPLEMENTATION_PLAN.md) | Execution plan for the Quick Calculation core: files, sequence, result contract, test plan |
-| [`CLAUDE.md`](CLAUDE.md) | Operating guidance for AI coding models working in this repository |
+| [`docs/README.md`](docs/README.md) | Index of active vs archived documentation |
+| [`docs/quick-calculation-scope-v1.md`](docs/quick-calculation-scope-v1.md) | Quick / Lite product & financial scope |
+| [`docs/DETAILED_FEASIBILITY_DECISIONS.md`](docs/DETAILED_FEASIBILITY_DECISIONS.md) | Detailed Feasibility locked decisions (not a full financial spec yet) |
+| [`docs/TECH_STACK_AND_CONSTRAINTS.md`](docs/TECH_STACK_AND_CONSTRAINTS.md) | Stack, runtime, persistence, technical exclusions |
+| [`docs/APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md`](docs/APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md) | Folder structure, layer boundaries, reuse rules, naming |
+| [`docs/DESIGN_DIRECTION.md`](docs/DESIGN_DIRECTION.md) | Locked visual & UX direction |
+| [`docs/FRONTEND_IMPLEMENTATION_SPEC.md`](docs/FRONTEND_IMPLEMENTATION_SPEC.md) | Quick / Lite UI measurements, tokens, copy |
+| [`CLAUDE.md`](CLAUDE.md) | Operating guidance for AI coding models |
 
 ---
 
 ## Development
 
-There is **no package tooling in the repository yet** — no `package.json`, no source files. Implementation has not started, so there are no install, build or test commands to run.
-
-The first implementation phase is the Quick Calculation core, described in `docs/QUICK_CALCULATION_CORE_IMPLEMENTATION_PLAN.md`. That phase creates the project tooling along with the engine, and defines the scripts for install, test, typecheck and lint. This section should be updated with the real commands once those files exist.
+```bash
+npm install
+npm run dev          # Vite dev server
+npm run test:run     # Vitest once
+npm run typecheck
+npm run lint
+npm run build
+```
 
 ---
 

@@ -1,6 +1,6 @@
 # CLAUDE.md — Operating Guide for Coding Models
 
-This file is **operational guidance** for any AI coding model working in this repository. It is not a specification. The specifications live in `docs/`.
+This file is **operational guidance** for any AI coding model working in this repository. It is not a specification. The specifications live in `docs/`. The index of active vs archived documents is `docs/README.md`.
 
 Read this file first, then read the source-of-truth documents relevant to your task.
 
@@ -12,19 +12,26 @@ Before making any architectural, financial or implementation change, read the re
 
 | Document | Owns |
 | --- | --- |
-| `docs/quick-calculation-scope-v1.md` | Quick Calculation product & financial scope — inputs, formulas, outputs, terminology |
+| `docs/quick-calculation-scope-v1.md` | Quick / Lite product & financial scope — inputs, formulas, outputs, terminology |
+| `docs/DETAILED_FEASIBILITY_DECISIONS.md` | Detailed Feasibility locked decisions and v1 exclusions — not yet a full financial specification |
 | `docs/TECH_STACK_AND_CONSTRAINTS.md` | Stack, runtime, deployment, persistence, technical exclusions |
 | `docs/APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md` | Folder structure, layer boundaries, dependency direction, reuse rules, naming |
-| `docs/QUICK_CALCULATION_CORE_IMPLEMENTATION_PLAN.md` | Execution of the Quick Calculation core — files, sequence, contract, test plan |
+| `docs/DESIGN_DIRECTION.md` | Locked visual & UX direction |
+| `docs/FRONTEND_IMPLEMENTATION_SPEC.md` | Quick / Lite UI measurements, tokens, copy |
+| `docs/design.md` | Design index and layout-frame notes |
+
+Finished Quick execution plans live in `docs/archive/`. They are historical. Do not treat them as current authority.
 
 ### Authority order
 
 If two documents appear to disagree:
 
-- **financial behaviour** → the product/financial spec wins;
+- **financial behaviour (Quick / Lite)** → the Quick product/financial spec wins;
+- **Detailed product decisions recorded so far** → the Detailed Feasibility decisions document wins, without inventing formulas it does not contain;
 - **stack, runtime, persistence** → the tech-stack document wins;
 - **code organisation and boundaries** → the architecture document wins;
-- **execution of the Quick core** → the implementation plan controls it.
+- **visual / UX locked rules** → the design-direction document wins;
+- **Quick UI measurements and copy** → the frontend implementation spec wins.
 
 Do not resolve a disagreement by picking whichever is easier to implement. Report it.
 
@@ -84,12 +91,5 @@ For any financial logic:
 ## 6. Scope discipline
 
 Implement **only the requested phase**. Nothing adjacent, nothing anticipatory.
-
-For example, during Quick Calculation core implementation:
-
-- do not create any frontend;
-- do not create Detailed Feasibility;
-- do not add benchmark infrastructure;
-- do not add Cloudflare services.
 
 If something outside the current phase seems necessary, say so and wait. Do not implement it.

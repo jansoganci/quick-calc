@@ -1,6 +1,6 @@
 # Design source of truth
 
-Visual and UX authority for the Quick Calculation product UI. **Do not implement UI until a later instruction.** Financial formulas stay in `docs/quick-calculation-scope-v1.md` and the TypeScript engine.
+Visual and UX authority for the Quick Calculation product UI. Financial formulas stay in `docs/quick-calculation-scope-v1.md` and the TypeScript engine.
 
 ## Files
 

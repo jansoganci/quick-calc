@@ -351,7 +351,8 @@ All items are **LOCKED / APPROVED**. Not to be reopened or replaced without an e
 | `docs/quick-calculation-scope-v1.md` | Quick Calculation product scope, inputs, formulas, outputs, terminology |
 | `docs/TECH_STACK_AND_CONSTRAINTS.md` | Stack, runtime, deployment, persistence, exclusions, engineering constraints |
 | `docs/APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md` (this file) | Folder structure, layer boundaries, dependency direction, reuse rules, testing boundaries, naming |
-| *(not yet written)* | Detailed Feasibility product & financial scope |
+| `docs/DETAILED_FEASIBILITY_DECISIONS.md` | Detailed Feasibility locked decisions (not yet a full financial specification) |
+| `docs/README.md` | Index of active vs archived documentation |
 
 On disagreement: the product spec wins on **financial behaviour**; the tech stack document wins on **stack, runtime and persistence**; this document wins on **code organisation and boundaries**.
 
