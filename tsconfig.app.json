@@ -13,5 +13,5 @@
     "noEmit": true,
     "allowImportingTsExtensions": true
   },
-  "include": ["src/**/*.tsx", "src/features/**/hooks/**", "src/vite-env.d.ts"]
+  "include": ["src/**/*.tsx", "src/features/**/hooks/**/*.ts", "src/vite-env.d.ts"]
 }

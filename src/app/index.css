@@ -11,18 +11,18 @@
 
   body {
     margin: 0;
-    background: #edeef0;
+    background: var(--qc-page);
     font-family: 'IBM Plex Sans', system-ui, sans-serif;
-    color: #16181c;
+    color: var(--qc-ink);
   }
 
   a {
-    color: #1d3a5f;
+    color: var(--qc-accent);
     text-underline-offset: 2px;
   }
 
   a:hover {
-    color: #16181c;
+    color: var(--qc-ink);
   }
 }
 
@@ -35,34 +35,43 @@
 
   .qc-field-label {
     font-size: 13px;
-    color: #5b6169;
+    color: var(--qc-secondary);
     line-height: 1.3;
   }
 
   .qc-input-wrap {
     display: flex;
     align-items: center;
-    border: 1px solid #c3c8ce;
+    border: 1px solid var(--qc-rule-strong);
     border-radius: 4px;
-    height: 40px;
+    height: 44px;
     padding: 0 10px;
     gap: 8px;
-    background: #fff;
+    background: var(--qc-surface);
+  }
+
+  /* From the lg breakpoint the pointer is a mouse, so the row returns to the
+     h-10 of FRONTEND_IMPLEMENTATION_SPEC.md §2. Below it, DESIGN_DIRECTION §1.1
+     governs: no interactive target under 44px. */
+  @media (min-width: 1024px) {
+    .qc-input-wrap {
+      height: 40px;
+    }
   }
 
   .qc-input-wrap:focus-within {
-    border-color: #1d3a5f;
-    box-shadow: 0 0 0 3px rgba(29, 58, 95, 0.13);
+    border-color: var(--qc-accent);
+    box-shadow: 0 0 0 3px var(--qc-focus-ring);
   }
 
   .qc-input-wrap.is-error {
-    border-color: #a0503c;
+    border-color: var(--qc-error);
     box-shadow: none;
   }
 
   .qc-input-wrap.is-error:focus-within {
-    border-color: #a0503c;
-    box-shadow: 0 0 0 3px rgba(160, 80, 60, 0.13);
+    border-color: var(--qc-error);
+    box-shadow: 0 0 0 3px var(--qc-error-ring);
   }
 
   .qc-input {
@@ -71,32 +80,74 @@
     width: 100%;
     font-family: 'IBM Plex Mono', ui-monospace, monospace;
     font-size: 15px;
-    color: #16181c;
+    color: var(--qc-ink);
     text-align: right;
     background: transparent;
   }
 
   .qc-input::placeholder {
-    color: #a8aeb6;
+    color: var(--qc-subtle);
   }
 
   .qc-unit {
     font-size: 12px;
-    color: #8a9199;
+    color: var(--qc-muted);
     flex: none;
   }
 
   .qc-hint {
     font-size: 11px;
-    color: #8a9199;
+    color: var(--qc-muted);
+  }
+
+  /* spec §1: the error token covers the invalid input border *and* its message */
+  .qc-error {
+    font-size: 11px;
+    color: var(--qc-error);
+  }
+
+  .qc-segment {
+    display: flex;
+    margin-top: 8px;
+    border: 1px solid var(--qc-rule-strong);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .qc-segment-btn {
+    flex: 1;
+    min-height: 44px;
+    padding: 0 6px;
+    border: 0;
+    background: transparent;
+    font-size: 12px;
+    color: var(--qc-secondary);
+    cursor: pointer;
+  }
+
+  .qc-segment-btn[aria-pressed='true'] {
+    background: var(--qc-accent);
+    color: var(--qc-on-accent);
+  }
+
+  @media (min-width: 1024px) {
+    .qc-segment-btn {
+      min-height: 32px;
+    }
   }
 
   .qc-hint.is-error {
-    color: #a0503c;
+    color: var(--qc-error);
   }
 
   .qc-assumptions.collapse {
     border-radius: 0;
+  }
+
+  /* the toggle covers the title row only — otherwise it overlays the inputs below */
+  .qc-assumptions > input[type='checkbox'] {
+    height: 44px;
+    bottom: auto;
   }
 
   .qc-assumptions .collapse-title,
@@ -114,7 +165,7 @@
     padding-top: 0;
     padding-bottom: 22px;
     font-size: 13px;
-    color: #5b6169;
+    color: var(--qc-secondary);
   }
 
   .qc-assumptions .collapse-title::after {
@@ -129,7 +180,7 @@
   .qc-assumptions .collapse-content {
     padding-bottom: 8px;
     font-size: 13px;
-    color: #5b6169;
+    color: var(--qc-secondary);
     line-height: 1.6;
   }
 

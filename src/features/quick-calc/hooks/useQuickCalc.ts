@@ -2,17 +2,22 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   EMPTY_FORM,
   PRIMARY_FIELDS,
+  SECONDARY_FIELDS,
   allPrimaryFilled,
   evaluateForm,
   type QuickField,
   type QuickFormState,
   type QuickView,
+  type RentInputBasis,
 } from '../viewModel.ts'
+import { COPY } from '../labels.ts'
+
+const ALL_FIELDS: readonly QuickField[] = [...PRIMARY_FIELDS, ...SECONDARY_FIELDS]
 
 export function useQuickCalc() {
   const [form, setForm] = useState<QuickFormState>(EMPTY_FORM)
   const [dirty, setDirty] = useState<Record<QuickField, boolean>>(
-    Object.fromEntries(PRIMARY_FIELDS.map((field) => [field, false])) as Record<
+    Object.fromEntries(ALL_FIELDS.map((field) => [field, false])) as Record<
       QuickField,
       boolean
     >,
@@ -25,7 +30,9 @@ export function useQuickCalc() {
   const previousViewKeyRef = useRef<string | null>(null)
 
   const evaluation = useMemo(() => evaluateForm(form), [form])
-  const canCalculate = evaluation.ok && allPrimaryFilled(form)
+  const allFilled = allPrimaryFilled(form)
+  const canSubmit = evaluation.ok && allFilled
+  const submitHint = canSubmit ? null : allFilled ? COPY.calculateInvalid : COPY.calculateDisabled
 
   useEffect(() => {
     if (!hasCalculated || !evaluation.ok) return
@@ -45,6 +52,10 @@ export function useQuickCalc() {
     setDirty((current) => ({ ...current, [field]: true }))
   }
 
+  function setRentInputBasis(value: RentInputBasis) {
+    setForm((current) => ({ ...current, rentInputBasis: value }))
+  }
+
   function markBlurred(field: QuickField) {
     setDirty((current) => ({ ...current, [field]: true }))
   }
@@ -54,7 +65,7 @@ export function useQuickCalc() {
     setHasCalculated(true)
     setView(evaluation.view)
     setDirty(
-      Object.fromEntries(PRIMARY_FIELDS.map((field) => [field, true])) as Record<
+      Object.fromEntries(ALL_FIELDS.map((field) => [field, true])) as Record<
         QuickField,
         boolean
       >,
@@ -81,11 +92,13 @@ export function useQuickCalc() {
     evaluation,
     view,
     hasCalculated,
-    canCalculate,
+    canSubmit,
+    submitHint,
     liveFlash,
     copied,
     resultsRef,
     setField,
+    setRentInputBasis,
     markBlurred,
     calculate,
     copySummary,

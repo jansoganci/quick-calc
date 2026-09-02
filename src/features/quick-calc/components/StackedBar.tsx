@@ -10,8 +10,8 @@ export function StackedBar({ bar, ticketFormatted }: StackedBarProps) {
   if (bar.length === 0) {
     return (
       <div>
-        <div className="mt-[18px] flex h-[38px] border border-[#D6D9DD] lg:h-[44px]" aria-hidden="true" />
-        <div className="mt-1.5 flex justify-between font-mono text-[11px] tabular-nums text-[#8A9199]">
+        <div className="mt-[18px] flex h-[38px] border border-qc-rule-mid lg:h-[44px]" aria-hidden="true" />
+        <div className="mt-1.5 flex justify-between font-mono text-[11px] tabular-nums text-qc-muted">
           <span>0,00 TL</span>
           <span>—</span>
         </div>
@@ -21,7 +21,7 @@ export function StackedBar({ bar, ticketFormatted }: StackedBarProps) {
 
   return (
     <div>
-      <div className="mt-[18px] flex h-[38px] overflow-hidden border border-[#D6D9DD] lg:mt-[22px] lg:h-[44px]">
+      <div className="mt-[18px] flex h-[38px] overflow-hidden border border-qc-rule-mid lg:mt-[22px] lg:h-[44px]">
         {bar.map((segment) => (
           <div
             key={segment.key}
@@ -33,14 +33,14 @@ export function StackedBar({ bar, ticketFormatted }: StackedBarProps) {
             title={`${segment.label} ${segment.amountFormatted}`}
           >
             {segment.showLabel ? (
-              <span className="hidden whitespace-nowrap text-[11px] text-white lg:inline">
+              <span className="hidden whitespace-nowrap text-[11px] text-qc-on-accent lg:inline">
                 {segment.label}
               </span>
             ) : null}
           </div>
         ))}
       </div>
-      <div className="mt-1.5 flex justify-between font-mono text-[11px] tabular-nums text-[#8A9199]">
+      <div className="mt-1.5 flex justify-between font-mono text-[11px] tabular-nums text-qc-muted">
         <span>0,00 TL</span>
         <span>{ticketFormatted}</span>
       </div>

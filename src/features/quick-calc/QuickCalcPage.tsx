@@ -6,8 +6,8 @@ export function QuickCalcPage() {
   const calc = useQuickCalc()
 
   return (
-    <div className="min-h-screen bg-[#EDEEF0]">
-      <div className="mx-auto max-w-[1152px] overflow-hidden border-x border-[#E3E5E8] bg-white lg:grid lg:grid-cols-[392px_1px_1fr]">
+    <div className="min-h-screen bg-qc-page">
+      <div className="mx-auto max-w-[1152px] overflow-hidden border-x border-qc-rule bg-qc-surface lg:grid lg:grid-cols-[392px_1px_1fr]">
         <QuickCalcForm
           form={calc.form}
           errors={calc.evaluation.ok ? {} : calc.evaluation.errors}
@@ -16,9 +16,10 @@ export function QuickCalcPage() {
           submitHint={calc.submitHint}
           onChange={calc.setField}
           onBlur={calc.markBlurred}
+          onRentBasisChange={calc.setRentInputBasis}
           onSubmit={calc.calculate}
         />
-        <div className="hidden bg-[#E3E5E8] lg:block" aria-hidden="true" />
+        <div className="hidden bg-qc-rule lg:block" aria-hidden="true" />
         <div ref={calc.resultsRef}>
           <QuickCalcResults
             view={calc.view}

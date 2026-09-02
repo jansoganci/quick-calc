@@ -135,4 +135,19 @@ describe('simulateQuick', () => {
       expect(current).toBeLessThan(previous);
     }
   });
+
+  it('carries net-rent stopaj through every volume level', () => {
+    const gross = simulateQuick(goldenInput());
+    const net = simulateQuick(resolve({ rentInputBasis: 'net' }));
+    const extraRent = 112_500;
+    for (let index = 0; index < gross.length; index += 1) {
+      const grossRow = gross[index];
+      const netRow = net[index];
+      expect(netRow?.dailySales).toBe(grossRow?.dailySales);
+      expect(netRow?.monthlyOperatingEarnings).toBeCloseTo(
+        (grossRow?.monthlyOperatingEarnings ?? 0) - extraRent,
+        2,
+      );
+    }
+  });
 });

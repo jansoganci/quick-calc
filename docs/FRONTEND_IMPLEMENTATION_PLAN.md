@@ -62,7 +62,9 @@ Visible fields bind to `QuickRawInput` keys from the spec §4:
 | Kişi başı aylık maliyet | `averageEmployeeMonthlyCost` |
 | Başlangıç yatırımı | `initialInvestment` |
 
-Assumptions strip shows `QUICK_DEFAULTS` (30 / 60 / 90% / 3,56%). Editing them is **out of v1** unless scope is reopened. Pass defaults through `validateQuickInput` as the engine already does when omitted.
+Assumptions strip shows `QUICK_DEFAULTS` (30 / 60 / 90% / 3,56%) and the four values are **editable**, per scope §6.3 and decisions C8, C9, C10, C31 and C33. A blank field falls back to its default through `validateQuickInput`, exactly as the engine already does when the value is omitted; an edited value is marked `user` and shown in ink (§7.1). The two rate assumptions are entered as percentages and stored as ratios.
+
+> **Superseded.** This section previously read "Editing them is **out of v1** unless scope is reopened", which contradicted five LOCKED decisions in the financial scope. The scope wins on financial behaviour, so editability was implemented.
 
 Parse UI strings (thousand separators, comma decimals) in the feature layer **before** `validateQuickInput`, or pass numbers if inputs are controlled numerics. Either way, `core` still sees `QuickRawInput`. Do not duplicate range logic in the UI.
 

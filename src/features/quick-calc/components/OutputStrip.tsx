@@ -10,13 +10,13 @@ export function OutputStrip({ outputs }: OutputStripProps) {
       {outputs.map((output, index) => (
         <div
           key={output.label}
-          className="lg:border-r lg:border-[#E3E5E8] lg:pr-4 lg:pl-4 first:lg:pl-0 last:lg:border-r-0"
+          className="lg:border-r lg:border-qc-rule lg:pr-4 lg:pl-4 first:lg:pl-0 last:lg:border-r-0"
           style={index === outputs.length - 1 ? { borderRightColor: 'transparent' } : undefined}
         >
-          <div className="min-h-8 text-xs leading-snug text-[#5B6169] lg:min-h-[34px]">{output.label}</div>
-          <div className="font-mono text-xl tabular-nums tracking-tight text-[#16181C] lg:text-[22px]">
+          <div className="line-clamp-2 min-h-8 text-xs leading-snug text-qc-secondary lg:min-h-[34px]">{output.label}</div>
+          <div className="font-mono text-xl tabular-nums tracking-tight text-qc-ink lg:text-[22px]">
             {output.value}
-            {output.unit ? <span className="text-[13px] text-[#8A9199]"> {output.unit}</span> : null}
+            {output.unit ? <span className="text-[13px] text-qc-muted"> {output.unit}</span> : null}
           </div>
         </div>
       ))}

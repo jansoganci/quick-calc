@@ -13,7 +13,8 @@ export type ValidationErrorCode =
   | 'required'
   | 'not_a_number'
   | 'below_min'
-  | 'above_max';
+  | 'above_max'
+  | 'invalid_value';
 
 export type PrimaryInputField =
   | 'monthlyRent'
@@ -31,7 +32,11 @@ export type SecondaryInputField =
   | 'cardPaymentShare'
   | 'posCommissionRate';
 
-export type QuickInputField = PrimaryInputField | SecondaryInputField;
+export type DiscreteInputField = 'rentInputBasis';
+
+export type RentInputBasis = 'net' | 'gross';
+
+export type QuickInputField = PrimaryInputField | SecondaryInputField | DiscreteInputField;
 
 export interface QuickCalculationInput {
   monthlyRent?: unknown;
@@ -46,6 +51,7 @@ export interface QuickCalculationInput {
   capexRecoveryPeriodMonths?: unknown;
   cardPaymentShare?: unknown;
   posCommissionRate?: unknown;
+  rentInputBasis?: unknown;
 }
 
 export interface QuickResolvedInput {
@@ -61,6 +67,8 @@ export interface QuickResolvedInput {
   capexRecoveryPeriodMonths: number;
   cardPaymentShare: number;
   posCommissionRate: number;
+  rentInputBasis: RentInputBasis;
+  rentWithholdingRate: number;
   vatRate: number;
 }
 
@@ -92,6 +100,9 @@ export interface MonthlyResult {
   vat: number;
   netRevenue: number;
   payroll: number;
+  rentCost: number;
+  rentPaidToLandlord: number;
+  rentWithholdingTax: number;
   variableCost: number;
   transactionCost: number;
   capexRecoveryAllocation: number;

@@ -1,24 +1,79 @@
-import { QUICK_DEFAULTS } from '../viewModel.ts'
-import { assumptionsSummary } from '../viewModel.ts'
-import { formatPercent } from '../../../lib/percent.ts'
+import { NumberField } from '../../../components/NumberField.tsx'
+import { COPY } from '../labels.ts'
+import {
+  assumptionRows,
+  fieldNumberFormat,
+  vatRateFormatted,
+  rentWithholdingRateFormatted,
+  type QuickField,
+  type QuickFormState,
+} from '../viewModel.ts'
 
-export function AssumptionsStrip() {
+type AssumptionsStripProps = {
+  form: QuickFormState
+  errors: Partial<Record<QuickField, string>>
+  dirty: Partial<Record<QuickField, boolean>>
+  onChange: (field: QuickField, value: string) => void
+  onBlur: (field: QuickField) => void
+}
+
+export function AssumptionsStrip({
+  form,
+  errors,
+  dirty,
+  onChange,
+  onBlur,
+}: AssumptionsStripProps) {
+  const rows = assumptionRows(form)
+
   return (
     <div className="collapse qc-assumptions">
       <input type="checkbox" aria-label="Varsayımları göster" />
       <div className="collapse-title">
-        <span>Varsayımlar</span>
+        <span>{COPY.assumptions}</span>
         <span className="inline-flex items-center gap-[9px]">
-          <span className="font-mono text-xs text-[#8A9199]">{assumptionsSummary()}</span>
-          <span className="text-[10px] text-[#8A9199]" aria-hidden="true">▾</span>
+          <span className="font-mono text-xs">
+            {rows.map((row, index) => (
+              <span key={row.field}>
+                {index > 0 ? <span className="text-qc-muted"> · </span> : null}
+                <span className={row.source === 'user' ? 'text-qc-ink' : 'text-qc-muted'}>
+                  {row.valueFormatted}
+                </span>
+              </span>
+            ))}
+          </span>
+          <span className="text-[10px] text-qc-muted" aria-hidden="true">
+            ▾
+          </span>
         </span>
       </div>
-      <div className="collapse-content text-[13px] leading-relaxed text-[#5B6169]">
-        <p>Aylık çalışma günü: {QUICK_DEFAULTS.operatingDaysPerMonth} gün</p>
-        <p>Yatırım geri kazanım süresi: {QUICK_DEFAULTS.capexRecoveryPeriodMonths} ay</p>
-        <p>Kartlı ödeme payı: {formatPercent(QUICK_DEFAULTS.cardPaymentShare)}</p>
-        <p>POS komisyonu: {formatPercent(QUICK_DEFAULTS.posCommissionRate)}</p>
-        <p>KDV oranı: {formatPercent(QUICK_DEFAULTS.vatRate)}</p>
+      <div className="collapse-content">
+        <div className="grid grid-cols-2 gap-x-[13px] gap-y-[15px]">
+          {rows.map((row) => {
+            const format = fieldNumberFormat(row.field)
+            return (
+              <NumberField
+                key={row.field}
+                id={row.field}
+                label={row.label}
+                value={form[row.field]}
+                onChange={(value) => onChange(row.field, value)}
+                onBlur={() => onBlur(row.field)}
+                unit={row.unit}
+                placeholder={row.placeholder}
+                error={dirty[row.field] ? errors[row.field] ?? null : null}
+                grouped={format.grouped}
+                maxFractionDigits={format.maxFractionDigits}
+              />
+            )
+          })}
+        </div>
+        <p className="mt-[15px] text-[13px] leading-relaxed text-qc-muted">
+          {COPY.vatAssumption(vatRateFormatted())}
+        </p>
+        <p className="mt-1.5 text-[13px] leading-relaxed text-qc-muted">
+          {COPY.rentWithholdingAssumption(rentWithholdingRateFormatted())}
+        </p>
       </div>
     </div>
   )

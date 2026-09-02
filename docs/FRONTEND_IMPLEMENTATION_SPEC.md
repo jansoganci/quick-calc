@@ -36,7 +36,7 @@ Bar cost ramp, in locked order: `#C3C8CE` KDV · `#3F4650` product · `#545C68` 
 
 `max-w-[1152px] mx-auto`, grid `392px 1px 1fr`. Left column inputs (`p-[30px]`), 1px hairline, right column result (`p-[30px_34px]`, `bg-[#FCFCFD]`). Result column `sticky top-0 self-start max-h-screen overflow-y-auto`.
 
-Inputs sit in a 2-column grid, `gap-y-[15px] gap-x-[13px]`; product cost and initial investment span both columns. Input row: `h-10`, value right-aligned in Mono, unit suffix in muted 12px. daisyUI: `input input-bordered` with `!rounded` `!h-10` and the border token; hint/error text as `label-text-alt`.
+Inputs sit in a 2-column grid, `gap-y-[15px] gap-x-[13px]`; product cost and initial investment span both columns. Input row: `h-10` **from the `lg` breakpoint up**; below it the row is 44px, because DESIGN_DIRECTION.md §1.1 locks "no interactive target below 44px" and that rule governs the mobile state. The same split applies to the `Özeti Kopyala` control (§3.1b). Value right-aligned in Mono, unit suffix in muted 12px. daisyUI: `input input-bordered` with `!rounded` `!h-10` and the border token; hint/error text as `label-text-alt`.
 
 Assumptions: one row, label left, current values as a Mono summary right, `▾`. daisyUI `collapse collapse-arrow` with the default chrome removed — border and background off. Collapsed by default; a user-edited assumption gets its value in ink instead of muted, no badge.
 
@@ -64,6 +64,8 @@ Assumptions: one row, label left, current values as a Mono summary right, `▾`.
 
 **Money format:** always full Turkish — `1.945.947 TL`, `107,56 TL`, `%25,5`. Group separator `.`, decimal `,`, unit after a space. Never abbreviated, never a currency symbol. Use `Intl.NumberFormat('tr-TR')`.
 
+**Input number formatting:** monetary and large-number fields show Turkish grouping while typing (`450000` → `450.000`, `1500000,50` → `1.500.000,50`). This is presentation only. The engine still receives numeric values. Percentage assumption fields are not grouped. Paste of `1500000`, `1.500.000`, or a valid Turkish-formatted number must parse to the same number.
+
 ## 4. Motion
 
 **R3:** on the first valid `Hesapla`, the result column transitions in once — `opacity 0→1` with `translateY(4px→0)`, 220ms `cubic-bezier(0.2,0,0,1)`. One element, one transition. No stagger, no scale, no bounce.
@@ -79,7 +81,7 @@ Breakpoint: single column below `lg` (1024px), two columns at and above.
 
 ## 6. Turkish copy — draft for review
 
-**Input labels:** Ortalama satış tutarı (hint *KDV dahil*) · Günlük satış adedi · Satış başına ürün maliyeti · Aylık kira · Diğer aylık giderler · Çalışan sayısı · Kişi başı aylık maliyet · Başlangıç yatırımı.
+**Input labels:** Ortalama satış tutarı (hint *KDV dahil*) · Günlük satış adedi · Satış başına ürün maliyeti · Aylık kira (Net kira / Brüt kira control; default Brüt) · Diğer aylık giderler · Çalışan sayısı · Kişi başı aylık maliyet · Başlangıç yatırımı.
 **Assumptions:** Ayda çalışılan gün · Yatırım geri kazanım süresi (ay) · Kartlı ödeme oranı · POS komisyon oranı.
 **Breakdown rows:** KDV · Ürün maliyeti · Personel · Kira · Diğer giderler · POS komisyonu · Yatırım geri kazanımı · **İşletmede kalan** · Toplam.
 **Outputs:** Aylık işletme kazancı · Brüt kâr marjı · İşletme kâr marjı · Yatırımın geri dönüşü.
@@ -96,7 +98,8 @@ Loss variant: `140,00 TL’lik ortalama satışın tamamı maliyete gidiyor; her
 - `above_max` — `En fazla {max} girilebilir.`
 
 **Caveats:**
-- Earnings (§10.1) — `Aylık işletme kazancı vergi öncesi bir tutardır. Kurumlar vergisi, finansman giderleri ve amortisman hesaba katılmamıştır.`
+- Earnings (§10.1) — `Aylık işletme kazancı basitleştirilmiş bir tahmindir; net kâr ya da işletme sahibinin eline geçen tutar değildir. Kurumlar vergisi, gelir vergisi, finansman giderleri ve kredi ödemeleri, işletme sahibinin maaşı ve ortaklara yapılan ödemeler ile diğer mali yükümlülükler hesaba katılmamıştır. Yatırım geri kazanım payı ise bir gider olarak bu tutarın içindedir.`
+  **Corrected against scope §6.5, §10.1 and C25.** The earlier wording used *amortisman* (depreciation), which §6.5 retires from this module in code, copy, labels and charts, and it stated that the allocation was excluded when C25 locks it as included as a cost. It also named only two of the five exclusions §10.1 requires; income tax, owner salary/drawings/dividends and other financial obligations have been added.
 - Simulation (§12.4) — `Simülasyonda kira, personel ve diğer sabit giderlerin değişmediği varsayılmıştır. Satış hacmi arttıkça satış başına maliyetin düşmesinin nedeni budur.`
 - Payback unavailable — `Bu satış hızında yatırım geri dönüşü hesaplanamıyor.`
 - Exceeds recovery period — `Yatırımın geri dönüşü öngörülen {n} aylık süreyi aşıyor.`

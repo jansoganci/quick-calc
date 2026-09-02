@@ -5,7 +5,48 @@ import type {
   PerSaleResult,
   QuickCalculationResult,
   QuickResolvedInput,
+  RentInputBasis,
 } from './types.ts';
+
+export interface ResolvedRentCost {
+  rentCost: number;
+  rentPaidToLandlord: number;
+  rentWithholdingTax: number;
+}
+
+export function resolveRentCost(input: {
+  monthlyRent: number;
+  rentInputBasis: RentInputBasis;
+  rentWithholdingRate: number;
+}): ResolvedRentCost {
+  const entered = input.monthlyRent;
+  const rate = input.rentWithholdingRate;
+
+  if (entered === 0 || rate === 0) {
+    return {
+      rentCost: entered,
+      rentPaidToLandlord: entered,
+      rentWithholdingTax: 0,
+    };
+  }
+
+  if (input.rentInputBasis === 'net') {
+    const rentCost = entered / (1 - rate);
+    const rentWithholdingTax = rentCost - entered;
+    return {
+      rentCost,
+      rentPaidToLandlord: entered,
+      rentWithholdingTax,
+    };
+  }
+
+  const rentWithholdingTax = entered * rate;
+  return {
+    rentCost: entered,
+    rentPaidToLandlord: entered - rentWithholdingTax,
+    rentWithholdingTax,
+  };
+}
 
 export function calculateQuick(input: QuickResolvedInput): QuickCalculationResult {
   const monthlySalesVolume = input.dailySalesVolume * input.operatingDaysPerMonth;
@@ -24,8 +65,10 @@ export function calculateQuick(input: QuickResolvedInput): QuickCalculationResul
 
   const monthlyCapexRecoveryAllocation = input.initialCapex / input.capexRecoveryPeriodMonths;
 
+  const rent = resolveRentCost(input);
+
   const monthlyFixedCost =
-    input.monthlyRent + monthlyPayroll + input.otherMonthlyOpex + monthlyCapexRecoveryAllocation;
+    rent.rentCost + monthlyPayroll + input.otherMonthlyOpex + monthlyCapexRecoveryAllocation;
 
   const monthlyTotalCost = monthlyFixedCost + monthlyVariableCost + monthlyTransactionCost;
 
@@ -39,7 +82,7 @@ export function calculateQuick(input: QuickResolvedInput): QuickCalculationResul
   if (monthlySalesVolume !== 0) {
     const fixedCostPerSale = monthlyFixedCost / monthlySalesVolume;
     const payrollPerSale = monthlyPayroll / monthlySalesVolume;
-    const rentPerSale = input.monthlyRent / monthlySalesVolume;
+    const rentPerSale = rent.rentCost / monthlySalesVolume;
     const otherOpexPerSale = input.otherMonthlyOpex / monthlySalesVolume;
     const investmentRecoveryPerSale = monthlyCapexRecoveryAllocation / monthlySalesVolume;
     const estimatedTotalCostPerSale =
@@ -105,6 +148,9 @@ export function calculateQuick(input: QuickResolvedInput): QuickCalculationResul
       vat: monthlyVat,
       netRevenue: monthlyNetRevenue,
       payroll: monthlyPayroll,
+      rentCost: rent.rentCost,
+      rentPaidToLandlord: rent.rentPaidToLandlord,
+      rentWithholdingTax: rent.rentWithholdingTax,
       variableCost: monthlyVariableCost,
       transactionCost: monthlyTransactionCost,
       capexRecoveryAllocation: monthlyCapexRecoveryAllocation,

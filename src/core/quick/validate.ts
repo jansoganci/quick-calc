@@ -85,10 +85,20 @@ export function validateQuickInput(raw: QuickCalculationInput): ValidateQuickRes
     }
   }
 
+  const basis = raw.rentInputBasis;
+  if (isAbsent(basis)) {
+    resolved.rentInputBasis = QUICK_DEFAULTS.rentInputBasis;
+  } else if (basis === 'net' || basis === 'gross') {
+    resolved.rentInputBasis = basis;
+  } else {
+    errors.push({ field: 'rentInputBasis', code: 'invalid_value' });
+  }
+
   if (errors.length > 0) {
     return { ok: false, errors };
   }
 
   resolved.vatRate = QUICK_DEFAULTS.vatRate;
+  resolved.rentWithholdingRate = QUICK_DEFAULTS.rentWithholdingRate;
   return { ok: true, input: resolved };
 }

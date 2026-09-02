@@ -59,6 +59,11 @@ function assertInvariants(input: QuickResolvedInput): void {
     result.monthly.operatingEarnings + result.monthly.capexRecoveryAllocation,
     INVARIANT,
   );
+
+  expect(result.monthly.rentPaidToLandlord + result.monthly.rentWithholdingTax).toBeCloseTo(
+    result.monthly.rentCost,
+    INVARIANT,
+  );
 }
 
 describe('calculateQuick golden vector', () => {
@@ -70,6 +75,9 @@ describe('calculateQuick golden vector', () => {
     expect(result.monthly.vat).toBeCloseTo(381_818.1818, MONEY);
     expect(result.monthly.netRevenue).toBeCloseTo(3_818_181.8182, MONEY);
     expect(result.monthly.payroll).toBeCloseTo(576_000, MONEY);
+    expect(result.monthly.rentCost).toBeCloseTo(450_000, MONEY);
+    expect(result.monthly.rentPaidToLandlord).toBeCloseTo(360_000, MONEY);
+    expect(result.monthly.rentWithholdingTax).toBeCloseTo(90_000, MONEY);
     expect(result.monthly.variableCost).toBeCloseTo(435_000, MONEY);
     expect(result.monthly.transactionCost).toBeCloseTo(134_568, MONEY);
     expect(result.monthly.capexRecoveryAllocation).toBeCloseTo(166_666.6667, MONEY);
@@ -143,6 +151,8 @@ describe('calculateQuick structural invariants', () => {
     resolve({ dailySalesVolume: 250, employeeCount: 3, initialCapex: 1_000_000 }),
     resolve({ averageTicket: 80, variableCostPerSale: 40, monthlyRent: 20_000 }),
     resolve({ dailySalesVolume: 0.25, operatingDaysPerMonth: 1 }),
+    resolve({ rentInputBasis: 'net', monthlyRent: 450_000 }),
+    resolve({ monthlyRent: 0, rentInputBasis: 'net' }),
   ])('holds for varied inputs %#', (input) => {
     assertInvariants(input);
   });
@@ -160,6 +170,67 @@ describe('calculateQuick structural invariants', () => {
         'payback',
         'perSale',
       ].sort(),
+    );
+  });
+});
+
+describe('calculateQuick rent withholding (§8.6a)', () => {
+  it('treats gross 450,000 at 20% as 360,000 net + 90,000 stopaj with unchanged cash cost', () => {
+    const result = calculateQuick(resolve({ monthlyRent: 450_000, rentInputBasis: 'gross' }));
+    expect(result.monthly.rentPaidToLandlord).toBe(360_000);
+    expect(result.monthly.rentWithholdingTax).toBe(90_000);
+    expect(result.monthly.rentCost).toBe(450_000);
+    expect(result.breakdownPerSale?.lines.find((line) => line.line === 'rent')?.amount).toBeCloseTo(
+      15,
+      MONEY,
+    );
+    expect(result.monthly.fixedCost).toBeCloseTo(1_302_666.6667, MONEY);
+    expect(result.monthly.operatingEarnings).toBeCloseTo(1_945_947.15, 2);
+  });
+
+  it('grosses net 450,000 at 20% to 562,500, never 450,000 × 1.20', () => {
+    const result = calculateQuick(resolve({ monthlyRent: 450_000, rentInputBasis: 'net' }));
+    expect(result.monthly.rentPaidToLandlord).toBe(450_000);
+    expect(result.monthly.rentCost).toBe(562_500);
+    expect(result.monthly.rentWithholdingTax).toBe(112_500);
+    expect(result.monthly.rentCost).not.toBe(450_000 * 1.2);
+
+    const extraRent = 112_500;
+    const sales = 30_000;
+    expect(result.breakdownPerSale?.lines.find((line) => line.line === 'rent')?.amount).toBeCloseTo(
+      562_500 / sales,
+      MONEY,
+    );
+    expect(result.perSale?.remainingProfit).toBeCloseTo(64.8649 - extraRent / sales, MONEY);
+    expect(result.monthly.operatingEarnings).toBeCloseTo(1_945_947.15 - extraRent, 2);
+    expect(result.monthly.fixedCost).toBeCloseTo(1_302_666.6667 + extraRent, MONEY);
+  });
+
+  it('keeps zero rent at zero on both bases', () => {
+    for (const rentInputBasis of ['gross', 'net'] as const) {
+      const result = calculateQuick(resolve({ monthlyRent: 0, rentInputBasis }));
+      expect(result.monthly.rentCost).toBe(0);
+      expect(result.monthly.rentPaidToLandlord).toBe(0);
+      expect(result.monthly.rentWithholdingTax).toBe(0);
+      expect(result.breakdownPerSale?.lines.find((line) => line.line === 'rent')?.amount).toBe(0);
+    }
+  });
+
+  it('reconciles net-rent per-sale and monthly figures', () => {
+    const result = calculateQuick(resolve({ monthlyRent: 450_000, rentInputBasis: 'net' }));
+    expect(result.perSale).not.toBeNull();
+    expect(result.breakdownPerSale).not.toBeNull();
+    if (result.perSale === null || result.breakdownPerSale === null) return;
+
+    const rentLine = result.breakdownPerSale.lines.find((line) => line.line === 'rent');
+    expect(rentLine?.amount).toBeCloseTo(result.monthly.rentCost / result.monthly.salesVolume, INVARIANT);
+    expect(result.monthly.operatingEarnings).toBeCloseTo(
+      result.perSale.remainingProfit * result.monthly.salesVolume,
+      INVARIANT,
+    );
+    expect(result.perSale.estimatedTotalCost).toBeCloseTo(
+      result.breakdownPerSale.averageSale - result.perSale.remainingProfit,
+      INVARIANT,
     );
   });
 });

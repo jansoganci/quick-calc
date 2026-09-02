@@ -15,6 +15,11 @@ export const FIELD_LABELS = {
   posCommissionRate: 'POS komisyonu',
 } as const
 
+export const RENT_BASIS_LABELS = {
+  net: 'Net kira',
+  gross: 'Brüt kira',
+} as const
+
 export const FIELD_UNITS: Record<keyof typeof FIELD_LABELS, FieldUnit> = {
   monthlyRent: 'TL',
   employeeCount: 'kişi',
@@ -55,17 +60,6 @@ export const BREAKDOWN_LABELS: Record<
   remaining: 'İşletmede kalan',
 }
 
-export const BREAKDOWN_SWATCH: Record<keyof typeof BREAKDOWN_LABELS, string> = {
-  vat: '#C3C8CE',
-  variable: '#3F4650',
-  payroll: '#545C68',
-  rent: '#6B7280',
-  otherOpex: '#8A9199',
-  pos: '#A8AEB6',
-  investmentRecovery: '#CFD3D8',
-  remaining: '#1D3A5F',
-}
-
 export const SIM_LABELS = {
   '-50%': '−%50',
   '-25%': '−%25',
@@ -73,6 +67,10 @@ export const SIM_LABELS = {
   '+25%': '+%25',
   '+50%': '+%50',
 } as const
+
+/** A run of the summary sentence. `amount` renders in Mono 500, `accent` adds the ink accent. */
+export type HeadlineTone = 'text' | 'amount' | 'accent'
+export type HeadlineSegment = { text: string; tone: HeadlineTone }
 
 export const COPY = {
   formSection: 'İşletme bilgileri',
@@ -95,19 +93,48 @@ export const COPY = {
   simCost: 'Satış başına maliyet',
   simEarnings: 'Aylık kazanç',
   earningsFootnote:
-    'Aylık işletme kazancı vergi öncesi bir tutardır. Kurumlar vergisi, finansman giderleri ve amortisman hesaba katılmamıştır.',
+    'Aylık işletme kazancı basitleştirilmiş bir tahmindir; net kâr ya da işletme sahibinin eline geçen tutar değildir. Kurumlar vergisi, gelir vergisi, finansman giderleri ve kredi ödemeleri, işletme sahibinin maaşı ve ortaklara yapılan ödemeler ile diğer mali yükümlülükler hesaba katılmamıştır. Yatırım geri kazanım payı ise bir gider olarak bu tutarın içindedir.',
   simFootnote:
     'Simülasyonda kira, personel ve diğer sabit giderlerin değişmediği varsayılmıştır. Satış hacmi arttıkça satış başına maliyetin düşmesinin nedeni budur.',
   emptyResult:
-    'Hesapla’dan önce sonuç alanında hiçbir sayı gösterilmez. Yalnızca kısa bir açıklama ve boş bir çubuk yer tutar.',
+    'Hesapla’dan önce sonuç alanında hiçbir sayı gösterilmez. Tüm alanları doldurup Hesapla’ya bastığınızda satış başına maliyet, işletmede kalan tutar ve aylık kazanç burada görünür.',
+  total: 'Toplam',
+  headlineSentence: (ticket: string, cost: string, remaining: string): HeadlineSegment[] => [
+    { text: ticket, tone: 'amount' },
+    { text: '’lik ortalama satışın ', tone: 'text' },
+    { text: cost, tone: 'amount' },
+    { text: '’si maliyete gidiyor, ', tone: 'text' },
+    { text: remaining, tone: 'accent' },
+    { text: '’si işletmede kalıyor.', tone: 'text' },
+  ],
+  // A deficit is not "the remaining amount", so it stays a plain Mono figure:
+  // V3 keeps negative values free of colour treatment.
+  headlineLossSentence: (ticket: string, deficit: string): HeadlineSegment[] => [
+    { text: ticket, tone: 'amount' },
+    { text: '’lik ortalama satışın tamamı maliyete gidiyor; her satışta ', tone: 'text' },
+    { text: deficit, tone: 'amount' },
+    { text: ' açık oluşuyor.', tone: 'text' },
+  ],
+  vatAssumption: (rate: string) => `KDV oranı: ${rate} (sistem varsayımı, değiştirilemez)`,
+  rentWithholdingAssumption: (rate: string) =>
+    `Kira stopaj oranı: ${rate} (işyeri, sistem varsayımı)`,
+  rentBasisGroup: 'Girilen kira tutarı',
+  rentCostHint: (net: string, tax: string, total: string) =>
+    `Mülk sahibine ${net} TL · stopaj ${tax} TL · toplam ${total} TL`,
+  simVolumeShort: 'Günlük',
+  simCostShort: 'Birim maliyet',
+  paybackUnavailable: 'Bu satış hızında yatırım geri dönüşü hesaplanamıyor.',
+  paybackExceeds: (months: string) =>
+    `Yatırımın geri dönüşü öngörülen ${months} aylık süreyi aşıyor.`,
   zeroVolume:
     'Günlük satış sıfır olduğu için satış başına maliyet gösterilemiyor.',
 } as const
 
 export const ERROR_COPY = {
-  required: 'Bu alanı doldurun.',
-  notANumber: 'Geçerli bir sayı girin.',
+  required: 'Bu alan gerekli.',
+  notANumber: 'Lütfen bir sayı girin.',
   aboveMax: (formatted: string) => `En fazla ${formatted} girilebilir.`,
-  belowMin: (formatted: string) => `${formatted} değerinden küçük olamaz.`,
+  belowMin: (formatted: string) => `En az ${formatted} girilebilir.`,
   exclusiveZero: '0’dan büyük bir değer girin.',
+  invalidValue: 'Lütfen geçerli bir seçim yapın.',
 } as const

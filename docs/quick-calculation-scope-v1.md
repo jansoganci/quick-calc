@@ -1,9 +1,9 @@
 # Quick Calculation Module — Product & Financial Scope
 
-**Version:** v1.4 (final approved decisions applied)
+**Version:** v1.5 (işyeri kira stopajı added to Quick Calculation)
 **Phase:** Financial Model Definition — **not** Implementation
 **Currency:** TRY · **Country:** Turkey · **Preset:** Coffee Shop / Cafe
-**Status of this document:** Financial model definition **complete**. All decisions in §24.1 are approved and locked; **no blocking open decisions remain** (§24.2).
+**Status of this document:** Financial model definition **complete**. All decisions in §24.1 are approved and locked; **no blocking open decisions remain** (§24.2). v1.5 adds a locked, simplified işyeri kira stopajı rule without reopening the rest of the model.
 
 ---
 
@@ -214,7 +214,7 @@ These 8 fields are the main Quick Calculation form. All are required and all are
 
 ### 6.2 Notes per primary input
 
-**1. `monthlyRent`** — Monthly rent for the premises. Example: `450,000 TRY`. Rent withholding and rent escalation are out of scope (§21).
+**1. `monthlyRent`** — Monthly rent for the premises, as written in the lease or as agreed with the landlord. Example: `450,000 TRY`. The user states whether this amount is **net** (what the landlord receives) or **gross** (the withholding-tax base). Quick Calculation then applies the simplified işyeri kira stopajı rule in §8.6a. Rent escalation remains out of scope (§21).
 
 **2. `employeeCount` / 3. `averageEmployeeMonthlyCost`** — `averageEmployeeMonthlyCost` is the **average total monthly employer cost per employee**, kept **consolidated** in Quick Calculation. No SGK or payroll breakdown here; the user enters one blended figure. Example: `12 × 48,000 TRY`.
 
@@ -246,6 +246,7 @@ Not part of the 8 primary required inputs. Each has a sensible default and is ed
 | `capexRecoveryPeriodMonths` | months | `60` | Yes | Product decision |
 | `posCommissionRate` | ratio | **`0.0356` (3.56%)** | Yes | Approved Turkey market assumption |
 | `cardPaymentShare` | ratio | **`0.90` (90%)** | Yes | Approved Turkey market assumption |
+| `rentInputBasis` | `'net'` \| `'gross'` | **`'gross'`** | Yes | Product decision — preserves the locked §19 vector unless the user selects net |
 
 **`operatingDaysPerMonth`** — Default `30`. Simple and explainable; editable for businesses that close one or two days a week.
 
@@ -254,6 +255,8 @@ Not part of the 8 primary required inputs. Each has a sensible default and is ed
 **`posCommissionRate` — default `3.56%` [LOCKED]** — The commission rate charged on a card transaction. Editable by the user.
 
 **`cardPaymentShare` — default `0.90` [LOCKED]** — The share of sales collected by card rather than cash. Editable by the user.
+
+**`rentInputBasis` — default `'gross'` [LOCKED]** — Whether the entered `monthlyRent` is net (landlord receives this amount) or gross (this amount is the withholding-tax base). Default `'gross'` keeps total cash rent cost equal to the entered figure, so the §19 golden vector does not change unless the user selects **Net kira**. See §8.6a.
 
 > **These two are different things and must never be conflated.**
 > `posCommissionRate` (3.56%) is *how much the payment provider charges on a card transaction*.
@@ -265,6 +268,7 @@ Not part of the 8 primary required inputs. Each has a sensible default and is ed
 | Field | Value | Exposed as a main input? |
 | --- | --- | --- |
 | `vatRate` | `0.10` | No — system assumption (§5.1) |
+| `rentWithholdingRate` | `0.20` | No — system assumption (§8.6a). Shown as an assumption, not as a tax-rate input. |
 
 ### 6.5 CAPEX terminology rule **[LOCKED]**
 
@@ -365,10 +369,67 @@ Default `capexRecoveryPeriodMonths = 60`, editable by the user (§6.3). This is 
 
 It is charged as a cost inside monthly operating earnings (§10.1). Investment payback is kept separate from it and adds it back, so CAPEX is never counted twice (§11).
 
+### 8.6a Monthly rent cost — işyeri kira stopajı **[LOCKED]**
+
+Quick Calculation models Turkish commercial rent withholding (GVK m. 94/5-a) as a **cash-cost adjustment**, not as a tax calculator.
+
+Definitions:
+
+| Term | Meaning |
+| --- | --- |
+| Net rent | Amount the landlord actually receives |
+| Gross rent | Withholding-tax base |
+| Withholding tax / stopaj | Amount paid to the tax authority |
+| Total cash cost to the business | Net rent + stopaj = gross rent |
+
+The rate is applied to the **gross** amount. **Never** compute net × 1.20. For a 20% rate the gross-up is:
+
+```
+rentWithholdingRate = 0.20                         (system assumption)
+
+if rentInputBasis === 'gross':
+  monthlyGrossRent          = monthlyRent          (as entered)
+  monthlyRentWithholdingTax = monthlyGrossRent × rentWithholdingRate
+  monthlyNetRentToLandlord  = monthlyGrossRent − monthlyRentWithholdingTax
+
+if rentInputBasis === 'net':
+  monthlyNetRentToLandlord  = monthlyRent          (as entered)
+  monthlyGrossRent          = monthlyRent / (1 − rentWithholdingRate)
+  monthlyRentWithholdingTax = monthlyGrossRent − monthlyNetRentToLandlord
+
+monthlyRentCost = monthlyGrossRent
+```
+
+`monthlyRentCost` is the amount that flows into every downstream rent use. The entered `monthlyRent` is never overwritten.
+
+Worked illustration — user enters `450,000 TRY`, rate `20%`:
+
+```
+Brüt kira 450,000:
+  stopaj     = 450,000 × 0.20 = 90,000
+  net        = 360,000
+  cash cost  = 450,000          (unchanged vs. v1.4)
+
+Net kira 450,000:
+  gross      = 450,000 / 0.80 = 562,500     (not 450,000 × 1.20 = 540,000)
+  stopaj     = 112,500
+  cash cost  = 562,500
+```
+
+Zero rent → all three rent figures are `0`.
+
+**Simplifications (intentional):**
+
+- Models the typical işyeri case (withholding as if the landlord is a gerçek kişi). A company landlord is not a third mode; selecting **Brüt kira** keeps total cash cost equal to the entered amount.
+- Rent KDV is not added. Cost inputs remain as entered (§5.1, C5).
+- The stopaj rate is not user-editable. Detailed tax reconciliation belongs to Detailed Feasibility (§21).
+
+The cost-breakdown **Kira** line stays a single category (§9.2). The split (net + stopaj = gross) may be shown as an explanatory note, not as extra breakdown rows.
+
 ### 8.7 Monthly fixed cost
 
 ```
-monthlyFixedCost = monthlyRent + monthlyPayroll + otherMonthlyOpex
+monthlyFixedCost = monthlyRentCost + monthlyPayroll + otherMonthlyOpex
                  + monthlyCapexRecoveryAllocation
 ```
 
@@ -419,7 +480,7 @@ A simple breakdown of the average customer payment. **Approved categories, in th
 | 1 | VAT | `vatPerSale` |
 | 2 | Direct / Variable Product Cost | `variableCostPerSale` |
 | 3 | Payroll Allocation | `monthlyPayroll / monthlySalesVolume` |
-| 4 | Rent Allocation | `monthlyRent / monthlySalesVolume` |
+| 4 | Rent Allocation | `monthlyRentCost / monthlySalesVolume` |
 | 5 | Other OPEX Allocation | `otherMonthlyOpex / monthlySalesVolume` |
 | 6 | POS / Payment Cost | `posCostPerSale` |
 | 7 | Investment Recovery Allocation | `monthlyCapexRecoveryAllocation / monthlySalesVolume` |
@@ -648,7 +709,7 @@ These may exist internally where useful for formulas, validation or warnings. **
 | `contributionPerSale` = `netAverageTicket − variableCostPerSale − posCostPerSale` | Break-even math and the negative-contribution edge case (§16). Not to be confused with Gross Profit Margin (§10.2). |
 | `contributionMargin` | Diagnostic only |
 | Break-even monthly / daily sales, on both a running-cost and an investment-recovery basis | Plausibility checks and internal validation. **Break-even is not shown in Quick Calculation v1 [LOCKED]** — the result surface stays simpler, and the volume simulation (§12) conveys the same intuition. |
-| `monthlyGrossCollections`, `monthlyVat`, `monthlyNetRevenue`, `monthlyFixedCost`, `monthlyVariableCost`, `monthlyTransactionCost`, `monthlyTotalCost` | Intermediate steps feeding the approved outputs |
+| `monthlyGrossCollections`, `monthlyVat`, `monthlyNetRevenue`, `monthlyFixedCost`, `monthlyVariableCost`, `monthlyTransactionCost`, `monthlyTotalCost`, `monthlyRentCost`, `monthlyNetRentToLandlord`, `monthlyRentWithholdingTax` | Intermediate steps feeding the approved outputs |
 | Cash-basis operating earnings and margin | Feed payback; never shown alongside §10 as a second KPI |
 
 ### 13.1 Explicitly excluded from the Quick result surface **[LOCKED]**
@@ -696,7 +757,7 @@ These may belong to Detailed Feasibility later.
 | **Net Revenue** | Gross collections with the 10% VAT assumption removed |
 | **Direct / Variable Product Cost** | Cost directly attached to producing or selling one average sale |
 | **POS / Payment Cost** | Cost of collecting payment for one sale (commission on the card share) |
-| **Payroll / Rent / Other OPEX Allocation** | The monthly cost divided by monthly sales volume |
+| **Payroll / Rent / Other OPEX Allocation** | The monthly cost divided by monthly sales volume. Rent uses `monthlyRentCost` (gross / total cash cost), not the raw entered figure when the user selected net |
 | **Investment Recovery Allocation** | `initialCapex / capexRecoveryPeriodMonths` — **never** "depreciation" (§6.5) |
 | **Estimated Total Cost Per Sale** | The seven cost categories of §9.2 summed, VAT included |
 | **Remaining Profit** | Average sale minus all seven cost categories |
@@ -778,9 +839,11 @@ interface QuickCalculationInput {
 
   // secondary assumptions, defaulted and editable (§6.3)
   operatingDaysPerMonth; capexRecoveryPeriodMonths; cardPaymentShare; posCommissionRate;
+  rentInputBasis;           // 'net' | 'gross' — default 'gross'
 
-  // system assumption (§6.4)
+  // system assumptions (§6.4)
   vatRate;
+  rentWithholdingRate;      // 0.20 — not a user input
 }
 
 type CostLine =
@@ -835,7 +898,9 @@ interface QuickCalculationResult {
 
 Primary: `monthlyRent 450,000` · `employeeCount 12` · `averageEmployeeMonthlyCost 48,000` · `otherMonthlyOpex 110,000` · `initialCapex 10,000,000` · `averageTicket 140 (VAT-incl.)` · `dailySalesVolume 1,000` · `variableCostPerSale 14.50`.
 
-Assumptions (all approved defaults): `operatingDaysPerMonth 30` · `capexRecoveryPeriodMonths 60` · `vatRate 0.10` · `posCommissionRate 0.0356` · `cardPaymentShare 0.90`.
+Assumptions (all approved defaults): `operatingDaysPerMonth 30` · `capexRecoveryPeriodMonths 60` · `vatRate 0.10` · `posCommissionRate 0.0356` · `cardPaymentShare 0.90` · `rentInputBasis 'gross'` · `rentWithholdingRate 0.20`.
+
+Under the gross default, `monthlyRentCost = 450,000` (net to landlord 360,000 + stopaj 90,000). The arithmetic below is therefore identical to v1.4.
 
 POS cost per sale = `140 × 0.90 × 0.0356 = 4.4856 TRY`.
 
@@ -927,7 +992,7 @@ Quick Calculation is deliberately simplified. These belong to the future Detaile
 
 **Removed from Quick by decision:** waste rate and waste modelling; benchmark completion of core financial inputs; `pricesIncludeVat`; any shared financial engine with Detailed Feasibility; break-even as a user-facing output; multiple margin definitions; user-configurable scenarios.
 
-**Payroll & tax:** detailed SGK calculations, employee-level payroll, income tax brackets, corporate tax, Bağ-Kur, rent withholding, input VAT and detailed VAT accounting.
+**Payroll & tax:** detailed SGK calculations, employee-level payroll, income tax brackets, corporate tax, Bağ-Kur, input VAT and detailed VAT accounting. Simplified işyeri kira stopajı **is** in Quick Calculation (§8.6a); landlord-type branching, rent KDV, rate editing and a full tax reconciliation are not.
 
 **Regulatory:** municipal licenses, fire department fees, music copyright fees.
 
@@ -1024,6 +1089,7 @@ Not to be reopened, reconsidered or re-proposed.
 | C33 | Card payment share | **Default `0.90`, editable.** Distinct from the commission rate. (§6.3) |
 | C34 | Worked-example realism | **Closed.** The example validates formula arithmetic only; it need not represent realistic market economics. Realism comes later from actual benchmark data. Plausibility, recalibration and example credibility are **not blockers**. (§19.3) |
 | C32 | Payback gating band *(resolved by C27)* | Gate on `monthlyOperatingEarningsBeforeCapexRecoveryAllocation <= 0`. Keeping payback separate from the recovery allocation means the allocation cannot decide whether payback exists; in the band where displayed earnings are ≤ 0 but the before-allocation figure is positive, the payback number is shown with a note that it exceeds the recovery period. (§11.2) |
+| C35 | İşyeri kira stopajı in Quick Calculation | **In scope as a simplified cash-cost rule.** `monthlyRent` stays one of the 8 primary inputs. `rentInputBasis` is a secondary assumption defaulting to **`'gross'`**. Rate is a system assumption **`0.20`**, applied to the gross / withholding-tax base. Net rent grosses up as `monthlyRent / (1 − rate)`, never `monthlyRent × 1.20`. Total cash cost equals gross rent and is the only rent figure used by §8.7, §9.1, §9.2, §10.1 and §12. The breakdown keeps a single Kira line. (§6.3, §6.4, §8.6a) |
 
 ### 24.2 OPEN — non-blocking only
 
@@ -1092,3 +1158,4 @@ This separation keeps hard-coded numbers out of the engine. It is **not** a benc
 | v1.2 | Two separate calculation engines replacing the single-engine requirement; benchmark completion removed as a Quick dependency; 8 primary inputs frozen; VAT-inclusive ticket convention with a fixed 10% system assumption and no cost-side VAT adjustment; waste removed; CAPEX recovery-period terminology; secondary editable assumptions defined; per-sale allocation on a gross-ticket basis; decisions register split into CLOSED and OPEN |
 | v1.3 | Approved output decisions applied: result philosophy and hierarchy; Estimated Total Cost Per Sale as the VAT-inclusive headline; 8-category Cost Breakdown Per Sale; single Estimated Monthly Operating Earnings figure with mandatory limitation statement; single Estimated Profit Margin; Estimated Investment Payback with required qualifiers; automatic −50/−25/current/+25/+50 volume simulation with no new inputs; break-even, contribution and cash-vs-economic profit demoted to internal; result contract and worked example rebuilt around the six approved outputs; `421 sales/day` figure retired |
 | v1.4 | Final approved decisions applied, planning phase closed: `cardPaymentShare` default `0.90` (editable) and worked-example realism closed as a non-issue, leaving no blocking open decisions; monthly operating earnings confirmed as recovery-inclusive; CAPEX recovery allocation formula, 60-month default and non-depreciation status locked; payback kept separate from the allocation with the no-double-counting rule and the gate moved to the before-allocation figure (resolving the v1.3 conflict); `variableCostPerSale` locked as entered with no waste, input-VAT or recipe adjustment; break-even confirmed out of v1; POS commission default set to 3.56% and card payment share to 0.90, kept explicitly distinct from each other; margins changed from one to two (Gross and Operating, with "Net Profit Margin" forbidden); output set grown to seven; worked example recomputed |
+| v1.5 | Simplified işyeri kira stopajı added (C35): `rentInputBasis` net/gross with default `'gross'`, system rate `0.20` on the gross base, net gross-up `entered / (1 − rate)` not `× 1.20`. `monthlyRentCost` (= gross) replaces raw `monthlyRent` in fixed cost, per-sale rent allocation, earnings and the volume simulation. §19 golden vector is unchanged under the gross default. Rent KDV, company-landlord mode and rate editing stay out of scope. |

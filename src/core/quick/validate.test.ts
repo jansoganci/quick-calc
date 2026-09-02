@@ -37,6 +37,8 @@ describe('validateQuickInput', () => {
     expect(result.input.capexRecoveryPeriodMonths).toBe(QUICK_DEFAULTS.capexRecoveryPeriodMonths);
     expect(result.input.cardPaymentShare).toBe(QUICK_DEFAULTS.cardPaymentShare);
     expect(result.input.posCommissionRate).toBe(QUICK_DEFAULTS.posCommissionRate);
+    expect(result.input.rentInputBasis).toBe(QUICK_DEFAULTS.rentInputBasis);
+    expect(result.input.rentWithholdingRate).toBe(QUICK_DEFAULTS.rentWithholdingRate);
   });
 
   it.each(PRIMARY_FIELDS)('returns required when %s is missing', (field) => {
@@ -112,6 +114,24 @@ describe('validateQuickInput', () => {
     expect(result.input.capexRecoveryPeriodMonths).toBe(60);
     expect(result.input.cardPaymentShare).toBe(0.9);
     expect(result.input.posCommissionRate).toBe(0.0356);
+    expect(result.input.rentInputBasis).toBe('gross');
+    expect(result.input.rentWithholdingRate).toBe(0.2);
+  });
+
+  it('accepts rentInputBasis net and gross', () => {
+    const net = validateQuickInput({ ...VALID_PRIMARY, rentInputBasis: 'net' });
+    expect(net.ok).toBe(true);
+    if (net.ok) expect(net.input.rentInputBasis).toBe('net');
+    const gross = validateQuickInput({ ...VALID_PRIMARY, rentInputBasis: 'gross' });
+    expect(gross.ok).toBe(true);
+    if (gross.ok) expect(gross.input.rentInputBasis).toBe('gross');
+  });
+
+  it('rejects an invalid rentInputBasis', () => {
+    const result = validateQuickInput({ ...VALID_PRIMARY, rentInputBasis: 'brüt' });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.errors).toContainEqual({ field: 'rentInputBasis', code: 'invalid_value' });
   });
 
   it('rejects operatingDaysPerMonth 0 and 32', () => {
