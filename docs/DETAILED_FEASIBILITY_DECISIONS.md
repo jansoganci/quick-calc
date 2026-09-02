@@ -1,6 +1,6 @@
 # Detailed Feasibility — Locked Decisions
 
-**Version:** v0.3
+**Version:** v0.4
 **Status:** Decision log for product decisions that are **LOCKED / AGREED**. Remaining mechanics are intentionally open.
 **Phase:** Planning — **not** a financial specification and **not** implementation
 **Currency:** TRY · **Country:** Turkey · **Preset context:** Coffee Shop / Cafe (same product family as Quick / Lite)
@@ -208,7 +208,7 @@ Category is not the v1 revenue-calculation unit.
 
 Earlier lock: each category carried an average VAT-inclusive price, an average unit cost in TL, and an expected quantity.
 
-**v1 lock:** those fields belong to **products** for revenue (DF-45). Unit cost / COGS is **not** being decided in this revenue update (see §5.2).
+**v1 lock:** those fields belong to **products** for revenue (DF-45). Product unit cost is locked in §5.2.
 
 #### DF-45 — Product fields for v1 revenue **[LOCKED]**
 
@@ -218,6 +218,7 @@ Each product has at minimum:
 - **normal** selling price
 - **online / delivery** selling price
 - expected sales quantity
+- **unit product cost in TL** (Product COGS — DF-28; not a selling price)
 
 All customer-facing selling prices are VAT-inclusive (DF-03).
 
@@ -237,7 +238,7 @@ The user must not be required to define ingredient-level recipes such as:
 - lid
 - individual ingredient bills of materials
 
-Product-level selling items are sufficient for v1 revenue. Packaging cost, channel-specific product cost, waste, and recipe costing are **not** decided in this update.
+Product-level selling items are sufficient for v1 revenue. Ingredient-level costing remains out of v1.
 
 #### DF-03 — Customer-facing sales prices are VAT-inclusive **[LOCKED]**
 
@@ -346,24 +347,85 @@ Platform / service deductions are applied to delivery revenue under DF-10. They 
 
 ---
 
-### 5.2 COGS
+### 5.2 Cost structure — Product COGS, Channel Variable Costs, Payment / Platform Fees
 
-**This revenue update does not resolve COGS.** Packaging cost, takeaway packaging, delivery packaging, channel-specific product cost, waste, and recipe costing remain for the next decision step. DF-28 and DF-29 stay as previously locked and are not reopened or extended here.
+#### DF-50 — Keep the three cost concepts separate **[LOCKED]**
 
-#### DF-28 — Unit COGS is entered directly in TL **[LOCKED]**
+Detailed v1 must keep these three concepts **separate**:
 
-Users enter average unit product / category cost **directly in TL**.
+1. **Product COGS**
+2. **Channel Variable Costs**
+3. **Payment / Platform Fees**
 
-That unit cost is not derived from a recipe engine (DF-02).
+Do **not** merge them into one generic “product cost” number.
 
-#### DF-29 — Unit COGS is constant; total COGS follows units sold **[LOCKED]**
+The purpose is to show the user whether margin loss comes from:
 
-When sales volume changes:
+- the product itself;
+- channel-specific fulfillment costs;
+- or commissions / payment fees.
 
-- **unit COGS stays constant**;
-- **total COGS increases or decreases with units sold**.
+The v1 cost structure is intentionally limited to these three. Do not add any other standard channel-variable cost unless separately approved.
+
+#### DF-28 — Each product has a unit product cost in TL **[LOCKED]**
+
+Each product has a **user-entered unit cost in TL**.
+
+Example (illustrative):
+
+Americano:
+
+- selling price: 150 TL
+- unit product cost: 30 TL
+
+No recipe engine. No ingredient-level costing. **No COGS percentage input.**
+
+#### DF-29 — Product COGS follows units sold **[LOCKED]**
+
+Conceptual formula:
+
+```
+productCOGS = unitsSold × unitProductCost
+```
+
+Unit product cost **stays constant** when sales volume changes. Total product COGS increases or decreases with units sold.
 
 This also applies when comparing sales-volume scenarios (DF-37).
+
+#### DF-52 — Channel Variable Costs are separate from Product COGS **[LOCKED]**
+
+Channel-specific variable costs are **not** Product COGS.
+
+For v1, the standard channel-variable fields are:
+
+- takeaway packaging cost per order
+- delivery packaging cost per order
+- own-courier variable payment per delivery order, **if applicable**
+
+Examples (illustrative):
+
+- product COGS: 30 TL
+- delivery packaging: 5 TL
+- own courier variable payment: 40 TL
+
+These remain **separate cost lines**.
+
+Do **not** include in channel-variable cost:
+
+| Cost | Where it belongs |
+| --- | --- |
+| Courier salary | Personnel / payroll |
+| Motorcycle fuel / maintenance / insurance | OPEX |
+| Motorcycle purchase | CAPEX |
+| Platform commission | Payment / Platform Fees |
+
+**DEFERRED:** the exact input placement and labels; when own-courier variable payment is shown (it is “if applicable”); whether packaging is a single business-level amount or can vary by product. Do not add further standard channel-variable fields in this update.
+
+#### DF-56 — No extra standard channel-variable costs in v1 **[LOCKED]**
+
+Do not add any other standard channel-variable cost unless separately approved.
+
+Campaigns, Joker, promotional subsidies, and listing / reklam charges are out of v1 (X13).
 
 ---
 
@@ -442,9 +504,9 @@ Do **not** hardcode a 15% default merely because it was mentioned in discussion.
 
 Detailed must distinguish two delivery operating models.
 
-**Mode 1 — Platform only / merchant handles delivery**
+**Mode 1 — Platform only / merchant courier**
 
-The platform generates the order. Delivery is handled outside the platform courier service.
+The platform generates the order. Delivery is handled by the merchant (own courier), not the platform courier service.
 
 The relevant platform cost is **percentage-based and editable**.
 
@@ -458,25 +520,91 @@ This cost is also **percentage-based and editable**.
 
 The product's **online selling price stays the same** in both modes (DF-46).
 
-The difference between modes is the **percentage-based platform / service deduction** applied to delivery revenue, not the customer-facing online price.
+What changes between modes is the **percentage-based platform / service deduction** applied to delivery revenue, not the customer-facing online price.
 
-Approximate market figures discussed in planning (roughly 12–15% for one model, roughly 38% for platform + courier) are **not** approved benchmark or product defaults.
+#### DF-10a — Default editable platform deduction rates **[LOCKED]**
 
-Do **not** encode them as authoritative defaults. Exact default percentages remain **OPEN**.
+Default **editable** effective total deduction rates for v1:
 
-**DEFERRED:** default rates for Mode 1 and Mode 2; how the user chooses a mode; whether both modes can coexist.
+| Mode | Default effective rate |
+| --- | --- |
+| Platform only / merchant courier | **15%** |
+| Platform + platform courier | **38%** |
 
-#### DF-11 — Platform / courier VAT treatment is not finalized **[DEFERRED]**
+These are **default assumptions only**. The user must be able to edit them because real contractual rates vary.
 
-Delivery-platform VAT treatment remains an **explicitly open** topic requiring research.
+Do **not** treat these defaults as authoritative market constants.
 
-Do not invent:
+Earlier planning figures such as “roughly 12–15%” and “roughly 38%” are superseded **as open defaults** by this table. They were never market constants, and these v1 defaults are still not market constants.
 
-- VAT on platform service invoices;
-- how that VAT sits relative to the commission percentage;
-- cash paid vs. P&L expense vs. deductible input VAT.
+**DEFERRED:** how the user chooses a mode; whether both modes can coexist.
 
-A full VAT-return / input-VAT accounting engine is out of v1 (DF-31). That exclusion does **not** close this research item. It only forbids guessing a treatment now.
+#### DF-53 — Platform fee is a percentage of VAT-inclusive delivery gross **[LOCKED]**
+
+Platform commission / service cost is **not** Product COGS. It is a separate **Payment / Platform Fee**.
+
+All online customer prices are VAT-inclusive (DF-03, DF-48).
+
+Platform fee is calculated from **VAT-inclusive gross delivery revenue**:
+
+```
+platformFee = deliveryGrossRevenue × effectivePlatformFeeRate
+```
+
+Example (illustrative of an edited rate, not a second default):
+
+Delivery gross revenue = 100 TL  
+Effective platform fee rate = 38.40%
+
+```
+platformFee = 100 × 0.384 = 38.40 TL
+```
+
+Seller remainder **before** Product COGS and other channel costs:
+
+```
+100 − 38.40 = 61.60 TL
+```
+
+#### DF-11 — Platform commission VAT as a separate accounting split **[SUPERSEDED for v1 by DF-54]**
+
+Earlier lock: platform / courier VAT treatment was an open research item.
+
+**v1 lock:** the user-entered percentage is the effective total deduction, VAT included. Do not model a separate platform-VAT cash line in v1.
+
+#### DF-54 — Effective total platform deduction is VAT-inclusive **[LOCKED]**
+
+For Detailed v1, the percentage entered by the user represents the:
+
+**effective total platform deduction rate, VAT included.**
+
+Therefore:
+
+- do **not** add another 20% VAT on top of the entered platform fee rate;
+- do **not** calculate `platformFee × 1.20`;
+- do **not** create a separate platform service VAT cash-cost line in v1.
+
+Example:
+
+If the effective rate is 38.40%:
+
+Correct: `100 × 38.40% = 38.40 TL` total deduction.
+
+Incorrect: `38.40 + 20% = 46.08 TL`.
+
+The service invoice may internally split the 38.40 TL into service-base + VAT components. Detailed v1 does **not** need to expose or model that accounting decomposition.
+
+The user-facing input should conceptually mean:
+
+`Platform toplam kesinti oranı (KDV dahil)`
+
+This is consistent with DF-31 (no full VAT accounting engine in v1).
+
+#### DF-55 — Platform campaigns / Joker are out of v1 **[LOCKED]**
+
+Platform campaigns, Joker discounts, promotional subsidies, listing / reklam charges, and similar campaign mechanics are **explicitly out of v1**.
+
+Do not add them to the engine or the standard input set.
 
 ---
 
@@ -740,7 +868,7 @@ Do **not** create:
 
 Sales prices remain VAT-inclusive (DF-03).
 
-Delivery-platform VAT treatment remains explicitly open and requires research (DF-11). Do not invent it here.
+Platform fee uses an effective VAT-inclusive deduction rate (DF-54). Do not add 20% on top of that rate, and do not model the service-base vs VAT split in v1.
 
 ---
 
@@ -883,11 +1011,12 @@ These are decided exclusions, not open questions.
 | X5 | Financing | No loans, interest, debt/equity structure, or financing schedules (DF-40). |
 | X6 | Working-capital / payment-timing | No POS settlement delays, supplier terms, or daily cash timing (DF-41). |
 | X7 | Income / corporate / distribution tax model | No PIT, CIT, profit-distribution withholding, or full company-tax model (DF-30). |
-| X8 | Full accounting VAT engine | No per-OPEX/per-CAPEX deductible VAT, VAT carry-forward, or VAT-return machinery (DF-31). Platform VAT treatment remains a research item (DF-11). |
+| X8 | Full accounting VAT engine | No per-OPEX/per-CAPEX deductible VAT, VAT carry-forward, or VAT-return machinery (DF-31). Platform fee is an effective VAT-inclusive deduction rate (DF-54); no extra 20% on top. |
 | X9 | Payroll engine | No gross-salary-to-employer-cost conversion (DF-15). Detailed is not payroll software. |
 | X10 | Accounting depreciation / tax useful-life machinery | CAPEX is initial investment (DF-34). |
 | X11 | Complex OPEX driver system | Ordinary recurring amounts in v1 (DF-39). |
 | X12 | Accounting / ERP / tax-advisory product shape | DF-00. |
+| X13 | Platform campaigns / Joker / listing ads | Out of v1 (DF-55). |
 
 ---
 
@@ -904,8 +1033,9 @@ These are known open questions. They are listed so they are not silently closed.
 | POS default rate | Percentage, editable; not a fixed monthly TL amount; not applied again to platform-collected delivery | The default percentage |
 | Meal-card default rate | Percentage, editable; not a fixed monthly TL amount; not applied again to platform-collected delivery | The default percentage (15% was discussed only) |
 | Payment mix | Percentage-based; cash / card / meal card; must equal 100%; applies to direct store sales (salon and takeaway) | The default mix; 100% enforcement UX |
-| Delivery defaults | Two percentage-based commercial modes; online price unchanged across modes | Approved default rates; mode-selection UX; coexistence of both modes |
-| Platform / courier VAT | Must be researched; not invented here | The treatment itself (DF-11) |
+| Delivery defaults | Two percentage-based commercial modes; online price unchanged across modes | Mode-selection UX; whether both modes can coexist |
+| Platform fee rates | Editable effective VAT-inclusive deduction; v1 defaults 15% (platform only) and 38% (platform + courier) | Nothing remaining on the rate meaning or v1 defaults. Do not treat defaults as market constants |
+| Platform commission VAT | User-entered rate is the effective total deduction, KDV dahil (DF-54) | Accounting split of service-base vs VAT — out of v1, not a remaining v1 design task |
 | Aidat default | Standard line; may start empty | Label grouping only |
 | Personnel additional costs | Meals, transport, bonus are in scope | Input granularity |
 | Owner labour UX | Can be entered as an operating cost | Exact control and cost basis |
@@ -919,8 +1049,8 @@ These are known open questions. They are listed so they are not silently closed.
 | CAPEX recovery presentation | No accounting depreciation | Whether any simplified recovery allocation is shown |
 | Operating break-even formula | Simple operating break-even; CAPEX excluded | Exact formula |
 | Payback formula | Approximate investment payback is shown | Exact formula; interaction with ramp-up |
-| Waste modelling | — | Not decided in this revenue update. Explicitly out of this step along with packaging and channel-specific product cost |
-| Product COGS attachment | Unit COGS previously locked as a direct TL amount (DF-28, DF-29) | How COGS attaches to the product list; packaging; takeaway vs delivery packaging; channel-specific product cost |
+| Waste modelling | Not part of Product COGS, Channel Variable Costs, or Platform Fees as locked here | Whether waste is modelled at all in Detailed v1 |
+| Channel-variable placement | Takeaway packaging, delivery packaging, own-courier variable payment if applicable | Whether packaging is business-level or per product; when own-courier payment is shown |
 
 ---
 
@@ -953,8 +1083,8 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 | DF-01 | Category as sales engine | **Superseded by DF-44.** |
 | DF-44 | Sales unit | Product-based. User adds selling items. Engine calculates from products, not a blended category average. |
 | DF-44a | Category | Optional grouping / organisation only. |
-| DF-01a | Category price / cost / qty fields | **Superseded by DF-45** for revenue. COGS not decided in this update. |
-| DF-45 | Product fields | Name, normal price, online price, expected quantity. All prices VAT-inclusive. |
+| DF-01a | Category price / cost / qty fields | **Superseded by DF-45** for revenue. Product unit cost is DF-28. |
+| DF-45 | Product fields | Name, normal price, online price, expected quantity, unit product cost in TL. Selling prices VAT-inclusive. |
 | DF-02 | Recipe / SKU engine | Out of Detailed v1. |
 | DF-03 | Sales prices | VAT-inclusive as entered, including normal and online prices. Never silently grossed up. |
 | DF-04 | Sales channels | Salon / on-premise, al-götür / takeaway, paket servis / delivery. |
@@ -963,15 +1093,23 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 | DF-46 | Normal vs online price | Salon and takeaway use normal price. Delivery uses online price. Online price is fixed and does not change with delivery mode. |
 | DF-47 | Quantity split | One quantity per product, multiplied by the business-level channel mix. Time basis not locked. |
 | DF-48 | Channel revenue | `qty × normalPrice` for salon and takeaway; `qty × onlinePrice` for delivery. Gross customer sales are VAT-inclusive. |
-| DF-28 | Unit COGS | Entered directly in TL. Not extended by this revenue update. |
-| DF-29 | COGS vs. volume | Unit COGS constant; total COGS follows units sold. Not extended by this revenue update. |
+| DF-50 | Cost structure | Product COGS, Channel Variable Costs, and Payment / Platform Fees stay separate. |
+| DF-28 | Product COGS | Per-product unit cost in TL. `productCOGS = unitsSold × unitProductCost`. No COGS %. |
+| DF-29 | COGS vs. volume | Unit product cost constant; total product COGS follows units sold. |
+| DF-52 | Channel variable costs | Takeaway packaging / order; delivery packaging / order; own-courier variable payment / delivery order if applicable. Not payroll, OPEX vehicle running costs, CAPEX, or platform commission. |
+| DF-56 | Extra channel-variable fields | Do not add other standard channel-variable costs unless separately approved. |
 | DF-06 | Payment methods | Cash, card, meal card — distinct from channels. Direct store sales. |
 | DF-06a | Payment mix | Percentage-based. Must equal 100%. |
 | DF-49 | No double-count | Do not apply POS / meal-card commission to platform-collected delivery. Payment mix applies to salon and takeaway. |
 | DF-07 | Cash | No payment-processing commission. |
 | DF-08 | POS | Editable percentage. Not a fixed monthly TL amount. Default rate not locked. |
 | DF-09 | Meal card | Editable percentage. Not a fixed monthly TL amount. Default rate not locked. |
-| DF-10 | Delivery modes | Mode 1 platform only; Mode 2 platform + courier. Both percentage-based and editable. Online price unchanged across modes. Discussed market rates are not defaults. |
+| DF-10 | Delivery modes | Mode 1 platform only / merchant courier; Mode 2 platform + courier. Online price unchanged across modes. |
+| DF-10a | Platform fee defaults | Editable. v1 defaults 15% and 38%. Not market constants. |
+| DF-53 | Platform fee formula | `platformFee = deliveryGrossRevenue × effectivePlatformFeeRate` on VAT-inclusive gross. Not Product COGS. |
+| DF-11 | Platform VAT as open research | **Superseded for v1 by DF-54.** |
+| DF-54 | Platform fee VAT | Entered rate is effective total deduction, KDV dahil. Do not add 20% on top. Do not split service-base vs VAT in v1. |
+| DF-55 | Campaigns / Joker | Out of v1. |
 | DF-12 | Rent | Same net/gross 20% withholding math as Lite. Gross-up is `net / 0.80`, never `net × 1.20`. Implemented later in the Detailed engine, not by importing Lite. |
 | DF-13 | Aidat | Standard occupancy expense; may start empty; no forced default. |
 | DF-14 | Personnel | Position-based; user-addable positions. |
@@ -998,7 +1136,7 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 | DF-36 | Payback | Approximate investment payback. Formula and ramp-up interaction later. |
 | DF-40 | Financing | Out of v1. |
 | DF-41 | Working-capital timing | Out of v1. |
-| X1–X12 | v1 exclusions | See §6. |
+| X1–X13 | v1 exclusions | See §6. |
 
 ### 9.2 SUPERSEDED
 
@@ -1009,10 +1147,12 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 | DF-01 | Category-based sales as the engine input | DF-44 — product-based revenue |
 | DF-01a | Category average price, unit cost, and quantity | DF-45 — product name, normal price, online price, quantity. COGS left to the next step |
 | DF-05 | Optional per-channel price overrides, including a distinct takeaway price | DF-46 — two prices only: normal (salon + takeaway) and online (delivery) |
+| DF-10 open defaults | Exact platform percentages left open; discussed 12–15% / 38% not to be encoded as defaults | DF-10a — v1 editable defaults 15% and 38%, still not market constants |
+| DF-11 | Platform / courier VAT treatment left open for research | DF-54 — entered rate is effective total deduction, VAT included; no extra 20%; no v1 VAT split line |
 
 ### 9.3 DEFERRED (non-exhaustive; see §7)
 
-DF-11 (platform / courier VAT treatment), DF-43 (inflation / escalation), DF-42 mechanics, break-even and payback formulas, scenario multipliers, ramp-up presets, and every other **DEFERRED** row in §7 remain open. They will be resolved in follow-up tasks, then recorded in a future Detailed financial specification.
+DF-43 (inflation / escalation), DF-42 mechanics, break-even and payback formulas, scenario multipliers, ramp-up presets, and every other **DEFERRED** row in §7 remain open. They will be resolved in follow-up tasks, then recorded in a future Detailed financial specification.
 
 ---
 
@@ -1028,7 +1168,7 @@ Once a Detailed financial specification exists, the following still need a later
 | --- | --- |
 | `docs/APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md` D4 | Currently says there is no router yet; tab navigation may later require an explicit routing/navigation decision |
 | `docs/TECH_STACK_AND_CONSTRAINTS.md` §4.2 | Persistence rules already cover Detailed and should remain the technical authority |
-| `docs/quick-calculation-scope-v1.md` §21 / §6.2 | Lite currently says waste modelling and recipe-level costing "belong to Detailed Feasibility". Detailed v1 has now **excluded** the recipe/SKU engine. Lite also deferred detailed VAT accounting and tax to Detailed; Detailed v1 has now **excluded** a full VAT engine and a company-tax model. Waste is still undecided for Detailed. The Lite document should later distinguish "out of Lite" from "in Detailed v1" |
+| `docs/quick-calculation-scope-v1.md` §21 / §6.2 | Lite currently says waste modelling and recipe-level costing "belong to Detailed Feasibility". Detailed v1 has now **excluded** the recipe/SKU engine. Lite also deferred detailed VAT accounting and tax to Detailed; Detailed v1 has now **excluded** a full VAT engine and a company-tax model, and treats platform fee as an effective VAT-inclusive deduction. Waste is still undecided for Detailed. The Lite document should later distinguish "out of Lite" from "in Detailed v1" |
 | `docs/DESIGN_DIRECTION.md` and `docs/FRONTEND_IMPLEMENTATION_SPEC.md` | Visual inheritance is locked; Detailed screen structure, tabs, and result hierarchy are not. The Quick masthead currently assumes no navigation |
 
 None of the above is a reason to change Lite behaviour now.
@@ -1043,3 +1183,4 @@ None of the above is a reason to change Lite behaviour now.
 | v0.1.1 | Companion paths updated after docs cleanup: finished Quick execution plans now live under `docs/archive/`. |
 | v0.2 | Locked Detailed v1 simplification principle; category fields (VAT-inclusive price, unit cost in TL, quantity); business-level channel mix; percentage payment mix; COGS volume behaviour; CAPEX as initial investment including opening stock; no depreciation engine; no financing or working-capital timing; no income/corporate/distribution tax model; no full VAT accounting engine; simple operating break-even (CAPEX excluded); approximate payback; simple sales-volume scenarios with fixed cost assumptions; preset-driven ramp-up; multi-month projection. Superseded DF-21 and DF-22 for v1. Inflation/escalation and platform VAT treatment remain open. |
 | v0.3 | Revenue is product-based. Category is optional grouping only. Each product has name, VAT-inclusive normal price, VAT-inclusive online price, and one expected quantity. Salon and takeaway use the normal price; delivery uses the online price. Online price does not vary by delivery mode. Business-level channel mix must equal 100% and is applied to each product's quantity. Channel revenue concept locked. Payment mix must equal 100% and applies to direct store sales; do not also apply POS/meal-card commission to platform-collected delivery. COGS, packaging, waste, and recipe costing not decided in this update. Superseded DF-01, DF-01a, and DF-05. |
+| v0.4 | Locked the three-way cost structure: Product COGS, Channel Variable Costs, Payment / Platform Fees. Per-product unit cost in TL; `productCOGS = unitsSold × unitProductCost`. Standard channel-variable fields: takeaway packaging, delivery packaging, own-courier variable payment if applicable. Platform fee is a percentage of VAT-inclusive delivery gross. v1 editable defaults 15% and 38%. Entered platform rate is effective total deduction, KDV dahil; do not add 20% VAT on top. Campaigns / Joker out of v1. Superseded DF-11 and the previous “platform defaults remain open” clause of DF-10. |
