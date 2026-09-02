@@ -1,0 +1,11 @@
+{
+  "name": "F&B Financial Calculator",
+  "install": "npm ci",
+  "terminals": [
+    {
+      "name": "dev-server",
+      "command": "npm run dev"
+    }
+  ],
+  "ports": [5173]
+}
