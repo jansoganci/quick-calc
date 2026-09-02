@@ -1,6 +1,6 @@
 # Detailed Feasibility — Locked Decisions
 
-**Version:** v0.5
+**Version:** v0.6
 **Status:** Decision log for product decisions that are **LOCKED / AGREED**. Remaining mechanics are intentionally open.
 **Phase:** Planning — **not** a financial specification and **not** implementation
 **Currency:** TRY · **Country:** Turkey · **Preset context:** Coffee Shop / Cafe (same product family as Quick / Lite)
@@ -137,7 +137,31 @@ Rules that already apply and are **not** being changed:
 
 **Already locked technically** (owned by `docs/TECH_STACK_AND_CONSTRAINTS.md`, not redefined here): when Detailed is built, scenarios persist in `localStorage` with JSON export/import; no cloud sync and no user accounts in the initial version. Calculations remain client-side TypeScript.
 
-**Not authorised by this document:** creating `core/detailed/`, `features/detailed/`, `businessModel.ts`, any Detailed UI, or any Detailed calculation engine.
+**Not authorised by this document:** creating `core/detailed/`, `features/detailed/`, `businessModel.ts`, any Detailed UI, or any Detailed calculation engine **in this planning pass**. When implementation is requested, see §3.1.
+
+---
+
+### 3.1 Implementation and design responsibility **[LOCKED]**
+
+| Work | Owner |
+| --- | --- |
+| Calculation engine / financial logic | **Cursor**, when implementation is requested |
+| UI / UX for Detailed | **Separate Claude Design pass**, after financial behaviour is sufficiently locked |
+
+Cursor must document the financial behaviour and required outputs clearly enough that the later Claude Design task can design the interface around them.
+
+**Do not let UI decisions change the locked financial logic.**
+
+The Claude Design pass should receive:
+
+- the locked financial definitions;
+- required inputs (already entered elsewhere in the business description — not extra finance fields for these outputs);
+- required outputs (see DF-61);
+- edge states such as unreachable break-even / unavailable payback / payback not reached within the horizon;
+- scenario behaviour;
+- ramp-up behaviour.
+
+This document is the handoff source for those items. It is not a screen layout.
 
 ---
 
@@ -900,23 +924,24 @@ Platform fee uses an effective VAT-inclusive deduction rate (DF-54). Do not add 
 
 ---
 
-### 5.10 Projection
+### 5.10 Projection and ramp-up
 
-#### DF-23 — Multi-month projection is part of Detailed v1 **[LOCKED]**
+#### DF-23 — Simple monthly projection **[LOCKED]**
 
-Detailed is not intended to calculate only a single "normal month".
+Detailed includes a **simple monthly projection**.
 
-A **multi-month projection** is part of Detailed v1.
+Default horizon: **24 months**. The horizon is **user-editable** (DF-24).
 
-This is one of the major differences between Lite and Detailed.
+The projection exists to show how the business may evolve from opening toward stabilized operations, and to support approximate investment payback (DF-36).
 
-The Detailed experience should eventually be able to answer:
+This is **not**:
 
-> How much cash do I actually need to open and survive the early months?
+- a working-capital model;
+- a payment-settlement timing model;
+- a supplier-credit model;
+- a daily cash-flow model.
 
-That question is answered with initial investment plus projected operating results. It is **not** a working-capital / payment-timing model (X6).
-
-**DEFERRED:** the projection statement shape; which lines it contains; opening-cash presentation; exact relationship between CAPEX timing and month 1.
+**DEFERRED:** the projection statement shape and line list; opening-cash presentation; exact CAPEX timing vs. month 1; horizon control UX (free number vs. presets). Do not invent those here.
 
 #### DF-24 — Default projection horizon is 24 months **[LOCKED]**
 
@@ -926,15 +951,27 @@ The projection period should be **user-editable**.
 
 **DEFERRED:** the precise UX — free numeric input versus presets such as 12 / 24 / 36 months. Do not decide that here.
 
-#### DF-25 — Ramp-up will exist, and it stays simple **[LOCKED]**
+#### DF-25 — Ramp-up is preset-driven **[LOCKED]**
 
-New stores do not necessarily reach stabilized sales immediately.
+Opening-period ramp-up is part of Detailed v1.
 
-Detailed will include a **ramp-up** concept for the opening period.
+It must remain **simple and preset-driven**.
 
-It should remain **simple and preset-driven**, rather than requiring the user to enter many monthly values.
+The user should **not** enter a month-by-month sales table.
 
-**DEFERRED:** exact ramp-up percentages, duration, curve shape / presets, and the relationship between ramp-up and scenarios. Do not invent the curves here.
+Conceptually the user chooses an opening sales maturation profile such as:
+
+- cautious / slow
+- normal
+- strong / fast
+
+The engine then applies **predefined monthly sales-volume multipliers** until the store reaches its stabilized / base sales level.
+
+Ramp-up **feeds the multi-month projection** and therefore **affects estimated payback**.
+
+**Exact preset names, percentages, and duration remain OPEN.** Do not invent them in this update.
+
+**DEFERRED:** how ramp-up combines with Bad / Base / Good scenario multipliers. Do not invent that interaction here.
 
 #### DF-26 — Seasonality is not part of Detailed v1 **[LOCKED]**
 
@@ -946,7 +983,7 @@ Seasonality may be considered in a future version.
 
 #### DF-43 — Inflation / escalation treatment is not decided **[DEFERRED]**
 
-Inflation / cost-escalation / rent-escalation treatment is still open.
+Inflation / annual escalation remains **OPEN**.
 
 Do not invent an inflation engine, index, or default escalation rate in this document.
 
@@ -954,53 +991,141 @@ Do not invent an inflation engine, index, or default escalation rate in this doc
 
 ### 5.11 Scenarios
 
-#### DF-27 — Detailed is scenario-based, and scenarios stay simple **[LOCKED]**
+#### DF-27 — Three simple scenarios **[LOCKED]**
 
-The Detailed experience will support scenario analysis.
+Detailed v1 uses a deliberately simple scenario model.
 
-Scenarios are **intentionally simple**.
+Three scenarios:
 
-Intended conceptual states:
+- Bad / Kötü
+- Base / Baz
+- Good / İyi
 
-- weak / bad case
-- base / expected case
-- strong / good case
+Do **not** create per-input scenario overrides in v1.
 
 #### DF-37 — The primary scenario variable is sales volume **[LOCKED]**
 
-When comparing sales scenarios, the primary variable is **sales volume**.
+The primary scenario variable is **sales volume**.
 
-These remain **fixed assumptions** across those sales scenarios:
+Scenario changes apply **proportionally to product sales quantities**.
 
-- rent
+The following assumptions remain **fixed** across scenarios:
+
+- product mix
+- normal prices
+- online prices
+- channel mix
+- payment mix
+- unit Product COGS
+- packaging / channel-variable unit costs
+- platform commission rates
+- card / meal-card commission rates
 - payroll
+- owner / operator cost
+- Bağ-Kur
+- rent
+- aidat
 - OPEX
 - CAPEX
-- unit COGS
 
-**Total COGS still changes with units sold** (DF-29).
+Total Product COGS and other variable costs still change naturally because sales quantity changes.
 
-Exact Bad / Base / Good multipliers remain **DEFERRED**. Do not invent them.
-
-Whether ramp-up and scenarios are the same system remains **DEFERRED** (DF-25).
+**Exact scenario multipliers remain OPEN** and will be decided separately. Do not invent them.
 
 ---
 
 ### 5.12 Break-even and payback
 
-#### DF-35 — Simple operating break-even **[LOCKED]**
+#### DF-35 — Operating break-even is derived automatically **[LOCKED]**
 
-Detailed v1 will show a **simple operating break-even**.
+Detailed v1 will calculate **operating break-even automatically**.
 
-**CAPEX is not part of operating break-even.**
+The user should **not** enter a separate break-even input. The calculation uses the financial information already entered elsewhere.
 
-The exact calculation formula will be defined later in the Detailed financial specification. Do not invent it here.
+**CAPEX is not included** in operating break-even.
 
-#### DF-36 — Approximate investment payback **[LOCKED]**
+Do **not** mix operating break-even with investment payback.
 
-Detailed will show an **approximate investment payback period**.
+Fixed monthly costs include concepts such as:
 
-The exact formula, and its interaction with ramp-up, will be defined later. Do not invent them here.
+- payroll
+- owner / operator cost
+- Bağ-Kur
+- rent
+- aidat
+- monthly OPEX
+
+Variable costs that move with sales include:
+
+- Product COGS
+- Channel Variable Costs
+- Payment Fees
+- Platform Fees
+
+The engine should derive a **weighted contribution per sale** from the current product mix, prices, channel mix, payment mix, and variable costs.
+
+Conceptual formula:
+
+```
+breakEvenMonthlySalesCount = monthlyFixedCosts / weightedContributionPerSale
+```
+
+If weighted contribution per sale is **less than or equal to zero**, break-even is **unavailable / unreachable** under the current assumptions.
+
+Primary user-facing break-even outputs:
+
+- approximate **monthly** sales count required to break even
+- approximate **daily** sales count required to break even
+
+A corresponding approximate **monthly revenue** figure may also be shown.
+
+**DEFERRED:** the exact weighting algebra for contribution per sale (belongs in the eventual financial spec, following this concept); the operating-days basis used to convert monthly count to daily count. Do not invent those here.
+
+#### DF-36 — Investment payback from the projection **[LOCKED]**
+
+Detailed will calculate investment payback **automatically**.
+
+The user should **not** enter a separate payback assumption.
+
+Total initial investment is the **sum of the approved CAPEX / opening investment items** (DF-32, DF-33), including:
+
+- fit-out
+- equipment
+- furniture
+- signage
+- opening stock
+- setup / opening expenses
+- custom investment items
+
+The preferred payback calculation uses the **multi-month projection**:
+
+- calculate monthly operating profit;
+- accumulate operating profit month by month;
+- the estimated payback month is the **first month** where cumulative operating profit **equals or exceeds** total initial investment.
+
+Opening ramp-up therefore affects payback **without extra user inputs**.
+
+If cumulative operating profit **never** reaches the investment within the modelled horizon, show that payback is **not reached within the projection period**.
+
+If operating economics remain **non-positive**, payback is **unavailable**.
+
+Do **not** add accounting depreciation / useful-life machinery for this.
+
+#### DF-61 — Engine-derived analysis, not extra finance fields **[LOCKED]**
+
+These outputs should require little or no additional financial input from the user.
+
+The user describes the business once. The engine derives:
+
+- monthly operating result
+- break-even sales volume
+- approximate daily break-even volume
+- total initial investment
+- estimated payback
+- Bad / Base / Good scenario results
+- multi-month projection
+
+**Product principle:** Detailed should provide deeper analysis through the engine, not by forcing the user to fill more finance fields.
 
 ---
 
@@ -1045,6 +1170,9 @@ These are decided exclusions, not open questions.
 | X11 | Complex OPEX driver / recurrence system | Monthly amounts only (DF-39, DF-57). No annual/quarterly/per-sqm/stepped drivers. |
 | X12 | Accounting / ERP / tax-advisory product shape | DF-00. |
 | X13 | Platform campaigns / Joker / listing ads | Out of v1 (DF-55). |
+| X14 | Per-input scenario overrides | Scenarios scale sales quantities only (DF-37). |
+| X15 | Month-by-month ramp-up sales table | Preset-driven ramp-up only (DF-25). |
+| X16 | Extra break-even or payback inputs | Derived automatically from the business description (DF-35, DF-36, DF-61). |
 
 ---
 
@@ -1070,13 +1198,13 @@ These are known open questions. They are listed so they are not silently closed.
 | Standard OPEX list | Common monthly lines as listed in DF-18/19/20; monthly average amounts only | Exact Turkish labels; grouping; which lines start empty vs suggested |
 | Custom OPEX | `+ Gider Ekle`; name + average monthly amount | — |
 | Company-type control | No v1 tax engine | Whether şahıs vs. limited still appears as a non-calculating input |
-| Projection internals | Multi-month model; 24-month default; editable horizon | Statement shape; CAPEX timing vs. month 1; horizon UX |
-| Ramp-up | Concept exists; simple; preset-driven | Preset curves, duration, percentages; relationship to scenarios |
-| Scenario multipliers | Primary variable is sales volume; other listed assumptions stay fixed; total COGS follows units | Exact Bad / Base / Good multipliers |
+| Projection internals | Simple monthly projection; 24-month default; editable horizon; not working-capital / settlement / supplier-credit / daily cash | Statement shape; CAPEX timing vs. month 1; horizon control UX |
+| Ramp-up | Preset-driven; no month-by-month sales table; conceptual slow / normal / fast; feeds projection and payback | Exact preset names, percentages, duration; how ramp-up combines with Bad / Base / Good |
+| Scenario multipliers | Bad / Kötü, Base / Baz, Good / İyi; sales volume only, proportional to product quantities; listed assumptions stay fixed; no per-input overrides | Exact multipliers |
 | Inflation / escalation | Out of invented scope for now | Whether and how prices, rent, or OPEX escalate |
-| CAPEX recovery presentation | No accounting depreciation | Whether any simplified recovery allocation is shown |
-| Operating break-even formula | Simple operating break-even; CAPEX excluded | Exact formula |
-| Payback formula | Approximate investment payback is shown | Exact formula; interaction with ramp-up |
+| CAPEX recovery presentation | No accounting depreciation; payback uses cumulative operating profit vs. investment | Whether any other recovery-allocation figure is shown |
+| Operating break-even | Automatic; `fixed / weightedContributionPerSale`; CAPEX excluded; monthly and daily counts; optional monthly revenue; unreachable if contribution ≤ 0 | Exact contribution weighting algebra; operating-days basis for the daily count |
+| Payback | Automatic from projection; first month cumulative operating profit ≥ total CAPEX; ramp-up affects it; not reached / unavailable edge states | — |
 | Waste modelling | Not part of Product COGS, Channel Variable Costs, or Platform Fees as locked here | Whether waste is modelled at all in Detailed v1 |
 | Channel-variable placement | Takeaway packaging, delivery packaging, own-courier variable payment if applicable | Whether packaging is business-level or per product; when own-courier payment is shown |
 
@@ -1093,7 +1221,8 @@ Do **not** create, from this file:
 - the component plan;
 - the tax specification;
 - `businessModel.ts` or any Detailed engine module;
-- any Detailed UI;
+- any Detailed UI (that is a later Claude Design pass — §3.1);
+- any Detailed calculation engine **until implementation is explicitly requested**;
 - any change to the Quick / Lite financial engine.
 
 Generic utilities and visual primitives may be shared later when reuse is genuine. That reuse is not being designed now.
@@ -1153,17 +1282,18 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 | DF-34 | Depreciation | No accounting depreciation / tax useful-life machinery in v1. |
 | DF-30 | Company tax | No PIT, CIT, profit-distribution withholding, or full company-tax model in v1. |
 | DF-31 | VAT engine | No full accounting VAT engine; no per-expense deductible VAT / carry-forward / VAT-return machinery. Prices stay VAT-inclusive. |
-| DF-23 | Projection | Multi-month projection is in Detailed v1. Not a working-capital timing model. |
+| DF-23 | Projection | Simple monthly projection. Not working-capital, settlement, supplier-credit, or daily cash. Supports payback. |
 | DF-24 | Horizon | Default 24 months, user-editable. Horizon UX not locked. |
-| DF-25 | Ramp-up | In v1; simple; preset-driven. Curves not locked. |
+| DF-25 | Ramp-up | Preset-driven (conceptually slow / normal / fast). No month-by-month sales table. Feeds projection and payback. Exact curves OPEN. |
 | DF-26 | Seasonality | Out of v1. |
-| DF-27 | Scenarios | Required, and intentionally simple. Bad / base / good remain the conceptual states. |
-| DF-37 | Scenario variable | Primary variable is sales volume. Rent, payroll, OPEX, CAPEX and unit COGS stay fixed. Total COGS follows units. Multipliers not locked. |
-| DF-35 | Break-even | Simple operating break-even. CAPEX excluded. Formula later. |
-| DF-36 | Payback | Approximate investment payback. Formula and ramp-up interaction later. |
+| DF-27 | Scenarios | Bad / Kötü, Base / Baz, Good / İyi. No per-input overrides. |
+| DF-37 | Scenario variable | Sales volume, proportional to product quantities. Listed prices/mixes/rates/fixed costs stay fixed. Variable totals follow quantity. Multipliers OPEN. |
+| DF-35 | Break-even | Automatic operating break-even. `fixed / weightedContributionPerSale`. CAPEX excluded. Monthly and daily counts. Unreachable if contribution ≤ 0. |
+| DF-36 | Payback | Automatic. Cumulative projected operating profit vs. total CAPEX. First month ≥ investment. Ramp-up affects it. Horizon / non-positive edge states locked. |
+| DF-61 | Analysis UX principle | User describes the business once; engine derives operating result, break-even, investment, payback, scenarios, projection. |
 | DF-40 | Financing | Out of v1. |
 | DF-41 | Working-capital timing | Out of v1. |
-| X1–X13 | v1 exclusions | See §6. |
+| X1–X16 | v1 exclusions | See §6. |
 
 ### 9.2 SUPERSEDED
 
@@ -1181,7 +1311,7 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 
 ### 9.3 DEFERRED (non-exhaustive; see §7)
 
-DF-43 (inflation / escalation), break-even and payback formulas, scenario multipliers, ramp-up presets, and every other **DEFERRED** row in §7 remain open. They will be resolved in follow-up tasks, then recorded in a future Detailed financial specification.
+DF-43 (inflation / escalation), exact scenario multipliers, exact ramp-up preset curves, break-even contribution-weighting algebra, daily-break-even operating-days basis, and every other **DEFERRED** row in §7 remain open. They will be resolved in follow-up tasks, then recorded in a future Detailed financial specification.
 
 ---
 
@@ -1198,7 +1328,7 @@ Once a Detailed financial specification exists, the following still need a later
 | `docs/APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md` D4 | Currently says there is no router yet; tab navigation may later require an explicit routing/navigation decision |
 | `docs/TECH_STACK_AND_CONSTRAINTS.md` §4.2 | Persistence rules already cover Detailed and should remain the technical authority |
 | `docs/quick-calculation-scope-v1.md` §21 / §6.2 | Lite currently says waste modelling and recipe-level costing "belong to Detailed Feasibility". Detailed v1 has now **excluded** the recipe/SKU engine. Lite also deferred detailed VAT accounting and tax to Detailed; Detailed v1 has now **excluded** a full VAT engine and a company-tax model, and treats platform fee as an effective VAT-inclusive deduction. Waste is still undecided for Detailed. The Lite document should later distinguish "out of Lite" from "in Detailed v1" |
-| `docs/DESIGN_DIRECTION.md` and `docs/FRONTEND_IMPLEMENTATION_SPEC.md` | Visual inheritance is locked; Detailed screen structure, tabs, and result hierarchy are not. The Quick masthead currently assumes no navigation |
+| `docs/DESIGN_DIRECTION.md` and `docs/FRONTEND_IMPLEMENTATION_SPEC.md` | Visual inheritance is locked; Detailed screen structure is a later Claude Design pass (§3.1). The Quick masthead currently assumes no navigation |
 
 None of the above is a reason to change Lite behaviour now.
 
@@ -1214,3 +1344,4 @@ None of the above is a reason to change Lite behaviour now.
 | v0.3 | Revenue is product-based. Category is optional grouping only. Each product has name, VAT-inclusive normal price, VAT-inclusive online price, and one expected quantity. Salon and takeaway use the normal price; delivery uses the online price. Online price does not vary by delivery mode. Business-level channel mix must equal 100% and is applied to each product's quantity. Channel revenue concept locked. Payment mix must equal 100% and applies to direct store sales; do not also apply POS/meal-card commission to platform-collected delivery. COGS, packaging, waste, and recipe costing not decided in this update. Superseded DF-01, DF-01a, and DF-05. |
 | v0.4 | Locked the three-way cost structure: Product COGS, Channel Variable Costs, Payment / Platform Fees. Per-product unit cost in TL; `productCOGS = unitsSold × unitProductCost`. Standard channel-variable fields: takeaway packaging, delivery packaging, own-courier variable payment if applicable. Platform fee is a percentage of VAT-inclusive delivery gross. v1 editable defaults 15% and 38%. Entered platform rate is effective total deduction, KDV dahil; do not add 20% VAT on top. Campaigns / Joker out of v1. Superseded DF-11 and the previous “platform defaults remain open” clause of DF-10. |
 | v0.5 | Locked position fields (name, headcount, monthly employer cost, meal, transport, average monthly bonus) and `positionMonthlyCost`. Owner/operator is a separate section with owner monthly amount and Bağ-Kur monthly cost; no owner PIT or payroll engine. OPEX is monthly-only average amounts; standard lines listed; custom expense is name + monthly amount. No annual/quarterly/per-sqm/stepped OPEX. Rent unchanged. |
+| v0.6 | Locked automatic operating break-even (`fixed / weightedContributionPerSale`; CAPEX excluded; monthly and daily counts). Locked payback from cumulative projected operating profit vs. total CAPEX, including ramp-up and horizon edge states. Locked Bad/Base/Good as sales-volume-only scenarios with an expanded fixed-assumption list. Ramp-up is preset-driven (slow/normal/fast conceptually); exact curves remain open. Projection purpose restated. Cursor implements the engine; Claude Design designs UI. Engine-derived analysis principle locked. |
