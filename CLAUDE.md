@@ -14,6 +14,7 @@ Before making any architectural, financial or implementation change, read the re
 | --- | --- |
 | `docs/quick-calculation-scope-v1.md` | Quick / Lite product & financial scope — inputs, formulas, outputs, terminology |
 | `docs/DETAILED_FEASIBILITY_DECISIONS.md` | Detailed Feasibility locked decisions and v1 exclusions — not yet a full financial specification |
+| `docs/DETAILED_FINANCIAL_SPEC.md` | Detailed Feasibility formula contract — inputs, defaults, formulas, outputs, edge states, golden vector |
 | `docs/TECH_STACK_AND_CONSTRAINTS.md` | Stack, runtime, deployment, persistence, technical exclusions |
 | `docs/APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md` | Folder structure, layer boundaries, dependency direction, reuse rules, naming |
 | `docs/DESIGN_DIRECTION.md` | Locked visual & UX direction |
@@ -28,6 +29,7 @@ If two documents appear to disagree:
 
 - **financial behaviour (Quick / Lite)** → the Quick product/financial spec wins;
 - **Detailed product decisions recorded so far** → the Detailed Feasibility decisions document wins, without inventing formulas it does not contain;
+- **Detailed formulas, schema, defaults and edge states** → the Detailed Financial Specification wins, within the scope the decisions document locks;
 - **stack, runtime, persistence** → the tech-stack document wins;
 - **code organisation and boundaries** → the architecture document wins;
 - **visual / UX locked rules** → the design-direction document wins;

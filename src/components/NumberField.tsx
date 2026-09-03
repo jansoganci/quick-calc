@@ -15,6 +15,17 @@ type NumberFieldProps = {
   placeholder?: string
   grouped?: boolean
   maxFractionDigits?: number
+  /**
+   * Id of a hint element the caller renders itself, when the hint has to sit below
+   * another control. Keeps the input described without moving the hint into here.
+   */
+  describedBy?: string
+  /**
+   * `true` hides the label at every width — the row already names the field.
+   * `'from-lg'` keeps it on mobile and hides it from `lg` up, where a column header
+   * takes over: a repeating row that collapses to a stack must still be labelled.
+   */
+  labelHidden?: boolean | 'from-lg'
 }
 
 export function NumberField({
@@ -30,6 +41,8 @@ export function NumberField({
   placeholder,
   grouped = false,
   maxFractionDigits = 2,
+  labelHidden = false,
+  describedBy,
 }: NumberFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const caretRef = useRef<number | null>(null)
@@ -51,8 +64,13 @@ export function NumberField({
   }
 
   return (
-    <label className={cn('qc-field', span === 'full' && 'col-span-full')} htmlFor={id}>
-      <span>{label}</span>
+    <label
+      className={cn('qc-field', span === 'full' && 'col-span-full', labelHidden === true && 'gap-0')}
+      htmlFor={id}
+    >
+      <span className={labelHidden === true ? 'sr-only' : labelHidden === 'from-lg' ? 'lg:sr-only' : undefined}>
+        {label}
+      </span>
       <span className={cn('qc-input-wrap', error && 'is-error')}>
         <input
           ref={inputRef}
@@ -88,7 +106,9 @@ export function NumberField({
           inputMode="decimal"
           autoComplete="off"
           aria-invalid={Boolean(error)}
-          aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
+          aria-describedby={
+            error ? `${id}-error` : hint ? `${id}-hint` : describedBy ? describedBy : undefined
+          }
         />
         <span className="qc-unit">{unit}</span>
       </span>

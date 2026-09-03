@@ -89,6 +89,53 @@
     color: var(--qc-subtle);
   }
 
+  /* Names in Detailed's repeating rows are text, not figures: Plex Sans, left
+     aligned. Everything else about the control is unchanged. */
+  .qc-input.is-text {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    text-align: left;
+  }
+
+  /* A quiet text-level control: add/remove row, section jump, disclosure.
+     No icon, no fill, no radius — underline on hover only. */
+  .qc-text-btn {
+    font-size: 13px;
+    color: var(--qc-secondary);
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .qc-text-btn:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .qc-text-btn.is-accent {
+    color: var(--qc-accent);
+    font-weight: 500;
+  }
+
+  .qc-text-btn.is-muted {
+    color: var(--qc-muted);
+    font-size: 12px;
+  }
+
+  .qc-text-btn:disabled {
+    color: var(--qc-subtle);
+    cursor: default;
+    text-decoration: none;
+  }
+
+  /* Below lg the same 44px floor as every other target (DIRECTION §1.1). */
+  @media (max-width: 1023px) {
+    .qc-text-btn {
+      min-height: 44px;
+    }
+  }
+
   .qc-unit {
     font-size: 12px;
     color: var(--qc-muted);

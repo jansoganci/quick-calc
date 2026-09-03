@@ -3,10 +3,10 @@ import type { QuickView } from '../viewModel.ts'
 
 type StackedBarProps = {
   bar: QuickView['bar']
-  ticketFormatted: string
+  endLabel: string
 }
 
-export function StackedBar({ bar, ticketFormatted }: StackedBarProps) {
+export function StackedBar({ bar, endLabel }: StackedBarProps) {
   if (bar.length === 0) {
     return (
       <div>
@@ -42,7 +42,7 @@ export function StackedBar({ bar, ticketFormatted }: StackedBarProps) {
       </div>
       <div className="mt-1.5 flex justify-between font-mono text-[11px] tabular-nums text-qc-muted">
         <span>0,00 TL</span>
-        <span>{ticketFormatted}</span>
+        <span>{endLabel}</span>
       </div>
     </div>
   )

@@ -13,7 +13,6 @@ import {
   calculateQuick,
   validateQuickInput,
   simulateQuick,
-  QUICK_DEFAULTS,
   type ValidationError,
 } from '../../core/quick/index.ts'
 
@@ -283,20 +282,15 @@ describe('rentCostHint', () => {
   })
 })
 
-describe('masthead and colophon', () => {
-  it('names the product and the current mode', () => {
-    expect(COPY.productName.trim().length).toBeGreaterThan(0)
-    expect(COPY.modeName).toBe('Hızlı Hesap')
+describe('masthead and footer', () => {
+  it('names the product and both modes', () => {
+    expect(COPY.productName).toBe('Maliyet')
+    expect(COPY.quickMode).toBe('Hızlı Hesap')
+    expect(COPY.detailedMode).toBe('Detaylı Fizibilite')
   })
 
-  it('renders the engine version from the engine, never a typed literal', () => {
-    expect(COPY.footerVersion(QUICK_DEFAULTS.quickEngineVersion)).toBe(
-      `Hesap motoru ${QUICK_DEFAULTS.quickEngineVersion}`,
-    )
-  })
-
-  it('states the v1 scope without repeating the §10.1 limitation statement', () => {
-    expect(COPY.footerScope).toContain('TRY')
+  it('states the simplified scope without repeating the §10.1 limitation statement', () => {
+    expect(COPY.footerScope).toBe('TRY · Türkiye')
     expect(COPY.footerNature).not.toContain('vergi')
     expect(COPY.footerNature.length).toBeLessThan(60)
   })

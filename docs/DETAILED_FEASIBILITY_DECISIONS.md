@@ -1,6 +1,6 @@
 # Detailed Feasibility — Locked Decisions
 
-**Version:** v0.10
+**Version:** v0.11
 **Status:** Decision log. Major Detailed v1 **product-scope** decisions are **locked**. Major calculation-model review blockers are **resolved**. Remaining implementation details belong in a dedicated Detailed Financial Specification. This file is still **not** that specification and **not** implementation.
 **Phase:** Planning — **not** a financial specification and **not** implementation
 **Currency:** TRY · **Country:** Turkey · **Preset context:** Coffee Shop / Cafe (same product family as Quick / Lite)
@@ -1434,6 +1434,32 @@ Do **not** add more escalation categories in v1.
 
 These three rates remain part of the **financial model**. They must **not** be prominent in the primary input flow. In the later UI they belong to a **secondary / advanced assumptions** area (DF-74).
 
+Channel Variable Costs are assigned to escalation group 2 by DF-83. That assignment does **not** create a fourth category.
+
+#### DF-83 — Channel Variable Costs escalate with Product COGS **[LOCKED]**
+
+Takeaway packaging cost, delivery packaging cost, and own-courier variable payment escalate using the **Product COGS annual increase** rate.
+
+They are assigned to escalation **group 2**. This does **not** create a fourth escalation category.
+
+The three annual escalation groups remain exactly:
+
+1. Sales price annual increase
+2. Product COGS annual increase
+3. Fixed operating cost annual increase
+
+This closes an assignment gap: DF-52 keeps these costs separate from Product COGS as **cost lines** (DF-68), and DF-43 named only three escalation groups, so these per-unit channel costs previously belonged to no group. Escalation grouping and cost-line separation are different concerns. DF-68 is **not** reopened — packaging and own-courier payment remain separate cost lines and must never be folded into `unitProductCost`.
+
+Formula timing is unchanged (DF-43):
+
+```
+valueAtMonthM = baseValue × (1 + annualRate) ^ ((m − 1) / 12)
+```
+
+Month 1 exponent is 0, so Month 1 equals the exact value entered by the user.
+
+Do **not** add a separate packaging or courier inflation input.
+
 #### DF-74 — Escalation inputs are secondary / advanced **[LOCKED]**
 
 The three annual escalation assumptions stay in the model (DF-43).
@@ -1732,7 +1758,7 @@ These are known open questions. They are listed so they are not silently closed.
 | Ramp-up | Locked Slow / Normal / Fast monthly % of scenario-adjusted stabilized quantity; sales volume only; no custom monthly table | — |
 | Scenario multipliers | Bad −25% / Base 0% / Good +25%; editable defaults; proportional to product quantities; listed assumptions stay fixed | — |
 | Scenario × ramp-up order | `stabilizedDaily × scenarioMultiplier × rampUpMultiplier`, then × `operatingDaysPerMonth` (DF-69) | — |
-| Inflation / escalation | Three annual assumptions stay in the **model**; Month 1 = entered values; CAPEX does not escalate; **not** prominent in the primary input flow (DF-74) | **Default percentages** for the three rates; exact advanced-area UI |
+| Inflation / escalation | Three annual assumptions stay in the **model**; Month 1 = entered values; CAPEX does not escalate; Channel Variable Costs escalate with Product COGS (DF-83); **not** prominent in the primary input flow (DF-74) | **Default percentages** for the three rates; exact advanced-area UI |
 | CAPEX recovery presentation | No accounting depreciation; payback uses cumulative operating profit vs. investment | Whether any other recovery-allocation figure is shown |
 | Operating break-even | Automatic; `fixed / weightedContributionPerSale`; CAPEX excluded; primary outputs **units/day** and **units/month**; **not customer count**; daily conversion uses `operatingDaysPerMonth`; unreachable if contribution ≤ 0 | Exact contribution weighting algebra; whether a secondary TL revenue figure is shown |
 | Payback | Automatic from projection; first month cumulative operating profit ≥ total CAPEX; ramp-up affects it; not reached / unavailable edge states; not decoupled from display horizon | — |
@@ -1834,6 +1860,7 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 | DF-69 | Scenario → ramp-up order | `effectiveDaily = stabilizedDaily × scenarioMultiplier × rampUpMultiplier`, then × `operatingDaysPerMonth`. Ramp-up does not change prices or unit costs. At 100% ramp-up, Bad stays at 75% of original. |
 | DF-26 | Seasonality | Out of v1. LATER, not a missing requirement. |
 | DF-43 | Annual increase | Three user-editable annual rates (sales price, product COGS, fixed opex). `valueAtMonthM = base × (1+r)^((m−1)/12)`. Month 1 = entered values. CAPEX does not escalate. **Default % OPEN.** No extra escalation categories. |
+| DF-83 | Channel Variable Cost escalation | Takeaway packaging, delivery packaging and own-courier variable payment escalate with the **Product COGS** rate (group 2). No fourth category. No separate packaging/courier inflation input. DF-68 cost-line separation unchanged. |
 | DF-74 | Escalation placement | Stay in the model; secondary / advanced assumptions area in later UI; not prominent in the primary flow. |
 | DF-27 | Scenarios | Bad / Kötü, Base / Baz, Good / İyi. No per-input overrides. |
 | DF-37 | Scenario variable | Sales volume, proportional to product quantities, applied before ramp-up (DF-69). Listed prices/mixes/rates/fixed costs stay fixed. Variable totals follow quantity. |
@@ -1903,6 +1930,7 @@ None of the above is a reason to change Lite behaviour now.
 | v0.8 | Closed the six calculation-model review blockers. Sales VAT netting: default 10% editable; `netRevenue = gross / (1 + vatRate)`; commissions stay on VAT-inclusive gross; still not a full VAT engine. Per-order = per-unit. Product COGS excludes packaging, courier, and commissions. Escalation: Month 1 = entered values; exponent `(m−1)/12`. Quantity is daily; `operatingDaysPerMonth` default 30. Order of operations: scenario then ramp-up. |
 | v0.9 | Scope cut: remove company-type input; horizon presets 12/24/36 only (default 24); no category grouping; merge security OPEX; drop separate water-treatment line; escalation stays in the model but secondary/advanced in UI; break-even primary outputs are units/day and units/month. Record seasonality, basket size, platform vs own-channel delivery split, and per-product channel mix as LATER — not missing v1 requirements. |
 | v0.10 | Final accepted review fixes. Break-even is units not customers. Payment mix locked to salon/takeaway only. Owner and aidat double-count are UI-guardrail rules. Own-courier cost is Mode 1 only. Platform fee may be 0%. Rejected extra payback/cash/pre-opening/COGS-% ideas. Product scope is complete enough to hand off to the Detailed Financial Specification. |
+| v0.11 | Locked DF-83: Channel Variable Costs (takeaway packaging, delivery packaging, own-courier variable payment) escalate with the Product COGS annual rate as escalation group 2. No fourth escalation category, no new input, and DF-68's cost-line separation is unchanged. Closes the last escalation-assignment gap before the Detailed Financial Specification. |
 
 ---
 
@@ -1920,6 +1948,7 @@ Major calculation-model blockers from the external review are **resolved**.
 | Annual escalation timing (Month 1 = entered values) | **Closed** | DF-43 |
 | Sales quantity time basis | **Closed** | DF-66 |
 | Scenario → ramp-up order of operations | **Closed** | DF-69 |
+| Channel Variable Cost escalation group | **Closed** | DF-83 |
 
 Remaining implementation details should now be defined in a dedicated **Detailed Financial Specification**.
 

@@ -53,6 +53,12 @@ const QC_COLORS = {
   'bar-pos': '#A8AEB6',
   'bar-investment-recovery': '#CFD3D8',
   'bar-remaining': '#1D3A5F',
+
+  // Detailed's reconciliation bar needs nine stops where Quick's needs eight, so
+  // two tones join the same monotone ramp. It stays one quantity divided, not a
+  // hue scale. See DETAILED_FRONTEND_IMPLEMENTATION_SPEC.md §4.4 (D-2).
+  'bar-channel': '#4A515C',
+  'bar-owner': '#7C838C',
 } as const
 
 /** Focus and error rings, per FRONTEND_IMPLEMENTATION_SPEC.md §1. */

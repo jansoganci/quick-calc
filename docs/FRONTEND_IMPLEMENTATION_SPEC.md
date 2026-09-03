@@ -34,9 +34,13 @@ Bar cost ramp, in locked order: `#C3C8CE` KDV · `#3F4650` product · `#545C68` 
 
 ## 2. Desktop layout
 
-`max-w-[1152px] mx-auto`, grid `392px 1px 1fr`. Left column inputs (`p-[30px]`), 1px hairline, right column result (`p-[30px_34px]`, `bg-[#FCFCFD]`). Result column `sticky top-0 max-h-screen overflow-y-auto`.
+`max-w-[1152px] mx-auto`, grid `392px 1px 1fr`. Left column inputs (`p-[30px]`), 1px hairline, right column result (`p-[30px_34px]`, `bg-[#FCFCFD]`). Result column `lg:sticky lg:top-14 lg:max-h-[calc(100vh-3.5rem)] lg:overflow-y-auto`.
 
-> **Corrected.** This previously read `sticky top-0 self-start max-h-screen overflow-y-auto`, and `self-start` prevents the sticky behaviour it was meant to support. `align-self: start` shrinks the grid item to its content, so the pane exactly fills its containing block and has zero travel — measured at 1710px, the pane scrolled to −540px instead of pinning. With the item left to stretch (the grid default) the pane has real travel and pins at the top. The page frame also had `overflow-hidden`, which makes it a scroll container and defeats `position: sticky` outright; it is now `overflow-x-clip`, which still clips horizontally but creates no scroll container. Sticky engages whenever the form column is taller than the viewport-capped result pane.
+**The `#FCFCFD` tint belongs to the grid item, the sticky behaviour to an element inside it.** The grid item stretches to the row height; the result content does not. With the tint on the content, a short result left the column untinted below it — measured at 823px of column against 191px of tinted content — and the two-column sheet visibly broke. The item now carries `lg:bg-qc-surface-result` and wraps the sticky pane. Mobile stays white (§5), so the class is `lg:`-prefixed.
+
+> **Corrected.** This previously read `sticky top-0 self-start max-h-screen overflow-y-auto`, and `self-start` prevents the sticky behaviour it was meant to support. `align-self: start` shrinks the grid item to its content, so the pane exactly fills its containing block and has zero travel — measured at 1710px, the pane scrolled to −540px instead of pinning. With the item left to stretch (the grid default) the pane has real travel and pins at the top. The page frame also had `overflow-hidden`, which makes it a scroll container and defeats `position: sticky` outright; it is now `overflow-x-clip`, which still clips horizontally but creates no scroll container. Sticky engages whenever the form column is taller than the viewport-capped result pane; where the two are equal the pane has zero travel by definition and scrolls with the page, which is correct rather than a defect.
+
+**The offset is `top-14`, not `top-0`, because the masthead is sticky (§2.1).** Verified in the browser: with any real travel the pane pins exactly at the masthead's bottom edge (56px).
 
 Inputs sit in a 2-column grid, `gap-y-[15px] gap-x-[13px]`; product cost and initial investment span both columns. Input row: `h-10` **from the `lg` breakpoint up**; below it the row is 44px, because DESIGN_DIRECTION.md §1.1 locks "no interactive target below 44px" and that rule governs the mobile state. The same split applies to the `Özeti Kopyala` control (§3.1b). Value right-aligned in Mono, unit suffix in muted 12px. daisyUI: `input input-bordered` with `!rounded` `!h-10` and the border token; hint/error text as `label-text-alt`.
 
@@ -48,7 +52,9 @@ Assumptions: one row, label left, current values as a Mono summary right, `▾`.
 
 **Added after the original spec.** No document previously described a header or footer; both are recorded here as a new product surface. They carry only what the locked rules permit: there is no router (ARCH D4), so no navigation; no icons outside the assumptions chevron (§7), so no mark; and the accent stays reserved for the headline figure and focus states (DIRECTION V2), so neither is filled or coloured.
 
-**Masthead.** One hairline-separated row inside the same `1152px` frame as the form and result, so the page reads as a single sheet. `h-14` from `lg`, 52px below it; padding `30px` / `18px` to match the form column. Product name left in Plex Sans 600 15px ink; mode label right in the 11px uppercase eyebrow style already used for `İŞLETME BİLGİLERİ` and `SONUÇ`. Bottom rule `--qc-rule`. **Not sticky** — it must not compete with the result column's own `lg:top-0`.
+**Masthead.** One hairline-separated row inside the same `1152px` frame as the form and result, so the page reads as a single sheet. `h-14` from `lg`, 52px below it; padding `30px` / `18px` to match the form column. Product name left in Plex Sans 600 15px ink; mode label right in the 11px uppercase eyebrow style already used for `İŞLETME BİLGİLERİ` and `SONUÇ`. Bottom rule `--qc-rule`.
+
+**Sticky from `lg` (`lg:sticky lg:top-0 lg:z-10`).** *Corrected — this previously read "Not sticky", which contradicted the shipped code and the Detailed pane's positioning.* The masthead now carries the mode switch between Hızlı Hesap and Detaylı Fizibilite, and Detaylı Fizibilite is a long scrolling page; a switch that scrolls away is a switch the user has to hunt for. The two sticky elements do not compete because the result column offsets by the masthead's own height (`lg:top-14`) instead of `lg:top-0`. Both modes use the same offset.
 
 **Colophon.** Above a `--qc-rule` top rule, `18px` padding, 12px `--qc-muted`. One row with `space-between` from `lg`, stacked with a 5px gap below it. Three items: the v1 scope (scope §26), a six-word statement of what the tool is, and the engine version in Plex Mono 11px `--qc-subtle`. The version is read from `meta.quickEngineVersion`, never typed — scope §18 requires a formula change to be detectable as a version difference.
 
@@ -73,8 +79,12 @@ Both elements are rendered as `<header>`, `<main>` and `<footer>`, which are als
 2. **Headline.** Label 13px muted, figure Mono 500 44px in accent, `tracking-[-0.02em]`, unit 21px secondary. Average sale right-aligned at 19px as the reconciliation anchor.
 3. **Bar (R2).** `flex h-11` + 1px `#D6D9DD` border, eight `div`s with percentage widths, no radius, no gap. In-bar labels only where a segment exceeds ~15% width (product, payroll, remaining); everything else is read from the table. `0,00 TL` / `140,00 TL` end labels beneath in Mono 11px. Widths are `share × 100` from the engine; the last segment absorbs the rounding remainder so the row always totals exactly 100%.
 4. **Breakdown table.** Grid `10px 1fr auto 58px`. A 10px full-height swatch links each row to its bar segment — this replaces any legend. Amount in Mono, share in muted Mono. Rules: `#EEF0F2` between rows, `#D6D9DD` above remaining profit, `#16181C` above and below the remaining row, then a `Toplam 140,00 TL` line in 13px muted. Remaining profit is the only row at weight 600.
-5. **Four outputs.** 4-column grid, hairline dividers, no cards, no icons. Label 12px 2-line clamp, figure Mono 22px in ink. Negative earnings render `−28.602 TL` in ink — no colour, no arrow (V3). The §10.1 limitation note sits directly beneath in 12px muted.
+5. **Four outputs.** 4-column grid, hairline dividers, no cards, no icons. Label 12px 2-line clamp, figure Mono 22px in ink. Negative earnings render `−28.602 TL` in ink — no colour, no arrow (V3). Beneath, in 12px muted: **the payback note first when there is one**, because it explains a figure the strip is rendering as `—`, then the general §10.1 limitation note, which explains no single figure. The specific explanation must not sit behind six lines of general disclaimer.
 6. **Simulation.** Grid `1fr auto auto auto`. Header row 12px muted, `#16181C` rule under it and at the table foot. Current row: weight 600, ink, `#D6D9DD` rules above and below, `py-[11px]` against `py-[10px]` — no fill, no accent. §12.4 caveat beneath in 12px muted.
+
+**Empty state (before the first `Hesapla`).** The summary paragraph and nothing else. DIRECTION V6 forbids "partial figures, placeholder numbers, [and] skeleton of the result column"; an outlined empty bar labelled `0,00 TL` was all three, and has been removed.
+
+**Bar end labels.** The left label is always `0,00 TL`. The right label is the figure the bar actually ends at: the average sale normally, and **the estimated total cost per sale when the result is a loss**, because in that case the segments are rescaled to total cost. Labelling a loss bar with the sale amount reads as "costs equal the sale price", the opposite of what happened. Both figures are already on screen; the view model only chooses between them (`barEndLabel`).
 
 **Money format:** always full Turkish — `1.945.947 TL`, `107,56 TL`, `%25,5`. Group separator `.`, decimal `,`, unit after a space. Never abbreviated, never a currency symbol. Use `Intl.NumberFormat('tr-TR')`.
 
@@ -95,7 +105,11 @@ Breakpoint: single column below `lg` (1024px), two columns at and above.
 
 ## 6. Turkish copy — draft for review
 
-**Masthead / colophon:** Product name *(placeholder — pending a product decision)* · `Hızlı Hesap` · `TRY · Türkiye · Kafe` · `Basitleştirilmiş bir ön değerlendirmedir.` · `Hesap motoru {version}`.
+**Masthead / colophon:** `Maliyet` (product name, **locked**) · slogan `Rakamlar tutuyor mu?` in 12px muted beside the name, from the `sm` breakpoint up · mode switch `Hızlı Hesap` / `Detaylı Fizibilite` · `maliyet.lol · TRY · Türkiye` · `Basitleştirilmiş bir ön değerlendirmedir.`
+
+Brand copy has one home, `src/app/shellCopy.ts`, which both modes render from and which `features/quick-calc/labels.ts` re-exports into its own `COPY`. `main.tsx` applies `DOCUMENT_TITLE` at startup; the static `<title>` in `index.html` is only the first-paint fallback.
+
+**The slogan appears in exactly two places** — the masthead from `sm` up, and the document title. Below `sm` there is no room beside two mode tabs, so phones get it from the browser tab instead. It never appears next to a figure.
 **Input labels:** Ortalama satış tutarı (hint *KDV dahil*) · Günlük satış adedi · Satış başına ürün maliyeti · Aylık kira (Net kira / Brüt kira control; default Brüt) · Diğer aylık giderler · Çalışan sayısı · Kişi başı aylık maliyet · Başlangıç yatırımı.
 **Assumptions:** Ayda çalışılan gün · Yatırım geri kazanım süresi (ay) · Kartlı ödeme oranı · POS komisyon oranı.
 **Breakdown rows:** KDV · Ürün maliyeti · Personel · Kira · Diğer giderler · POS komisyonu · Yatırım geri kazanımı · **İşletmede kalan** · Toplam.
@@ -118,6 +132,12 @@ Loss variant: `140,00 TL’lik ortalama satışın tamamı maliyete gidiyor; her
 - Simulation (§12.4) — `Simülasyonda kira, personel ve diğer sabit giderlerin değişmediği varsayılmıştır. Satış hacmi arttıkça satış başına maliyetin düşmesinin nedeni budur.`
 - Payback unavailable — `Bu satış hızında yatırım geri dönüşü hesaplanamıyor.`
 - Exceeds recovery period — `Yatırımın geri dönüşü öngörülen {n} aylık süreyi aşıyor.`
+
+## 6.1 Rent group order
+
+Field → `Net kira` / `Brüt kira` segmented control → the stopaj hint. **Not** field → hint → control, which was the original order: the hint appears only once an amount is typed, so it pushed the control down three lines mid-entry, and it explained a choice the user had not reached yet. The hint keeps its `aria-describedby` link to the input through `NumberField`'s `describedBy` prop.
+
+---
 
 ## 7. Not in v1
 

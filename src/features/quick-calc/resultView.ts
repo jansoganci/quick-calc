@@ -78,6 +78,13 @@ export type QuickView = {
   copyText: string
   headlineCost: string
   ticketFormatted: string
+  /**
+   * The figure the bar actually ends at. In a loss the segments are scaled to total
+   * cost rather than to the sale, so labelling that end with the sale would read as
+   * "costs equal the sale price" — the opposite of what happened. Both strings are
+   * already displayed elsewhere; this only chooses between them.
+   */
+  barEndLabel: string
   bar: BarSegment[]
   breakdown: BreakdownRow[]
   outputs: OutputItem[]
@@ -163,6 +170,7 @@ export function buildQuickView(
       ].join('\n'),
       headlineCost: '',
       ticketFormatted: `${formatTryExact(ticket, 2)} TL`,
+      barEndLabel: `${formatTryExact(ticket, 2)} TL`,
       bar: [],
       breakdown: [],
       outputs: [
@@ -264,6 +272,7 @@ export function buildQuickView(
     ].join('\n'),
     headlineCost: costText,
     ticketFormatted: ticketText,
+    barEndLabel: remaining < 0 ? costText : ticketText,
     bar,
     breakdown: breakdownRows,
     outputs: [

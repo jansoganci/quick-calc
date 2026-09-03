@@ -1,3 +1,5 @@
+import { SHELL_COPY } from '../../app/shellCopy.ts'
+
 export type FieldUnit = 'TL' | 'adet' | 'kişi' | 'gün' | 'ay' | '%'
 
 export const FIELD_LABELS = {
@@ -73,12 +75,9 @@ export type HeadlineTone = 'text' | 'amount' | 'accent'
 export type HeadlineSegment = { text: string; tone: HeadlineTone }
 
 export const COPY = {
-  // Placeholder product name — swap this one string when the real name is decided.
-  productName: 'Fizibilite',
-  modeName: 'Hızlı Hesap',
-  footerScope: 'TRY · Türkiye · Kafe',
-  footerNature: 'Basitleştirilmiş bir ön değerlendirmedir.',
-  footerVersion: (version: string) => `Hesap motoru ${version}`,
+  // Masthead and colophon copy is owned by the shell, which both modes render
+  // inside. Re-exported here so this module keeps one import surface (U4).
+  ...SHELL_COPY,
   formSection: 'İşletme bilgileri',
   assumptions: 'Varsayımlar',
   calculate: 'Hesapla',

@@ -1,5 +1,8 @@
 # Design source of truth
 
+**Product name:** Maliyet · **domain:** maliyet.lol · **slogan:** *Rakamlar tutuyor mu?*
+Brand copy has one home: `src/app/shellCopy.ts`.
+
 Visual and UX authority for the Quick Calculation product UI. Financial formulas stay in `docs/quick-calculation-scope-v1.md` and the TypeScript engine.
 
 ## Files

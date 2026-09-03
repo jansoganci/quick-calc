@@ -24,7 +24,10 @@ export function QuickCalcResults({
   return (
     <div
       className={cn(
-        'bg-qc-surface-result px-[18px] py-5 lg:sticky lg:top-0 lg:max-h-screen lg:overflow-y-auto lg:px-[34px] lg:py-[30px] lg:pb-[34px]',
+        // The column tint lives on the stretching grid item in QuickCalcPage, so it
+        // fills the column; mobile stays white (spec §5). The max-width caps the
+        // measure in the single-column band, matching the form.
+        'mx-auto w-full max-w-[600px] px-[18px] py-5 lg:max-w-none lg:px-[34px] lg:py-[30px] lg:pb-[34px]',
         hasCalculated && view && 'qc-enter',
         liveFlash && 'qc-live',
       )}
@@ -83,19 +86,29 @@ export function QuickCalcResults({
             </div>
           ) : null}
 
-          <StackedBar bar={view.bar} ticketFormatted={view.ticketFormatted} />
+          <StackedBar bar={view.bar} endLabel={view.barEndLabel} />
           <BreakdownTable rows={view.breakdown} totalFormatted={view.ticketFormatted} />
 
           <div className="mb-[18px] mt-6 h-px bg-qc-rule lg:mb-6 lg:mt-[30px]" />
           <OutputStrip outputs={view.outputs} />
-          <p className="mt-[14px] max-w-[620px] text-xs leading-relaxed text-qc-muted text-pretty lg:mt-[15px]">
-            {COPY.earningsFootnote}
-          </p>
+          {/*
+            The payback note explains a specific figure the strip renders as `—`, so
+            it sits directly beneath it; the general §10.1 limitation statement, which
+            explains none of them in particular, follows.
+          */}
           {view.paybackNote ? (
-            <p className="mt-2 max-w-[620px] text-xs leading-relaxed text-qc-muted text-pretty">
+            <p className="mt-[14px] max-w-[620px] text-xs leading-relaxed text-qc-muted text-pretty lg:mt-[15px]">
               {view.paybackNote}
             </p>
           ) : null}
+          <p
+            className={cn(
+              'max-w-[620px] text-xs leading-relaxed text-qc-muted text-pretty',
+              view.paybackNote ? 'mt-2' : 'mt-[14px] lg:mt-[15px]',
+            )}
+          >
+            {COPY.earningsFootnote}
+          </p>
 
           <div className="mb-[18px] mt-6 h-px bg-qc-rule lg:mb-5 lg:mt-[30px]" />
           <SimulationTable rows={view.simulation} />
@@ -108,13 +121,15 @@ export function QuickCalcResults({
   )
 }
 
+/**
+ * The sentence and nothing else. DIRECTION V6 is explicit: before the first
+ * calculation there is "no partial figures, no placeholder numbers, no skeleton of
+ * the result column" — an outlined empty bar under a `0,00 TL` label is all three.
+ */
 function EmptyResult() {
   return (
-    <>
-      <p className="text-[13px] leading-relaxed text-qc-secondary text-pretty">
-        {COPY.emptyResult}
-      </p>
-      <StackedBar bar={[]} ticketFormatted="—" />
-    </>
+    <p className="text-[13px] leading-relaxed text-qc-secondary text-pretty">
+      {COPY.emptyResult}
+    </p>
   )
 }

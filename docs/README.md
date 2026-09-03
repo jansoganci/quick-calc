@@ -14,6 +14,8 @@ If two documents appear to disagree, use the authority order in [`CLAUDE.md`](..
 | --- | --- |
 | [`quick-calculation-scope-v1.md`](./quick-calculation-scope-v1.md) | Quick / Lite product & financial scope — inputs, formulas, outputs, terminology |
 | [`DETAILED_FEASIBILITY_DECISIONS.md`](./DETAILED_FEASIBILITY_DECISIONS.md) | Detailed Feasibility locked decisions and v1 exclusions. Not yet a full financial specification |
+| [`DETAILED_FINANCIAL_SPEC.md`](./DETAILED_FINANCIAL_SPEC.md) | Detailed Feasibility formula contract — inputs, defaults, formulas, outputs, edge states, golden vector |
+| [`DETAILED_FRONTEND_IMPLEMENTATION_SPEC.md`](./DETAILED_FRONTEND_IMPLEMENTATION_SPEC.md) | Detailed Feasibility UI — information architecture, layout, results hierarchy, charts, states, mode switch |
 | [`TECH_STACK_AND_CONSTRAINTS.md`](./TECH_STACK_AND_CONSTRAINTS.md) | Stack, runtime, deployment, persistence, technical exclusions |
 | [`APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md`](./APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md) | Folder structure, layer boundaries, dependency direction, reuse rules, naming |
 | [`DESIGN_DIRECTION.md`](./DESIGN_DIRECTION.md) | Locked visual & UX direction for Quick / Lite (inherited by Detailed) |

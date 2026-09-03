@@ -40,7 +40,11 @@ export function QuickCalcForm({
 
   return (
     <form
-      className="bg-qc-surface px-[18px] py-5 lg:px-[30px] lg:py-[30px] lg:pb-[34px]"
+      // Below `lg` the page is one column at any width. Without a cap, a tablet
+      // stretches each field to ~450px and puts a right-aligned value ~400px from
+      // its label, which is hard to read as a pair. The desktop column is 392px and
+      // already narrower than this, so `lg` clears the cap.
+      className="mx-auto w-full max-w-[600px] bg-qc-surface px-[18px] py-5 lg:max-w-none lg:px-[30px] lg:py-[30px] lg:pb-[34px]"
       onSubmit={(event) => {
         event.preventDefault()
         onSubmit()
@@ -63,7 +67,8 @@ export function QuickCalcForm({
                   onBlur={() => onBlur(field)}
                   unit={fieldUnit(field)}
                   error={dirty[field] ? errors[field] ?? null : null}
-                  hint={rentHint}
+                  hint={null}
+                  describedBy={rentHint ? `${field}-basis-hint` : undefined}
                   span="full"
                   grouped={format.grouped}
                   maxFractionDigits={format.maxFractionDigits}
@@ -81,6 +86,11 @@ export function QuickCalcForm({
                     </button>
                   ))}
                 </div>
+                {rentHint ? (
+                  <p id={`${field}-basis-hint`} className="qc-hint mt-1.5">
+                    {rentHint}
+                  </p>
+                ) : null}
               </div>
             )
           }
