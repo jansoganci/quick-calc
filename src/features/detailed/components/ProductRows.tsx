@@ -3,7 +3,7 @@ import { TextField } from '../../../components/TextField.tsx'
 import { cn } from '../../../lib/cn.ts'
 import type { ProductRow } from '../formState.ts'
 import { COPY, GUARDRAIL_COPY, PRODUCT_LABELS } from '../labels.ts'
-import { useNewestRowOpen } from './RepeatingRows.ts'
+import { useNewestRowOpen } from '../hooks/useNewestRowOpen.ts'
 
 const GRID = 'lg:grid-cols-[1fr_104px_104px_92px_104px_56px]'
 
@@ -60,7 +60,11 @@ export function ProductRows({
           .join(' · ')
 
         return (
-          <div key={product.id} className="border-t border-qc-rule-row lg:py-[9px]">
+          <div
+            key={product.id}
+            ref={rows.rowRef(product.id)}
+            className="border-t border-qc-rule-row lg:py-[9px]"
+          >
             <button
               type="button"
               onClick={() => rows.toggle(product.id)}

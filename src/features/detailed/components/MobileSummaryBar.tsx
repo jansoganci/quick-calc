@@ -7,6 +7,7 @@ type MobileSummaryBarProps = {
   canSubmit: boolean
   submitHint: string | null
   onCalculate: () => void
+  onGoToInputs: () => void
   onGoToResults: () => void
 }
 
@@ -20,6 +21,7 @@ export function MobileSummaryBar({
   canSubmit,
   submitHint,
   onCalculate,
+  onGoToInputs,
   onGoToResults,
 }: MobileSummaryBarProps) {
   if (view === null) {
@@ -53,9 +55,14 @@ export function MobileSummaryBar({
           {view.monthlyOperatingResult}
         </span>
       </span>
-      <button type="button" className="qc-text-btn is-accent" onClick={onGoToResults}>
-        {COPY.results}
-      </button>
+      <span className="flex shrink-0 items-center gap-3">
+        <button type="button" className="qc-text-btn" onClick={onGoToInputs}>
+          {COPY.backToInputs}
+        </button>
+        <button type="button" className="qc-text-btn is-accent" onClick={onGoToResults}>
+          {COPY.results}
+        </button>
+      </span>
     </div>
   )
 }

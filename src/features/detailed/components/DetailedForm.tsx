@@ -19,7 +19,7 @@ import {
   SECTION_LABELS,
   type SectionId,
 } from '../labels.ts'
-import { sectionSummary, typedDailyUnits, visibleSections } from '../sectionSummary.ts'
+import { rampUpTableHint, sectionSummary, typedDailyUnits, visibleSections } from '../sectionSummary.ts'
 import { echoLabel } from '../viewModel.ts'
 import { formatCount } from '../../../lib/number.ts'
 import { LineRows } from './LineRows.tsx'
@@ -219,6 +219,7 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
                   ? COPY.ownCourierDisabledHint
                   : COPY.ownCourierHint
               }
+              disabled={form.delivery.mode === 'platformCourier'}
               grouped
             />
           </div>
@@ -415,6 +416,7 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
                 </button>
               ))}
             </div>
+            <p className="qc-hint mt-1.5">{rampUpTableHint(form.assumptions.rampUpPreset)}</p>
           </div>
         </div>
 

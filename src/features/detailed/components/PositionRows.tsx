@@ -3,7 +3,7 @@ import { TextField } from '../../../components/TextField.tsx'
 import { cn } from '../../../lib/cn.ts'
 import type { PositionRow } from '../formState.ts'
 import { COPY, POSITION_LABELS } from '../labels.ts'
-import { useNewestRowOpen } from './RepeatingRows.ts'
+import { useNewestRowOpen } from '../hooks/useNewestRowOpen.ts'
 
 const PER_PERSON_FIELDS = [
   { field: 'employerCostPerPerson', label: POSITION_LABELS.employerCostPerPerson },
@@ -45,7 +45,11 @@ export function PositionRows({
         const guardrail = guardrailFor(position.id)
 
         return (
-          <div key={position.id} className="border-t border-qc-rule-row lg:py-3.5">
+          <div
+            key={position.id}
+            ref={rows.rowRef(position.id)}
+            className="border-t border-qc-rule-row lg:py-3.5"
+          >
             <button
               type="button"
               onClick={() => rows.toggle(position.id)}

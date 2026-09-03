@@ -20,6 +20,7 @@ type NumberFieldProps = {
    * another control. Keeps the input described without moving the hint into here.
    */
   describedBy?: string
+  disabled?: boolean
   /**
    * `true` hides the label at every width — the row already names the field.
    * `'from-lg'` keeps it on mobile and hides it from `lg` up, where a column header
@@ -43,6 +44,7 @@ export function NumberField({
   maxFractionDigits = 2,
   labelHidden = false,
   describedBy,
+  disabled = false,
 }: NumberFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const caretRef = useRef<number | null>(null)
@@ -71,12 +73,19 @@ export function NumberField({
       <span className={labelHidden === true ? 'sr-only' : labelHidden === 'from-lg' ? 'lg:sr-only' : undefined}>
         {label}
       </span>
-      <span className={cn('qc-input-wrap', error && 'is-error')}>
+      <span
+        className={cn(
+          'qc-input-wrap',
+          error && 'is-error',
+          disabled && 'border-qc-disabled-border bg-qc-disabled',
+        )}
+      >
         <input
           ref={inputRef}
           id={id}
-          className="qc-input"
+          className={cn('qc-input', disabled && 'text-qc-subtle')}
           value={value}
+          disabled={disabled}
           onChange={(event) => {
             const next = event.target.value
             if (!grouped) {

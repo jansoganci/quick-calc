@@ -47,6 +47,13 @@ export function DetailedFeasibilityPage() {
     calc.resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
+  function goToInputs() {
+    document.getElementById('detailed-feasibility')?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+  }
+
   return (
     <div className="pb-[92px] lg:pb-0">
       <main id="detailed-feasibility" className="lg:grid lg:grid-cols-[1fr_1px_372px]">
@@ -93,6 +100,7 @@ export function DetailedFeasibilityPage() {
         canSubmit={calc.canSubmit}
         submitHint={submitHint}
         onCalculate={calc.calculate}
+        onGoToInputs={goToInputs}
         onGoToResults={goToResults}
       />
     </div>

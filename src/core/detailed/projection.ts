@@ -33,7 +33,7 @@ export function escalationFactor(annualRate: number, month: number): number {
  * Investment payback (spec §14.2 / DF-36).
  *
  * Scans rows that have already been computed; it never recalculates an operating
- * result. There is no depreciation and no monthly CAPEX allocation.
+ * result, and CAPEX is never spread across months as a charge (DF-34).
  */
 export function paybackFromProjection(
   projection: MonthResult[],
