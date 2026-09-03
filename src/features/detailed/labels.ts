@@ -327,6 +327,7 @@ export const COPY = {
   productCount: (count: number) => `${count} ürün`,
   positionCount: (count: number) => `${count} pozisyon`,
   lineCount: (count: number) => `${count} kalem`,
+  assumptionRowCount: (count: number) => `${count} satır`,
   dailyUnits: (units: string) => `günde ${units} adet`,
   defaultsUnchanged: 'varsayılan',
   none: '—',

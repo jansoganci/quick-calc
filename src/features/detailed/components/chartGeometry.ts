@@ -3,7 +3,11 @@
  * onto a viewBox and computes nothing financial.
  */
 
-export type ChartSize = 'sm' | 'lg'
+/**
+ * `smPayback` is the payback chart's own mobile frame — spec §4.5 keeps the two
+ * mobile charts at different heights (200px / 180px), not one shared `sm` frame.
+ */
+export type ChartSize = 'sm' | 'smPayback' | 'lg'
 
 export type ChartFrame = {
   width: number
@@ -18,6 +22,7 @@ export type ChartFrame = {
 
 export const CHART_FRAMES: Record<ChartSize, ChartFrame> = {
   sm: { width: 354, height: 200, left: 30, right: 348, top: 20, bottom: 168, labelSize: 10, axisGap: 6 },
+  smPayback: { width: 354, height: 180, left: 30, right: 348, top: 20, bottom: 148, labelSize: 10, axisGap: 6 },
   lg: { width: 1092, height: 292, left: 76, right: 1080, top: 20, bottom: 258, labelSize: 11, axisGap: 8 },
 }
 

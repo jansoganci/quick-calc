@@ -4,8 +4,9 @@
  * Authority: docs/DETAILED_FINANCIAL_SPEC.md §10, §11.
  *
  * Nothing here depends on sales volume. CAPEX is summed here but is returned
- * separately and is never added to `monthlyFixedCost`: Detailed v1 has no
- * accounting depreciation and no recovery allocation (DF-34).
+ * separately and is never added to `monthlyFixedCost`: Detailed v1 never spreads
+ * it over time as a tax useful-life charge, and there is no recovery allocation
+ * (DF-34).
  */
 
 import type {

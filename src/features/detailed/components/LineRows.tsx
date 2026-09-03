@@ -3,6 +3,7 @@ import { TextField } from '../../../components/TextField.tsx'
 import { cn } from '../../../lib/cn.ts'
 import type { LineRow } from '../formState.ts'
 import { COPY } from '../labels.ts'
+import { useNewestRowOpen } from '../hooks/useNewestRowOpen.ts'
 
 type LineRowsProps = {
   lines: LineRow[]
@@ -41,11 +42,14 @@ export function LineRows({
   onRemove,
 }: LineRowsProps) {
   const used = new Set(lines.map((line) => line.name.trim()))
+  const rows = useNewestRowOpen(lines.map((line) => line.id))
+  // Spec §2.1: opexLines cell is `1fr 124px 52px`, capexItems is `1fr 132px 52px`.
+  const gridCols = pathPrefix === 'capexItems' ? 'grid-cols-[1fr_132px_52px]' : 'grid-cols-[1fr_124px_52px]'
 
   return (
     <div>
       {lines.length > 0 ? (
-        <div className="hidden grid-cols-[1fr_124px_52px] gap-2.5 pb-2 lg:grid">
+        <div className={cn('hidden gap-2.5 pb-2 lg:grid', gridCols)}>
           <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
             {nameLabel}
           </span>
@@ -60,7 +64,8 @@ export function LineRows({
         {lines.map((line, index) => (
           <div
             key={line.id}
-            className="grid grid-cols-[1fr_124px_52px] items-center gap-2.5 border-t border-qc-rule-row py-2"
+            ref={rows.rowRef(line.id)}
+            className={cn('grid items-center gap-2.5 border-t border-qc-rule-row py-2', gridCols)}
           >
             <TextField
               id={`${pathPrefix}.${index}.name`}

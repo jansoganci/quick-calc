@@ -31,7 +31,13 @@ export function DetailedResults({
         </span>
       </div>
 
-      <ResultSection title={COPY.moneyFlowTitle} note={COPY.moneyFlowNote} figure={view.breakdown.total} figureLabel={COPY.grossCustomerSales}>
+      <ResultSection
+        title={COPY.moneyFlowTitle}
+        titleMobile={COPY.moneyFlowTitleShort}
+        note={COPY.moneyFlowNote}
+        figure={view.breakdown.total}
+        figureLabel={COPY.grossCustomerSales}
+      >
         <ResultBar breakdown={view.breakdown} gross={view.breakdown.total} />
       </ResultSection>
 
@@ -67,7 +73,7 @@ export function DetailedResults({
           <PaybackChart data={view.paybackChart} size="lg" />
         </div>
         <div className="lg:hidden">
-          <PaybackChart data={view.paybackChart} size="sm" />
+          <PaybackChart data={view.paybackChart} size="smPayback" />
         </div>
         {view.payback.available ? null : (
           <p className="mt-2.5 text-xs leading-relaxed text-qc-muted">{view.payback.message}</p>
@@ -101,6 +107,7 @@ export function DetailedResults({
 
 function ResultSection({
   title,
+  titleMobile,
   note,
   figure,
   figureLabel,
@@ -108,6 +115,7 @@ function ResultSection({
   children,
 }: {
   title: string
+  titleMobile?: string
   note: string
   figure?: string | null
   figureLabel?: string
@@ -117,7 +125,16 @@ function ResultSection({
   return (
     <section className={`border-t border-qc-rule pt-[26px] ${isLast ? 'pb-0' : 'pb-[30px]'}`}>
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h2 className="m-0 text-[15px] font-semibold text-qc-ink">{title}</h2>
+        <h2 className="m-0 text-[15px] font-semibold text-qc-ink">
+          {titleMobile ? (
+            <>
+              <span className="lg:hidden">{titleMobile}</span>
+              <span className="hidden lg:inline">{title}</span>
+            </>
+          ) : (
+            title
+          )}
+        </h2>
         {figure ? (
           <div className="flex items-baseline gap-2">
             <span className="text-xs text-qc-muted">{figureLabel}</span>

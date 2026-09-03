@@ -1,4 +1,5 @@
 import { formatDecimal, parseTurkishNumber } from '../../lib/number.ts'
+import { RAMP_UP_TABLES, type RampUpPreset } from '../../core/detailed/index.ts'
 import { initialForm, type DetailedFormState } from './formState.ts'
 import { COPY, SECTION_IDS, type SectionId } from './labels.ts'
 
@@ -62,6 +63,14 @@ export function visibleSections(form: DetailedFormState): SectionId[] {
   const deliveryShare = parseTurkishNumber(form.channelMix.delivery)
   const hasDelivery = deliveryShare.status === 'ok' && deliveryShare.value > 0
   return SECTION_IDS.filter((section) => section !== 'delivery' || hasDelivery)
+}
+
+/** The active ramp-up preset's month-by-month percentage, as an 11px hint (spec §2.3). */
+export function rampUpTableHint(preset: RampUpPreset): string {
+  const months = RAMP_UP_TABLES[preset].map(
+    (share, index) => `${index + 1}. ay %${formatDecimal(share * 100, 0)}`,
+  )
+  return [...months, 'sonrası %100'].join(' · ')
 }
 
 /** Sum of the daily quantities the user typed — a count of their own entries, not a result. */
