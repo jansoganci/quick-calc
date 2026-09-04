@@ -78,7 +78,21 @@ export const COPY = {
   // Masthead and colophon copy is owned by the shell, which both modes render
   // inside. Re-exported here so this module keeps one import surface (U4).
   ...SHELL_COPY,
-  formSection: 'İşletme bilgileri',
+  // The eight primary inputs sit under three group headings; the old single
+  // `formSection` eyebrow ("İşletme bilgileri") named all of them at once and
+  // has been dropped, since the group headings now carry that job.
+  salesGroup: 'Satış',
+  monthlyCostsGroup: 'Aylık giderler',
+  capexGroup: 'Başlangıç yatırımı',
+  /** Shown beside a group heading when its subtotal cannot be derived yet. */
+  noValue: '—',
+  /**
+   * The derived line under the two payroll inputs. It borrows the result
+   * table's own `Personel` label rather than restating the word, so the form
+   * line and the breakdown row it corresponds to can never drift apart.
+   */
+  payrollHint: (count: string, perEmployee: string, total: string) =>
+    `${BREAKDOWN_LABELS.payroll}: ${count} × ${perEmployee} = ${total}`,
   assumptions: 'Varsayımlar',
   calculate: 'Hesapla',
   calculateDisabled: 'Sonucu görmek için tüm alanları doldurun',

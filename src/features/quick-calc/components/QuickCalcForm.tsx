@@ -1,11 +1,16 @@
+import { Fragment } from 'react'
 import { NumberField } from '../../../components/NumberField.tsx'
 import {
-  FIELD_LAYOUT,
+  FIELD_GROUPS,
   fieldHint,
   fieldLabel,
   fieldNumberFormat,
   fieldUnit,
+  groupHeading,
+  groupSummary,
+  payrollHint,
   rentCostHint,
+  type FieldGroup,
   type QuickField,
   type QuickFormState,
   type RentInputBasis,
@@ -25,6 +30,8 @@ type QuickCalcFormProps = {
   onSubmit: () => void
 }
 
+type FieldProps = Pick<QuickCalcFormProps, 'form' | 'errors' | 'dirty' | 'onChange' | 'onBlur'>
+
 export function QuickCalcForm({
   form,
   errors,
@@ -36,7 +43,7 @@ export function QuickCalcForm({
   onRentBasisChange,
   onSubmit,
 }: QuickCalcFormProps) {
-  const rentHint = rentCostHint(form)
+  const fieldProps: FieldProps = { form, errors, dirty, onChange, onBlur }
 
   return (
     <form
@@ -50,69 +57,15 @@ export function QuickCalcForm({
         onSubmit()
       }}
     >
-      <div className="mb-[14px] text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted lg:mb-[18px]">
-        {COPY.formSection}
-      </div>
-      <div className="grid grid-cols-2 gap-x-[13px] gap-y-[15px]">
-        {FIELD_LAYOUT.map(({ field, span }) => {
-          const format = fieldNumberFormat(field)
-          if (field === 'monthlyRent') {
-            return (
-              <div key={field}>
-                <NumberField
-                  id={field}
-                  label={fieldLabel(field)}
-                  value={form[field]}
-                  onChange={(value) => onChange(field, value)}
-                  onBlur={() => onBlur(field)}
-                  unit={fieldUnit(field)}
-                  error={dirty[field] ? errors[field] ?? null : null}
-                  hint={null}
-                  describedBy={rentHint ? `${field}-basis-hint` : undefined}
-                  span="full"
-                  grouped={format.grouped}
-                  maxFractionDigits={format.maxFractionDigits}
-                />
-                <div className="qc-segment" role="group" aria-label={COPY.rentBasisGroup}>
-                  {(['net', 'gross'] as const).map((basis) => (
-                    <button
-                      key={basis}
-                      type="button"
-                      className="qc-segment-btn"
-                      aria-pressed={form.rentInputBasis === basis}
-                      onClick={() => onRentBasisChange(basis)}
-                    >
-                      {RENT_BASIS_LABELS[basis]}
-                    </button>
-                  ))}
-                </div>
-                {rentHint ? (
-                  <p id={`${field}-basis-hint`} className="qc-hint mt-1.5">
-                    {rentHint}
-                  </p>
-                ) : null}
-              </div>
-            )
-          }
-
-          return (
-            <NumberField
-              key={field}
-              id={field}
-              label={fieldLabel(field)}
-              value={form[field]}
-              onChange={(value) => onChange(field, value)}
-              onBlur={() => onBlur(field)}
-              unit={fieldUnit(field)}
-              error={dirty[field] ? errors[field] ?? null : null}
-              hint={fieldHint(field) ?? null}
-              span={span}
-              grouped={format.grouped}
-              maxFractionDigits={format.maxFractionDigits}
-            />
-          )
-        })}
-      </div>
+      {FIELD_GROUPS.map((group, index) => (
+        <FieldGroupSection
+          key={group.id}
+          group={group}
+          first={index === 0}
+          fieldProps={fieldProps}
+          onRentBasisChange={onRentBasisChange}
+        />
+      ))}
 
       <div className="my-[22px] h-px bg-qc-rule" />
       <AssumptionsStrip
@@ -139,5 +92,163 @@ export function QuickCalcForm({
         <p className="mt-2.5 text-center text-xs text-qc-muted">{submitHint}</p>
       ) : null}
     </form>
+  )
+}
+
+/**
+ * One input group: an eyebrow heading, optionally with a Mono subtotal opposite
+ * it, over the same 2-column grid the form has always used. The heading row
+ * repeats the `AssumptionsStrip` pattern — label left, derived figure right.
+ */
+function FieldGroupSection({
+  group,
+  first,
+  fieldProps,
+  onRentBasisChange,
+}: {
+  group: FieldGroup
+  first: boolean
+  fieldProps: FieldProps
+  onRentBasisChange: (value: RentInputBasis) => void
+}) {
+  const headingId = `group-${group.id}`
+  const summary = groupSummary(fieldProps.form, group.id)
+
+  return (
+    <section aria-labelledby={headingId} className={first ? undefined : 'mt-[22px]'}>
+      <div className="mb-[14px] flex items-baseline justify-between gap-3 lg:mb-[18px]">
+        <h2
+          id={headingId}
+          className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted"
+        >
+          {groupHeading(group.id)}
+        </h2>
+        {summary ? <span className="font-mono text-[11px] text-qc-ink">{summary}</span> : null}
+      </div>
+      <div className="grid grid-cols-2 gap-x-[13px] gap-y-[15px]">
+        {group.rows.map((row) =>
+          row.kind === 'payroll' ? (
+            <PayrollRow key="payroll" {...fieldProps} />
+          ) : row.field === 'monthlyRent' ? (
+            <RentField key={row.field} {...fieldProps} onRentBasisChange={onRentBasisChange} />
+          ) : (
+            <PlainField key={row.field} field={row.field} span={row.span} {...fieldProps} />
+          ),
+        )}
+      </div>
+    </section>
+  )
+}
+
+function PlainField({
+  field,
+  span,
+  form,
+  errors,
+  dirty,
+  onChange,
+  onBlur,
+}: FieldProps & { field: QuickField; span: 'half' | 'full' }) {
+  const format = fieldNumberFormat(field)
+  return (
+    <NumberField
+      id={field}
+      label={fieldLabel(field)}
+      value={form[field]}
+      onChange={(value) => onChange(field, value)}
+      onBlur={() => onBlur(field)}
+      unit={fieldUnit(field)}
+      error={dirty[field] ? errors[field] ?? null : null}
+      hint={fieldHint(field) ?? null}
+      span={span}
+      grouped={format.grouped}
+      maxFractionDigits={format.maxFractionDigits}
+    />
+  )
+}
+
+/**
+ * Headcount and per-employee cost keep their own labels — "Personel" alone would
+ * not say which box is which — and share a derived line beneath them, so the
+ * form states the payroll figure the result table shows as one row.
+ */
+function PayrollRow({ form, errors, dirty, onChange, onBlur }: FieldProps) {
+  const hint = payrollHint(form)
+  const fields: readonly QuickField[] = ['employeeCount', 'averageEmployeeMonthlyCost']
+
+  return (
+    <Fragment>
+      {fields.map((field) => {
+        const format = fieldNumberFormat(field)
+        return (
+          <NumberField
+            key={field}
+            id={field}
+            label={fieldLabel(field)}
+            value={form[field]}
+            onChange={(value) => onChange(field, value)}
+            onBlur={() => onBlur(field)}
+            unit={fieldUnit(field)}
+            error={dirty[field] ? errors[field] ?? null : null}
+            hint={null}
+            span="half"
+            grouped={format.grouped}
+            maxFractionDigits={format.maxFractionDigits}
+          />
+        )
+      })}
+      {hint ? <p className="qc-hint col-span-full -mt-[7px]">{hint}</p> : null}
+    </Fragment>
+  )
+}
+
+/** §6.1 order: field → `Net kira` / `Brüt kira` control → the stopaj hint. */
+function RentField({
+  form,
+  errors,
+  dirty,
+  onChange,
+  onBlur,
+  onRentBasisChange,
+}: FieldProps & { onRentBasisChange: (value: RentInputBasis) => void }) {
+  const field: QuickField = 'monthlyRent'
+  const format = fieldNumberFormat(field)
+  const rentHint = rentCostHint(form)
+
+  return (
+    <div className="col-span-full">
+      <NumberField
+        id={field}
+        label={fieldLabel(field)}
+        value={form[field]}
+        onChange={(value) => onChange(field, value)}
+        onBlur={() => onBlur(field)}
+        unit={fieldUnit(field)}
+        error={dirty[field] ? errors[field] ?? null : null}
+        hint={null}
+        describedBy={rentHint ? `${field}-basis-hint` : undefined}
+        span="full"
+        grouped={format.grouped}
+        maxFractionDigits={format.maxFractionDigits}
+      />
+      <div className="qc-segment" role="group" aria-label={COPY.rentBasisGroup}>
+        {(['net', 'gross'] as const).map((basis) => (
+          <button
+            key={basis}
+            type="button"
+            className="qc-segment-btn"
+            aria-pressed={form.rentInputBasis === basis}
+            onClick={() => onRentBasisChange(basis)}
+          >
+            {RENT_BASIS_LABELS[basis]}
+          </button>
+        ))}
+      </div>
+      {rentHint ? (
+        <p id={`${field}-basis-hint`} className="qc-hint mt-1.5">
+          {rentHint}
+        </p>
+      ) : null}
+    </div>
   )
 }

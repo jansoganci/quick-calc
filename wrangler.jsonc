@@ -1,6 +1,14 @@
 {
-  "name": "fnb-financial-calculator",
+  "name": "maliyet",
   "compatibility_date": "2026-08-15",
+  // Production lives on maliyet.lol only. Do not re-enable workers.dev:
+  // this account's workers.dev subdomain is emlak-crm.
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [
+    { "pattern": "maliyet.lol/*", "zone_name": "maliyet.lol" },
+    { "pattern": "www.maliyet.lol/*", "zone_name": "maliyet.lol" }
+  ],
   "assets": {
     "directory": "./dist",
     "not_found_handling": "single-page-application"

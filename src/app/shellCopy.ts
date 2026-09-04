@@ -12,12 +12,12 @@ export type CalculationMode = 'quick' | 'detailed'
 export const SHELL_COPY = {
   productName: 'Maliyet',
   /**
-   * The slogan is scoped to what the tool actually does — it asks whether the
-   * numbers add up, and never claims the business will succeed. `tutmak` is the
-   * everyday Turkish idiom for figures reconciling, so it reads as a question an
-   * owner already asks rather than as advertising.
+   * The slogan names the tool's actual output — the breakdown reconciles to
+   * `İşletmede kalan`, and the R1 sentence ends `…’si işletmede kalıyor` — so it
+   * describes what the visitor gets rather than asking them to already have
+   * figures. It stays a question and still claims nothing about success.
    */
-  slogan: 'Rakamlar tutuyor mu?',
+  slogan: 'Bir satıştan geriye ne kalıyor?',
   domain: 'maliyet.lol',
   /** Document metadata only. The UI does not need a second explanatory sentence. */
   metaDescription:
@@ -27,6 +27,14 @@ export const SHELL_COPY = {
   detailedMode: 'Detaylı Fizibilite',
   footerScope: 'TRY · Türkiye',
   footerNature: 'Basitleştirilmiş bir ön değerlendirmedir.',
+  /**
+   * Colophon attribution. `null` renders no attribution at all, which is the
+   * safe default: a wrong handle would send visitors to somebody else's profile.
+   * Set this to the handle (`'@example'`) and `authorUrl` to its address to turn
+   * the fourth colophon item on.
+   */
+  authorHandle: null as string | null,
+  authorUrl: null as string | null,
 } as const
 
 /** The anchor each mode owns, so the masthead entries stay real links. */
@@ -42,5 +50,8 @@ export const MODE_LABELS = {
 
 export const MODES = ['quick', 'detailed'] as const satisfies readonly CalculationMode[]
 
-/** Browser tab, bookmarks and share previews — the one place the slogan reaches phones. */
+/** Browser tab, bookmarks and share previews. */
 export const DOCUMENT_TITLE = `${SHELL_COPY.productName} — ${SHELL_COPY.slogan}`
+
+/** Canonical address, used by the `index.html` share tags. */
+export const CANONICAL_URL = `https://${SHELL_COPY.domain}/`

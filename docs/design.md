@@ -19,7 +19,7 @@ The Design HTML preview (`Quick Calculation Reference.dc.html`) is a **layout mo
 
 ### 1a — Desktop, after calculation (`1152px`)
 
-Two-column page: left **İşletme bilgileri** form (`392px`), `1px` `#E3E5E8` rule, right results on `#FCFCFD`.
+Two-column page: left input form (`392px`, grouped **Satış** / **Aylık giderler** / **Başlangıç yatırımı**), `1px` `#E3E5E8` rule, right results on `#FCFCFD`.
 
 Form: two-column field grid, full-width product cost and capex, assumptions strip (`30 gün · 60 ay · %90 · %3,56`), primary **Hesapla**.
 

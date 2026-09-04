@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { calculateQuick } from './calculate.ts';
+import { calculateQuick, resolveMonthlyPayroll } from './calculate.ts';
 import { QUICK_DEFAULTS } from './defaults.ts';
 import type { CostLine, QuickResolvedInput } from './types.ts';
 import { validateQuickInput } from './validate.ts';
@@ -142,6 +142,38 @@ describe('calculateQuick golden vector', () => {
       vatRate: QUICK_DEFAULTS.vatRate,
       revenueBasis: 'net',
     });
+  });
+});
+
+describe('resolveMonthlyPayroll', () => {
+  // Extracted from calculateQuick so the Quick form can show the same product
+  // beneath its two payroll inputs without restating the multiplication.
+  it('multiplies headcount by the blended per-employee cost', () => {
+    expect(
+      resolveMonthlyPayroll({ employeeCount: 12, averageEmployeeMonthlyCost: 48_000 }),
+    ).toBe(576_000);
+  });
+
+  it('is zero when there are no employees', () => {
+    expect(resolveMonthlyPayroll({ employeeCount: 0, averageEmployeeMonthlyCost: 48_000 })).toBe(0);
+  });
+
+  it('is the value calculateQuick reports as monthly payroll', () => {
+    const validated = validateQuickInput({
+      monthlyRent: 450_000,
+      employeeCount: 12,
+      averageEmployeeMonthlyCost: 48_000,
+      otherMonthlyOpex: 110_000,
+      initialCapex: 10_000_000,
+      averageTicket: 140,
+      dailySalesVolume: 1_000,
+      variableCostPerSale: 14.5,
+    });
+    expect(validated.ok).toBe(true);
+    if (!validated.ok) return;
+    expect(calculateQuick(validated.input).monthly.payroll).toBe(
+      resolveMonthlyPayroll(validated.input),
+    );
   });
 });
 

@@ -14,6 +14,19 @@ export interface ResolvedRentCost {
   rentWithholdingTax: number;
 }
 
+/**
+ * Monthly payroll: headcount times the blended per-employee employer cost that
+ * scope §6.2 keeps consolidated. Extracted so the Quick form can show the same
+ * product beneath its two payroll inputs without restating the multiplication —
+ * a formula has exactly one home.
+ */
+export function resolveMonthlyPayroll(input: {
+  employeeCount: number;
+  averageEmployeeMonthlyCost: number;
+}): number {
+  return input.employeeCount * input.averageEmployeeMonthlyCost;
+}
+
 export function resolveRentCost(input: {
   monthlyRent: number;
   rentInputBasis: RentInputBasis;
@@ -57,7 +70,7 @@ export function calculateQuick(input: QuickResolvedInput): QuickCalculationResul
   const monthlyNetRevenue = monthlySalesVolume * netAverageTicket;
   const monthlyVat = monthlyGrossCollections - monthlyNetRevenue;
 
-  const monthlyPayroll = input.employeeCount * input.averageEmployeeMonthlyCost;
+  const monthlyPayroll = resolveMonthlyPayroll(input);
   const monthlyVariableCost = monthlySalesVolume * input.variableCostPerSale;
 
   const posCostPerSale = input.averageTicket * input.cardPaymentShare * input.posCommissionRate;

@@ -42,7 +42,40 @@ Bar cost ramp, in locked order: `#C3C8CE` KDV · `#3F4650` product · `#545C68` 
 
 **The offset is `top-14`, not `top-0`, because the masthead is sticky (§2.1).** Verified in the browser: with any real travel the pane pins exactly at the masthead's bottom edge (56px).
 
-Inputs sit in a 2-column grid, `gap-y-[15px] gap-x-[13px]`; product cost and initial investment span both columns. Input row: `h-10` **from the `lg` breakpoint up**; below it the row is 44px, because DESIGN_DIRECTION.md §1.1 locks "no interactive target below 44px" and that rule governs the mobile state. The same split applies to the `Özeti Kopyala` control (§3.1b). Value right-aligned in Mono, unit suffix in muted 12px. daisyUI: `input input-bordered` with `!rounded` `!h-10` and the border token; hint/error text as `label-text-alt`.
+### Input groups
+
+*Revised.* The eight primary inputs previously sat in one flat list under a single `İŞLETME BİLGİLERİ` eyebrow. They are now split into **three groups**, each a `<section aria-labelledby>` tied to its own eyebrow heading. The old `formSection` heading and the flat `FIELD_LAYOUT` are gone; `FIELD_GROUPS` in `features/quick-calc/viewModel.ts` owns the structure.
+
+| Group | Heading | Rows |
+| --- | --- | --- |
+| `sales` | `Satış` | `averageTicket` (half) · `dailySalesVolume` (half) · `variableCostPerSale` (full) |
+| `monthlyCosts` | `Aylık giderler` | `monthlyRent` (full) · payroll pair · `otherMonthlyOpex` (full) |
+| `capex` | `Başlangıç yatırımı` | `initialCapex` (full) |
+
+Sales leads: a visitor describes what they sell before what they pay. Initial investment is its own group because it is **not** a monthly cost and must not land inside the monthly subtotal. Groups are separated by `mt-[22px]`, matching the rule rhythm above the assumptions strip.
+
+**Rent is now full-span.** It carries the basis control and the stopaj hint beneath it; as a half-width cell it left its row partner top-aligned against roughly 50px of empty space, because a grid row stretches to its tallest cell.
+
+**The payroll pair.** `scope §6.1` locks headcount and per-employee cost as two of the eight inputs, but they are one cost to the business. They keep their own labels — "Personel" alone would not say which box is which — and sit side by side above a full-width derived line:
+
+```
+Personel: 12 kişi × 48.000 TL = 576.000 TL
+```
+
+Rendered in the existing `qc-hint` style. The copy borrows `BREAKDOWN_LABELS.payroll` rather than restating the word, so this line and the result row it corresponds to cannot drift apart. It is `null` until both inputs parse.
+
+**The monthly-cost subtotal.** The `Aylık giderler` heading carries a right-aligned Mono figure — the same label-left / figure-right pattern as the assumptions strip (§2, "Assumptions"). It shows `—` while any of its three inputs is missing, so the slot does not appear and disappear while typing.
+
+- It is **always visible, including before `Hesapla`.** DIRECTION V6 governs the *result column*: `hasCalculated` is untouched and the result stays empty until the button is pressed. The form already showed money derived from a user's own input before `Hesapla` — the rent stopaj hint — so this is that existing behaviour applied to a second figure, not a new class of it.
+- It is **deliberately not the engine's `fixedCost`**, which also carries the capex recovery allocation (`core/quick/calculate.ts`). `viewModel.test.ts` pins the difference — `subtotal + capexRecoveryAllocation === fixedCost` — so the form and the result cannot silently diverge.
+- Rent enters through `resolveRentCost`, not the raw input, so a `Net` entry is counted at what it actually costs the business and agrees with the result's `Kira` line.
+- It lives in `viewModel.ts`, never in the component (`CLAUDE.md §3`). Payroll comes from the engine's `resolveMonthlyPayroll`, extracted alongside the existing `resolveRentCost` so the multiplication has one home.
+
+**Deliberate divergence from Detailed.** `features/detailed/sectionSummary.ts` states that a section header "is never a money figure". Quick departs from that here. The two features are separate business logics (`CLAUDE.md §3`), and Quick's form — unlike Detailed's — already displayed derived money before the first calculation. Detailed's rule is unchanged.
+
+### Grid
+
+Inputs sit in a 2-column grid, `gap-y-[15px] gap-x-[13px]`; product cost, rent, other opex and initial investment span both columns. Input row: `h-10` **from the `lg` breakpoint up**; below it the row is 44px, because DESIGN_DIRECTION.md §1.1 locks "no interactive target below 44px" and that rule governs the mobile state. The same split applies to the `Özeti Kopyala` control (§3.1b). Value right-aligned in Mono, unit suffix in muted 12px. daisyUI: `input input-bordered` with `!rounded` `!h-10` and the border token; hint/error text as `label-text-alt`.
 
 Assumptions: one row, label left, current values as a Mono summary right, `▾`. daisyUI `collapse collapse-arrow` with the default chrome removed — border and background off. Collapsed by default; a user-edited assumption gets its value in ink instead of muted, no badge.
 
@@ -52,15 +85,25 @@ Assumptions: one row, label left, current values as a Mono summary right, `▾`.
 
 **Added after the original spec.** No document previously described a header or footer; both are recorded here as a new product surface. They carry only what the locked rules permit: there is no router (ARCH D4), so no navigation; no icons outside the assumptions chevron (§7), so no mark; and the accent stays reserved for the headline figure and focus states (DIRECTION V2), so neither is filled or coloured.
 
-**Masthead.** One hairline-separated row inside the same `1152px` frame as the form and result, so the page reads as a single sheet. `h-14` from `lg`, 52px below it; padding `30px` / `18px` to match the form column. Product name left in Plex Sans 600 15px ink; mode label right in the 11px uppercase eyebrow style already used for `İŞLETME BİLGİLERİ` and `SONUÇ`. Bottom rule `--qc-rule`.
+**Masthead.** One hairline-separated row inside the same `1152px` frame as the form and result, so the page reads as a single sheet. `h-14` from `lg`, 52px below it; padding `30px` / `18px` to match the form column. Product name left in Plex Sans 600 15px ink; mode label right in the 11px uppercase eyebrow style already used for the input group headings (§2) and `SONUÇ`. Bottom rule `--qc-rule`.
 
 **Sticky from `lg` (`lg:sticky lg:top-0 lg:z-10`).** *Corrected — this previously read "Not sticky", which contradicted the shipped code and the Detailed pane's positioning.* The masthead now carries the mode switch between Hızlı Hesap and Detaylı Fizibilite, and Detaylı Fizibilite is a long scrolling page; a switch that scrolls away is a switch the user has to hunt for. The two sticky elements do not compete because the result column offsets by the masthead's own height (`lg:top-14`) instead of `lg:top-0`. Both modes use the same offset.
 
 **Colophon.** Above a `--qc-rule` top rule, `18px` padding, 12px `--qc-muted`. One row with `space-between` from `lg`, stacked with a 5px gap below it. Three items: the v1 scope (scope §26), a six-word statement of what the tool is, and the engine version in Plex Mono 11px `--qc-subtle`. The version is read from `meta.quickEngineVersion`, never typed — scope §18 requires a formula change to be detectable as a version difference.
 
+**Attribution (optional fourth item).** *Added.* The colophon may carry one author handle after the scope, as a plain underlined link in the same Mono 11px `--qc-subtle` run — no icon, no avatar, no follow button, no second row. It is driven by `SHELL_COPY.authorHandle` / `authorUrl`; when either is unset the colophon renders the three items above and nothing else. It is the only outbound link on the page, and it stays out of the result column entirely.
+
 The §10.1 limitation statement deliberately stays with the earnings figure and is **not** repeated in the colophon.
 
 Both elements are rendered as `<header>`, `<main>` and `<footer>`, which are also the document's only landmarks.
+
+## 2.2 Share tags
+
+**Added.** `index.html` carries Open Graph and Twitter card tags plus a canonical link, so a pasted link renders as a titled card instead of a bare URL.
+
+These are **not** a first-paint fallback the way the `<title>` is. The crawlers that build link previews do not execute scripts, so the static tags are the only version they ever see and `main.tsx` cannot correct them. `shellCopy.ts` remains the source of truth for the wording; when the slogan or meta description changes there, the tags must be updated to match by hand.
+
+`twitter:card` is `summary`, not `summary_large_image`: the project ships no image assets, so there is no `og:image` and a large-image card would render blank. Adding one is a later decision, not an omission to be patched with a placeholder.
 
 ## 3. Result (locked order — R1…R5)
 
@@ -84,6 +127,12 @@ Both elements are rendered as `<header>`, `<main>` and `<footer>`, which are als
 
 **Empty state (before the first `Hesapla`).** The summary paragraph and nothing else. DIRECTION V6 forbids "partial figures, placeholder numbers, [and] skeleton of the result column"; an outlined empty bar labelled `0,00 TL` was all three, and has been removed.
 
+**Seeded input form.** *Added.* The eight primary inputs open pre-filled with a worked example — a plausible mid-size cafe — rather than blank, so a first-time arrival reads a form they could have typed instead of eight empty boxes. The values live in `EXAMPLE_FORM` (`features/quick-calc/viewModel.ts`); the four assumptions stay empty there so `toRawInput` falls through to `QUICK_DEFAULTS` and the defaults keep one home (U4).
+
+**This does not touch V6.** V6 governs the *result*: `hasCalculated` still starts false, the result column still shows the empty-state paragraph and nothing else, and the first figure still appears only after `Hesapla`. A pre-filled input is not a partial figure, a placeholder number or a skeleton of the result column — it is an input the visitor overwrites.
+
+The example must stay believable, because it is the first impression of the model's judgement: it is covered by tests asserting it validates, enables `Hesapla` on load, and leaves a positive amount in the business. A figure set that implies an implausible payback undermines the tool more than an empty form does.
+
 **Bar end labels.** The left label is always `0,00 TL`. The right label is the figure the bar actually ends at: the average sale normally, and **the estimated total cost per sale when the result is a loss**, because in that case the segments are rescaled to total cost. Labelling a loss bar with the sale amount reads as "costs equal the sale price", the opposite of what happened. Both figures are already on screen; the view model only chooses between them (`barEndLabel`).
 
 **Money format:** always full Turkish — `1.945.947 TL`, `107,56 TL`, `%25,5`. Group separator `.`, decimal `,`, unit after a space. Never abbreviated, never a currency symbol. Use `Intl.NumberFormat('tr-TR')`.
@@ -105,11 +154,13 @@ Breakpoint: single column below `lg` (1024px), two columns at and above.
 
 ## 6. Turkish copy — draft for review
 
-**Masthead / colophon:** `Maliyet` (product name, **locked**) · slogan `Rakamlar tutuyor mu?` in 12px muted beside the name, from the `sm` breakpoint up · mode switch `Hızlı Hesap` / `Detaylı Fizibilite` · `maliyet.lol · TRY · Türkiye` · `Basitleştirilmiş bir ön değerlendirmedir.`
+**Masthead / colophon:** `Maliyet` (product name, **locked**) · slogan `Bir satıştan geriye ne kalıyor?` in 12px muted beside the name, from the `sm` breakpoint up · mode switch `Hızlı Hesap` / `Detaylı Fizibilite` · `maliyet.lol · TRY · Türkiye` · `Basitleştirilmiş bir ön değerlendirmedir.`
 
 Brand copy has one home, `src/app/shellCopy.ts`, which both modes render from and which `features/quick-calc/labels.ts` re-exports into its own `COPY`. `main.tsx` applies `DOCUMENT_TITLE` at startup; the static `<title>` in `index.html` is only the first-paint fallback.
 
-**The slogan appears in exactly two places** — the masthead from `sm` up, and the document title. Below `sm` there is no room beside two mode tabs, so phones get it from the browser tab instead. It never appears next to a figure.
+**Slogan wording.** *Revised.* Previously `Rakamlar tutuyor mu?`. That line asked the visitor about figures they were assumed to already hold; the current line names what the tool actually returns — the breakdown reconciles to `İşletmede kalan` and the R1 sentence ends `…’si işletmede kalıyor`. It stays a question, stays inside what the model can deliver, and claims nothing about the business succeeding. `shellCopy.test.ts` caps it at 32 characters.
+
+**The slogan appears in exactly three places** — the masthead from `sm` up, its own row below `sm`, and the document title. *Revised: this previously read "exactly two places", with phones getting the slogan from the browser tab alone.* The masthead genuinely has no room beside two mode tabs on a phone, so the slogan takes a hairline-separated row of its own directly beneath the masthead (12px `--qc-muted`, `18px` padding, `sm:hidden`) rather than being dropped — most arrivals are phones, and a browser tab does not orient a first-time visitor. It never appears next to a figure, and it never carries the accent.
 **Input labels:** Ortalama satış tutarı (hint *KDV dahil*) · Günlük satış adedi · Satış başına ürün maliyeti · Aylık kira (Net kira / Brüt kira control; default Brüt) · Diğer aylık giderler · Çalışan sayısı · Kişi başı aylık maliyet · Başlangıç yatırımı.
 **Assumptions:** Ayda çalışılan gün · Yatırım geri kazanım süresi (ay) · Kartlı ödeme oranı · POS komisyon oranı.
 **Breakdown rows:** KDV · Ürün maliyeti · Personel · Kira · Diğer giderler · POS komisyonu · Yatırım geri kazanımı · **İşletmede kalan** · Toplam.

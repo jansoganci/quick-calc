@@ -1,4 +1,4 @@
-export { calculateQuick, resolveRentCost } from './calculate.ts';
+export { calculateQuick, resolveMonthlyPayroll, resolveRentCost } from './calculate.ts';
 export type { ResolvedRentCost } from './calculate.ts';
 export { QUICK_DEFAULTS } from './defaults.ts';
 export { QUICK_LIMITS } from './limits.ts';

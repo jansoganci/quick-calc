@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import {
   EMPTY_FORM,
+  EXAMPLE_FORM,
+  allPrimaryFilled,
   assumptionRows,
+  monthlyCostsTotal,
+  monthlyCostsTotalValue,
+  payrollHint,
   buildQuickView,
   errorMessage,
   evaluateForm,
@@ -27,6 +32,89 @@ const GOLDEN: QuickFormState = {
   dailySalesVolume: '1000',
   variableCostPerSale: '14,50',
 }
+
+describe('EXAMPLE_FORM', () => {
+  // The seeded form is the first thing a visitor sees, so it has to be a form
+  // they could have typed themselves: complete, valid, and profitable enough to
+  // read as an example rather than as a warning.
+  it('fills every primary field so Hesapla is enabled on load', () => {
+    expect(allPrimaryFilled(EXAMPLE_FORM)).toBe(true)
+  })
+
+  it('leaves the assumptions empty so the engine defaults apply', () => {
+    expect(EXAMPLE_FORM.operatingDaysPerMonth).toBe('')
+    expect(EXAMPLE_FORM.capexRecoveryPeriodMonths).toBe('')
+    expect(EXAMPLE_FORM.cardPaymentShare).toBe('')
+    expect(EXAMPLE_FORM.posCommissionRate).toBe('')
+  })
+
+  it('calculates, and leaves a positive amount in the business', () => {
+    const result = evaluateForm(EXAMPLE_FORM)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    const remaining = result.view.breakdown.find((row) => row.key === 'remaining')
+    expect(remaining?.label).toBe(BREAKDOWN_LABELS.remaining)
+    // The profit variant of the R1 sentence, not the `açık oluşuyor` one.
+    expect(result.view.headline).toContain('işletmede kalıyor')
+  })
+})
+
+describe('monthly cost group', () => {
+  it('states the payroll product beneath the two payroll inputs', () => {
+    // Borrows the breakdown row's own label, so the form line and the result
+    // row it corresponds to cannot drift apart.
+    expect(payrollHint(GOLDEN)).toBe(
+      `${BREAKDOWN_LABELS.payroll}: 12 kişi × 48.000 TL = 576.000 TL`,
+    )
+  })
+
+  it('withholds both derived figures until their inputs parse', () => {
+    expect(payrollHint({ ...GOLDEN, employeeCount: '' })).toBeNull()
+    expect(monthlyCostsTotal({ ...GOLDEN, otherMonthlyOpex: '' })).toBeNull()
+    expect(monthlyCostsTotal({ ...GOLDEN, monthlyRent: 'abc' })).toBeNull()
+  })
+
+  it('sums rent, payroll and other opex', () => {
+    // 450.000 gross rent + 12 × 48.000 payroll + 110.000 other.
+    expect(monthlyCostsTotalValue(GOLDEN)).toBe(1_136_000)
+    expect(monthlyCostsTotal(GOLDEN)).toBe('1.136.000 TL')
+  })
+
+  it('counts net-basis rent at what it actually costs the business', () => {
+    // Proves the total runs through `resolveRentCost` rather than reading the
+    // raw input — otherwise it would disagree with the result's `Kira` line.
+    const gross = monthlyCostsTotalValue(GOLDEN)
+    const net = monthlyCostsTotalValue({ ...GOLDEN, rentInputBasis: 'net' })
+    expect(gross).not.toBeNull()
+    expect(net).not.toBeNull()
+    expect(net!).toBeGreaterThan(gross!)
+  })
+
+  it('differs from the engine fixed cost by exactly the capex recovery share', () => {
+    // The structural invariant. The engine's `fixedCost` also carries the capex
+    // recovery allocation; this group deliberately does not. Pinning the
+    // difference is what stops the form and the result from silently diverging.
+    const validated = validateQuickInput({
+      monthlyRent: 450_000,
+      employeeCount: 12,
+      averageEmployeeMonthlyCost: 48_000,
+      otherMonthlyOpex: 110_000,
+      initialCapex: 10_000_000,
+      averageTicket: 140,
+      dailySalesVolume: 1_000,
+      variableCostPerSale: 14.5,
+    })
+    expect(validated.ok).toBe(true)
+    if (!validated.ok) return
+    const { monthly } = calculateQuick(validated.input)
+
+    expect(monthlyCostsTotalValue(GOLDEN)).toBeCloseTo(
+      monthly.fixedCost - monthly.capexRecoveryAllocation,
+      6,
+    )
+    expect(monthlyCostsTotalValue(GOLDEN)).not.toBe(monthly.fixedCost)
+  })
+})
 
 describe('evaluateForm', () => {
   it('returns field errors for an empty form', () => {

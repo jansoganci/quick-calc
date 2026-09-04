@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  EMPTY_FORM,
+  EXAMPLE_FORM,
   PRIMARY_FIELDS,
   SECONDARY_FIELDS,
   allPrimaryFilled,
@@ -15,7 +15,9 @@ import { COPY } from '../labels.ts'
 const ALL_FIELDS: readonly QuickField[] = [...PRIMARY_FIELDS, ...SECONDARY_FIELDS]
 
 export function useQuickCalc() {
-  const [form, setForm] = useState<QuickFormState>(EMPTY_FORM)
+  // Seeded with the worked example rather than a blank form (see EXAMPLE_FORM).
+  // `hasCalculated` still starts false, so V6 holds: no result until `Hesapla`.
+  const [form, setForm] = useState<QuickFormState>(EXAMPLE_FORM)
   const [dirty, setDirty] = useState<Record<QuickField, boolean>>(
     Object.fromEntries(ALL_FIELDS.map((field) => [field, false])) as Record<
       QuickField,

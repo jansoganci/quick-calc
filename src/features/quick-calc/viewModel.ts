@@ -2,6 +2,7 @@ import {
   calculateQuick,
   QUICK_DEFAULTS,
   QUICK_LIMITS,
+  resolveMonthlyPayroll,
   resolveRentCost,
   simulateQuick,
   validateQuickInput,
@@ -85,18 +86,154 @@ export const EMPTY_FORM: QuickFormState = {
   rentInputBasis: 'gross',
 }
 
+/**
+ * The form a first-time visitor lands on: a plausible mid-size Istanbul cafe.
+ *
+ * The eight primary fields start filled so the first screen is a readable
+ * example with one button rather than eight blank boxes — most arrivals come
+ * from a link and have no figures of their own to type yet. Nothing here is a
+ * result: DIRECTION V6 still holds, the result column stays empty until
+ * `Hesapla` is pressed, and every figure below is an input the visitor
+ * overwrites.
+ *
+ * The secondary fields stay empty on purpose. `toRawInput` skips empty
+ * assumptions so the engine applies `QUICK_DEFAULTS`, which keeps the defaults
+ * stated exactly once (U4) instead of copied into this literal.
+ */
+export const EXAMPLE_FORM: QuickFormState = {
+  averageTicket: '180',
+  dailySalesVolume: '120',
+  variableCostPerSale: '45',
+  monthlyRent: '85.000',
+  otherMonthlyOpex: '60.000',
+  employeeCount: '4',
+  averageEmployeeMonthlyCost: '32.000',
+  initialCapex: '1.500.000',
+  operatingDaysPerMonth: '',
+  capexRecoveryPeriodMonths: '',
+  cardPaymentShare: '',
+  posCommissionRate: '',
+  rentInputBasis: 'gross',
+}
+
 export type FieldSpan = 'half' | 'full'
 
-export const FIELD_LAYOUT: readonly { field: QuickField; span: FieldSpan }[] = [
-  { field: 'averageTicket', span: 'half' },
-  { field: 'dailySalesVolume', span: 'half' },
-  { field: 'variableCostPerSale', span: 'full' },
-  { field: 'monthlyRent', span: 'half' },
-  { field: 'otherMonthlyOpex', span: 'half' },
-  { field: 'employeeCount', span: 'half' },
-  { field: 'averageEmployeeMonthlyCost', span: 'half' },
-  { field: 'initialCapex', span: 'full' },
+export type FieldGroupId = 'sales' | 'monthlyCosts' | 'capex'
+
+/**
+ * A row inside a group. `payroll` is the one row that is not a single field:
+ * scope §6.1 keeps headcount and per-employee cost as two of the eight locked
+ * inputs, but they are one cost to the business, so they share a row and a
+ * label. Rent stays a plain field row — the form renders its basis control and
+ * stopaj hint around it, as it already did.
+ */
+export type FieldRow =
+  | { kind: 'field'; field: QuickField; span: FieldSpan }
+  | { kind: 'payroll' }
+
+export type FieldGroup = { id: FieldGroupId; rows: readonly FieldRow[] }
+
+/**
+ * The eight primary inputs, grouped. Replaces the flat `FIELD_LAYOUT`, which
+ * interleaved sales and cost fields under one heading and split payroll away
+ * from the other monthly costs.
+ *
+ * Sales comes first: a visitor describes what they sell before what they pay.
+ * Initial investment is its own group because it is not a monthly cost and must
+ * not land inside the monthly subtotal.
+ */
+export const FIELD_GROUPS: readonly FieldGroup[] = [
+  {
+    id: 'sales',
+    rows: [
+      { kind: 'field', field: 'averageTicket', span: 'half' },
+      { kind: 'field', field: 'dailySalesVolume', span: 'half' },
+      { kind: 'field', field: 'variableCostPerSale', span: 'full' },
+    ],
+  },
+  {
+    id: 'monthlyCosts',
+    rows: [
+      // Rent spans both columns: it carries the basis control and the stopaj
+      // hint beneath it, and as a half-width cell it left its row partner
+      // top-aligned against ~50px of empty space.
+      { kind: 'field', field: 'monthlyRent', span: 'full' },
+      { kind: 'payroll' },
+      { kind: 'field', field: 'otherMonthlyOpex', span: 'full' },
+    ],
+  },
+  {
+    id: 'capex',
+    rows: [{ kind: 'field', field: 'initialCapex', span: 'full' }],
+  },
 ]
+
+/**
+ * `4 kişi × 32.000,00 TL = 128.000,00 TL` beneath the payroll row. The result
+ * table shows `Personel` as one line; without this the form is the only place
+ * the user has to do that multiplication in their head.
+ *
+ * `null` while either input is empty or unparseable — the same contract as
+ * `rentCostHint`, which is the existing precedent for money derived from a
+ * user's own input being shown before `Hesapla`.
+ */
+export function payrollHint(form: FormValues): string | null {
+  const count = parseTurkishNumber(form.employeeCount)
+  const perEmployee = parseTurkishNumber(form.averageEmployeeMonthlyCost)
+  if (count.status !== 'ok' || perEmployee.status !== 'ok') return null
+  const payroll = resolveMonthlyPayroll({
+    employeeCount: count.value,
+    averageEmployeeMonthlyCost: perEmployee.value,
+  })
+  return COPY.payrollHint(
+    `${formatCount(count.value)} ${FIELD_UNITS.employeeCount}`,
+    `${formatTry(perEmployee.value)} TL`,
+    `${formatTry(payroll)} TL`,
+  )
+}
+
+/**
+ * Rent + payroll + other monthly opex, as a number.
+ *
+ * **This is deliberately not the engine's `fixedCost`**, which also carries the
+ * capex recovery allocation (`core/quick/calculate.ts`). Initial investment is
+ * its own input group and must not inflate a figure labelled "monthly costs";
+ * `viewModel.test.ts` pins the difference so the two can never drift apart.
+ *
+ * Rent goes through `resolveRentCost` rather than being read raw, so a `Net`
+ * entry is counted at what it actually costs the business — otherwise this
+ * total would disagree with the `Kira` line in the result breakdown.
+ */
+export function monthlyCostsTotalValue(form: QuickFormState): number | null {
+  const rent = parseTurkishNumber(form.monthlyRent)
+  const count = parseTurkishNumber(form.employeeCount)
+  const perEmployee = parseTurkishNumber(form.averageEmployeeMonthlyCost)
+  const otherOpex = parseTurkishNumber(form.otherMonthlyOpex)
+  if (
+    rent.status !== 'ok' ||
+    count.status !== 'ok' ||
+    perEmployee.status !== 'ok' ||
+    otherOpex.status !== 'ok'
+  ) {
+    return null
+  }
+  const rentCost = resolveRentCost({
+    monthlyRent: rent.value,
+    rentInputBasis: form.rentInputBasis,
+    rentWithholdingRate: QUICK_DEFAULTS.rentWithholdingRate,
+  }).rentCost
+  const payroll = resolveMonthlyPayroll({
+    employeeCount: count.value,
+    averageEmployeeMonthlyCost: perEmployee.value,
+  })
+  return rentCost + payroll + otherOpex.value
+}
+
+/** The monthly-cost subtotal as it appears beside the group heading. */
+export function monthlyCostsTotal(form: QuickFormState): string | null {
+  const total = monthlyCostsTotalValue(form)
+  return total === null ? null : `${formatTry(total)} TL`
+}
 
 export type EvaluateFormResult =
   | { ok: true; view: QuickView }
@@ -167,6 +304,29 @@ export function evaluateForm(form: QuickFormState): EvaluateFormResult {
 
 export function allPrimaryFilled(form: FormValues): boolean {
   return PRIMARY_FIELDS.every((field) => form[field].trim() !== '')
+}
+
+const GROUP_HEADINGS: Record<FieldGroupId, string> = {
+  sales: COPY.salesGroup,
+  monthlyCosts: COPY.monthlyCostsGroup,
+  capex: COPY.capexGroup,
+}
+
+export function groupHeading(id: FieldGroupId): string {
+  return GROUP_HEADINGS[id]
+}
+
+/**
+ * The figure beside a group heading. Only the monthly-cost group has one — sales
+ * inputs do not sum to anything meaningful, and the capex group is a single
+ * field that would only repeat itself.
+ */
+export function groupSummary(form: QuickFormState, id: FieldGroupId): string | null {
+  // `null` means the group has no summary slot at all. The monthly-cost group
+  // always has one, falling back to `—` while a figure is missing, so the slot
+  // does not appear and disappear as the user types.
+  if (id !== 'monthlyCosts') return null
+  return monthlyCostsTotal(form) ?? COPY.noValue
 }
 
 export function fieldLabel(field: QuickField): string {

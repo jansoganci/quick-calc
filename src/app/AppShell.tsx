@@ -25,6 +25,7 @@ export function AppShell({ mode, onModeChange, children }: AppShellProps) {
     <div className="min-h-screen bg-qc-page">
       <div className="mx-auto max-w-[1152px] overflow-x-clip border-x border-qc-rule bg-qc-surface">
         <AppHeader mode={mode} onModeChange={onModeChange} />
+        <SloganRow />
         {children}
         <AppFooter />
       </div>
@@ -51,8 +52,8 @@ function AppHeader({
           {SHELL_COPY.productName}
         </span>
         {/* Orientation for a first-time visitor, not a headline: it never competes
-            with the result. Phones have no room beside two mode tabs, and the
-            document title carries it there instead. */}
+            with the result. Phones have no room beside two mode tabs, so below
+            `sm` the slogan moves to its own row in `SloganRow` instead. */}
         <span className="hidden truncate text-xs text-qc-muted sm:inline">
           {SHELL_COPY.slogan}
         </span>
@@ -94,6 +95,20 @@ function AppHeader({
   )
 }
 
+/**
+ * The slogan on phones. Below `sm` the masthead has no room for it beside two
+ * mode tabs, so it takes its own row under the masthead rule rather than being
+ * dropped: most arrivals are phones, and the browser tab alone does not orient
+ * them. Muted 12px, no accent, never beside a figure.
+ */
+function SloganRow() {
+  return (
+    <div className="border-b border-qc-rule px-[18px] py-2 text-xs text-qc-muted sm:hidden">
+      {SHELL_COPY.slogan}
+    </div>
+  )
+}
+
 function AppFooter() {
   return (
     <footer className="border-t border-qc-rule px-[18px] py-[18px] text-xs text-qc-muted lg:px-[30px]">
@@ -101,6 +116,22 @@ function AppFooter() {
         <span>{SHELL_COPY.footerNature}</span>
         <span className="font-mono text-[11px] text-qc-subtle">
           {SHELL_COPY.domain} · {SHELL_COPY.footerScope}
+          {/* Attribution is opt-in: `shellCopy.ts` ships it as null so an
+              unconfigured build renders the three specified items and nothing
+              more, rather than a placeholder handle pointing at a stranger. */}
+          {SHELL_COPY.authorHandle && SHELL_COPY.authorUrl ? (
+            <>
+              {' · '}
+              <a
+                href={SHELL_COPY.authorUrl}
+                target="_blank"
+                rel="me noopener noreferrer"
+                className="underline decoration-qc-rule underline-offset-2 hover:text-qc-muted"
+              >
+                {SHELL_COPY.authorHandle}
+              </a>
+            </>
+          ) : null}
         </span>
       </div>
     </footer>

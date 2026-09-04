@@ -4,11 +4,37 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Static fallback for the first paint. src/app/shellCopy.ts owns this copy. -->
-    <title>Maliyet — Rakamlar tutuyor mu?</title>
+    <title>Maliyet — Bir satıştan geriye ne kalıyor?</title>
     <meta
       name="description"
       content="Kafe, restoran ve küçük işletmeler için sade bir maliyet ve fizibilite hesabı. Muhasebe bilgisi gerektirmez."
     />
+    <link rel="canonical" href="https://maliyet.lol/" />
+
+    <!--
+      Share tags. Unlike the title above these are not a fallback: the crawlers
+      that build link previews do not run scripts, so what is written here is the
+      only version they ever see. `src/app/shellCopy.ts` stays the source of truth
+      for the wording — when the slogan or description changes there, mirror it
+      here. No og:image yet: the project ships no image assets, so the cards
+      render as text-only summaries rather than pointing at a missing file.
+    -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Maliyet" />
+    <meta property="og:locale" content="tr_TR" />
+    <meta property="og:url" content="https://maliyet.lol/" />
+    <meta property="og:title" content="Maliyet — Bir satıştan geriye ne kalıyor?" />
+    <meta
+      property="og:description"
+      content="Kafe, restoran ve küçük işletmeler için sade bir maliyet ve fizibilite hesabı. Muhasebe bilgisi gerektirmez."
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Maliyet — Bir satıştan geriye ne kalıyor?" />
+    <meta
+      name="twitter:description"
+      content="Kafe, restoran ve küçük işletmeler için sade bir maliyet ve fizibilite hesabı. Muhasebe bilgisi gerektirmez."
+    />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

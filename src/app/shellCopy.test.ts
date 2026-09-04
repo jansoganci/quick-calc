@@ -14,8 +14,11 @@ describe('brand', () => {
   })
 
   it('keeps the slogan short enough to sit beside the mode switch', () => {
-    expect(SHELL_COPY.slogan).toBe('Rakamlar tutuyor mu?')
-    expect(SHELL_COPY.slogan.length).toBeLessThanOrEqual(24)
+    expect(SHELL_COPY.slogan).toBe('Bir satıştan geriye ne kalıyor?')
+    // The bound guards the `sm`-and-up masthead, where the slogan shares a row
+    // with the product name and both mode tabs. Below `sm` it has its own row,
+    // so the row is no longer what constrains the length.
+    expect(SHELL_COPY.slogan.length).toBeLessThanOrEqual(32)
   })
 
   it('promises nothing the model cannot deliver', () => {
@@ -29,7 +32,7 @@ describe('brand', () => {
 describe('document title', () => {
   it('is built from the product name and slogan', () => {
     expect(DOCUMENT_TITLE).toBe(`${SHELL_COPY.productName} — ${SHELL_COPY.slogan}`)
-    expect(DOCUMENT_TITLE).toBe('Maliyet — Rakamlar tutuyor mu?')
+    expect(DOCUMENT_TITLE).toBe('Maliyet — Bir satıştan geriye ne kalıyor?')
   })
 })
 
