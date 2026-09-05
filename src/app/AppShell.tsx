@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { BrandMark } from './BrandMark.tsx'
 import { ModeRow } from './ModeRow.tsx'
 import { SHELL_COPY, type CalculationMode } from './shellCopy.ts'
 
@@ -28,7 +29,7 @@ export function AppShell({ mode, onModeChange, children }: AppShellProps) {
 }
 
 /**
- * Masthead: the product name and the slogan, nothing else.
+ * Masthead: the mark, the product name and the slogan.
  *
  * The mode switch used to live here, in the top-right corner, where visitors did
  * not find it — see `ModeRow.tsx`. With it gone the slogan fits beside the name at
@@ -40,8 +41,12 @@ export function AppShell({ mode, onModeChange, children }: AppShellProps) {
 function AppHeader() {
   return (
     <header className="qc-screen-only flex h-[52px] items-center gap-2.5 border-b border-qc-rule bg-qc-surface px-[18px] lg:sticky lg:top-0 lg:z-10 lg:h-14 lg:px-[30px]">
-      <span className="shrink-0 text-sm font-semibold tracking-[-0.005em] text-qc-ink lg:text-[15px]">
-        {SHELL_COPY.productName}
+      {/* The mark sits tight to the name — 8px, one lockup, not two elements. */}
+      <span className="flex shrink-0 items-center gap-2">
+        <BrandMark size={18} />
+        <span className="text-sm font-semibold tracking-[-0.005em] text-qc-ink lg:text-[15px]">
+          {SHELL_COPY.productName}
+        </span>
       </span>
       <span className="truncate text-xs text-qc-muted">{SHELL_COPY.slogan}</span>
     </header>

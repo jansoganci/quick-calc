@@ -12,6 +12,17 @@
     <link rel="canonical" href="https://maliyet.lol/" />
 
     <!--
+      The mark. `favicon.svg` is the real one — one file, sharp at every size, and
+      it swaps to a light ground under a dark colour scheme. The 32px PNG is the
+      fallback for browsers that do not take an SVG icon; the 180px one is what
+      iOS uses on the home screen, and it pins the light colours deliberately
+      rather than following the viewer's theme. Sources live in `public/`.
+    -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!--
       Share tags. Unlike the title above these are not a fallback: the crawlers
       that build link previews do not run scripts, so what is written here is the
       only version they ever see. `src/app/shellCopy.ts` stays the source of truth

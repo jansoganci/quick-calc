@@ -156,7 +156,7 @@ Breakpoint: single column below `lg` (1024px), two columns at and above.
 
 ## 6. Turkish copy — draft for review
 
-**Masthead / colophon:** `Maliyet` (product name, **locked**) · slogan `Bir satıştan geriye ne kalıyor?` in 12px muted beside the name, at every width · `maliyet.lol · TRY · Türkiye` · `Basitleştirilmiş bir ön değerlendirmedir.` The mode switch is no longer in the masthead — see the mode row.
+**Masthead / colophon:** the 18px mark + `Maliyet` (product name, **locked**) as one lockup · slogan `Bir satıştan geriye ne kalıyor?` in 12px muted beside the name, at every width · `maliyet.lol · TRY · Türkiye` · `Basitleştirilmiş bir ön değerlendirmedir.` The mode switch is no longer in the masthead — see the mode row.
 
 **Handoff copy (Quick result foot):** `Bu bir ön bakış. Kanal kırılımı, personel dökümü, senaryolar ve indirilebilir PDF rapor için Detaylı Fizibilite'yi kullanın.` + `Detaylı Fizibilite'ye geç →`. It renders only after a calculation: an empty result column is no place to advertise a second product.
 
