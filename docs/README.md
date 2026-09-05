@@ -21,8 +21,6 @@ If two documents appear to disagree, use the authority order in [`CLAUDE.md`](..
 | [`DESIGN_DIRECTION.md`](./DESIGN_DIRECTION.md) | Locked visual & UX direction for Quick / Lite (inherited by Detailed) |
 | [`FRONTEND_IMPLEMENTATION_SPEC.md`](./FRONTEND_IMPLEMENTATION_SPEC.md) | Quick / Lite UI measurements, tokens, field map, copy |
 | [`design.md`](./design.md) | Design index plus layout-frame notes from the HTML preview |
-| [`DRAFT_PERSISTENCE_AND_REPORT_OUTPUT.md`](./DRAFT_PERSISTENCE_AND_REPORT_OUTPUT.md) | What the Detailed Feasibility draft autosave actually does and why. Part B records the report's objective; the specification is the plan below |
-| [`DETAILED_REPORT_IMPLEMENTATION_PLAN.md`](./DETAILED_REPORT_IMPLEMENTATION_PLAN.md) | The downloadable Detailed Feasibility report — mechanism, report content, print layout, download flow, task order, verification |
 
 [`CLAUDE.md`](../CLAUDE.md) is operating guidance for coding models. It is not a specification.
 
@@ -34,5 +32,7 @@ If two documents appear to disagree, use the authority order in [`CLAUDE.md`](..
 | --- | --- |
 | [`archive/QUICK_CALCULATION_CORE_IMPLEMENTATION_PLAN.md`](./archive/QUICK_CALCULATION_CORE_IMPLEMENTATION_PLAN.md) | Quick core execution plan — the engine is implemented |
 | [`archive/FRONTEND_IMPLEMENTATION_PLAN.md`](./archive/FRONTEND_IMPLEMENTATION_PLAN.md) | Quick frontend execution plan — the Lite UI is implemented |
+| [`archive/DRAFT_PERSISTENCE_AND_REPORT_OUTPUT.md`](./archive/DRAFT_PERSISTENCE_AND_REPORT_OUTPUT.md) | Detailed draft autosave record — Part A is implemented; persistence rules stay in `TECH_STACK_AND_CONSTRAINTS.md` §4 |
+| [`archive/DETAILED_REPORT_IMPLEMENTATION_PLAN.md`](./archive/DETAILED_REPORT_IMPLEMENTATION_PLAN.md) | Detailed downloadable-report execution plan — the report is implemented |
 
 See [`archive/README.md`](./archive/README.md).

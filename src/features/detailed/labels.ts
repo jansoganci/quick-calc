@@ -349,7 +349,7 @@ export const COPY = {
  * reason everything else here does (U4: one home per label), and the limitation
  * text is authored as prose a reader would accept in a feasibility document:
  * it states what the document is and is not, without disclaiming the analysis
- * itself. See docs/DETAILED_REPORT_IMPLEMENTATION_PLAN.md §9.3.
+ * itself. See docs/archive/DETAILED_REPORT_IMPLEMENTATION_PLAN.md §9.3.
  */
 export const REPORT_COPY = {
   documentTitle: 'Fizibilite Raporu',

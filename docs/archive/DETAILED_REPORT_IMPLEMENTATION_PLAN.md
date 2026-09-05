@@ -17,7 +17,7 @@ Draft persistence of `İşletme adı` is a later locked decision, implemented pe
 
 | Document | Owns | Relationship to this plan |
 | --- | --- | --- |
-| `docs/DRAFT_PERSISTENCE_AND_REPORT_OUTPUT.md` | Draft autosave (Part A, implemented) and the recorded report goal (Part B) | **Part B is the parent of this document.** Its B1–B5 are inputs here; its B4 "not decided" list is answered here. When this plan is approved, B4 should point at this file |
+| `docs/archive/DRAFT_PERSISTENCE_AND_REPORT_OUTPUT.md` | Draft autosave (Part A, implemented) and the recorded report goal (Part B) | **Part B is the parent of this document.** Its B1–B5 are inputs here; its B4 "not decided" list is answered here. When this plan is approved, B4 should point at this file |
 | `docs/TECH_STACK_AND_CONSTRAINTS.md` | Stack, persistence, exclusions | §5, §6.2, §7.1 constrain the mechanism choice (§10) |
 | `docs/DETAILED_FRONTEND_IMPLEMENTATION_SPEC.md` | Detailed screen UI | §2 (input IA), §4.6 (tables), §4.7 (assumptions), §8.1 (structure), §8.2 (non-negotiables) are binding here |
 | `docs/DESIGN_DIRECTION.md` | Locked visual direction | V1–V4, V6, V9, V11, V12 and §3 (excluded visual language) apply to paper and to the modal |

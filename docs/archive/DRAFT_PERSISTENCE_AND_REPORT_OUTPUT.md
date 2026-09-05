@@ -166,7 +166,7 @@ Confirmed in a real browser against the dev server: fill → reload → **inputs
 
 > **This section is not a specification.** It records the objective and the reasoning behind it so the intent is not lost.
 >
-> **The specification now exists: `docs/DETAILED_REPORT_IMPLEMENTATION_PLAN.md`.** It owns the mechanism, the report content, the print layout, the download flow and the task order, and it answers B4's "not decided" list. Read it rather than this section for anything the report actually does; what follows is the original objective, kept for the reasoning.
+> **The specification now exists: `docs/archive/DETAILED_REPORT_IMPLEMENTATION_PLAN.md`.** It owns the mechanism, the report content, the print layout, the download flow and the task order, and it answers B4's "not decided" list. Read it rather than this section for anything the report actually does; what follows is the original objective, kept for the reasoning.
 
 ## B1. The goal
 

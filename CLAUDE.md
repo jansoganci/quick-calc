@@ -21,7 +21,7 @@ Before making any architectural, financial or implementation change, read the re
 | `docs/FRONTEND_IMPLEMENTATION_SPEC.md` | Quick / Lite UI measurements, tokens, copy |
 | `docs/design.md` | Design index and layout-frame notes |
 
-Finished Quick execution plans live in `docs/archive/`. They are historical. Do not treat them as current authority.
+Finished execution plans live in `docs/archive/`. They are historical. Do not treat them as current authority.
 
 ### Authority order
 

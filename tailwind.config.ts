@@ -96,7 +96,7 @@ export default {
        * printed it. Cost: Tailwind generates no `max-lg:` variant for a `raw`
        * screen — nothing uses one, and `reportGuards.test.ts` keeps it that way.
        *
-       * See docs/DETAILED_REPORT_IMPLEMENTATION_PLAN.md T-01.
+       * See docs/archive/DETAILED_REPORT_IMPLEMENTATION_PLAN.md T-01.
        */
       screens: { lg: { raw: 'screen and (min-width: 1024px), print' } },
       fontFamily: {
