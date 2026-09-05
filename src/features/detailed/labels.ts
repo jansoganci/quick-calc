@@ -195,6 +195,14 @@ export const COPY = {
     `${count} alanı kontrol edin — ${sections}`,
   copySummary: 'Özeti kopyala',
   copied: 'Kopyalandı',
+
+  draftSaved: 'Taslak bu cihaza kaydedildi',
+  draftScope:
+    'Yalnızca bu tarayıcıda saklanır; iPhone’da uzun süre girilmezse silinebilir.',
+  draftReset: 'Baştan başla',
+  draftResetConfirm: 'Girdiklerinizin tamamı silinecek.',
+  draftResetYes: 'Evet, sil',
+  draftResetCancel: 'Vazgeç',
   allResults: 'Tüm sonuçlar ↓',
   backToInputs: 'Girdilere dön ↑',
   results: 'Sonuçlar ↓',
@@ -331,6 +339,59 @@ export const COPY = {
   dailyUnits: (units: string) => `günde ${units} adet`,
   defaultsUnchanged: 'varsayılan',
   none: '—',
+} as const
+
+/**
+ * The report's own copy — the download action, the business-name dialog, the
+ * cover, the appendix and the limitation statement.
+ *
+ * It sits beside the screen's copy rather than inside a component for the same
+ * reason everything else here does (U4: one home per label), and the limitation
+ * text is authored as prose a reader would accept in a feasibility document:
+ * it states what the document is and is not, without disclaiming the analysis
+ * itself. See docs/DETAILED_REPORT_IMPLEMENTATION_PLAN.md §9.3.
+ */
+export const REPORT_COPY = {
+  documentTitle: 'Fizibilite Raporu',
+
+  action: 'Fizibilite raporunu indir',
+  actionHintDesktop: 'Yazdırma penceresi açılır; hedef olarak “PDF olarak kaydet” seçilir.',
+  actionHintMobile: 'Yazdırma ekranı açılır; oradan “PDF” veya “Dosyalar’a Kaydet” seçebilirsiniz.',
+  printUnavailable:
+    'Bu tarayıcı yazdırmayı desteklemiyor. Sayfayı Safari veya Chrome’da açıp tekrar deneyin.',
+
+  dialogTitle: 'Fizibilite raporunu indir',
+  dialogLede: 'Rapor bu adla başlıklandırılır ve kaydedilen dosyanın adında kullanılır.',
+  businessName: 'İşletme adı',
+  businessNamePlaceholder: 'Örn. Kadıköy Kahve Projesi',
+  businessNameHint: 'Rapor oluşturmak için gereklidir.',
+  submit: 'Raporu indir',
+  cancel: 'Vazgeç',
+
+  coverHeadline: 'Aylık işletme sonucu · baz senaryo',
+  coverWarnings: 'Dikkat edilmesi gereken noktalar',
+
+  appendixTitle: 'Ek A — Girdiler',
+  appendixNote:
+    'Rapordaki bütün sonuçlar aşağıdaki girdilerle hesaplanmıştır. Sıralama, hesaplama formundaki bölüm sırasını izler.',
+  limitsTitle: 'Ek B — Kapsam ve sorumluluk sınırları',
+
+  /** Cover foot. The full text is in `disclaimerFull`; this one points at it. */
+  disclaimerShort:
+    'Bu rapor, girilen verilere ve raporda listelenen varsayımlara dayanan bir ön fizibilite değerlendirmesidir. İçerdiği projeksiyonlar tahmindir ve gerçekleşme garantisi taşımaz; muhasebe, vergi, yatırım veya hukuk danışmanlığı yerine geçmez. Kapsamın tamamı için bkz. Ek B — Kapsam ve sorumluluk sınırları.',
+
+  disclaimerFull: [
+    'Bu belge bir ön fizibilite çalışmasıdır; denetlenmiş bir mali tablo, değerleme raporu veya bağımsız denetim raporu değildir.',
+    'Bütün hesaplamalar, kullanıcının girdiği veriler ile raporun “Hesaplamada kullanılan varsayımlar” bölümünde listelenen varsayımlara dayanır. Girdiler değiştiğinde sonuçlar da değişir.',
+    'Projeksiyonlar, senaryolar ve grafikler tahmindir; gerçekleşme taahhüdü içermez.',
+    'Fiili ticari, vergisel, operasyonel ve finansal sonuçlar; talep, maliyet, mevzuat ve piyasa koşullarına bağlı olarak bu raporda gösterilenlerden farklılaşabilir.',
+    'Bu rapor muhasebe, vergi, yatırım, hukuk veya finansal danışmanlık hizmeti değildir ve bu hizmetlerin yerine geçmez. Karar öncesinde ilgili alanların uzmanlarına danışılması önerilir.',
+    'Maliyet, yalnızca bu rapora dayanılarak alınan kararların sonuçlarından sorumlu tutulamaz.',
+  ],
+
+  meta: (engineVersion: string, date: string) =>
+    `Hesap motoru ${engineVersion} · Rapor tarihi ${date} · TRY · Türkiye`,
+  runningHead: (businessName: string) => `Fizibilite Raporu · ${businessName}`,
 } as const
 
 /** A run of the verdict sentence. `amount` renders in Mono 500, `accent` adds the ink accent. */

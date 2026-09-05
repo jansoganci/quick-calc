@@ -23,7 +23,7 @@ type AppShellProps = {
 export function AppShell({ mode, onModeChange, children }: AppShellProps) {
   return (
     <div className="min-h-screen bg-qc-page">
-      <div className="mx-auto max-w-[1152px] overflow-x-clip border-x border-qc-rule bg-qc-surface">
+      <div className="qc-sheet mx-auto max-w-[1152px] overflow-x-clip border-x border-qc-rule bg-qc-surface">
         <AppHeader mode={mode} onModeChange={onModeChange} />
         <SloganRow />
         {children}
@@ -46,7 +46,7 @@ function AppHeader({
   onModeChange: (mode: CalculationMode) => void
 }) {
   return (
-    <header className="flex h-[52px] items-center justify-between gap-3 border-b border-qc-rule bg-qc-surface px-[18px] lg:sticky lg:top-0 lg:z-10 lg:h-14 lg:gap-6 lg:px-[30px]">
+    <header className="qc-screen-only flex h-[52px] items-center justify-between gap-3 border-b border-qc-rule bg-qc-surface px-[18px] lg:sticky lg:top-0 lg:z-10 lg:h-14 lg:gap-6 lg:px-[30px]">
       <span className="flex min-w-0 shrink items-baseline gap-2.5">
         <span className="shrink-0 text-sm font-semibold tracking-[-0.005em] text-qc-ink lg:text-[15px]">
           {SHELL_COPY.productName}
@@ -103,7 +103,7 @@ function AppHeader({
  */
 function SloganRow() {
   return (
-    <div className="border-b border-qc-rule px-[18px] py-2 text-xs text-qc-muted sm:hidden">
+    <div className="qc-screen-only border-b border-qc-rule px-[18px] py-2 text-xs text-qc-muted sm:hidden">
       {SHELL_COPY.slogan}
     </div>
   )
@@ -111,7 +111,7 @@ function SloganRow() {
 
 function AppFooter() {
   return (
-    <footer className="border-t border-qc-rule px-[18px] py-[18px] text-xs text-qc-muted lg:px-[30px]">
+    <footer className="qc-screen-only border-t border-qc-rule px-[18px] py-[18px] text-xs text-qc-muted lg:px-[30px]">
       <div className="flex flex-col gap-[5px] lg:flex-row lg:items-baseline lg:justify-between lg:gap-6">
         <span>{SHELL_COPY.footerNature}</span>
         <span className="font-mono text-[11px] text-qc-subtle">

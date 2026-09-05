@@ -15,13 +15,16 @@ import { DETAILED_DEFAULTS } from '../../../core/detailed/index.ts'
 import type { SectionId } from '../labels.ts'
 import { toDetailedInput } from '../toInput.ts'
 import { evaluateDetailed, type DetailedView } from '../viewModel.ts'
+import { createDraftSaveQueue, registerDraftLifecycleFlush } from './draftAutosave.ts'
+import { clearDraft, loadInitialDraft, writeDraft } from './draftStorage.ts'
 
 /**
  * Form state and the V6 gate: the first calculation happens only on `Hesapla`, and
  * every valid change after it updates the result live.
  */
 export function useDetailedCalc() {
-  const [form, setForm] = useState<DetailedFormState>(initialForm)
+  const [initialDraft] = useState(loadInitialDraft)
+  const [form, setForm] = useState<DetailedFormState>(initialDraft.form)
   const [touched, setTouched] = useState<Record<string, boolean>>({})
   const [submitted, setSubmitted] = useState(false)
   const [hasCalculated, setHasCalculated] = useState(false)
@@ -30,8 +33,29 @@ export function useDetailedCalc() {
   const [copied, setCopied] = useState(false)
   const [openSection, setOpenSection] = useState<SectionId | null>('products')
   const [showMonthTable, setShowMonthTable] = useState(false)
+  const [draftSaved, setDraftSaved] = useState(initialDraft.hasStoredDraft)
+  /**
+   * Report metadata, not a financial input: it titles the report and names the
+   * saved file, and it is deliberately NOT part of `DetailedFormState`, so it
+   * cannot reach `toInput.ts`, validation or the engine even by accident. The ref
+   * mirrors it for the autosave writer, which runs outside React's render.
+   */
+  const [businessName, setBusinessNameState] = useState(initialDraft.businessName)
+  const businessNameRef = useRef(initialDraft.businessName)
   const resultsRef = useRef<HTMLDivElement>(null)
   const previousViewKeyRef = useRef<string | null>(null)
+  const draftSaveQueueRef = useRef<ReturnType<typeof createDraftSaveQueue> | null>(null)
+  if (draftSaveQueueRef.current === null) {
+    draftSaveQueueRef.current = createDraftSaveQueue(
+      initialDraft.form,
+      (form) => writeDraft({ form, businessName: businessNameRef.current }),
+      () => {
+        setDraftSaved(true)
+      },
+    )
+  }
+  const draftSaveQueue = draftSaveQueueRef.current
+  draftSaveQueue.updateLatest(form)
 
   const evaluation = useMemo(() => evaluateDetailed(form, toDetailedInput(form)), [form])
   const canSubmit = evaluation.ok
@@ -48,6 +72,25 @@ export function useDetailedCalc() {
     const timer = window.setTimeout(() => setLiveFlash(false), 180)
     return () => window.clearTimeout(timer)
   }, [hasCalculated, evaluation])
+
+  /**
+   * Autosave, debounced so a burst of typing writes once.
+   *
+   * It watches `form` rather than hooking into `update()`, so any mutator added
+   * later is covered without being remembered. The queue begins with the hydrated
+   * form marked handled, so mount does not rewrite either a blank or restored form.
+   */
+  useEffect(() => {
+    draftSaveQueue.schedule()
+  }, [draftSaveQueue, form])
+
+  useEffect(() => {
+    const unregister = registerDraftLifecycleFlush(draftSaveQueue)
+    return () => {
+      unregister()
+      draftSaveQueue.dispose()
+    }
+  }, [draftSaveQueue])
 
   const markTouched = useCallback((path: string) => {
     setTouched((current) => ({ ...current, [path]: true }))
@@ -69,20 +112,58 @@ export function useDetailedCalc() {
     setForm((current) => mutate(current))
   }
 
+  /**
+   * Back to a blank form with no stored draft.
+   *
+   * Autosave means a reload no longer clears the page, so this is the only way to
+   * start a second business. The result is cleared along with the inputs: a
+   * calculated result left beside an empty form would break V6.
+   */
+  function resetForm() {
+    const fresh = initialForm()
+    draftSaveQueue.reset(fresh)
+    clearDraft()
+    businessNameRef.current = ''
+    setBusinessNameState('')
+    setForm(fresh)
+    setTouched({})
+    setSubmitted(false)
+    setHasCalculated(false)
+    setView(null)
+    setDraftSaved(false)
+    setOpenSection('products')
+    setShowMonthTable(false)
+    previousViewKeyRef.current = null
+  }
+
+  /**
+   * Committed when a report is generated, not on every keystroke in the dialog:
+   * the name is worth keeping once the owner has actually used it.
+   */
+  function setBusinessName(next: string) {
+    businessNameRef.current = next
+    setBusinessNameState(next)
+    if (writeDraft({ form, businessName: next })) setDraftSaved(true)
+  }
+
   const api = {
     form,
     evaluation,
     view,
+    businessName,
+    setBusinessName,
     hasCalculated,
     canSubmit,
     liveFlash,
     copied,
     openSection,
     showMonthTable,
+    draftSaved,
     resultsRef,
     errorFor,
     errorSections,
     markTouched,
+    resetForm,
 
     setOpenSection: (section: SectionId | null) => setOpenSection(section),
     toggleSection: (section: SectionId) =>

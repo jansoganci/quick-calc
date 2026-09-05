@@ -35,7 +35,7 @@ export function AssumptionsList({ rows }: { rows: AssumptionRow[] }) {
         {rows.map((row) => (
           <div
             key={row.label}
-            className="flex justify-between gap-3 border-t border-qc-rule-row py-2 last:border-b"
+            className="qc-report-row flex justify-between gap-3 border-t border-qc-rule-row py-2 last:border-b"
           >
             <span className="text-[13px] text-qc-secondary">{row.label}</span>
             <span className="font-mono text-[13px] tabular-nums text-qc-ink">{row.value}</span>

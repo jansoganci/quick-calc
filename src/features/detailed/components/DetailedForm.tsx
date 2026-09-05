@@ -22,6 +22,7 @@ import {
 import { rampUpTableHint, sectionSummary, typedDailyUnits, visibleSections } from '../sectionSummary.ts'
 import { echoLabel } from '../viewModel.ts'
 import { formatCount } from '../../../lib/number.ts'
+import { DraftNotice } from './DraftNotice.tsx'
 import { LineRows } from './LineRows.tsx'
 import { MixTable } from './MixTable.tsx'
 import { PositionRows } from './PositionRows.tsx'
@@ -492,6 +493,8 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
           </p>
         </details>
       </SectionFrame>
+
+      <DraftNotice saved={calc.draftSaved} onReset={calc.resetForm} />
     </div>
   )
 }

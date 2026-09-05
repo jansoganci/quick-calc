@@ -77,6 +77,23 @@ function makeId(prefix: string): string {
   return `${prefix}-${nextId}`
 }
 
+/**
+ * Point the counter past every id already in `form`.
+ *
+ * `nextId` starts at 0 on every page load, so a draft restored from storage carries
+ * ids the counter is about to hand out again — `addProduct` after restoring
+ * `product-1, product-2` would mint a second `product-2`. These ids are React keys
+ * and the map key in `hooks/useNewestRowOpen.ts`, so a collision makes rows trade
+ * places. Called once, by the draft loader, before the restored form is used.
+ */
+export function syncIdCounter(form: DetailedFormState): void {
+  const rows = [...form.products, ...form.positions, ...form.opexLines, ...form.capexItems]
+  for (const row of rows) {
+    const suffix = Number(row.id.slice(row.id.lastIndexOf('-') + 1))
+    if (Number.isFinite(suffix) && suffix > nextId) nextId = suffix
+  }
+}
+
 /** A 0–1 rate rendered as the percentage string the field shows. */
 export function rateToPercentInput(rate: number): string {
   return formatDecimal(rate * 100, 2)

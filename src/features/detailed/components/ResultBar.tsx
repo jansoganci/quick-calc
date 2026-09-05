@@ -14,7 +14,10 @@ export function ResultBar({ breakdown, gross }: { breakdown: BreakdownView; gros
 
   return (
     <div>
-      <div className="flex h-[38px] border border-qc-rule-mid lg:h-11">
+      {/* `qc-print-ink` opts this bar — and only this bar — out of the browser's
+          drop-the-backgrounds print rule. Without it the segments print white on
+          white, taking the in-bar labels with them (plan T-09). */}
+      <div className="qc-print-ink flex h-[38px] border border-qc-rule-mid lg:h-11">
         {segments.map((row) => (
           <div
             key={row.key}
@@ -52,7 +55,10 @@ export function ResultBar({ breakdown, gross }: { breakdown: BreakdownView; gros
                 !isResult && index === breakdown.rows.length - 2 && 'border-b-qc-rule-mid',
               )}
             >
-              <span className={cn('h-[13px] lg:h-3.5', row.colorClass)} aria-hidden="true" />
+              <span
+                className={cn('qc-print-ink h-[13px] lg:h-3.5', row.colorClass)}
+                aria-hidden="true"
+              />
               <span
                 className={cn(
                   'text-[13px] lg:text-sm',

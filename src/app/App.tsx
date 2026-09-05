@@ -11,7 +11,9 @@ import { ErrorBoundary } from './ErrorBoundary.tsx'
  * screen requires it" is not yet met.
  *
  * Both modes stay mounted so switching away and back preserves what the user typed.
- * Nothing is persisted: a reload starts over, as it always has.
+ * Across a reload only Detailed restores, from its own `localStorage` draft
+ * (`features/detailed/storage.ts`); Quick is deliberately stateless per
+ * TECH_STACK §4.1. Which mode is showing is never persisted.
  */
 export function App() {
   const [mode, setMode] = useState<CalculationMode>('quick')

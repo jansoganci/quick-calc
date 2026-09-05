@@ -140,6 +140,8 @@ Quick Calculation is stateless from the server's point of view. A user can compu
 
 Scenarios live on the user's device. JSON export/import is the backup and transfer mechanism. There is no cloud copy of a user's scenarios in the initial version.
 
+**Implemented so far:** a single autosaved draft — the Detailed form is written to `localStorage` as the user types and restored on the next visit (`src/features/detailed/storage.ts` for the codec, `hooks/draftStorage.ts` for the browser calls). Named multi-scenario storage and JSON export/import are approved by this section but **not built yet**; they were deferred because a JSON file is only meaningful to someone who already has this app, whereas the artefact owners actually asked for is a readable report. Note the durability limit this leaves: WebKit clears script-writable storage after 7 days without a visit, so on iOS a draft is a convenience, not an archive.
+
 ### 4.3 Persistence that is out of scope for the initial architecture
 
 No database, no cloud object storage, no synced user store, no server-side session. Persistence, where it exists at all, is **browser-local** (`localStorage` and optional URL state).

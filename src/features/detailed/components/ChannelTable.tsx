@@ -25,7 +25,9 @@ export function ChannelTable({ channels, totals }: ChannelTableProps) {
   return (
     <div>
       <div className="hidden lg:block">
-        <div className="grid grid-cols-[130px_92px_repeat(5,minmax(0,1fr))]">
+        {/* Eight tracks for eight cells a row: the channel, `Adet`, and the six
+            money columns. */}
+        <div className="grid grid-cols-[130px_92px_repeat(6,minmax(0,1fr))]">
           <span className="pb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
             {COPY.channelColumn}
           </span>

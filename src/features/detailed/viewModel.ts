@@ -10,6 +10,7 @@ import { formatCount } from '../../lib/number.ts'
 import { formatTry } from '../../lib/money.ts'
 import type { DetailedFormState } from './formState.ts'
 import { buildErrorMap, type ErrorMap } from './errors.ts'
+import { buildReportInputGroups, type ReportInputGroup } from './reportView.ts'
 import { collectGuardrails, type Guardrail } from './guardrails.ts'
 import {
   COPY,
@@ -76,6 +77,14 @@ export type DetailedView = {
   assumptions: AssumptionRow[]
   guardrails: Guardrail[]
   hasDelivery: boolean
+  /** `meta.detailedEngineVersion`, which the report's colophon states. */
+  engineVersion: string
+  /**
+   * The report's input appendix. It rides on the view because the report is a
+   * presentation of this same view model — the figures a reader audits are the
+   * figures the screen shows, formatted once (plan T-07).
+   */
+  reportInputs: ReportInputGroup[]
 }
 
 export type DetailedEvaluation =
@@ -217,6 +226,8 @@ function buildView(result: DetailedResult, input: DetailedResolvedInput): Detail
     assumptions: buildAssumptionRows(result, hasDelivery),
     guardrails: collectGuardrails(input),
     hasDelivery,
+    engineVersion: result.meta.detailedEngineVersion,
+    reportInputs: buildReportInputGroups(input, result),
   }
 
   return { ...withoutCopy, copyText: buildCopyText(result, withoutCopy) }

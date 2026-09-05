@@ -7,7 +7,7 @@
  * `smPayback` is the payback chart's own mobile frame — spec §4.5 keeps the two
  * mobile charts at different heights (200px / 180px), not one shared `sm` frame.
  */
-export type ChartSize = 'sm' | 'smPayback' | 'lg'
+export type ChartSize = 'sm' | 'smPayback' | 'lg' | 'print' | 'printPayback'
 
 export type ChartFrame = {
   width: number
@@ -24,6 +24,14 @@ export const CHART_FRAMES: Record<ChartSize, ChartFrame> = {
   sm: { width: 354, height: 200, left: 30, right: 348, top: 20, bottom: 168, labelSize: 10, axisGap: 6 },
   smPayback: { width: 354, height: 180, left: 30, right: 348, top: 20, bottom: 148, labelSize: 10, axisGap: 6 },
   lg: { width: 1092, height: 292, left: 76, right: 1080, top: 20, bottom: 258, labelSize: 11, axisGap: 8 },
+  /**
+   * The paper frames. The `lg` viewBox is 1092 units wide and renders into a
+   * ~704px page area, a 0.64 scale that would put its 11-unit axis labels at
+   * about 5pt. Authoring at the page's own width keeps 11 units at 11px ≈ 8pt.
+   * Geometry is unchanged — only the frame differs (plan T-10).
+   */
+  print: { width: 704, height: 236, left: 68, right: 692, top: 16, bottom: 196, labelSize: 11, axisGap: 8 },
+  printPayback: { width: 704, height: 212, left: 68, right: 692, top: 16, bottom: 172, labelSize: 11, axisGap: 8 },
 }
 
 export function makeScales(frame: ChartFrame, min: number, max: number, months: number) {

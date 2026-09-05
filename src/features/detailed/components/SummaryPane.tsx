@@ -1,6 +1,7 @@
 import { cn } from '../../../lib/cn.ts'
 import { COPY, SECTION_LABELS, type SectionId } from '../labels.ts'
 import type { DetailedView } from '../viewModel.ts'
+import { ReportActionButton } from './ReportActionButton.tsx'
 
 export type SectionSummary = { section: SectionId; index: number; summary: string }
 
@@ -14,6 +15,8 @@ type SummaryPaneProps = {
   onCalculate: () => void
   onGoToSection: (section: SectionId) => void
   onGoToResults: () => void
+  canPrintReport: boolean
+  onOpenReport: () => void
 }
 
 /**
@@ -31,6 +34,8 @@ export function SummaryPane({
   onCalculate,
   onGoToSection,
   onGoToResults,
+  canPrintReport,
+  onOpenReport,
 }: SummaryPaneProps) {
   if (view === null) {
     return (
@@ -191,6 +196,12 @@ export function SummaryPane({
       <button type="button" className="qc-text-btn is-accent mt-5" onClick={onGoToResults}>
         {COPY.allResults}
       </button>
+
+      {/* The desktop call site: the pane is where a desktop reader sits, so the
+          report is reachable without scrolling back through the results. */}
+      <div className="hidden lg:block">
+        <ReportActionButton variant="pane" canPrint={canPrintReport} onOpen={onOpenReport} />
+      </div>
     </div>
   )
 }

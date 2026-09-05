@@ -2,8 +2,13 @@ import { cn } from '../../lib/cn.ts'
 import { DetailedForm } from './components/DetailedForm.tsx'
 import { DetailedResults } from './components/DetailedResults.tsx'
 import { MobileSummaryBar } from './components/MobileSummaryBar.tsx'
+import { ReportActionButton } from './components/ReportActionButton.tsx'
+import { ReportAppendix } from './components/ReportAppendix.tsx'
+import { ReportCover } from './components/ReportCover.tsx'
+import { ReportNameDialog } from './components/ReportNameDialog.tsx'
 import { SummaryPane, type SectionSummary } from './components/SummaryPane.tsx'
 import { useDetailedCalc } from './hooks/useDetailedCalc.ts'
+import { useReportPrint } from './hooks/useReportPrint.ts'
 import { COPY, SECTION_LABELS } from './labels.ts'
 import { sectionSummary, visibleSections } from './sectionSummary.ts'
 
@@ -14,6 +19,7 @@ import { sectionSummary, visibleSections } from './sectionSummary.ts'
  */
 export function DetailedFeasibilityPage() {
   const calc = useDetailedCalc()
+  const report = useReportPrint(calc.businessName, calc.setBusinessName)
   const sections = visibleSections(calc.form)
 
   const summaries: SectionSummary[] = sections.map((section, index) => ({
@@ -56,7 +62,18 @@ export function DetailedFeasibilityPage() {
 
   return (
     <div className="pb-[92px] lg:pb-0">
-      <main id="detailed-feasibility" className="lg:grid lg:grid-cols-[1fr_1px_372px]">
+      {/*
+        The report is this same result, printed: a cover ahead of it, the input
+        appendix behind it, and the application's own chrome left out. Both are
+        print-only, and both render only once a result exists — before `Hesapla`
+        there is nothing to report (V6).
+      */}
+      {calc.view ? <ReportCover view={calc.view} businessName={calc.businessName} /> : null}
+
+      <main
+        id="detailed-feasibility"
+        className="qc-screen-only lg:grid lg:grid-cols-[1fr_1px_372px]"
+      >
         <DetailedForm calc={calc} />
         <div className="hidden bg-qc-rule lg:block" aria-hidden="true" />
         {/*
@@ -78,6 +95,8 @@ export function DetailedFeasibilityPage() {
               onCalculate={calc.calculate}
               onGoToSection={goToSection}
               onGoToResults={goToResults}
+              canPrintReport={report.canPrint}
+              onOpenReport={report.open}
             />
           </div>
         </div>
@@ -91,9 +110,28 @@ export function DetailedFeasibilityPage() {
               showMonthTable={calc.showMonthTable}
               onToggleMonthTable={calc.toggleMonthTable}
             />
+            {/* The mobile call site: at the end of the results, where reading ends.
+                Desktop reaches the same control from the summary pane. */}
+            <div className="px-[18px] pb-[34px] lg:hidden">
+              <ReportActionButton
+                variant="results"
+                canPrint={report.canPrint}
+                onOpen={report.open}
+              />
+            </div>
+            <ReportAppendix view={calc.view} />
           </div>
         ) : null}
       </div>
+
+      <ReportNameDialog
+        open={report.isOpen}
+        name={report.name}
+        canGenerate={report.canGenerate}
+        onNameChange={report.setName}
+        onCancel={report.cancel}
+        onGenerate={report.generate}
+      />
 
       <MobileSummaryBar
         view={calc.view}
