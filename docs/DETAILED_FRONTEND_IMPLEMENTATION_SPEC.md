@@ -269,16 +269,41 @@ Section 01 starts with **one empty product row**. Every other section renders em
 
 ## 6. Quick ↔ Detailed navigation
 
-The switch **already exists** in `AppHeader.tsx` and this design changes none of its anatomy — only which side is active and what the inactive side does.
+*Revised after launch.* The switch used to be two text links in the masthead's top-right corner. It did not work: visitors did not see it, and those who did could not tell what the other mode was for. The evidence was public — replies asking for things the Detailed mode already does. Two faults, both now fixed.
 
-- Placement: masthead right, inside the same 1152px frame. Product name stays left.
-- Active: 13px (11px below `lg`), weight 600, `--qc-ink`, 2px `--qc-ink` underline seated on the masthead's bottom rule (`after:absolute after:inset-x-0 after:bottom-0`). **Not the accent** — V2 reserves accent for the headline figure and focus states.
-- Inactive: same size, weight 400, `--qc-secondary`; underline on hover only.
-- Labels never abbreviate: `Hızlı Hesap` / `Detaylı Fizibilite` at both widths (`COPY.quickMode` / `COPY.detailedMode`, already in `labels.ts`), sizes 13px / 11px, gaps 24px / 12px.
-- Sticky: the masthead is `lg:sticky lg:top-0`, so the switch is always reachable on desktop. On mobile it is not sticky — the sticky bottom bar is the persistent surface there, and two sticky bars would eat the viewport.
-- Both entries render as `<a href="#quick-calculation">` / `<a href="#detailed-feasibility">` with `aria-current="page"` on the active one, inside the existing `<nav aria-label={COPY.modeNavigation}>`.
+### 6.1 Why the masthead switch failed
 
-> **Resolved (was D-3) — routing.** Architecture D4 says a router arrives "only when a second real screen requires it". This design proposes **in-page mode state** (`useState` in `App.tsx`, both feature states kept mounted or lifted) and **no router**, because Quick R6 puts URL sharing explicitly out of scope, so nothing needs to be addressable. Consequence: mode state lives for the session only — switching modes and back preserves what was typed; a reload does not (there is no persistence in this product). No confirmation dialog on switch.
+- **It did not read as a control.** Active and inactive differed only by font weight (600 vs 400) and a 2px underline. No border, no background, no fill — the same treatment as any link.
+- **It was 11px on a phone**, in the top-right corner, beside the product name: the least-examined spot on the screen.
+- **Two labels cannot explain two products.** `Hızlı Hesap` and `Detaylı Fizibilite` name them without saying how they differ, so nobody learned that the second one does channels, staffing, scenarios and a downloadable PDF report.
+- **Quick is the default**, so a visitor who never looked top-right never learned the other mode existed at all.
+
+### 6.2 The mode row **[current]**
+
+A full-width row directly under the masthead, above the content, in both modes. `src/app/ModeRow.tsx`.
+
+- Eyebrow `HESAPLAMA MODU` in the 11px uppercase style used for input-group headings, then the two modes in a two-column grid at every width.
+- Each entry is its label plus **one line saying what that mode gives you** — this is the half that was missing, and it is what makes the row worth its height:
+  - `Hızlı Hesap` — `8 soruda ön bakış`
+  - `Detaylı Fizibilite` — `Kanal, personel, senaryo, PDF rapor`
+- Active: 14px weight 600 `--qc-ink` with a 2px `--qc-ink` underline **under the label**. Inactive: weight 400 `--qc-secondary`, underline `--qc-rule-strong` on hover. **Never the accent** — V2 reserves it for the headline figure and focus states.
+- Each entry is a ≥44px target, still `<a href="#quick-calculation">` / `<a href="#detailed-feasibility">` with `aria-current="page"` on the active one, inside `<nav aria-label="Hesaplama modu">`.
+- The row does not print (`qc-screen-only`): it is application chrome, not part of the report.
+- Cost: ~100px above the fold, of which ~33px is paid back by the phone-only slogan row it makes unnecessary (`FRONTEND_IMPLEMENTATION_SPEC.md` §6).
+
+**Not sticky.** The masthead stays sticky from `lg` and the result panes still offset by `lg:top-14`; making the row sticky too would take ~100px of every desktop viewport and force both panes' offsets and max-heights to change. Switching mid-scroll is rare, and the case that does arise — "I have my Quick answer, now I want the real thing" — is served by §6.3 instead.
+
+### 6.3 The handoff at the foot of a finished Quick result
+
+After the simulation table, behind a hairline: one muted sentence plus a quiet accent control, `Detaylı Fizibilite'ye geç →`. It appears **only once a result exists** — before that, V6 leaves the column empty and an empty result column is no place to advertise a second product.
+
+This is the moment the offer lands: the reader has their answer and can weigh whether they need the deeper one.
+
+### 6.4 Switching, wherever it is asked for
+
+Both entry points call one function in `App.tsx`, which sets the mode, stamps `#quick-calculation` / `#detailed-feasibility` in the URL, and **scrolls to the top**. The scroll is not cosmetic: without it, a reader taking the handoff from the foot of the Quick page lands in the middle of the Detailed form.
+
+> **Resolved (was D-3) — routing.** Architecture D4 says a router arrives "only when a second real screen requires it". This design proposes **in-page mode state** (`useState` in `App.tsx`, both feature states kept mounted or lifted) and **no router**, because Quick R6 puts URL sharing explicitly out of scope, so nothing needs to be addressable. Consequence: mode state lives for the session only — switching modes and back preserves what was typed; a reload does not restore Quick (Detailed restores from its own draft). No confirmation dialog on switch.
 
 ---
 

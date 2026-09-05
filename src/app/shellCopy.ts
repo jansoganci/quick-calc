@@ -25,6 +25,20 @@ export const SHELL_COPY = {
   modeNavigation: 'Hesaplama modu',
   quickMode: 'Hızlı Hesap',
   detailedMode: 'Detaylı Fizibilite',
+  /**
+   * What each mode is for. The labels alone never told a first-time visitor which
+   * calculator they needed — `Hızlı Hesap` and `Detaylı Fizibilite` name two things
+   * without saying how they differ — so the mode row states it in five words.
+   */
+  quickModeSummary: '8 soruda ön bakış',
+  detailedModeSummary: 'Kanal, personel, senaryo, PDF rapor',
+  /**
+   * The handoff at the foot of a finished Quick result: the moment the reader has
+   * their answer is the moment "there is a deeper version" is worth saying.
+   */
+  quickHandoff:
+    'Bu bir ön bakış. Kanal kırılımı, personel dökümü, senaryolar ve indirilebilir PDF rapor için Detaylı Fizibilite’yi kullanın.',
+  quickHandoffLink: 'Detaylı Fizibilite’ye geç →',
   footerScope: 'TRY · Türkiye',
   footerNature: 'Basitleştirilmiş bir ön değerlendirmedir.',
   /**
@@ -46,6 +60,12 @@ export const MODE_ANCHORS = {
 export const MODE_LABELS = {
   quick: SHELL_COPY.quickMode,
   detailed: SHELL_COPY.detailedMode,
+} as const satisfies Record<CalculationMode, string>
+
+/** One line per mode, shown under its label in the mode row. */
+export const MODE_DESCRIPTIONS = {
+  quick: SHELL_COPY.quickModeSummary,
+  detailed: SHELL_COPY.detailedModeSummary,
 } as const satisfies Record<CalculationMode, string>
 
 export const MODES = ['quick', 'detailed'] as const satisfies readonly CalculationMode[]

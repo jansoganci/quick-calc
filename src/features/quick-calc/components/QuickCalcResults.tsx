@@ -12,6 +12,7 @@ type QuickCalcResultsProps = {
   liveFlash: boolean
   copied: boolean
   onCopy: () => void
+  onGoToDetailed: () => void
 }
 
 export function QuickCalcResults({
@@ -20,6 +21,7 @@ export function QuickCalcResults({
   liveFlash,
   copied,
   onCopy,
+  onGoToDetailed,
 }: QuickCalcResultsProps) {
   return (
     <div
@@ -115,6 +117,21 @@ export function QuickCalcResults({
           <p className="mt-3 max-w-[620px] text-xs leading-relaxed text-qc-muted text-pretty lg:mt-[13px]">
             {COPY.simFootnote}
           </p>
+
+          {/*
+            The handoff to the other calculator, placed where the reader has just
+            got their answer — the one moment "there is a deeper version of this"
+            is useful rather than noise. It is deliberately not shown before the
+            first calculation: an empty result column is no place to advertise.
+          */}
+          <div className="mt-6 border-t border-qc-rule pt-4 lg:mt-[30px]">
+            <p className="max-w-[620px] text-xs leading-relaxed text-qc-muted text-pretty">
+              {COPY.quickHandoff}
+            </p>
+            <button type="button" className="qc-text-btn is-accent mt-1.5" onClick={onGoToDetailed}>
+              {COPY.quickHandoffLink}
+            </button>
+          </div>
         </>
       )}
     </div>

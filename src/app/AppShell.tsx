@@ -1,12 +1,6 @@
 import type { ReactNode } from 'react'
-import { cn } from '../lib/cn.ts'
-import {
-  MODES,
-  MODE_ANCHORS,
-  MODE_LABELS,
-  SHELL_COPY,
-  type CalculationMode,
-} from './shellCopy.ts'
+import { ModeRow } from './ModeRow.tsx'
+import { SHELL_COPY, type CalculationMode } from './shellCopy.ts'
 
 type AppShellProps = {
   mode: CalculationMode
@@ -24,8 +18,8 @@ export function AppShell({ mode, onModeChange, children }: AppShellProps) {
   return (
     <div className="min-h-screen bg-qc-page">
       <div className="qc-sheet mx-auto max-w-[1152px] overflow-x-clip border-x border-qc-rule bg-qc-surface">
-        <AppHeader mode={mode} onModeChange={onModeChange} />
-        <SloganRow />
+        <AppHeader />
+        <ModeRow mode={mode} onModeChange={onModeChange} />
         {children}
         <AppFooter />
       </div>
@@ -34,78 +28,23 @@ export function AppShell({ mode, onModeChange, children }: AppShellProps) {
 }
 
 /**
- * Masthead: product name and the mode switch, nothing else. The active mode is
- * marked by weight and a 2px ink underline seated on the masthead rule — never by
- * the accent, which DESIGN_DIRECTION V2 reserves for the headline figure and focus.
+ * Masthead: the product name and the slogan, nothing else.
+ *
+ * The mode switch used to live here, in the top-right corner, where visitors did
+ * not find it — see `ModeRow.tsx`. With it gone the slogan fits beside the name at
+ * every width, so the phone-only slogan row it used to displace is gone too.
+ *
+ * Still sticky from `lg`: the result panes in both modes offset by its height
+ * (`lg:top-14`), and it keeps the product name in view on a long page.
  */
-function AppHeader({
-  mode,
-  onModeChange,
-}: {
-  mode: CalculationMode
-  onModeChange: (mode: CalculationMode) => void
-}) {
+function AppHeader() {
   return (
-    <header className="qc-screen-only flex h-[52px] items-center justify-between gap-3 border-b border-qc-rule bg-qc-surface px-[18px] lg:sticky lg:top-0 lg:z-10 lg:h-14 lg:gap-6 lg:px-[30px]">
-      <span className="flex min-w-0 shrink items-baseline gap-2.5">
-        <span className="shrink-0 text-sm font-semibold tracking-[-0.005em] text-qc-ink lg:text-[15px]">
-          {SHELL_COPY.productName}
-        </span>
-        {/* Orientation for a first-time visitor, not a headline: it never competes
-            with the result. Phones have no room beside two mode tabs, so below
-            `sm` the slogan moves to its own row in `SloganRow` instead. */}
-        <span className="hidden truncate text-xs text-qc-muted sm:inline">
-          {SHELL_COPY.slogan}
-        </span>
+    <header className="qc-screen-only flex h-[52px] items-center gap-2.5 border-b border-qc-rule bg-qc-surface px-[18px] lg:sticky lg:top-0 lg:z-10 lg:h-14 lg:px-[30px]">
+      <span className="shrink-0 text-sm font-semibold tracking-[-0.005em] text-qc-ink lg:text-[15px]">
+        {SHELL_COPY.productName}
       </span>
-      <nav
-        className="flex h-full items-center gap-3 lg:gap-6"
-        aria-label={SHELL_COPY.modeNavigation}
-      >
-        {MODES.map((candidate) => {
-          const isActive = candidate === mode
-          return (
-            <a
-              key={candidate}
-              href={`#${MODE_ANCHORS[candidate]}`}
-              aria-current={isActive ? 'page' : undefined}
-              onClick={(event) => {
-                // The href keeps each entry a real link and stamps the mode in the
-                // URL. Following it, though, lands just below the masthead — which
-                // below `lg`, where the masthead is not sticky, scrolls the mode
-                // switch itself out of view. Set the hash without the jump instead.
-                event.preventDefault()
-                onModeChange(candidate)
-                window.history.replaceState(null, '', `#${MODE_ANCHORS[candidate]}`)
-                window.scrollTo({ top: 0 })
-              }}
-              className={cn(
-                'relative flex h-full items-center whitespace-nowrap text-[11px] lg:text-[13px]',
-                isActive
-                  ? 'font-semibold text-qc-ink after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-qc-ink hover:text-qc-ink'
-                  : 'font-normal text-qc-secondary hover:text-qc-secondary',
-              )}
-            >
-              {MODE_LABELS[candidate]}
-            </a>
-          )
-        })}
-      </nav>
+      <span className="truncate text-xs text-qc-muted">{SHELL_COPY.slogan}</span>
     </header>
-  )
-}
-
-/**
- * The slogan on phones. Below `sm` the masthead has no room for it beside two
- * mode tabs, so it takes its own row under the masthead rule rather than being
- * dropped: most arrivals are phones, and the browser tab alone does not orient
- * them. Muted 12px, no accent, never beside a figure.
- */
-function SloganRow() {
-  return (
-    <div className="qc-screen-only border-b border-qc-rule px-[18px] py-2 text-xs text-qc-muted sm:hidden">
-      {SHELL_COPY.slogan}
-    </div>
   )
 }
 

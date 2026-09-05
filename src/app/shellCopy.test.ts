@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { DOCUMENT_TITLE, MODES, MODE_ANCHORS, MODE_LABELS, SHELL_COPY } from './shellCopy.ts'
+import {
+  DOCUMENT_TITLE,
+  MODES,
+  MODE_ANCHORS,
+  MODE_DESCRIPTIONS,
+  MODE_LABELS,
+  SHELL_COPY,
+} from './shellCopy.ts'
 
 /**
  * The shell owns the product's name, slogan and domain. `main.tsx` applies
@@ -13,11 +20,10 @@ describe('brand', () => {
     expect(SHELL_COPY.domain).toBe('maliyet.lol')
   })
 
-  it('keeps the slogan short enough to sit beside the mode switch', () => {
+  it('keeps the slogan short enough to sit beside the product name', () => {
     expect(SHELL_COPY.slogan).toBe('Bir satıştan geriye ne kalıyor?')
-    // The bound guards the `sm`-and-up masthead, where the slogan shares a row
-    // with the product name and both mode tabs. Below `sm` it has its own row,
-    // so the row is no longer what constrains the length.
+    // The bound guards the masthead at phone width, where the slogan now shares
+    // the row with the product name alone — the mode switch moved to its own row.
     expect(SHELL_COPY.slogan.length).toBeLessThanOrEqual(32)
   })
 
@@ -41,6 +47,21 @@ describe('mode navigation', () => {
     expect(MODES).toEqual(['quick', 'detailed'])
     expect(MODE_LABELS.quick).toBe('Hızlı Hesap')
     expect(MODE_LABELS.detailed).toBe('Detaylı Fizibilite')
+  })
+
+  it('says what each mode is for, because the labels alone did not', () => {
+    // The switch was invisible partly because two names cannot explain two
+    // products. Every mode carries a line; it stays short enough for the row.
+    for (const mode of MODES) {
+      expect(MODE_DESCRIPTIONS[mode].length).toBeGreaterThan(0)
+      expect(MODE_DESCRIPTIONS[mode].length).toBeLessThanOrEqual(40)
+    }
+    expect(MODE_DESCRIPTIONS.detailed).toContain('PDF')
+  })
+
+  it('offers the deeper mode from the foot of a finished Quick result', () => {
+    expect(SHELL_COPY.quickHandoff).toContain('Detaylı Fizibilite')
+    expect(SHELL_COPY.quickHandoffLink).toContain('Detaylı Fizibilite')
   })
 
   it('gives each mode a distinct anchor so the entries stay real links', () => {

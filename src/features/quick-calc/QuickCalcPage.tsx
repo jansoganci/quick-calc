@@ -7,7 +7,7 @@ import { useQuickCalc } from './hooks/useQuickCalc.ts'
  * `app/AppShell.tsx` when Detailed became the second mode; the rendered output of
  * this screen is unchanged.
  */
-export function QuickCalcPage() {
+export function QuickCalcPage({ onGoToDetailed }: { onGoToDetailed: () => void }) {
   const calc = useQuickCalc()
 
   return (
@@ -45,6 +45,7 @@ export function QuickCalcPage() {
             onCopy={() => {
               void calc.copySummary()
             }}
+            onGoToDetailed={onGoToDetailed}
           />
         </div>
       </div>
