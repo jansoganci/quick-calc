@@ -82,6 +82,17 @@ A single quiet text-level control next to the R1 summary sentence copies a short
 
 **URL sharing is out of scope for v1**: no share links, no encoded state in the address bar, no social share targets, no server round-trip. Clipboard copy only.
 
+### R7 — Supplementary Sankey visualisation **[LOCKED / APPROVED]**
+
+A Sankey diagram of the same §9.2 breakdown (average sale fanning out into the 8 locked categories) may be shown **in addition to** R2, never instead of it. The stacked bar (R2) stays the primary visual and stays first; the Sankey is supplementary and sits below it, alongside or after the exact cost breakdown table.
+
+Rules:
+
+- **Same data, same categories, same locked order** as R2 and the breakdown table — no new categories, no re-splitting of OPEX/payroll/tax/product cost, no new formulas. It renders `breakdownPerSale` (§9.2), nothing else.
+- **Live, not static.** It updates with the same inputs that drive R2 and the breakdown table (V6) — same values, different shape.
+- No new financial concept, no additional user interaction required to understand the primary result — a user who ignores it loses nothing already required by R1–R2.
+- Presentation-layer only: no chart library is required by default (plain SVG is sufficient, consistent with R2); if a library is used, it must not introduce a shared dependency for anything beyond rendering this one supplementary visual.
+
 ### R5 — Simulation row previews the breakdown bar **[OPTIONAL / LATER]**
 
 The five-row volume simulation remains a plain table (V8). A possible later enhancement: hovering a row on desktop or tapping it on mobile temporarily re-renders the main breakdown bar for that sales-volume case, returning to the current scenario afterwards. It is worth doing because it shows how fixed costs dilute as volume changes.
@@ -93,8 +104,9 @@ Constraints on it: **not required for the first frontend implementation**; must 
 1. Plain-language summary sentence (R1)
 2. Average Sale Breakdown Bar (R2)
 3. Exact cost breakdown table
-4. Approved simple financial outputs — Monthly Operating Earnings, Gross Profit Margin, Operating Profit Margin, Estimated Investment Payback
-5. Simple five-level volume simulation table
+4. Supplementary Sankey visualisation of the same breakdown (R7)
+5. Approved simple financial outputs — Monthly Operating Earnings, Gross Profit Margin, Operating Profit Margin, Estimated Investment Payback
+6. Simple five-level volume simulation table
 
 The whole experience stays fast to scan. It is not a financial dashboard.
 
@@ -104,7 +116,8 @@ The whole experience stays fast to scan. It is not a financial dashboard.
 | --- | --- |
 | "100 TL üzerinden" normalisation toggle | Introduces an unnecessary second framing; may confuse Lite users. |
 | Per-sale / per-month view toggle | The monthly figures are already presented separately; the user must not switch the whole result context. |
-| Additional charts — line, area, waterfall, Sankey, gauges, speedometers, extra profit/expense charts | The stacked breakdown bar already carries the visual explanation. |
+| Additional charts — line, area, waterfall, gauges, speedometers, extra profit/expense charts | The stacked breakdown bar already carries the visual explanation. |
+| ~~Sankey~~ | **Superseded — see R7.** A supplementary Sankey visualisation of the same §9.2 breakdown is now approved, additive to the stacked bar (R2), which remains primary and is not replaced. |
 | Complex simulation interaction — configurable scenarios, sliders, multi-variable controls, extra scenario inputs | The five-level table stays simple. |
 | URL / link sharing, encoded state in the address bar, social share targets | v1 shares via clipboard only (R6). |
 
