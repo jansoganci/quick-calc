@@ -20,12 +20,27 @@ import type {
   DetailedResult,
   MonthFactors,
   MonthResult,
+  ProductLine,
   ScenarioKey,
   ScenarioResult,
 } from './types.ts';
 
 function emptyChannelLine(): ChannelLine {
   return {
+    units: 0,
+    grossCustomerSales: 0,
+    netRevenue: 0,
+    productCogs: 0,
+    channelVariableCost: 0,
+    paymentPlatformFee: 0,
+    contribution: 0,
+  };
+}
+
+function emptyProductLine(productId: string, name: string): ProductLine {
+  return {
+    productId,
+    name,
     units: 0,
     grossCustomerSales: 0,
     netRevenue: 0,
@@ -55,13 +70,15 @@ export function calculateMonth(
     delivery: emptyChannelLine(),
   };
 
-  for (const entry of unitEconomics.products) {
+  // Ordered as `input.products` (DF-84) — one pass per product, mirroring the channel loop.
+  const byProduct: ProductLine[] = unitEconomics.products.map((entry) => {
     // Scenario and ramp-up are already combined into `quantityFactor`;
     // operating days are applied after both multipliers (DF-66, DF-69).
     const monthlyQuantity =
       entry.product.dailyQuantity *
       factors.quantityFactor *
       input.assumptions.operatingDaysPerMonth;
+    const productLine = emptyProductLine(entry.product.id, entry.product.name);
 
     for (const channel of CHANNELS) {
       // The single place volume meets unit economics (spec §12.1).
@@ -76,8 +93,19 @@ export function calculateMonth(
       line.channelVariableCost += channelQuantity * unit.unitChannelVariableCost;
       line.paymentPlatformFee += channelQuantity * unit.unitPaymentPlatformFee;
       line.contribution += channelQuantity * unit.unitContribution;
+
+      // Same six figures, summed across channels instead of across products (DF-84).
+      productLine.units += channelQuantity;
+      productLine.grossCustomerSales += channelQuantity * unit.grossPerUnit;
+      productLine.netRevenue += channelQuantity * unit.netPerUnit;
+      productLine.productCogs += channelQuantity * unit.unitProductCost;
+      productLine.channelVariableCost += channelQuantity * unit.unitChannelVariableCost;
+      productLine.paymentPlatformFee += channelQuantity * unit.unitPaymentPlatformFee;
+      productLine.contribution += channelQuantity * unit.unitContribution;
     }
-  }
+
+    return productLine;
+  });
 
   const lines = CHANNELS.map((channel) => byChannel[channel]);
   const sum = (pick: (line: ChannelLine) => number): number =>
@@ -115,6 +143,7 @@ export function calculateMonth(
     monthlyFixedCost: fixed.monthlyFixedCost,
     monthlyOperatingResult: netRevenue - totalVariableCost - fixed.monthlyFixedCost,
     byChannel,
+    byProduct,
   };
 }
 
