@@ -21,6 +21,7 @@ If two documents appear to disagree, use the authority order in [`CLAUDE.md`](..
 | [`DESIGN_DIRECTION.md`](./DESIGN_DIRECTION.md) | Locked visual & UX direction for Quick / Lite (inherited by Detailed) |
 | [`FRONTEND_IMPLEMENTATION_SPEC.md`](./FRONTEND_IMPLEMENTATION_SPEC.md) | Quick / Lite UI measurements, tokens, field map, copy |
 | [`design.md`](./design.md) | Design index plus layout-frame notes from the HTML preview |
+| [`PRODUCT_BREAKDOWN_AND_ONBOARDING_PLAN.md`](./PRODUCT_BREAKDOWN_AND_ONBOARDING_PLAN.md) | Proposal — product-level contribution breakdown (Detailed) and first-time-user onboarding (ⓘ help, sample fill). Not yet implemented. |
 
 [`CLAUDE.md`](../CLAUDE.md) is operating guidance for coding models. It is not a specification.
 
