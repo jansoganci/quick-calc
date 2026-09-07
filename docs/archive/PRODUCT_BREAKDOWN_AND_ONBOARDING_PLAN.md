@@ -1,9 +1,13 @@
 # Product-Level Breakdown & Onboarding Help — Plan
 
-**Status:** Proposal. Records decisions already made in conversation and lays out the
-implementation plan. **Does not itself authorise implementation** — same convention as
-every other document in `docs/`. Implementation starts when explicitly requested, feature
-by feature (§6).
+**Status:** Implemented. Every item in §3 and §4 has shipped (PR #8 —
+`claude/product-breakdown-onboarding-plan`): the DF-84 decision-log entry, the
+engine's `byProduct` accumulator, `ProductContributionTable` in both the screen
+result and the report, `InfoTooltip` piloted and then extended to the four
+fields in `docs/HANDOFF.md`'s latest entry, and the `sampleCafeForm()` /
+"Örnekle doldur" flow (placement A). Kept here as the historical record of the
+plan, not as a pending proposal. See `docs/HANDOFF.md` for what shipped and
+what is still open.
 **Scope:** Detailed Feasibility only, except where §4 notes a Quick / Lite touchpoint.
 **Companion documents:** `DETAILED_FEASIBILITY_DECISIONS.md` (decision log this plan adds
 one entry to), `APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md` (layer boundaries this plan
