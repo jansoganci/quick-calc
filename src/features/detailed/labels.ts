@@ -225,6 +225,8 @@ export const COPY = {
   starterCapex: 'Sık kullanılan kalemler',
   productName: 'Ürün adı',
   positionName: 'Pozisyon adı',
+  employerCostInfo:
+    'İşverene aylık toplam maliyettir — çalışanın eline geçen net maaş değil. SGK işveren payı gibi kalemleri de içerir.',
   lineName: 'Gider adı',
   monthlyAmount: 'Aylık tutar',
   capexName: 'Kalem adı',
@@ -234,6 +236,8 @@ export const COPY = {
   mixShare: 'Pay',
   packagingPerOrder: 'Ambalaj / sipariş',
   commission: 'Komisyon',
+  commissionInfo:
+    'Bankanın veya yemek kartı şirketinin her işlemden aldığı yüzdedir. Paket serviste ayrıca uygulanan platform kesintisinden farklıdır — ikisi asla üst üste hesaplanmaz.',
   channelColumn: 'Kanal',
   paymentColumn: 'Yöntem',
 
@@ -251,6 +255,8 @@ export const COPY = {
   ownerMonthlyAmount: 'Kendinize ayırdığınız aylık tutar',
   ownerBagKur: 'Aylık Bağ-Kur',
   monthlyRent: 'Aylık kira',
+  monthlyRentInfo:
+    '"Brüt kira" girdiğin tutarın tamamı işletme çıkışıdır; stopaj bu tutardan kesilip devlete ödenir. "Net kira" ise ev sahibinin eline geçecek tutardır — gerçek nakit çıkışı bundan daha yüksek hesaplanır.',
   monthlyAidat: 'Aylık aidat',
   rentBasisGroup: 'Girilen kira tutarı',
   aidatOnceHint: 'Aidatı yalnızca burada girin — “Diğer giderler”de tekrar eklemeyin.',

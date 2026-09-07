@@ -1,3 +1,4 @@
+import { InfoTooltip } from '../../../components/InfoTooltip.tsx'
 import { NumberField } from '../../../components/NumberField.tsx'
 import { TextField } from '../../../components/TextField.tsx'
 import { cn } from '../../../lib/cn.ts'
@@ -6,10 +7,14 @@ import { COPY, POSITION_LABELS } from '../labels.ts'
 import { useNewestRowOpen } from '../hooks/useNewestRowOpen.ts'
 
 const PER_PERSON_FIELDS = [
-  { field: 'employerCostPerPerson', label: POSITION_LABELS.employerCostPerPerson },
-  { field: 'mealCostPerPerson', label: POSITION_LABELS.mealCostPerPerson },
-  { field: 'transportCostPerPerson', label: POSITION_LABELS.transportCostPerPerson },
-  { field: 'averageBonusPerPerson', label: POSITION_LABELS.averageBonusPerPerson },
+  {
+    field: 'employerCostPerPerson',
+    label: POSITION_LABELS.employerCostPerPerson,
+    info: COPY.employerCostInfo,
+  },
+  { field: 'mealCostPerPerson', label: POSITION_LABELS.mealCostPerPerson, info: null },
+  { field: 'transportCostPerPerson', label: POSITION_LABELS.transportCostPerPerson, info: null },
+  { field: 'averageBonusPerPerson', label: POSITION_LABELS.averageBonusPerPerson, info: null },
 ] as const
 
 type PositionRowsProps = {
@@ -110,8 +115,9 @@ export function PositionRows({
               <div className="mt-2.5 grid grid-cols-2 gap-2.5 lg:grid-cols-4 lg:pr-[66px]">
                 {PER_PERSON_FIELDS.map((column) => (
                   <div key={column.field} className="flex flex-col gap-[5px]">
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+                    <span className="flex items-baseline text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
                       {column.label}
+                      {column.info ? <InfoTooltip text={column.info} /> : null}
                     </span>
                     <NumberField
                       id={`positions.${index}.${column.field}`}

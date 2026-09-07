@@ -1,3 +1,4 @@
+import { InfoTooltip } from '../../../components/InfoTooltip.tsx'
 import { NumberField } from '../../../components/NumberField.tsx'
 import { cn } from '../../../lib/cn.ts'
 import { COPY } from '../labels.ts'
@@ -15,12 +16,16 @@ export type MixRow = {
     unit: string
     label: string
     onChange: (value: string) => void
+    /** Shown on mobile, where this field's own (otherwise hidden) label is what's visible. */
+    info?: string | null
   } | null
 }
 
 type MixTableProps = {
   firstColumnLabel: string
   extraColumnLabel: string
+  /** Shown next to the shared desktop column header — the mobile counterpart is `MixRow.extra.info`. */
+  extraColumnInfo?: string | null
   rows: MixRow[]
   total: string
   totalError: string | null
@@ -36,6 +41,7 @@ type MixTableProps = {
 export function MixTable({
   firstColumnLabel,
   extraColumnLabel,
+  extraColumnInfo,
   rows,
   total,
   totalError,
@@ -51,8 +57,9 @@ export function MixTable({
         <span className="text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
           {COPY.mixShare}
         </span>
-        <span className="text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+        <span className="flex items-baseline justify-end text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
           {extraColumnLabel}
+          {extraColumnInfo ? <InfoTooltip text={extraColumnInfo} /> : null}
         </span>
       </div>
 
@@ -86,6 +93,7 @@ export function MixTable({
                 onBlur={() => onBlur(row.extra!.path)}
                 unit={row.extra.unit}
                 error={errorFor(row.extra.path)}
+                info={row.extra.info}
                 grouped
               />
             </div>

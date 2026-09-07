@@ -120,6 +120,7 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
         <MixTable
           firstColumnLabel={COPY.paymentColumn}
           extraColumnLabel={COPY.commission}
+          extraColumnInfo={COPY.commissionInfo}
           total={sectionSummary(form, 'payments')}
           totalError={calc.errorFor('paymentMix')}
           errorFor={calc.errorFor}
@@ -145,6 +146,7 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
                 unit: '%',
                 label: COPY.posCommission,
                 onChange: calc.setPosCommissionRate,
+                info: COPY.commissionInfo,
               },
             },
             {
@@ -159,6 +161,7 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
                 unit: '%',
                 label: COPY.mealCardCommission,
                 onChange: calc.setMealCardCommissionRate,
+                info: COPY.commissionInfo,
               },
             },
           ]}
@@ -292,6 +295,7 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
               onBlur={() => calc.markTouched('occupancy.monthlyRent')}
               unit="TL"
               error={calc.errorFor('occupancy.monthlyRent')}
+              info={COPY.monthlyRentInfo}
               grouped
             />
             <div className="qc-segment" role="group" aria-label={COPY.rentBasisGroup}>
