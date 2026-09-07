@@ -105,7 +105,7 @@ describe('result contract (spec §16)', () => {
     const sumProducts = (pick: (line: (typeof month.byProduct)[number]) => number) =>
       month.byProduct.reduce((total, line) => total + pick(line), 0);
 
-    const figures: Array<keyof (typeof month.byProduct)[number]> = [
+    const figures: Array<keyof (typeof channelLines)[number]> = [
       'units',
       'grossCustomerSales',
       'netRevenue',

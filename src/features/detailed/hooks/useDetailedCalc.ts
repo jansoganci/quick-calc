@@ -6,6 +6,7 @@ import {
   emptyProduct,
   initialForm,
   rateToPercentInput,
+  sampleCafeForm,
   type DetailedFormState,
   type LineRow,
   type PositionRow,
@@ -137,6 +138,23 @@ export function useDetailedCalc() {
   }
 
   /**
+   * Replaces the form with a realistic filled example (onboarding). Same reset of
+   * touched/submitted/view as `resetForm` — new inputs need a fresh `Hesapla` (V6)
+   * — but not a `clearDraft()`: the sample becomes the new draft through the same
+   * debounced autosave every other edit goes through.
+   */
+  function loadSample() {
+    setForm(sampleCafeForm())
+    setTouched({})
+    setSubmitted(false)
+    setHasCalculated(false)
+    setView(null)
+    setOpenSection('products')
+    setShowMonthTable(false)
+    previousViewKeyRef.current = null
+  }
+
+  /**
    * Committed when a report is generated, not on every keystroke in the dialog:
    * the name is worth keeping once the owner has actually used it.
    */
@@ -164,6 +182,7 @@ export function useDetailedCalc() {
     errorSections,
     markTouched,
     resetForm,
+    loadSample,
 
     setOpenSection: (section: SectionId | null) => setOpenSection(section),
     toggleSection: (section: SectionId) =>

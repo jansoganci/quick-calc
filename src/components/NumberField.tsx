@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef } from 'react'
 import { cn } from '../lib/cn.ts'
 import { caretAfterFormat, formatTypedTurkishNumber } from '../lib/number.ts'
+import { InfoTooltip } from './InfoTooltip.tsx'
 
 type NumberFieldProps = {
   id: string
@@ -11,6 +12,8 @@ type NumberFieldProps = {
   unit: string
   error?: string | null
   hint?: string | null
+  /** Short explanation revealed by a ⓘ next to the label — what the field means and what it changes. Not the short always-visible `hint`. */
+  info?: string | null
   span?: 'half' | 'full'
   placeholder?: string
   grouped?: boolean
@@ -38,6 +41,7 @@ export function NumberField({
   unit,
   error,
   hint,
+  info,
   span = 'half',
   placeholder,
   grouped = false,
@@ -70,8 +74,14 @@ export function NumberField({
       className={cn('qc-field', span === 'full' && 'col-span-full', labelHidden === true && 'gap-0')}
       htmlFor={id}
     >
-      <span className={labelHidden === true ? 'sr-only' : labelHidden === 'from-lg' ? 'lg:sr-only' : undefined}>
+      <span
+        className={cn(
+          'flex items-baseline',
+          labelHidden === true ? 'sr-only' : labelHidden === 'from-lg' ? 'lg:sr-only' : undefined,
+        )}
+      >
         {label}
+        {info ? <InfoTooltip text={info} /> : null}
       </span>
       <span
         className={cn(

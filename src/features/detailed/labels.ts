@@ -203,6 +203,10 @@ export const COPY = {
   draftResetConfirm: 'Girdiklerinizin tamamı silinecek.',
   draftResetYes: 'Evet, sil',
   draftResetCancel: 'Vazgeç',
+  loadSample: 'Nereden başlayacağını bilmiyor musun? Örnek bir kafeyle doldur →',
+  loadSampleConfirm: 'Girdiklerinizin tamamı örnek verilerle değiştirilecek.',
+  loadSampleYes: 'Evet, doldur',
+  loadSampleCancel: 'Vazgeç',
   allResults: 'Tüm sonuçlar ↓',
   backToInputs: 'Girdilere dön ↑',
   results: 'Sonuçlar ↓',
@@ -238,6 +242,8 @@ export const COPY = {
     'Seçim, platform kesinti oranının başlangıç değerini belirler: kendi kuryeniz %15, platformun kuryesi %38.',
   platformFeeRate: 'Platform kesintisi',
   platformFeeHint: 'KDV dahil toplam kesinti oranı',
+  platformFeeInfo:
+    'Kendi kuryenizle teslim ediyorsanız bu, platformun sipariş başına aldığı komisyondur. Platformun kendi kuryesini seçtiyseniz aynı oran teslimatı da kapsar ve daha yüksektir.',
   ownCourierCost: 'Sipariş başına kurye maliyeti',
   ownCourierHint: 'Yalnızca kendi kuryenizle çalışırken geçerli',
   ownCourierDisabledHint: 'Platformun kuryesinde bu tutar hesaba katılmaz.',
@@ -299,6 +305,9 @@ export const COPY = {
   channelTitle: 'Kanal ekonomisi',
   channelNote:
     'Katkı, o kanalın kendi maliyetlerinden sonra işletmeye kalan tutardır. Sabit giderler kanallara dağıtılmaz.',
+  productTitle: 'Ürün bazlı katkı',
+  productNote:
+    'Aynı katkı hesabı, kanal yerine ürüne göre toplanmış. Kanal ekonomisiyle aynı toplamlara ulaşır.',
   channelUnits: 'Adet',
   channelGross: 'Brüt satış',
   channelNet: 'Net ciro',

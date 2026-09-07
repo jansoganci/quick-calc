@@ -198,6 +198,37 @@ export function buildChannelTotals(month: MonthResult): Omit<ChannelRow, 'channe
   }
 }
 
+/** Same shape as `ChannelRow` — units/gross/net/cogs/variable/fee/contribution — one row per product instead of per channel (DF-84). */
+export type ProductRow = {
+  productId: string
+  name: string
+  units: string
+  gross: string
+  net: string
+  cogs: string
+  variable: string
+  fee: string
+  contribution: string
+}
+
+export function buildProductRows(month: MonthResult): ProductRow[] {
+  return month.byProduct.map((line) => ({
+    productId: line.productId,
+    name: line.name,
+    units: formatCount(line.units),
+    gross: formatTry(line.grossCustomerSales),
+    net: formatTry(line.netRevenue),
+    cogs: formatTry(line.productCogs),
+    variable: line.channelVariableCost === 0 ? COPY.none : formatTry(line.channelVariableCost),
+    fee: formatTry(line.paymentPlatformFee),
+    contribution: formatTry(line.contribution),
+  }))
+}
+
+export function buildProductTotals(month: MonthResult): Omit<ProductRow, 'productId' | 'name'> {
+  return buildChannelTotals(month)
+}
+
 export type ProjectionSeries = { key: ScenarioKey; label: string; values: number[] }
 
 export type ProjectionData = {

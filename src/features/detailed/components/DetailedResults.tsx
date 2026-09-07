@@ -4,6 +4,7 @@ import { AssumptionsList } from './AssumptionsList.tsx'
 import { ChannelTable } from './ChannelTable.tsx'
 import { MonthTable } from './MonthTable.tsx'
 import { PaybackChart } from './PaybackChart.tsx'
+import { ProductContributionTable } from './ProductContributionTable.tsx'
 import { ProjectionChart } from './ProjectionChart.tsx'
 import { ResultBar } from './ResultBar.tsx'
 import { ScenarioTable } from './ScenarioTable.tsx'
@@ -97,6 +98,10 @@ export function DetailedResults({
 
       <ResultSection title={COPY.channelTitle} note={COPY.channelNote}>
         <ChannelTable channels={view.channels} totals={view.channelTotals} />
+      </ResultSection>
+
+      <ResultSection title={COPY.productTitle} note={COPY.productNote}>
+        <ProductContributionTable products={view.products} totals={view.productTotals} />
       </ResultSection>
 
       <ResultSection title={COPY.breakEvenTitle} note={COPY.breakEvenNote}>
