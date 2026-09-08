@@ -1,6 +1,6 @@
 # Detailed Feasibility — Locked Decisions
 
-**Version:** v0.11
+**Version:** v0.12
 **Status:** Decision log. Major Detailed v1 **product-scope** decisions are **locked**. Major calculation-model review blockers are **resolved**. Remaining implementation details belong in a dedicated Detailed Financial Specification. This file is still **not** that specification and **not** implementation.
 **Phase:** Planning — **not** a financial specification and **not** implementation
 **Currency:** TRY · **Country:** Turkey · **Preset context:** Coffee Shop / Cafe (same product family as Quick / Lite)
@@ -1644,6 +1644,20 @@ They are not extra analysis worksheets. Do **not** add further finance fields fo
 
 **Product principle:** Detailed should provide deeper analysis through the engine, not by forcing the user to fill more finance fields.
 
+#### DF-84 — Product-level contribution is a derived report/UI output **[LOCKED]**
+
+The engine-derived analysis (DF-61) also includes a **per-product** breakdown: units, gross customer sales, net revenue, Product COGS, Channel Variable Cost, Payment / Platform Fee, and contribution, for the stabilized month.
+
+This is **not** a new input and does **not** reopen any locked input decision:
+
+- it does **not** add a per-product channel mix — the one business-level mix (DF-04a) still applies identically to every product;
+- it does **not** add category grouping (DF-72);
+- it adds **no** formula. Every figure already exists per product, per channel, in the unit economics the engine computes for revenue and cost (spec §9) — this decision only says those per-product figures may be aggregated across channels and surfaced, instead of being discarded after folding into channel totals.
+
+Product identity in this breakdown is the product's `name` as entered (DF-45). There is no separate product code or SKU concept introduced by this decision.
+
+This view is additive to the existing channel breakdown, not a replacement for it. Both may be shown together.
+
 ---
 
 ### 5.13 Financing and working capital
@@ -1868,6 +1882,7 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 | DF-35 | Break-even | Automatic operating break-even. `fixed / weightedContributionPerSale`. CAPEX excluded. Primary outputs **units/day** and **units/month**. **Not customer count.** TL revenue only secondary if design needs it. Unreachable if contribution ≤ 0. |
 | DF-36 | Payback | Automatic. Cumulative projected operating profit vs. total CAPEX. First month ≥ investment. Ramp-up affects it. Horizon / non-positive edge states locked. |
 | DF-61 | Analysis UX principle | User describes the business once; engine derives operating result, break-even, investment, payback, scenarios, projection. |
+| DF-84 | Product-level contribution | Derived report/UI output only — units, revenue, cost lines, contribution per product, summed across channels. No per-product channel mix (DF-04a unchanged). No category grouping (DF-72 unchanged). No new formula. |
 | DF-62 | Waste / fire | Out of v1. |
 | DF-40 | Financing | Out of v1. |
 | DF-41 | Working-capital timing | Out of v1. |
@@ -1931,6 +1946,7 @@ None of the above is a reason to change Lite behaviour now.
 | v0.9 | Scope cut: remove company-type input; horizon presets 12/24/36 only (default 24); no category grouping; merge security OPEX; drop separate water-treatment line; escalation stays in the model but secondary/advanced in UI; break-even primary outputs are units/day and units/month. Record seasonality, basket size, platform vs own-channel delivery split, and per-product channel mix as LATER — not missing v1 requirements. |
 | v0.10 | Final accepted review fixes. Break-even is units not customers. Payment mix locked to salon/takeaway only. Owner and aidat double-count are UI-guardrail rules. Own-courier cost is Mode 1 only. Platform fee may be 0%. Rejected extra payback/cash/pre-opening/COGS-% ideas. Product scope is complete enough to hand off to the Detailed Financial Specification. |
 | v0.11 | Locked DF-83: Channel Variable Costs (takeaway packaging, delivery packaging, own-courier variable payment) escalate with the Product COGS annual rate as escalation group 2. No fourth escalation category, no new input, and DF-68's cost-line separation is unchanged. Closes the last escalation-assignment gap before the Detailed Financial Specification. |
+| v0.12 | Locked DF-84: a per-product contribution breakdown (units, revenue, cost lines, contribution) is an approved engine-derived report/UI output, additive to the existing channel breakdown. No new input, no per-product channel mix, no category grouping — DF-04a and DF-72 unchanged. Confirmed the platform-vs-own-courier delivery *volume* split stays rejected (DF-77 unchanged) and recorded that city/location benchmarking is shelved, not designed. |
 
 ---
 

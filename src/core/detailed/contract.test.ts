@@ -57,6 +57,7 @@ describe('result contract (spec §16)', () => {
       'monthlyFixedCost',
       'monthlyOperatingResult',
       'byChannel',
+      'byProduct',
     ].sort();
     expect(Object.keys(result.scenarios.base.stabilizedMonth).sort()).toEqual(expected);
     expect(Object.keys(result.scenarios.base.projection[0] ?? {}).sort()).toEqual(expected);
@@ -76,6 +77,54 @@ describe('result contract (spec §16)', () => {
         ].sort(),
       );
     }
+  });
+
+  it('exposes exactly the documented product-line keys (DF-84)', () => {
+    for (const line of result.scenarios.base.stabilizedMonth.byProduct) {
+      expect(Object.keys(line).sort()).toEqual(
+        [
+          'productId',
+          'name',
+          'units',
+          'grossCustomerSales',
+          'netRevenue',
+          'productCogs',
+          'channelVariableCost',
+          'paymentPlatformFee',
+          'contribution',
+        ].sort(),
+      );
+    }
+  });
+
+  it('reconciles byProduct against byChannel and the month totals (DF-84)', () => {
+    const month = result.scenarios.base.stabilizedMonth;
+    const channelLines = Object.values(month.byChannel);
+    const sumChannels = (pick: (line: (typeof channelLines)[number]) => number) =>
+      channelLines.reduce((total, line) => total + pick(line), 0);
+    const sumProducts = (pick: (line: (typeof month.byProduct)[number]) => number) =>
+      month.byProduct.reduce((total, line) => total + pick(line), 0);
+
+    const figures: Array<keyof (typeof channelLines)[number]> = [
+      'units',
+      'grossCustomerSales',
+      'netRevenue',
+      'productCogs',
+      'channelVariableCost',
+      'paymentPlatformFee',
+      'contribution',
+    ];
+    for (const figure of figures) {
+      expect(sumProducts((line) => line[figure])).toBeCloseTo(sumChannels((line) => line[figure]), 6);
+    }
+
+    expect(month.totalUnits).toBeCloseTo(sumProducts((line) => line.units), 6);
+    expect(month.grossCustomerSales).toBeCloseTo(sumProducts((line) => line.grossCustomerSales), 6);
+    expect(month.netRevenue).toBeCloseTo(sumProducts((line) => line.netRevenue), 6);
+    expect(month.productCogs).toBeCloseTo(sumProducts((line) => line.productCogs), 6);
+    expect(month.channelVariableCost).toBeCloseTo(sumProducts((line) => line.channelVariableCost), 6);
+    expect(month.paymentPlatformFee).toBeCloseTo(sumProducts((line) => line.paymentPlatformFee), 6);
+    expect(month.totalContribution).toBeCloseTo(sumProducts((line) => line.contribution), 6);
   });
 
   it('publishes no margin ratios — DF-61 does not list them', () => {

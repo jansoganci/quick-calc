@@ -66,9 +66,100 @@
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
+
+    <!--
+      Structured data. Mirrors the share tags above and the static "Hakkında"
+      block below word for word — a schema that disagrees with what a visitor
+      actually sees is a spam signal, not an SEO trick. Update all three
+      together when the copy changes.
+    -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Maliyet",
+        "url": "https://maliyet.lol/",
+        "description": "Kafe, restoran ve küçük işletmeler için sade bir maliyet ve fizibilite hesabı. Muhasebe bilgisi gerektirmez.",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Any (web browser)",
+        "inLanguage": "tr",
+        "isAccessibleForFree": true,
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "TRY"
+        }
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Maliyet ücretsiz mi?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Evet. Maliyet tamamen ücretsizdir; hesap açmaya veya ödeme yapmaya gerek yoktur."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Bir satışın maliyeti nasıl hesaplanır?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Ortalama satış tutarından KDV, ürün maliyeti, personel, kira, diğer işletme giderleri, POS/platform komisyonu ve yatırım geri kazanım payı düşülür; kalan tutar işletmede kalan kısımdır."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "İşyeri kira stopajı hesaba dahil mi?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Evet. Girilen kiranın net mi brüt mü olduğu seçilir ve stopaj otomatik hesaplanır; ayrıca bir vergi bilgisi girmeye gerek yoktur."
+            }
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!--
+      Static "Hakkında" content. Deliberately OUTSIDE #root: React never
+      touches it, so it exists in the raw HTML for any crawler that does not
+      run JavaScript — most of the ones that answer questions on Claude,
+      ChatGPT or Perplexity's behalf are exactly this kind. Kept as plain
+      inline-styled markup, independent of the app's own build pipeline, so
+      it renders correctly whatever the JS/CSS loading state is. Text mirrors
+      the JSON-LD above and the share tags at the top of <head> — same claims,
+      same wording, everywhere.
+    -->
+    <footer style="max-width: 640px; margin: 64px auto 40px; padding: 0 18px; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #16181C; line-height: 1.6;">
+      <h1 style="font-size: 15px; font-weight: 600; margin: 0 0 8px;">Maliyet</h1>
+      <p style="font-size: 13px; color: #5B6169; margin: 0 0 20px;">
+        Kafe, restoran ve küçük işletmeler için ücretsiz bir maliyet ve fizibilite hesaplama aracı. Bir satışın gerçek maliyetinin nereye gittiğini ve işletmede ne kadar kaldığını gösterir; muhasebe bilgisi gerektirmez.
+      </p>
+      <p style="font-size: 13px; color: #5B6169; margin: 0 0 20px;">
+        <strong style="color: #16181C;">Hızlı Hesap</strong>, 8 girdiyle bir satışın maliyet dağılımını gösterir.
+        <strong style="color: #16181C;">Detaylı Fizibilite</strong> ise ürün bazlı gelir, satış kanalı ekonomisi, personel, kira, senaryo analizi ve indirilebilir PDF rapor üretir. Türkiye'ye özel KDV netleme, işyeri kira stopajı ve POS/yemek kartı komisyonları hesaba dahildir.
+      </p>
+      <h2 style="font-size: 13px; font-weight: 600; margin: 0 0 10px;">Sık sorulanlar</h2>
+      <p style="font-size: 13px; margin: 0 0 12px;">
+        <strong style="color: #16181C;">Maliyet ücretsiz mi?</strong><br>
+        <span style="color: #5B6169;">Evet. Maliyet tamamen ücretsizdir; hesap açmaya veya ödeme yapmaya gerek yoktur.</span>
+      </p>
+      <p style="font-size: 13px; margin: 0 0 12px;">
+        <strong style="color: #16181C;">Bir satışın maliyeti nasıl hesaplanır?</strong><br>
+        <span style="color: #5B6169;">Ortalama satış tutarından KDV, ürün maliyeti, personel, kira, diğer işletme giderleri, POS/platform komisyonu ve yatırım geri kazanım payı düşülür; kalan tutar işletmede kalan kısımdır.</span>
+      </p>
+      <p style="font-size: 13px; margin: 0;">
+        <strong style="color: #16181C;">İşyeri kira stopajı hesaba dahil mi?</strong><br>
+        <span style="color: #5B6169;">Evet. Girilen kiranın net mi brüt mü olduğu seçilir ve stopaj otomatik hesaplanır; ayrıca bir vergi bilgisi girmeye gerek yoktur.</span>
+      </p>
+    </footer>
   </body>
 </html>

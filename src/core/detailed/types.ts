@@ -261,6 +261,19 @@ export interface ChannelLine {
   contribution: number;
 }
 
+/** Same six figures as `ChannelLine`, summed across channels instead of across products (DF-84). */
+export interface ProductLine {
+  productId: string;
+  name: string;
+  units: number;
+  grossCustomerSales: number;
+  netRevenue: number;
+  productCogs: number;
+  channelVariableCost: number;
+  paymentPlatformFee: number;
+  contribution: number;
+}
+
 export interface MonthResult {
   /** `null` for a stabilized month; 1-based for a projection row. */
   month: number | null;
@@ -287,6 +300,8 @@ export interface MonthResult {
   monthlyFixedCost: number;
   monthlyOperatingResult: number;
   byChannel: Record<Channel, ChannelLine>;
+  /** Ordered as `input.products` (DF-84). */
+  byProduct: ProductLine[];
 }
 
 export type BreakEvenUnavailableReason = 'no_sales_volume' | 'non_positive_contribution';

@@ -182,3 +182,67 @@ export function initialForm(): DetailedFormState {
     },
   }
 }
+
+/**
+ * A realistic small-cafe example, for the "Örnekle doldur" onboarding affordance.
+ *
+ * Illustrative numbers only — not a locked reference vector like Quick's §19
+ * golden vector, and never asserted against in a test the way that one is.
+ * Built on `initialForm()` so every secondary assumption and mix default it
+ * doesn't override stays the single source of truth in `core/detailed/defaults.ts`.
+ */
+export function sampleCafeForm(): DetailedFormState {
+  const base = initialForm()
+  return {
+    ...base,
+    products: [
+      {
+        ...emptyProduct(),
+        name: 'Amerikano',
+        normalPrice: '120',
+        onlinePrice: '150',
+        dailyQuantity: '80',
+        unitProductCost: '25',
+      },
+      {
+        ...emptyProduct(),
+        name: 'Poğaça',
+        normalPrice: '45',
+        onlinePrice: '55',
+        dailyQuantity: '60',
+        unitProductCost: '12',
+      },
+      {
+        ...emptyProduct(),
+        name: 'Cold Brew',
+        normalPrice: '140',
+        onlinePrice: '170',
+        dailyQuantity: '30',
+        unitProductCost: '35',
+      },
+    ],
+    packaging: { takeawayPerOrder: '5', deliveryPerOrder: '8' },
+    delivery: { ...base.delivery, mode: 'platformOnly' },
+    positions: [
+      {
+        ...emptyPosition(),
+        name: 'Barista',
+        headcount: '2',
+        employerCostPerPerson: '28000',
+        mealCostPerPerson: '2500',
+        transportCostPerPerson: '1500',
+        averageBonusPerPerson: '1000',
+      },
+    ],
+    owner: { monthlyAmount: '25000', bagKurMonthlyCost: '6000' },
+    occupancy: { ...base.occupancy, monthlyRent: '65000', monthlyAidat: '3000' },
+    opexLines: [
+      { ...emptyLine('opex', 'Elektrik'), amount: '6000' },
+      { ...emptyLine('opex', 'Su'), amount: '1200' },
+    ],
+    capexItems: [
+      { ...emptyLine('capex', 'Tadilat'), amount: '350000' },
+      { ...emptyLine('capex', 'Ekipman'), amount: '180000' },
+    ],
+  }
+}

@@ -29,12 +29,15 @@ import {
   buildChannelTotals,
   buildMonthRows,
   buildPaybackChart,
+  buildProductRows,
+  buildProductTotals,
   buildProjection,
   type AssumptionRow,
   type BreakdownView,
   type ChannelRow,
   type MonthRow,
   type PaybackData,
+  type ProductRow,
   type ProjectionData,
 } from './resultView.ts'
 
@@ -71,6 +74,8 @@ export type DetailedView = {
   breakdown: BreakdownView
   channels: ChannelRow[]
   channelTotals: Omit<ChannelRow, 'channel' | 'label'>
+  products: ProductRow[]
+  productTotals: Omit<ProductRow, 'productId' | 'name'>
   projection: ProjectionData
   paybackChart: PaybackData
   monthRows: MonthRow[]
@@ -220,6 +225,8 @@ function buildView(result: DetailedResult, input: DetailedResolvedInput): Detail
     breakdown: buildBreakdown(base),
     channels: buildChannelRows(base),
     channelTotals: buildChannelTotals(base),
+    products: buildProductRows(base),
+    productTotals: buildProductTotals(base),
     projection: buildProjection(result),
     paybackChart: buildPaybackChart(result),
     monthRows: buildMonthRows(result),

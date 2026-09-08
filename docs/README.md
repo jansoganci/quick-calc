@@ -21,6 +21,7 @@ If two documents appear to disagree, use the authority order in [`CLAUDE.md`](..
 | [`DESIGN_DIRECTION.md`](./DESIGN_DIRECTION.md) | Locked visual & UX direction for Quick / Lite (inherited by Detailed) |
 | [`FRONTEND_IMPLEMENTATION_SPEC.md`](./FRONTEND_IMPLEMENTATION_SPEC.md) | Quick / Lite UI measurements, tokens, field map, copy |
 | [`design.md`](./design.md) | Design index plus layout-frame notes from the HTML preview |
+| [`HANDOFF.md`](./HANDOFF.md) | Living status log — what shipped each session and what still needs a human (accounts, outreach). Not a specification. |
 
 [`CLAUDE.md`](../CLAUDE.md) is operating guidance for coding models. It is not a specification.
 
@@ -34,5 +35,6 @@ If two documents appear to disagree, use the authority order in [`CLAUDE.md`](..
 | [`archive/FRONTEND_IMPLEMENTATION_PLAN.md`](./archive/FRONTEND_IMPLEMENTATION_PLAN.md) | Quick frontend execution plan — the Lite UI is implemented |
 | [`archive/DRAFT_PERSISTENCE_AND_REPORT_OUTPUT.md`](./archive/DRAFT_PERSISTENCE_AND_REPORT_OUTPUT.md) | Detailed draft autosave record — Part A is implemented; persistence rules stay in `TECH_STACK_AND_CONSTRAINTS.md` §4 |
 | [`archive/DETAILED_REPORT_IMPLEMENTATION_PLAN.md`](./archive/DETAILED_REPORT_IMPLEMENTATION_PLAN.md) | Detailed downloadable-report execution plan — the report is implemented |
+| [`archive/PRODUCT_BREAKDOWN_AND_ONBOARDING_PLAN.md`](./archive/PRODUCT_BREAKDOWN_AND_ONBOARDING_PLAN.md) | Product-level contribution breakdown (DF-84) and onboarding (ⓘ help, sample fill) — both implemented, see `HANDOFF.md` |
 
 See [`archive/README.md`](./archive/README.md).

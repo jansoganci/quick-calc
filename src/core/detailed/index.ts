@@ -28,6 +28,7 @@ export type {
   PaybackUnavailableReason,
   PaymentMethod,
   PaymentMix,
+  ProductLine,
   ProjectionHorizonMonths,
   RampUpPreset,
   RentInputBasis,

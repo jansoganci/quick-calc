@@ -27,6 +27,7 @@ import { LineRows } from './LineRows.tsx'
 import { MixTable } from './MixTable.tsx'
 import { PositionRows } from './PositionRows.tsx'
 import { ProductRows } from './ProductRows.tsx'
+import { SampleFillControl } from './SampleFillControl.tsx'
 import { SectionFrame } from './SectionFrame.tsx'
 
 export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
@@ -54,6 +55,7 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
   return (
     <div className="px-[18px] py-5 lg:px-[30px] lg:py-[26px] lg:pb-[34px]">
       <SectionFrame {...frameProps('products')}>
+        <SampleFillControl draftSaved={calc.draftSaved} onLoadSample={calc.loadSample} />
         <ProductRows
           products={form.products}
           dailyUnits={formatCount(typedDailyUnits(form))}
@@ -118,6 +120,7 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
         <MixTable
           firstColumnLabel={COPY.paymentColumn}
           extraColumnLabel={COPY.commission}
+          extraColumnInfo={COPY.commissionInfo}
           total={sectionSummary(form, 'payments')}
           totalError={calc.errorFor('paymentMix')}
           errorFor={calc.errorFor}
@@ -143,6 +146,7 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
                 unit: '%',
                 label: COPY.posCommission,
                 onChange: calc.setPosCommissionRate,
+                info: COPY.commissionInfo,
               },
             },
             {
@@ -157,6 +161,7 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
                 unit: '%',
                 label: COPY.mealCardCommission,
                 onChange: calc.setMealCardCommissionRate,
+                info: COPY.commissionInfo,
               },
             },
           ]}
@@ -206,6 +211,7 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
               unit="%"
               error={calc.errorFor('delivery.platformFeeRate')}
               hint={COPY.platformFeeHint}
+              info={COPY.platformFeeInfo}
             />
             <NumberField
               id="delivery.ownCourierCostPerDeliveryOrder"
@@ -289,6 +295,7 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
               onBlur={() => calc.markTouched('occupancy.monthlyRent')}
               unit="TL"
               error={calc.errorFor('occupancy.monthlyRent')}
+              info={COPY.monthlyRentInfo}
               grouped
             />
             <div className="qc-segment" role="group" aria-label={COPY.rentBasisGroup}>

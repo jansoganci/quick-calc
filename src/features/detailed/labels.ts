@@ -203,6 +203,10 @@ export const COPY = {
   draftResetConfirm: 'Girdiklerinizin tamamı silinecek.',
   draftResetYes: 'Evet, sil',
   draftResetCancel: 'Vazgeç',
+  loadSample: 'Nereden başlayacağını bilmiyor musun? Örnek bir kafeyle doldur →',
+  loadSampleConfirm: 'Girdiklerinizin tamamı örnek verilerle değiştirilecek.',
+  loadSampleYes: 'Evet, doldur',
+  loadSampleCancel: 'Vazgeç',
   allResults: 'Tüm sonuçlar ↓',
   backToInputs: 'Girdilere dön ↑',
   results: 'Sonuçlar ↓',
@@ -221,6 +225,8 @@ export const COPY = {
   starterCapex: 'Sık kullanılan kalemler',
   productName: 'Ürün adı',
   positionName: 'Pozisyon adı',
+  employerCostInfo:
+    'İşverene aylık toplam maliyettir — çalışanın eline geçen net maaş değil. SGK işveren payı gibi kalemleri de içerir.',
   lineName: 'Gider adı',
   monthlyAmount: 'Aylık tutar',
   capexName: 'Kalem adı',
@@ -230,6 +236,8 @@ export const COPY = {
   mixShare: 'Pay',
   packagingPerOrder: 'Ambalaj / sipariş',
   commission: 'Komisyon',
+  commissionInfo:
+    'Bankanın veya yemek kartı şirketinin her işlemden aldığı yüzdedir. Paket serviste ayrıca uygulanan platform kesintisinden farklıdır — ikisi asla üst üste hesaplanmaz.',
   channelColumn: 'Kanal',
   paymentColumn: 'Yöntem',
 
@@ -238,6 +246,8 @@ export const COPY = {
     'Seçim, platform kesinti oranının başlangıç değerini belirler: kendi kuryeniz %15, platformun kuryesi %38.',
   platformFeeRate: 'Platform kesintisi',
   platformFeeHint: 'KDV dahil toplam kesinti oranı',
+  platformFeeInfo:
+    'Kendi kuryenizle teslim ediyorsanız bu, platformun sipariş başına aldığı komisyondur. Platformun kendi kuryesini seçtiyseniz aynı oran teslimatı da kapsar ve daha yüksektir.',
   ownCourierCost: 'Sipariş başına kurye maliyeti',
   ownCourierHint: 'Yalnızca kendi kuryenizle çalışırken geçerli',
   ownCourierDisabledHint: 'Platformun kuryesinde bu tutar hesaba katılmaz.',
@@ -245,6 +255,8 @@ export const COPY = {
   ownerMonthlyAmount: 'Kendinize ayırdığınız aylık tutar',
   ownerBagKur: 'Aylık Bağ-Kur',
   monthlyRent: 'Aylık kira',
+  monthlyRentInfo:
+    '"Brüt kira" girdiğin tutarın tamamı işletme çıkışıdır; stopaj bu tutardan kesilip devlete ödenir. "Net kira" ise ev sahibinin eline geçecek tutardır — gerçek nakit çıkışı bundan daha yüksek hesaplanır.',
   monthlyAidat: 'Aylık aidat',
   rentBasisGroup: 'Girilen kira tutarı',
   aidatOnceHint: 'Aidatı yalnızca burada girin — “Diğer giderler”de tekrar eklemeyin.',
@@ -299,6 +311,9 @@ export const COPY = {
   channelTitle: 'Kanal ekonomisi',
   channelNote:
     'Katkı, o kanalın kendi maliyetlerinden sonra işletmeye kalan tutardır. Sabit giderler kanallara dağıtılmaz.',
+  productTitle: 'Ürün bazlı katkı',
+  productNote:
+    'Aynı katkı hesabı, kanal yerine ürüne göre toplanmış. Kanal ekonomisiyle aynı toplamlara ulaşır.',
   channelUnits: 'Adet',
   channelGross: 'Brüt satış',
   channelNet: 'Net ciro',
