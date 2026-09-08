@@ -17,13 +17,11 @@ type AppShellProps = {
  */
 export function AppShell({ mode, onModeChange, children }: AppShellProps) {
   return (
-    <div className="min-h-screen bg-qc-page">
-      <div className="qc-sheet mx-auto max-w-[1152px] overflow-x-clip border-x border-qc-rule bg-qc-surface">
-        <AppHeader />
-        <ModeRow mode={mode} onModeChange={onModeChange} />
-        {children}
-        <AppFooter />
-      </div>
+    <div className="qc-sheet mx-auto max-w-[1152px] overflow-x-clip border-x border-qc-rule bg-qc-surface">
+      <AppHeader />
+      <ModeRow mode={mode} onModeChange={onModeChange} />
+      {children}
+      <AppFooter />
     </div>
   )
 }
