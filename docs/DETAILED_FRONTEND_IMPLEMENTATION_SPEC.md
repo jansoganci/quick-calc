@@ -196,12 +196,24 @@ No chart library (architecture D-series). Both are hand-authored inline SVG in a
 | Pie / donut of cost composition | The reconciliation bar already divides one quantity and reconciles exactly; a pie at these ratios is unreadable |
 | Bar chart of the three scenarios | Three numbers. The table is faster and carries four rows instead of one |
 | Channel revenue chart | Three rows. The table is already the compact form |
-| Waterfall gross → operating result | A second expression of the reconciliation bar — one quantity, two visuals |
+| ~~Waterfall gross → operating result~~ | **Partially superseded — see below.** A second expression of the reconciliation bar was rejected as a *waterfall*. A Sankey of the same reconciliation, additive rather than a replacement, is now approved (mirrors Quick/Lite's own R7 in `DESIGN_DIRECTION.md`). |
 | Classic break-even revenue/cost cross | Implies a revenue-by-volume curve the engine does not produce; break-even here is one units/day figure |
 | Monthly revenue chart separate from result | A series with no decision attached |
 | Per-KPI sparklines, gauges, speedometers | `DESIGN_DIRECTION.md` §3 |
 
 Mobile: both charts keep full width at 200px / 180px, x-labels thinned to 1 · 6 · 12 · 18 · 24.
+
+#### Supplementary Sankey visualisation **[LOCKED / APPROVED]**
+
+A Sankey diagram of the same reconciliation-bar breakdown (monthly gross customer sales fanning out into the nine `BREAKDOWN_ORDER` categories, same labels, same `bg-qc-bar-*` colours, same locked order) may be shown **in addition to** the reconciliation bar (`ResultBar`), never instead of it. The bar stays primary and stays first; the Sankey is supplementary and sits directly below it, in the same "Aylık işletme sonucu nasıl oluşuyor" result section.
+
+Rules, mirroring Quick/Lite's R7 exactly:
+
+- **Same data, same categories, same order, same colours** as the bar it sits under — no new category, no re-splitting of any line, no new formula. It renders `BreakdownView` (already computed by `buildBreakdown`), nothing else.
+- **Live, not static.** Updates with the same result that drives the bar (V6-equivalent recompute already governs Detailed).
+- Appears in both the on-screen result and the downloadable report — `DetailedResults.tsx` is the shared screen/report tree, so no separate report-side placement decision is needed.
+- No new financial concept, no additional interaction required to read the primary result.
+- Presentation-layer only: plain inline SVG (architecture D-series — no chart library), consistent with every other visual in this document.
 
 ### 4.6 Tables
 
