@@ -1,5 +1,7 @@
 # F&B Financial Feasibility Calculator
 
+> Now documented at [jansoganci.com/work/maliyet-lol](https://jansoganci.com/work/maliyet-lol) — part of my public build log.
+
 A Turkey-focused financial calculator and feasibility tool for food & beverage businesses. The initial preset is **Coffee Shop / Cafe**.
 
 The product will offer two separate calculation experiences:
