@@ -17,7 +17,8 @@ This is a Turkey-focused financial feasibility calculator for food-and-beverage 
 
 Read `docs/README.md` for the current documentation index. Use the following authority order when documents overlap:
 
-1. Quick financial behavior: `docs/quick-calculation-scope-v1.md`
+1. Quick financial behavior (Turkey): `docs/quick-calculation-scope-v1.md`
+1b. US variant of the same product: `docs/US_PRODUCT_SCOPE.md` — v0.2 owner locks recorded; implementation not authorised; does not replace the Turkey specs
 2. Detailed product decisions and exclusions: `docs/DETAILED_FEASIBILITY_DECISIONS.md`
 3. Detailed formulas, schema, defaults, edge states, and golden vector: `docs/DETAILED_FINANCIAL_SPEC.md`
 4. Stack, runtime, persistence, and technical exclusions: `docs/TECH_STACK_AND_CONSTRAINTS.md`

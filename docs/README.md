@@ -13,6 +13,7 @@ If two documents appear to disagree, use the authority order in [`CLAUDE.md`](..
 | Document | Owns |
 | --- | --- |
 | [`quick-calculation-scope-v1.md`](./quick-calculation-scope-v1.md) | Quick / Lite product & financial scope — inputs, formulas, outputs, terminology |
+| [`US_PRODUCT_SCOPE.md`](./US_PRODUCT_SCOPE.md) | US variant of the same product — owner locks US-1…US-4 recorded (v0.2). Implementation not authorised. Does not replace the Turkey specs |
 | [`DETAILED_FEASIBILITY_DECISIONS.md`](./DETAILED_FEASIBILITY_DECISIONS.md) | Detailed Feasibility locked decisions and v1 exclusions. Not yet a full financial specification |
 | [`DETAILED_FINANCIAL_SPEC.md`](./DETAILED_FINANCIAL_SPEC.md) | Detailed Feasibility formula contract — inputs, defaults, formulas, outputs, edge states, golden vector |
 | [`DETAILED_FRONTEND_IMPLEMENTATION_SPEC.md`](./DETAILED_FRONTEND_IMPLEMENTATION_SPEC.md) | Detailed Feasibility UI — information architecture, layout, results hierarchy, charts, states, mode switch |

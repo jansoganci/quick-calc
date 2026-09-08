@@ -8,6 +8,35 @@ Bu dosya onların yerine geçmez, sadece ilerlemeyi takip eder.
 
 ---
 
+## 2026-09-08 — ABD spec v0.2 (owner kilitleri)
+
+### Yapılanlar
+
+- `docs/US_PRODUCT_SCOPE.md` v0.2: owner kararları işlendi. Kod yok.
+
+### Kilitler
+
+1. Ticket **vergisiz** (menü / POS ara toplamı). `vergi = ticket × oran`.
+2. Stopaj yok. `monthlyRentCost = monthlyRent`.
+3. Eyalet + DC seçimi; Tax Foundation 1 Jan 2026 birleşik oranlar. NH %8.5 meals, DC %10 prepared food. Oran **düzenlenebilir**. Şehir yok.
+4. POS varsayılan **%3.5** (Square `2.6% + $0.15` etkin oran vekili). Kart kesintisi **müşteri ödemesi** (vergi dahil, bahşiş hariç) üzerinden.
+5. Bahşiş ciroya girmez; işveren bahşiş vergisi personel maliyetine girer.
+
+### Bekleyen
+
+- US UI copy spec (US-8), golden vector (US-11), Detailed platform varsayılanları (US-6).
+- Motor / UI yazılmadı; açık istek olmadan yazılmayacak.
+
+---
+
+## 2026-09-08 — ABD ürün eşlemesi (docs only)
+
+### Yapılanlar
+
+- İlk taslak: `docs/US_PRODUCT_SCOPE.md` v0.1 — vergi dahil ticket, gizli %7.5, POS %2.9. **v0.2 ile geçersiz.**
+
+---
+
 ## 2026-09-07 — Sankey, ürün bazlı katkı, onboarding, keşfedilebilirlik
 
 ### Yapılanlar

@@ -13,6 +13,7 @@ Before making any architectural, financial or implementation change, read the re
 | Document | Owns |
 | --- | --- |
 | `docs/quick-calculation-scope-v1.md` | Quick / Lite product & financial scope — inputs, formulas, outputs, terminology |
+| `docs/US_PRODUCT_SCOPE.md` | US variant of the same product — owner locks US-1…US-4 recorded (v0.2). Implementation not authorised; does not replace the Turkey specs |
 | `docs/DETAILED_FEASIBILITY_DECISIONS.md` | Detailed Feasibility locked decisions and v1 exclusions — not yet a full financial specification |
 | `docs/DETAILED_FINANCIAL_SPEC.md` | Detailed Feasibility formula contract — inputs, defaults, formulas, outputs, edge states, golden vector |
 | `docs/TECH_STACK_AND_CONSTRAINTS.md` | Stack, runtime, deployment, persistence, technical exclusions |
@@ -27,7 +28,8 @@ Finished execution plans live in `docs/archive/`. They are historical. Do not tr
 
 If two documents appear to disagree:
 
-- **financial behaviour (Quick / Lite)** → the Quick product/financial spec wins;
+- **financial behaviour (Quick / Lite, Turkey)** → the Quick product/financial spec wins;
+- **financial behaviour (US variant)** → `docs/US_PRODUCT_SCOPE.md` wins for US substitutions; Turkey specs still win for Turkey; US implementation is not authorised until explicitly requested;
 - **Detailed product decisions recorded so far** → the Detailed Feasibility decisions document wins, without inventing formulas it does not contain;
 - **Detailed formulas, schema, defaults and edge states** → the Detailed Financial Specification wins, within the scope the decisions document locks;
 - **stack, runtime, persistence** → the tech-stack document wins;
