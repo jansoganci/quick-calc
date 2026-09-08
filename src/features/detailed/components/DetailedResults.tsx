@@ -7,6 +7,7 @@ import { PaybackChart } from './PaybackChart.tsx'
 import { ProductContributionTable } from './ProductContributionTable.tsx'
 import { ProjectionChart } from './ProjectionChart.tsx'
 import { ResultBar } from './ResultBar.tsx'
+import { SankeyBreakdown } from './SankeyBreakdown.tsx'
 import { ScenarioTable } from './ScenarioTable.tsx'
 
 type DetailedResultsProps = {
@@ -40,6 +41,7 @@ export function DetailedResults({
         figureLabel={COPY.grossCustomerSales}
       >
         <ResultBar breakdown={view.breakdown} gross={view.breakdown.total} />
+        <SankeyBreakdown breakdown={view.breakdown} gross={view.breakdown.total} />
       </ResultSection>
 
       <ResultSection title={COPY.scenariosTitle} note={COPY.scenariosNote}>

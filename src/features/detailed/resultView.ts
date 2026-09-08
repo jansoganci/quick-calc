@@ -33,11 +33,22 @@ export type BreakdownRow = {
   share: string
   widthPercent: number
   colorClass: string
+  /** Same token as `colorClass`, as a CSS custom property — SVG `fill` cannot read a `bg-*` class (SankeyBreakdown). */
+  fillVar: string
 }
 
 /**
  * Nine stops of one monotone ramp, in the order the money leaves the gross figure.
  * The last two tones are Detailed's own additions to the Quick ramp.
+ *
+ * Both maps below carry the same nine tokens in two representations — a
+ * `bg-qc-*` class for the reconciliation bar's `<div>` segments, `var(--qc-*)`
+ * for `SankeyBreakdown`'s SVG `fill` (which cannot read a Tailwind class).
+ * They MUST stay fully literal, one string per entry: Tailwind's JIT finds
+ * class names by scanning source text for literal substrings, not by
+ * evaluating code, so a computed class name (e.g. `` `bg-qc-${token}` ``)
+ * is invisible to that scan and silently generates no CSS — every bar
+ * segment rendered transparent the one time this was tried.
  */
 const BREAKDOWN_COLORS: Record<BreakdownKey, string> = {
   vat: 'bg-qc-bar-vat',
@@ -49,6 +60,18 @@ const BREAKDOWN_COLORS: Record<BreakdownKey, string> = {
   occupancy: 'bg-qc-bar-other-opex',
   opex: 'bg-qc-bar-pos',
   operatingResult: 'bg-qc-bar-remaining',
+}
+
+const BREAKDOWN_FILL_VARS: Record<BreakdownKey, string> = {
+  vat: 'var(--qc-bar-vat)',
+  productCogs: 'var(--qc-bar-variable)',
+  channelVariableCost: 'var(--qc-bar-channel)',
+  paymentPlatformFee: 'var(--qc-bar-payroll)',
+  payroll: 'var(--qc-bar-rent)',
+  owner: 'var(--qc-bar-owner)',
+  occupancy: 'var(--qc-bar-other-opex)',
+  opex: 'var(--qc-bar-pos)',
+  operatingResult: 'var(--qc-bar-remaining)',
 }
 
 const BREAKDOWN_ORDER: readonly BreakdownKey[] = [
@@ -122,6 +145,7 @@ export function buildBreakdown(month: MonthResult): BreakdownView {
       share: formatPercent(gross === 0 ? 0 : amount / gross),
       widthPercent: fraction * 100,
       colorClass: BREAKDOWN_COLORS[key],
+      fillVar: BREAKDOWN_FILL_VARS[key],
     }
   })
 
@@ -143,6 +167,7 @@ export function buildBreakdown(month: MonthResult): BreakdownView {
           share: formatPercent(gross === 0 ? 0 : month.monthlyOperatingResult / gross),
           widthPercent: 0,
           colorClass: BREAKDOWN_COLORS.operatingResult,
+          fillVar: BREAKDOWN_FILL_VARS.operatingResult,
         },
       ],
       total: `${formatTry(gross)} TL`,
