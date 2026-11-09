@@ -66,6 +66,16 @@ app -> features -> core -> lib
 
 Do not introduce service/repository layers, dependency injection, generic engine interfaces, state-management libraries, generic form frameworks, chart libraries, or speculative shared abstractions. Two real call sites justify sharing; a hypothetical future use does not.
 
+### V2 modularity and cross-sector reuse
+
+- Keep new calculators and sector-specific business rules in modules with explicit input/output contracts and public entry points. Adding a sector must not change another sector's financial behavior implicitly.
+- Reuse domain-neutral UI components and generic helpers where there is a real need. Keep financial business logic out of `lib/` and `components/`.
+- Share a financial calculation across sectors only when approved specifications establish identical meaning, units, tax/cost basis, assumptions, and edge behavior, and at least two real consumers need it. Similar-looking arithmetic alone does not establish a shared business rule. Give the shared calculation one implementation and an explicit contract.
+- Keep sector-specific defaults, limits, validation rules, and policies owned by the relevant module. Pass explicit inputs to shared calculations; do not embed sector defaults or implicit sector switches in them.
+- The Quick–Detailed business-logic separation above remains binding. Cross-sector reuse does not authorize extracting their business formulas into a shared engine or changing locked formulas, defaults, or exclusions. Resolve any conflict through an explicit product/spec decision first.
+- Before changing a shared calculation, identify every consuming calculator and sector. Verify their relevant tests, golden vectors, reconciliation invariants, and edge cases; preserve existing results unless a financial behavior change was explicitly approved.
+- Do not build a universal engine, plugin framework, or speculative sector hierarchy. These guidelines do not authorize implementing V2 features before their scope and financial specifications are approved.
+
 ## Financial logic rules
 
 - A financial formula has exactly one implementation.
