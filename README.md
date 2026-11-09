@@ -4,10 +4,10 @@
 
 A Turkey-focused financial calculator and feasibility tool for food & beverage businesses. The initial preset is **Coffee Shop / Cafe**.
 
-The product will offer two separate calculation experiences:
+The product offers two separate calculation experiences:
 
 - **Quick / Lite Calculation** — a short, directional estimate from a handful of inputs. Intentionally simple: it answers "roughly, does this work?" and nothing more.
-- **Detailed Feasibility** — a deeper financial model with its own input model, engine, and business logic. Planning is in progress; implementation has not started.
+- **Detailed Feasibility** — a deeper financial model with its own input model, engine, business logic, and UI. Implemented.
 
 The two are **separate business logics** by design. They may reasonably produce different numbers, and they are not unified into one engine.
 
@@ -22,7 +22,7 @@ The two are **separate business logics** by design. They may reasonably produce 
 | Architecture and project structure | Approved — `docs/APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md` |
 | Quick / Lite core | Implemented |
 | Quick / Lite frontend | Implemented |
-| Detailed Feasibility | Decision log only — `docs/DETAILED_FEASIBILITY_DECISIONS.md`. Not implemented |
+| Detailed Feasibility | Implemented — engine in `src/core/detailed/`, UI in `src/features/detailed/` |
 
 Documentation index: [`docs/README.md`](docs/README.md).
 
@@ -67,7 +67,9 @@ Active specifications live in `docs/`. Finished execution plans live in `docs/ar
 | --- | --- |
 | [`docs/README.md`](docs/README.md) | Index of active vs archived documentation |
 | [`docs/quick-calculation-scope-v1.md`](docs/quick-calculation-scope-v1.md) | Quick / Lite product & financial scope |
-| [`docs/DETAILED_FEASIBILITY_DECISIONS.md`](docs/DETAILED_FEASIBILITY_DECISIONS.md) | Detailed Feasibility locked decisions (not a full financial spec yet) |
+| [`docs/DETAILED_FEASIBILITY_DECISIONS.md`](docs/DETAILED_FEASIBILITY_DECISIONS.md) | Detailed Feasibility locked decisions and v1 exclusions |
+| [`docs/DETAILED_FINANCIAL_SPEC.md`](docs/DETAILED_FINANCIAL_SPEC.md) | Detailed Feasibility inputs, formulas, defaults and output contract |
+| [`docs/DETAILED_FRONTEND_IMPLEMENTATION_SPEC.md`](docs/DETAILED_FRONTEND_IMPLEMENTATION_SPEC.md) | Implemented Detailed UI structure and behavior |
 | [`docs/TECH_STACK_AND_CONSTRAINTS.md`](docs/TECH_STACK_AND_CONSTRAINTS.md) | Stack, runtime, persistence, technical exclusions |
 | [`docs/APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md`](docs/APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md) | Folder structure, layer boundaries, reuse rules, naming |
 | [`docs/DESIGN_DIRECTION.md`](docs/DESIGN_DIRECTION.md) | Locked visual & UX direction |
@@ -79,7 +81,7 @@ Active specifications live in `docs/`. Finished execution plans live in `docs/ar
 ## Development
 
 ```bash
-npm install
+npm ci
 npm run dev          # Vite dev server
 npm run test:run     # Vitest once
 npm run typecheck

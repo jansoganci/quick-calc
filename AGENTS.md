@@ -10,7 +10,7 @@ This is a Turkey-focused financial feasibility calculator for food-and-beverage 
 - Runtime: client-side calculations, static assets on Cloudflare.
 - There is no database, authentication, or traditional application server.
 - The Quick Calculation engine and UI are implemented.
-- The Detailed Feasibility engine exists in `src/core/detailed/`; its feature UI is not implemented.
+- The Detailed Feasibility engine and feature UI are implemented in `src/core/detailed/` and `src/features/detailed/`.
 - Quick and Detailed are separate business models. They may intentionally produce different results.
 
 ## Sources of truth
@@ -21,6 +21,7 @@ Read `docs/README.md` for the current documentation index. Use the following aut
 1b. US variant of the same product: `docs/US_PRODUCT_SCOPE.md` — v0.2 owner locks recorded; implementation not authorised; does not replace the Turkey specs
 2. Detailed product decisions and exclusions: `docs/DETAILED_FEASIBILITY_DECISIONS.md`
 3. Detailed formulas, schema, defaults, edge states, and golden vector: `docs/DETAILED_FINANCIAL_SPEC.md`
+3b. Detailed UI structure, measurements, copy, and states: `docs/DETAILED_FRONTEND_IMPLEMENTATION_SPEC.md`
 4. Stack, runtime, persistence, and technical exclusions: `docs/TECH_STACK_AND_CONSTRAINTS.md`
 5. Folder ownership and dependency direction: `docs/APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md`
 6. Locked visual and UX rules: `docs/DESIGN_DIRECTION.md`
@@ -39,6 +40,7 @@ src/
   core/quick/           pure Quick financial engine
   core/detailed/        pure Detailed financial engine
   features/quick-calc/  Quick form state, view model, labels, and UI
+  features/detailed/    Detailed form, results, draft storage, and print UI
   components/           reusable domain-neutral UI primitives
   lib/                  generic parsing and formatting helpers
 ```
@@ -111,7 +113,7 @@ A refactor that changes a result is a financial product change, not a refactor. 
 
 ## Working discipline
 
-- Implement only the requested scope. Do not build adjacent phases or anticipated Detailed UI work.
+- Implement only the requested scope. Do not rebuild the completed Detailed UI or expand into excluded future phases.
 - Inspect the working tree before editing. Existing changes may belong to the user; preserve them and do not rewrite unrelated files.
 - Do not use destructive Git commands or discard user changes.
 - Prefer the smallest change that satisfies the requirement.
