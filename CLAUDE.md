@@ -14,8 +14,9 @@ Before making any architectural, financial or implementation change, read the re
 | --- | --- |
 | `docs/quick-calculation-scope-v1.md` | Quick / Lite product & financial scope — inputs, formulas, outputs, terminology |
 | `docs/US_PRODUCT_SCOPE.md` | US variant of the same product — owner locks US-1…US-4 recorded (v0.2). Implementation not authorised; does not replace the Turkey specs |
-| `docs/DETAILED_FEASIBILITY_DECISIONS.md` | Detailed Feasibility locked decisions and v1 exclusions — not yet a full financial specification |
+| `docs/DETAILED_FEASIBILITY_DECISIONS.md` | Detailed Feasibility locked decisions and v1 exclusions |
 | `docs/DETAILED_FINANCIAL_SPEC.md` | Detailed Feasibility formula contract — inputs, defaults, formulas, outputs, edge states, golden vector |
+| `docs/DETAILED_FRONTEND_IMPLEMENTATION_SPEC.md` | Detailed Feasibility implemented UI — layout, sections, results, states, and mode switch |
 | `docs/TECH_STACK_AND_CONSTRAINTS.md` | Stack, runtime, deployment, persistence, technical exclusions |
 | `docs/APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md` | Folder structure, layer boundaries, dependency direction, reuse rules, naming |
 | `docs/DESIGN_DIRECTION.md` | Locked visual & UX direction |
@@ -32,6 +33,7 @@ If two documents appear to disagree:
 - **financial behaviour (US variant)** → `docs/US_PRODUCT_SCOPE.md` wins for US substitutions; Turkey specs still win for Turkey; US implementation is not authorised until explicitly requested;
 - **Detailed product decisions recorded so far** → the Detailed Feasibility decisions document wins, without inventing formulas it does not contain;
 - **Detailed formulas, schema, defaults and edge states** → the Detailed Financial Specification wins, within the scope the decisions document locks;
+- **Detailed UI structure and behavior** → the Detailed Frontend Implementation Spec wins, within the approved visual design;
 - **stack, runtime, persistence** → the tech-stack document wins;
 - **code organisation and boundaries** → the architecture document wins;
 - **visual / UX locked rules** → the design-direction document wins;
