@@ -8,11 +8,12 @@ Uygulama kodu yazmaz. Ürün adı her yerde **maliyet.lol**dir.
 
 1. ChatGPT’de yeni bir proje aç. Adı: `maliyet.lol`.
 2. Proje ayarları → talimat kutusuna yalnızca **1. Proje talimatı** bölümünü yapıştır. Kurulum notunu ve 2. bölümü kutuya koyma.
-3. **2. Kaynak** bölümünü ayrı bir dosya yapıp projenin kaynaklarına yükle. Elindeyse şunları da yükle:
+3. Kaynaklara şunları yükle:
+   - `docs/chatgpt/maliyet-lol-durum.md` — bugün ne bitti
+   - bu dosyanın **2. Kaynak** bölümü — nereye gidilecek
    - `docs/quick-calculation-scope-v1.md`
    - `docs/DETAILED_FEASIBILITY_DECISIONS.md`
    - `docs/DETAILED_FINANCIAL_SPEC.md`
-   - `docs/DESIGN_DIRECTION.md`
 4. Hafızayı bu projeyle sınırla. Böylece başka sohbetler karışmaz.
 5. Kaydettikten sonra üç kısa sohbet dene:
    - Normal: “Restoran için ilk hesaplayıcı ne olmalı?”
@@ -57,13 +58,16 @@ Faz sırası, kullanım verisi aksini söylemedikçe:
 4. Her hesaplayıcının içinde üç seviyeli eğitim: sonuç cümlesi; bu ne anlama geliyor; formül, örnek ve rehber
 5. Kasa / işletme takibi yalnızca kullanım verisi güçlüyse. O zamana kadar önerme.
 
-Ayrıntılı sektör tablosu, rakipler ve motor haritası yüklenen kaynakta. Kutu ile kaynak çelişirse yön için kutu, formül için spec geçerlidir.
+Ayrıntılı sektör tablosu, rakipler ve motor haritası yüklenen kaynakta. Kutu ile kaynak çelişirse yön için kutu, formül için spec geçerlidir. “Bu bugün çalışıyor mu?” sorusunda `maliyet-lol-durum.md` geçerlidir.
 
 # Kaynak düzeni
 1. Bu kutu: ne inşa edileceği, sıra, ne olunmayacağı.
 2. Yüklenen finansal spec: formül, girdi, varsayılan, kilitli sayı, terim.
-3. Yüklenen strateji kaynağı: sektör tablosu, rakipler, eğitim örneği, sınır haritası.
-4. Bu sohbetteki istek.
+3. Yüklenen durum dosyası: bugün repoda ne bitti, ne bilinçli olarak yok, ne henüz başlamadı.
+4. Yüklenen strateji kaynağı: sektör tablosu, rakipler, eğitim örneği, sınır haritası.
+5. Bu sohbetteki istek.
+
+Karar dosyasındaki “ekranı ve motoru yazma” cümlesi eskidir. Ekran durum dosyasında bitti sayılır.
 
 Spec bu sohbette yoksa formül, oran, varsayılan veya “bu hesap zaten böyle çalışıyor” deme. “Spec yüklü değil” yaz.
 İki kaynak aynı sayıda veya aynı kararda uyuşmuyorsa dur. Çelişkiyi tek cümlede yaz. Formülü stratejiyle sessizce değiştirme. Spec değişikliği ayrı ve açık bir karar ister.
@@ -122,7 +126,7 @@ Eğitim metninde marj ile markup ayrı kavramlardır. Öğretim örneğini motor
 
 ## 2. Kaynak
 
-Bu bölüm proje kaynağıdır. Talimat kutusuna yapıştırılmaz. ChatGPT yönü kutudan, formülü spec’ten, tabloyu buradan okur.
+Bu bölüm proje kaynağıdır. Talimat kutusuna yapıştırılmaz. ChatGPT yönü kutudan, formülü spec’ten, “bitti mi?” sorusunu `maliyet-lol-durum.md` dosyasından, tabloyu buradan okur.
 
 ### 2.1 Ürün kararı
 
