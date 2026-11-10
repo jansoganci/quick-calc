@@ -8,6 +8,17 @@ Bu dosya onların yerine geçmez, sadece ilerlemeyi takip eder.
 
 ---
 
+## 2026-11-10 — V2 kararları netleşti (yalnızca dokümantasyon)
+
+- `V2_V3_PRODUCT_ROADMAP.md` 0.2: kesin kararlar, geliştirme sırası ve açık konular yazıldı.
+- İlk adım **Reçeteden hesapla**. Elle girilen ürün maliyeti kalıyor; reçete yalnızca o tutarı hesaplıyor.
+- Alt gruplar V2'de var ama ilk karşılaştırmaya alınmıyor. Önceki kayıttaki “alt gruplar V2'ye alınmadı” cümlesinin yerine bu geçerli.
+- Yeni veriler `localStorage`'da. Hesap ve veritabanı V2 bittikten sonra. Kabul ekranı ertelendi.
+- `AGENTS.md`'ye önce mobil kuralı eklendi.
+- Kod yazılmadı.
+
+---
+
 ## 2026-11-10 — V2 / V3 ürün kapsamı (yalnızca dokümantasyon)
 
 - `V2_V3_PRODUCT_ROADMAP.md` eklendi: Detailed içinde reçeteyle başlayan V2 akışı; kolay alış fiyatı ve gramaj revizyonları; food cost, katkı, ortak gider dağıtımı, yiyecek/içecek karşılaştırması ve basit senaryolar.

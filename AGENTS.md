@@ -108,6 +108,7 @@ A refactor that changes a result is a financial product change, not a refactor. 
 - Global component styles live in `src/app/index.css`. Feature-specific structure stays with the feature.
 - Keep labels and product copy centralized in the feature's `labels.ts`.
 - Use `src/components/` only for genuinely reusable, domain-neutral controls. Do not wrap daisyUI solely to hide class names.
+- Design every new screen mobile-first: start from the phone layout, then extend it to desktop. `docs/DESIGN_DIRECTION.md` V12 applies.
 - Maintain responsive behavior and accessible names, labels, focus states, touch targets, and semantic HTML.
 - For layout or styling changes, verify at least one desktop and one mobile viewport in a real browser.
 - Do not add a large UI test or visual-regression framework unless explicitly requested.
