@@ -467,6 +467,25 @@ export const ERROR_COPY = {
   paymentMixShort: (missing: string) => `Ödeme dağılımı %100 olmalı. ${missing} eksik.`,
   paymentMixOver: (excess: string) => `Ödeme dağılımı %100 olmalı. ${excess} fazla.`,
   deliveryModeRequired: 'Paket servis satışınız olduğu için bu seçim zorunlu.',
+  recipeIncomplete: 'Reçeteyi tamamla.',
+} as const
+
+export const RECIPE_COPY = {
+  fromRecipe: 'Reçeteden hesapla',
+  manual: 'Elle gir',
+  ingredientName: 'Malzeme',
+  purchaseQuantity: 'Alış miktarı',
+  purchaseUnit: 'Birim',
+  purchasePrice: 'Alış tutarı',
+  usageQuantity: 'Gramaj',
+  addLine: '+ Malzeme ekle',
+  recipeCostLabel: 'Reçete maliyeti',
+  usedBy: (count: string) => `Bu fiyat ${count} üründe kullanılıyor.`,
+  ingredientMissing: 'Malzemeyi yazın.',
+  purchaseQuantityEmpty: 'Alış miktarını girin.',
+  purchaseQuantityZero: 'Alış miktarı 0 olamaz.',
+  purchasePriceEmpty: 'Alış tutarını girin.',
+  usageQuantityEmpty: 'Gramajı girin.',
 } as const
 
 /** Guardrail copy — notes, never errors. They never block `Hesapla`. */

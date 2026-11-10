@@ -9,6 +9,8 @@ type TextFieldProps = {
   error?: string | null
   hint?: string | null
   placeholder?: string
+  /** Id of a `<datalist>` offering existing values. The field stays free text. */
+  list?: string
   /**
    * `true` hides the label at every width; `'from-lg'` keeps it on mobile and hides
    * it from `lg` up, where a column header takes over.
@@ -30,6 +32,7 @@ export function TextField({
   error,
   hint,
   placeholder,
+  list,
   labelHidden = false,
 }: TextFieldProps) {
   return (
@@ -46,6 +49,7 @@ export function TextField({
           onChange={(event) => onChange(event.target.value)}
           onBlur={onBlur}
           placeholder={placeholder}
+          list={list}
           autoComplete="off"
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}

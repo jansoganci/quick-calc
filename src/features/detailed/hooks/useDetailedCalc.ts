@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { DeliveryMode, RentInputBasis } from '../../../core/detailed/index.ts'
+import {
+  DETAILED_DEFAULTS,
+  isPurchaseUnit,
+  type DeliveryMode,
+  type PurchaseUnit,
+  type RentInputBasis,
+} from '../../../core/detailed/index.ts'
 import {
   emptyLine,
   emptyPosition,
@@ -12,8 +18,18 @@ import {
   type PositionRow,
   type ProductRow,
 } from '../formState.ts'
-import { DETAILED_DEFAULTS } from '../../../core/detailed/index.ts'
 import type { SectionId } from '../labels.ts'
+import {
+  addRecipeLine,
+  buildRecipeErrorMap,
+  closeRecipe,
+  commitRecipeIngredientName,
+  dropUnusedIngredients,
+  openRecipe,
+  removeRecipeLine,
+  updateIngredient,
+  updateRecipeUsage,
+} from '../recipeForm.ts'
 import { toDetailedInput } from '../toInput.ts'
 import { evaluateDetailed, type DetailedView } from '../viewModel.ts'
 import { createDraftSaveQueue, registerDraftLifecycleFlush } from './draftAutosave.ts'
@@ -59,6 +75,7 @@ export function useDetailedCalc() {
   draftSaveQueue.updateLatest(form)
 
   const evaluation = useMemo(() => evaluateDetailed(form, toDetailedInput(form)), [form])
+  const recipeErrors = useMemo(() => buildRecipeErrorMap(form), [form])
   const canSubmit = evaluation.ok
 
   useEffect(() => {
@@ -100,11 +117,13 @@ export function useDetailedCalc() {
   /** A field's message, held back until the user has left it or pressed `Hesapla`. */
   const errorFor = useCallback(
     (path: string): string | null => {
-      if (evaluation.ok) return null
       if (!submitted && !touched[path]) return null
+      const recipeMessage = recipeErrors[path]
+      if (recipeMessage !== undefined) return recipeMessage
+      if (evaluation.ok) return null
       return evaluation.errors[path] ?? null
     },
-    [evaluation, submitted, touched],
+    [evaluation, recipeErrors, submitted, touched],
   )
 
   const errorSections = evaluation.ok ? [] : evaluation.errorSections
@@ -198,7 +217,35 @@ export function useDetailedCalc() {
       })),
     addProduct: () => update((draft) => ({ ...draft, products: [...draft.products, emptyProduct()] })),
     removeProduct: (index: number) =>
-      update((draft) => ({ ...draft, products: draft.products.filter((_, at) => at !== index) })),
+      update((draft) =>
+        dropUnusedIngredients({
+          ...draft,
+          products: draft.products.filter((_, at) => at !== index),
+        }),
+      ),
+
+    openRecipe: (index: number) => update((draft) => openRecipe(draft, index)),
+    closeRecipe: (index: number) => update((draft) => closeRecipe(draft, index)),
+    addRecipeLine: (index: number) => update((draft) => addRecipeLine(draft, index)),
+    removeRecipeLine: (productIndex: number, lineIndex: number) =>
+      update((draft) => removeRecipeLine(draft, productIndex, lineIndex)),
+    commitRecipeIngredientName: (productIndex: number, lineIndex: number, name: string) =>
+      update((draft) => commitRecipeIngredientName(draft, productIndex, lineIndex, name)),
+    setIngredientField: (
+      ingredientId: string,
+      field: 'purchaseQuantity' | 'purchasePrice' | 'purchaseUnit',
+      value: string,
+    ) =>
+      update((draft) => {
+        if (field === 'purchaseUnit' && !isPurchaseUnit(value)) return draft
+        const patch =
+          field === 'purchaseUnit'
+            ? { purchaseUnit: value as PurchaseUnit }
+            : { [field]: value }
+        return updateIngredient(draft, ingredientId, patch)
+      }),
+    setRecipeUsage: (productIndex: number, lineIndex: number, value: string) =>
+      update((draft) => updateRecipeUsage(draft, productIndex, lineIndex, value)),
 
     setPositionField: (index: number, field: keyof Omit<PositionRow, 'id'>, value: string) =>
       update((draft) => ({

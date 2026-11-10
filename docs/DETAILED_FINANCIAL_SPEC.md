@@ -1,6 +1,6 @@
 # Detailed Feasibility — Financial Specification
 
-**Version:** v1.3
+**Version:** v1.4
 **Status:** Formula contract for `src/core/detailed/`. **Not** implementation.
 **Currency:** TRY · **Country:** Turkey · **Language for v1:** Turkish-first
 **Engine:** `detailedEngineVersion` `1.0.0`
@@ -57,7 +57,7 @@ The engine must not implement any of the following. This is the DF §6 exclusion
 
 | Excluded | Ref |
 | --- | --- |
-| Recipe / SKU / ingredient costing | X1 |
+| Recipe, SKU or ingredient costing inside the monthly engine. Appendix A only fills the entered `unitProductCost`; it is not a monthly-engine formula | X1 |
 | Capacity, seat, table-turnover modelling | X2 |
 | Seasonality or monthly seasonal coefficients | X3 |
 | AVM-specific rent model | X4 |
@@ -420,7 +420,7 @@ Three concepts, kept separate (DF-50). They are never merged into one "product c
 unitProductCost(p) = p.unitProductCost × cogsFactor
 ```
 
-Unit cost is constant with respect to volume; the monthly total follows units sold, via §12. Product COGS **excludes** packaging, own-courier payment and every commission.
+Unit cost is constant with respect to volume; the monthly total follows units sold, via §12. Product COGS **excludes** packaging, own-courier payment and every commission. Appendix A may supply the entered `unitProductCost`; it does not change this formula.
 
 ### 9.2 Channel Variable Costs (DF-52, DF-81, DF-83)
 
@@ -761,13 +761,19 @@ MonthResult = {
   monthlyFixedCost: number
   monthlyOperatingResult: number
   byChannel: { salon: ChannelLine, takeaway: ChannelLine, delivery: ChannelLine }
+  byProduct: ProductLine[]          // ordered as input.products (DF-84)
 }
 
 ChannelLine = { units, grossCustomerSales, netRevenue,
                 productCogs, channelVariableCost, paymentPlatformFee, contribution }
+
+ProductLine = { productId, name, units, grossCustomerSales, netRevenue,
+                productCogs, channelVariableCost, paymentPlatformFee, contribution }
 ```
 
 `byChannel` exists so the later UI can answer "where does the money go" without recomputing anything (DF-2.2).
+
+`byProduct` is the same six figures, summed across channels for each product (DF-84). It adds no formula and no input: `calculateMonth` already holds every figure per product and per channel, and this array keeps the per-product fold instead of discarding it. `productId` and `name` identify the product. For units, gross customer sales, net revenue, product COGS, channel variable cost, payment/platform fee and contribution, the sum of `byProduct` equals the month total, and therefore equals the sum of `byChannel`.
 
 ### 16.4 Meta — mandatory assumption transparency
 
@@ -832,6 +838,7 @@ raw DetailedInput
 | Formula | Home |
 | --- | --- |
 | Channel price, per-unit gross and net, unit COGS, unit channel variable cost, unit fee, unit contribution — **all volume-free** | `unitEconomics.ts` |
+| Recipe line cost and its sum, written into the entered `unitProductCost` before the engine runs | `recipeCost.ts` (Appendix A — not called by `calculate.ts`) |
 | Channel quantity expansion, monthly aggregation, **projection loop**, scenario assembly | `calculate.ts` |
 | Payroll, owner, rent withholding, aidat, OPEX, total CAPEX | `monthlyCosts.ts` |
 | Ramp-up lookup, escalation factor, payback scan | `projection.ts` |
@@ -967,8 +974,80 @@ Tier 1 must pass before any Detailed UI work begins.
 | 1 | T16 | Delivery mode requirement | Required at `channelMix.delivery > 0` (§6.4); not required and inert at a 0 share; every figure identical across both modes at a 0 share |
 | 2 | T17 | Approved zero defaults | Empty packaging resolves to 0 and charges no channel variable cost; empty employer cost resolves to 0, does not block, and contributes no payroll; the warn condition selects `headcount > 0` positions only |
 | 3 | T14 | Structural guards | I2, I3, I4, I5, I7, I13; banned terminology absent from `core/detailed/`; result carries nothing beyond §16 |
+| 2 | T18 | Recipe cost helper | Appendix A: the 16.2 worked example, both units of each family, a two-line sum, purchase quantity zero or empty, a missing ingredient, and no `NaN` or `Infinity`. No figure in §18.2 changes |
 
 Tests are colocated as `*.test.ts` under `src/core/detailed/`. No UI test suite.
+
+---
+
+## Appendix A — V2 recipe cost helper
+
+This helper is **not** part of `calculateDetailed`. The monthly engine still receives one `unitProductCost` per product (§4.1, §9.1) and does not learn what a recipe is. When the owner calculates a product from a recipe, the helper's total **is** that entered number. When they type the cost by hand, the helper is not called and the typed number is the entered number, even if a recipe was filled in earlier and then set aside.
+
+A recipe does not change packaging, channel mix, scenarios or any other formula. Packaging stays a business-level cost (§9.2) and is not a recipe line. There is no yield, waste or sub-recipe.
+
+### A.1 Inputs
+
+One shared ingredient list. Each ingredient has a purchase quantity, a purchase unit and a purchase price. Each product that uses the helper has lines of `{ ingredient, usage quantity }`. The usage quantity is the amount that goes into **one** unit of that product. It is always expressed in the family's base unit:
+
+| Purchase unit | Base unit the usage is typed in | Factor |
+| --- | --- | --- |
+| `kg` | `g` | 1 000 |
+| `g` | `g` | 1 |
+| `L` | `ml` | 1 000 |
+| `ml` | `ml` | 1 |
+| `adet` | `adet` | 1 |
+
+Only those five units exist. A quantity never converts from one family to another: grams do not become pieces, millilitres do not become grams.
+
+The purchase price is the amount the owner paid for the purchase quantity, as entered. The helper does not ask whether that amount includes VAT.
+
+### A.2 Formula
+
+```
+factor(kg) = factor(L) = 1 000
+factor(g) = factor(ml) = factor(adet) = 1
+
+unitPrice(ingredient) = purchasePrice / (purchaseQuantity × factor(purchaseUnit))
+lineCost(line)        = unitPrice(line.ingredient) × usageQuantity
+recipeCost(product)   = Σ lineCost(line)
+```
+
+`recipeCost` is raw. Nothing in `recipeCost.ts` rounds. Showing `16,20 TL` for 16.2 is presentation, done later with the other money formatting.
+
+An ingredient has one purchase price. Every line that points at it uses that price, including lines on other products. Changing the price changes every such line. Changing a usage quantity changes only that line.
+
+### A.3 Worked example
+
+5 kg purchased for 450 TL, 180 g used in one product:
+
+```
+unitPrice = 450 / (5 × 1 000) = 0.09 TL/g
+lineCost  = 0.09 × 180 = 16.2 TL
+```
+
+The same flour bought as 5 000 g for 450 TL gives the same 0.09 TL/g. A second line, 1 L of milk at 40 TL with 200 ml used, adds `40 / (1 × 1 000) × 200 = 8`. The product cost is then 24.2.
+
+### A.4 When there is no cost
+
+The helper never throws and never returns `NaN` or `Infinity`. If any line below fails, the product has **no** recipe cost — a partial sum is not returned — and the engine then sees a missing `unitProductCost` (§6.1, `required`).
+
+| Condition | Code |
+| --- | --- |
+| The product has no lines | `empty_recipe` |
+| The line names no ingredient, or the id is not in the list | `ingredient_not_found` |
+| Purchase unit is outside §A.1 | `invalid_unit` |
+| Purchase quantity, purchase price or usage quantity is not a finite number | `not_a_number` |
+| Purchase quantity is blank | `purchase_quantity_empty` |
+| Purchase quantity is zero or negative | `purchase_quantity_zero` |
+| Purchase price is blank | `purchase_price_empty` |
+| Usage quantity is blank | `usage_quantity_empty` |
+
+A purchase price of zero is valid. A usage quantity of zero is valid and adds nothing. A negative usage quantity is a normal negative number and can make the total negative; the engine's existing `unitProductCost` minimum then rejects it. The helper does not invent a second limit.
+
+### A.5 What this appendix does not do
+
+No ingredient screen, no food-cost ratio, no price history, no stock, no server. Those stay outside this contract.
 
 ---
 
@@ -976,6 +1055,7 @@ Tests are colocated as `*.test.ts` under `src/core/detailed/`. No UI test suite.
 
 | Version | Change |
 | --- | --- |
+| v1.4 | Documentation alignment plus the V2 recipe helper. §16.3 now records `byProduct` / `ProductLine`, which the engine has emitted since DF-84; no formula and no §18.2 figure changed. Appendix A defines the optional recipe total that may fill the entered `unitProductCost`. The monthly engine does not call it (X1 unchanged for `calculateDetailed`). New test T18. |
 | v1.3 | Locked three input-contract decisions. `delivery.mode` is now required when `channelMix.delivery > 0` and is never silently defaulted (§6.4), closing DF-10a's deferred mode-choice question for the input contract; at a 0 delivery share the mode reaches no figure (§15). Empty packaging and empty employer cost are recorded as approved zero-defaults, with the employer-cost case handled by a prominent UI warning rather than a validation error (§4.5a) — no engine contract change. New tests T16 and T17. No figure in §18.2 changed. |
 | v1.2 | Implementation-pass corrections, no figure in §18.2 changed. §17.2: the projection month **loop** belongs to `calculate.ts`, since a loop in `projection.ts` would require importing `calculateMonth` and create a cycle; `projection.ts` keeps the calculator-free helpers. New §4.5a records which inputs are required and which default, including `delivery.mode` defaulting to `platformOnly`. |
 | v1.1 | Review fixes, no figure in §18.2 changed. `mealCardCommissionRate` bound raised to 0.30 so DF-09's editable rate is genuinely editable upward. Empty product list is validation-only (§6.3); the §15 edge row now covers all-zero quantities, the reachable case. §9 restated strictly per unit with quantity expansion moved to §12.1, matching `unitEconomics.ts`'s volume-free responsibility; new invariant I13. Break-even guarded against restatement as a mix-weighted average. |

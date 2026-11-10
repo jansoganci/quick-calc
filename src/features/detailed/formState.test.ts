@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { emptyLine, emptyPosition, emptyProduct, initialForm, syncIdCounter } from './formState.ts'
+import {
+  emptyIngredient,
+  emptyLine,
+  emptyPosition,
+  emptyProduct,
+  emptyRecipeLine,
+  initialForm,
+  syncIdCounter,
+} from './formState.ts'
 
 function suffixOf(id: string): number {
   return Number(id.slice(id.lastIndexOf('-') + 1))
@@ -60,6 +68,23 @@ describe('syncIdCounter', () => {
 
     expect(() => syncIdCounter(form)).not.toThrow()
     expect(emptyProduct().id).toMatch(/^product-\d+$/)
+  })
+
+  it('counts ingredient and recipe-line ids, which share the counter', () => {
+    const form = initialForm()
+    form.ingredients = [{ ...emptyIngredient(), id: 'ingredient-40' }]
+    form.products = [
+      {
+        ...emptyProduct(),
+        id: 'product-1',
+        recipeLines: [{ id: 'recipe-41', ingredientId: 'ingredient-40', usageQuantity: '10' }],
+      },
+    ]
+    syncIdCounter(form)
+    const minted = [emptyIngredient().id, emptyRecipeLine('ingredient-40').id]
+    expect(minted).not.toContain('ingredient-40')
+    expect(minted).not.toContain('recipe-41')
+    expect(new Set(minted).size).toBe(2)
   })
 
   it('handles a form with no repeating rows at all', () => {

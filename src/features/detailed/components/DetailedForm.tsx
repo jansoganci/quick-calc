@@ -57,13 +57,20 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
       <SectionFrame {...frameProps('products')}>
         <SampleFillControl draftSaved={calc.draftSaved} onLoadSample={calc.loadSample} />
         <ProductRows
-          products={form.products}
+          form={form}
           dailyUnits={formatCount(typedDailyUnits(form))}
           errorFor={calc.errorFor}
           onBlur={calc.markTouched}
           onChange={calc.setProductField}
           onAdd={calc.addProduct}
           onRemove={calc.removeProduct}
+          onOpenRecipe={calc.openRecipe}
+          onCloseRecipe={calc.closeRecipe}
+          onAddRecipeLine={calc.addRecipeLine}
+          onRemoveRecipeLine={calc.removeRecipeLine}
+          onCommitRecipeName={calc.commitRecipeIngredientName}
+          onIngredientField={calc.setIngredientField}
+          onRecipeUsage={calc.setRecipeUsage}
         />
       </SectionFrame>
 

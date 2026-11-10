@@ -1,4 +1,5 @@
-import type { DetailedFormState } from './formState.ts'
+import { PURCHASE_UNITS } from '../../core/detailed/index.ts'
+import type { DetailedFormState, IngredientRow, ProductRow } from './formState.ts'
 
 /**
  * Draft persistence for Detailed Feasibility, as `TECH_STACK_AND_CONSTRAINTS.md`
@@ -85,6 +86,61 @@ function isOneOf(list: readonly unknown[], value: unknown): boolean {
   return list.includes(value)
 }
 
+const COST_SOURCES = ['manual', 'recipe'] as const
+
+function isRecipeLine(value: unknown): boolean {
+  return hasStrings(value, ['id', 'ingredientId', 'usageQuantity'])
+}
+
+function isIngredient(value: unknown): boolean {
+  return (
+    hasStrings(value, ['id', 'name', 'purchaseQuantity', 'purchasePrice']) &&
+    isObject(value) &&
+    isOneOf(PURCHASE_UNITS, value.purchaseUnit)
+  )
+}
+
+/**
+ * Recipe fields are optional on the wire so a draft written before them still
+ * opens. Present-but-wrong is a corrupt draft: the whole payload is rejected,
+ * same as every other field this codec does not recognise.
+ */
+function isRecipeExtensionOk(form: Record<string, unknown>): boolean {
+  if ('ingredients' in form && form.ingredients !== undefined) {
+    if (!Array.isArray(form.ingredients) || !form.ingredients.every(isIngredient)) return false
+  }
+  if (!Array.isArray(form.products)) return false
+  return form.products.every((product) => {
+    if (!isObject(product)) return false
+    if ('costSource' in product && product.costSource !== undefined) {
+      if (!isOneOf(COST_SOURCES, product.costSource)) return false
+    }
+    if ('recipeLines' in product && product.recipeLines !== undefined) {
+      if (!Array.isArray(product.recipeLines) || !product.recipeLines.every(isRecipeLine)) {
+        return false
+      }
+    }
+    return true
+  })
+}
+
+/** Fills the fields a pre-recipe draft does not have. Does not invent recipe lines. */
+function withRecipeDefaults(form: DetailedFormState): DetailedFormState {
+  const stored = form as DetailedFormState & {
+    ingredients?: IngredientRow[]
+    products: Array<ProductRow & { costSource?: ProductRow['costSource']; recipeLines?: ProductRow['recipeLines'] }>
+  }
+  return {
+    ...form,
+    ingredients: stored.ingredients ?? [],
+    products: stored.products.map((product) => ({
+      ...product,
+      costSource: product.costSource ?? 'manual',
+      recipeLines: product.recipeLines ?? [],
+    })),
+  }
+}
+
 /**
  * A whole-payload check. Anything unexpected rejects the entire draft rather than
  * being repaired: a half-recovered form is harder for the owner to trust than a
@@ -161,11 +217,12 @@ export function decodeDraft(raw: string | null): Draft | null {
 
   if (!isObject(parsed)) return null
   if (parsed.version !== DRAFT_VERSION) return null
-  if (!isFormShape(parsed.form)) return null
+  if (!isObject(parsed.form) || !isFormShape(parsed.form)) return null
+  if (!isRecipeExtensionOk(parsed.form)) return null
 
   // A missing name is the normal case for a draft written before the report
   // existed, and a corrupt one is metadata — neither may sink the financial
   // inputs, which is the one thing this codec exists to protect.
   const businessName = typeof parsed.businessName === 'string' ? parsed.businessName : ''
-  return { form: parsed.form, businessName }
+  return { form: withRecipeDefaults(parsed.form), businessName }
 }

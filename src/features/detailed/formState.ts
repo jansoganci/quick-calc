@@ -2,6 +2,7 @@ import {
   DETAILED_DEFAULTS,
   type DeliveryMode,
   type ProjectionHorizonMonths,
+  type PurchaseUnit,
   type RampUpPreset,
   type RentInputBasis,
 } from '../../core/detailed/index.ts'
@@ -16,6 +17,27 @@ import { formatDecimal } from '../../lib/number.ts'
  * an owner knows. The conversion to the engine's 0–1 fraction happens in one place.
  */
 
+export type CostSource = 'manual' | 'recipe'
+
+/**
+ * One purchased ingredient, shared by every recipe that points at it.
+ * Quantities stay strings: parsing happens once, on the way into `recipeCost`.
+ */
+export type IngredientRow = {
+  id: string
+  name: string
+  purchaseQuantity: string
+  purchaseUnit: PurchaseUnit
+  purchasePrice: string
+}
+
+/** How much of a shared ingredient one unit of this product uses. */
+export type RecipeLine = {
+  id: string
+  ingredientId: string
+  usageQuantity: string
+}
+
 export type ProductRow = {
   id: string
   name: string
@@ -23,6 +45,9 @@ export type ProductRow = {
   onlinePrice: string
   dailyQuantity: string
   unitProductCost: string
+  /** `recipe` means the engine receives the recipe total, not `unitProductCost`. */
+  costSource: CostSource
+  recipeLines: RecipeLine[]
 }
 
 export type PositionRow = {
@@ -42,6 +67,8 @@ export type LineRow = {
 }
 
 export type DetailedFormState = {
+  /** Shared purchase list. Drafts written before recipes decode as an empty list. */
+  ingredients: IngredientRow[]
   products: ProductRow[]
   channelMix: { salon: string; takeaway: string; delivery: string }
   packaging: { takeawayPerOrder: string; deliveryPerOrder: string }
@@ -87,7 +114,14 @@ function makeId(prefix: string): string {
  * places. Called once, by the draft loader, before the restored form is used.
  */
 export function syncIdCounter(form: DetailedFormState): void {
-  const rows = [...form.products, ...form.positions, ...form.opexLines, ...form.capexItems]
+  const rows = [
+    ...form.ingredients,
+    ...form.products,
+    ...form.products.flatMap((product) => product.recipeLines),
+    ...form.positions,
+    ...form.opexLines,
+    ...form.capexItems,
+  ]
   for (const row of rows) {
     const suffix = Number(row.id.slice(row.id.lastIndexOf('-') + 1))
     if (Number.isFinite(suffix) && suffix > nextId) nextId = suffix
@@ -107,7 +141,23 @@ export function emptyProduct(): ProductRow {
     onlinePrice: '',
     dailyQuantity: '',
     unitProductCost: '',
+    costSource: 'manual',
+    recipeLines: [],
   }
+}
+
+export function emptyIngredient(): IngredientRow {
+  return {
+    id: makeId('ingredient'),
+    name: '',
+    purchaseQuantity: '',
+    purchaseUnit: 'kg',
+    purchasePrice: '',
+  }
+}
+
+export function emptyRecipeLine(ingredientId: string): RecipeLine {
+  return { id: makeId('recipe'), ingredientId, usageQuantity: '' }
 }
 
 export function emptyPosition(): PositionRow {
@@ -136,6 +186,7 @@ export function emptyLine(prefix: 'opex' | 'capex', name = ''): LineRow {
  */
 export function initialForm(): DetailedFormState {
   return {
+    ingredients: [],
     products: [emptyProduct()],
     channelMix: {
       salon: rateToPercentInput(DETAILED_DEFAULTS.channelMix.salon),

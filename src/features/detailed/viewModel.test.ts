@@ -22,6 +22,8 @@ function viableForm(mutate: (draft: DetailedFormState) => void = () => {}): Deta
         onlinePrice: '70',
         dailyQuantity: '150',
         unitProductCost: '18',
+        costSource: 'manual',
+        recipeLines: [],
       },
     ]
     draft.delivery.mode = 'platformOnly'

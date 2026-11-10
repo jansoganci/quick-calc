@@ -156,6 +156,82 @@ describe('decodeDraft rejects anything it did not write', () => {
     expect(decodeDraft(unset)?.form.delivery.mode).toBeNull()
   })
 
+  it('reads a draft written before recipes as hand-entered costs', () => {
+    const form = filledForm()
+    const stored = JSON.parse(encodeDraft(draft(form))) as {
+      form: { ingredients?: unknown; products: Array<Record<string, unknown>> }
+    }
+    delete stored.form.ingredients
+    for (const product of stored.form.products) {
+      delete product.costSource
+      delete product.recipeLines
+    }
+
+    const restored = decodeDraft(JSON.stringify(stored))
+    expect(restored?.form.ingredients).toEqual([])
+    expect(restored?.form.products.every((product) => product.costSource === 'manual')).toBe(true)
+    expect(restored?.form.products.every((product) => product.recipeLines.length === 0)).toBe(true)
+    expect(restored?.form.products[0]?.name).toBe('Filtre kahve')
+  })
+
+  it('round-trips a shared ingredient and the recipe that uses it', () => {
+    const form = filledForm()
+    const product = form.products[0]
+    if (!product) throw new Error('fixture')
+    form.ingredients = [
+      {
+        id: 'ingredient-1',
+        name: 'Un',
+        purchaseQuantity: '5',
+        purchaseUnit: 'kg',
+        purchasePrice: '450',
+      },
+    ]
+    form.products[0] = {
+      ...product,
+      costSource: 'recipe',
+      recipeLines: [{ id: 'recipe-1', ingredientId: 'ingredient-1', usageQuantity: '180' }],
+    }
+    expect(decodeDraft(encodeDraft(draft(form)))).toEqual(draft(form))
+  })
+
+  it('returns null when recipe data is not the shape this version writes', () => {
+    expect(decodeDraft(draftWith((form) => void (form.ingredients = [{ id: 'i1', name: 'Un' }])))).toBeNull()
+    expect(
+      decodeDraft(
+        draftWith((form) => {
+          const products = form.products as Array<Record<string, unknown>>
+          const first = products[0]
+          if (first) first.costSource = 'guess'
+        }),
+      ),
+    ).toBeNull()
+    expect(
+      decodeDraft(
+        draftWith((form) => {
+          const products = form.products as Array<Record<string, unknown>>
+          const first = products[0]
+          if (first) first.recipeLines = [{ id: 'recipe-1' }]
+        }),
+      ),
+    ).toBeNull()
+    expect(
+      decodeDraft(
+        draftWith((form) => {
+          form.ingredients = [
+            {
+              id: 'ingredient-1',
+              name: 'Un',
+              purchaseQuantity: '5',
+              purchaseUnit: 'lb',
+              purchasePrice: '450',
+            },
+          ]
+        }),
+      ),
+    ).toBeNull()
+  })
+
   it('returns null when a nested rate group loses a key', () => {
     const raw = draftWith((form) => {
       ;(form.assumptions as Record<string, unknown>).scenarioVolumeDeltas = { bad: '-30' }

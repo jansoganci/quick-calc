@@ -35,6 +35,14 @@ const RATE_LEAVES = new Set([
   'good',
 ])
 
+/** A missing cost on a recipe product is "finish the recipe", not "type a number". */
+function isRecipeUnitCost(path: readonly ValidationPathSegment[], form: DetailedFormState): boolean {
+  if (path.length !== 3 || path[0] !== 'products' || path[2] !== 'unitProductCost') return false
+  const index = path[1]
+  if (typeof index !== 'number') return false
+  return form.products[index]?.costSource === 'recipe'
+}
+
 function isRatePath(path: readonly ValidationPathSegment[]): boolean {
   const leaf = path[path.length - 1]
   return typeof leaf === 'string' && RATE_LEAVES.has(leaf)
@@ -104,9 +112,9 @@ function mixMessage(
 export function messageFor(error: ValidationError, form: DetailedFormState): string {
   switch (error.code) {
     case 'required':
-      return pathKey(error.path) === 'delivery.mode'
-        ? ERROR_COPY.deliveryModeRequired
-        : ERROR_COPY.required
+      if (pathKey(error.path) === 'delivery.mode') return ERROR_COPY.deliveryModeRequired
+      if (isRecipeUnitCost(error.path, form)) return ERROR_COPY.recipeIncomplete
+      return ERROR_COPY.required
     case 'not_a_number':
       return ERROR_COPY.not_a_number
     case 'below_min':
