@@ -23,6 +23,7 @@ import { rampUpTableHint, sectionSummary, typedDailyUnits, visibleSections } fro
 import { echoLabel } from '../viewModel.ts'
 import { formatCount } from '../../../lib/number.ts'
 import { DraftNotice } from './DraftNotice.tsx'
+import { IngredientList } from './IngredientList.tsx'
 import { LineRows } from './LineRows.tsx'
 import { MixTable } from './MixTable.tsx'
 import { PositionRows } from './PositionRows.tsx'
@@ -56,6 +57,13 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
     <div className="px-[18px] py-5 lg:px-[30px] lg:py-[26px] lg:pb-[34px]">
       <SectionFrame {...frameProps('products')}>
         <SampleFillControl draftSaved={calc.draftSaved} onLoadSample={calc.loadSample} />
+        <IngredientList
+          form={form}
+          errorFor={calc.errorFor}
+          onBlur={calc.markTouched}
+          onCommitName={calc.commitIngredientListName}
+          onIngredientField={calc.setIngredientField}
+        />
         <ProductRows
           form={form}
           dailyUnits={formatCount(typedDailyUnits(form))}
