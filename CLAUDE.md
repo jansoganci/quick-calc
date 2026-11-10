@@ -10,6 +10,8 @@ Read this file first, then read the source-of-truth documents relevant to your t
 
 Before making any architectural, financial or implementation change, read the relevant document(s) under `docs/`.
 
+For V2/V3 product scope, read `docs/V2_V3_PRODUCT_ROADMAP.md` first. Its explicit version-specific scope additions do not replace the implemented v1 financial contracts, change Quick, or authorize coding. New formulas and UX still need approved specifications.
+
 | Document | Owns |
 | --- | --- |
 | `docs/quick-calculation-scope-v1.md` | Quick / Lite product & financial scope — inputs, formulas, outputs, terminology |

@@ -1,5 +1,7 @@
 # Detailed Feasibility — Locked Decisions
 
+**Version scope note (10 November 2026):** This remains the Detailed v1 decision log. See [V2/V3 product roadmap](./V2_V3_PRODUCT_ROADMAP.md) for explicit later-version scope additions (recipes, food cost, simple grouping, allocation and comparison). Those additions do not retroactively alter v1 formulas or authorize implementation.
+
 **Version:** v0.12
 **Status:** Decision log. Major Detailed v1 **product-scope** decisions are **locked**. Major calculation-model review blockers are **resolved**. Remaining implementation details belong in a dedicated Detailed Financial Specification. This file is still **not** that specification and **not** implementation.
 **Phase:** Planning — **not** a financial specification and **not** implementation

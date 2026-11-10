@@ -8,6 +8,17 @@ Bu dosya onların yerine geçmez, sadece ilerlemeyi takip eder.
 
 ---
 
+## 2026-11-10 — V2 / V3 ürün kapsamı (yalnızca dokümantasyon)
+
+- `V2_V3_PRODUCT_ROADMAP.md` eklendi: Detailed içinde reçeteyle başlayan V2 akışı; kolay alış fiyatı ve gramaj revizyonları; food cost, katkı, ortak gider dağıtımı, yiyecek/içecek karşılaştırması ve basit senaryolar.
+- V3 için stok, fatura girişi, POS entegrasyonu, hazırlık süresi/gelişmiş dağıtım ve otomatik fiyat tavsiyesi kaydedildi. Alt gruplar V2 kapsamına alınmadı.
+- Ücretsiz/üyeliksiz, sade hobi projesi yönü kaydedildi. İşletme görüşmeleri veya kullanım araştırması önkoşul değil.
+- AGENTS.md, CLAUDE.md, dokümantasyon indeksi ve Detailed v1 karar kaydı yeni kapsam belgesine bağlandı. Mevcut finansal sözleşmeler ve Hızlı Hesap korundu.
+- Açık kararlar: maliyet esası, reçete birimleri/verim/fire, dönem ve satış adedi, eksik menü, dağıtım yöntemi, senaryo kapsamı, saklama ve hukuki kabul.
+- Kod, finansal formül veya uygulama değişikliği yapılmadı. Commit/push/yayın yapılmadı; sıradaki aşama soru cevapla açık kararları netleştirmek.
+
+---
+
 ## 2026-09-08 — ABD spec v0.2 (owner kilitleri)
 
 ### Yapılanlar
