@@ -6,7 +6,7 @@ import {
   initialForm,
   type DetailedFormState,
 } from './formState.ts'
-import { decodeDraft, encodeDraft, type Draft } from './storage.ts'
+import { decodeDraft, encodeDraft, migrateDraftForm, type Draft } from './storage.ts'
 
 /** A form with every optional collection populated, so nothing is exercised empty. */
 function filledForm(): DetailedFormState {
@@ -154,6 +154,28 @@ describe('decodeDraft rejects anything it did not write', () => {
       ;(form.delivery as Record<string, unknown>).mode = null
     })
     expect(decodeDraft(unset)?.form.delivery.mode).toBeNull()
+  })
+
+  it('restores v1 dailyQuantity on the product so Satış tahmini can read it', () => {
+    const raw = JSON.stringify({ version: 1, form: filledForm() })
+    const restored = decodeDraft(raw)
+    expect(restored?.form.products.map((product) => product.dailyQuantity)).toEqual(['140', '90'])
+    expect(migrateDraftForm(restored!.form)).toEqual(restored!.form)
+  })
+
+  it('keeps dailyQuantity when a pre-recipe v1 draft is filled in', () => {
+    const form = filledForm()
+    const stored = JSON.parse(encodeDraft(draft(form))) as {
+      form: { ingredients?: unknown; products: Array<Record<string, unknown>> }
+    }
+    delete stored.form.ingredients
+    for (const product of stored.form.products) {
+      delete product.costSource
+      delete product.recipeLines
+    }
+    const restored = decodeDraft(JSON.stringify(stored))
+    expect(restored?.form.products[0]?.dailyQuantity).toBe('140')
+    expect(restored?.form.products[1]?.dailyQuantity).toBe('90')
   })
 
   it('reads a draft written before recipes as hand-entered costs', () => {

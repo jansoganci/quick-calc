@@ -36,6 +36,7 @@ export const RENT_BASIS_ORDER = ['net', 'gross'] as const satisfies readonly Ren
 
 export const SECTION_IDS = [
   'products',
+  'sales',
   'channels',
   'payments',
   'delivery',
@@ -50,7 +51,8 @@ export const SECTION_IDS = [
 export type SectionId = (typeof SECTION_IDS)[number]
 
 export const SECTION_LABELS: Record<SectionId, string> = {
-  products: 'Ürünler ve satış',
+  products: 'Ürünler',
+  sales: 'Satış tahmini',
   channels: 'Satış kanalları',
   payments: 'Ödeme yöntemleri',
   delivery: 'Paket servis',
@@ -64,7 +66,9 @@ export const SECTION_LABELS: Record<SectionId, string> = {
 
 export const SECTION_NOTES: Partial<Record<SectionId, string>> = {
   products:
-    'Sattığın ürünleri ve her birinden günde ortalama kaç adet sattığını gir. Fiyatlar KDV dahil.',
+    'Sattığın ürünleri, fiyatını ve malzeme maliyetini gir. Fiyatlar KDV dahil. Günde kaç sattığın Satış tahmini bölümünde.',
+  sales:
+    'Menüdeki her üründen günde kaç adet satacağını yaz. Ürün burada eklenmez. Ayda çalışılan gün varsayımlarda durur.',
   channels:
     'Satışların kanallara dağılımı ve sipariş başına ambalaj maliyeti. Dağılım tüm ürünler için ortaktır.',
   payments:
@@ -82,7 +86,7 @@ export const SECTION_NOTES: Partial<Record<SectionId, string>> = {
 
 /** The one engine figure a section header may echo, after the first calculation. */
 export const SECTION_ECHO_LABELS: Partial<Record<SectionId, string>> = {
-  products: 'Aylık brüt ciro',
+  sales: 'Planladığın satış',
   positions: 'Aylık personel gideri',
   owner: 'Aylık sahip gideri',
   occupancy: 'Aylık yer gideri',
@@ -382,6 +386,9 @@ export const COPY = {
     'Aylık işletme sonucu basitleştirilmiş bir tahmindir; kurumlar vergisi, gelir vergisi, finansman giderleri ve kredi ödemeleri hesaba katılmamıştır. İşletme sahibine ayrılan tutar ve Bağ-Kur ise bir gider olarak yukarıda yer alır.',
 
   nextSection: (label: string) => `Sonraki bölüm: ${label} →`,
+  salesWorkingDaysNote: (days: string) => `Ayda çalışılan gün varsayımlarda: ${days} gün.`,
+  salesNoProducts: 'Önce Ürünler bölümüne ürün ekle.',
+
   productCount: (count: number) => `${count} ürün`,
   positionCount: (count: number) => `${count} pozisyon`,
   lineCount: (count: number) => `${count} kalem`,

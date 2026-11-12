@@ -11,9 +11,9 @@ This document adds **no financial formulas.** Every figure it displays is read f
 
 ## 1. Design concept
 
-**Tek sayfa, on bölüm, kalıcı karar özeti.**
+**Tek sayfa, on bir bölüm, kalıcı karar özeti.**
 
-One scrolling page. Inputs are ten hairline-separated sections in a fixed order. A persistent panel on the right answers one question continuously — *is this business making money?* — while the depth (projection, scenarios, channel economics, assumptions) sits full-width below the inputs, reached deliberately.
+One scrolling page. Inputs are eleven hairline-separated sections in a fixed order (delivery still conditional). A persistent panel on the right answers one question continuously — *is this business making money?* — while the depth (projection, scenarios, channel economics, assumptions) sits full-width below the inputs, reached deliberately.
 
 Three rules carry the whole design:
 
@@ -27,41 +27,45 @@ Three rules carry the whole design:
 
 | Section | Engine field |
 | --- | --- |
-| 01 Ürünler ve satış | `grossCustomerSales` |
-| 05 Personel | `monthlyPayroll` |
-| 06 İşletme sahibi | `monthlyOwnerCost` |
-| 07 Kira ve aidat | `monthlyOccupancyCost` |
-| 08 Diğer giderler | `monthlyOpex` |
-| 09 İlk yatırım | `totalInitialInvestment` (top level) |
-| 02, 03, 04, 10 | **none** — their costs land jointly in `channelVariableCost` and `paymentPlatformFee`; a per-section split would be a new derivation |
+| 01 Ürünler | **none** — menu definition has no single engine money figure independent of volume |
+| 02 Satış tahmini | planned daily units (`totalUnits / operatingDaysPerMonth` on the base month) |
+| 06 Personel | `monthlyPayroll` |
+| 07 İşletme sahibi | `monthlyOwnerCost` |
+| 08 Kira ve aidat | `monthlyOccupancyCost` |
+| 09 Diğer giderler | `monthlyOpex` |
+| 10 İlk yatırım | `totalInitialInvestment` (top level) |
+| 03, 04, 05, 11 | **none** — channel/payment/delivery costs land jointly in `channelVariableCost` and `paymentPlatformFee`; a per-section split would be a new derivation |
 
 ---
 
 ## 2. Input information architecture
 
-Ten sections, fixed order, numbered `01`–`10` in Plex Mono 11px `--qc-subtle`. Order is revenue → how you sell → what it costs to run → what it costs to open → framing.
+Eleven sections, fixed order, numbered in Plex Mono 11px `--qc-subtle`. Order is what you sell → how many → how you sell → what it costs to run → what it costs to open → framing.
 
 | # | Section | Engine fields |
 | --- | --- | --- |
-| 01 | Ürünler ve satış | `products[]` |
-| 02 | Satış kanalları | `channelMix`, `packaging.takeawayPerOrder`, `packaging.deliveryPerOrder` |
-| 03 | Ödeme yöntemleri | `paymentMix`, `posCommissionRate`, `mealCardCommissionRate` |
-| 04 | Paket servis **(conditional)** | `delivery.mode`, `delivery.platformFeeRate`, `delivery.ownCourierCostPerDeliveryOrder` |
-| 05 | Personel | `positions[]` |
-| 06 | İşletme sahibi | `owner.monthlyAmount`, `owner.bagKurMonthlyCost` |
-| 07 | Kira ve aidat | `occupancy.*` |
-| 08 | Diğer giderler | `opexLines[]` |
-| 09 | İlk yatırım | `capexItems[]` |
-| 10 | Varsayımlar | `assumptions.*` |
+| 01 | Ürünler | `products[]` except `dailyQuantity` |
+| 02 | Satış tahmini | `products[].dailyQuantity` (lists 01's products; does not create them) |
+| 03 | Satış kanalları | `channelMix`, `packaging.takeawayPerOrder`, `packaging.deliveryPerOrder` |
+| 04 | Ödeme yöntemleri | `paymentMix`, `posCommissionRate`, `mealCardCommissionRate` |
+| 05 | Paket servis **(conditional)** | `delivery.mode`, `delivery.platformFeeRate`, `delivery.ownCourierCostPerDeliveryOrder` |
+| 06 | Personel | `positions[]` |
+| 07 | İşletme sahibi | `owner.monthlyAmount`, `owner.bagKurMonthlyCost` |
+| 08 | Kira ve aidat | `occupancy.*` |
+| 09 | Diğer giderler | `opexLines[]` |
+| 10 | İlk yatırım | `capexItems[]` |
+| 11 | Varsayımlar | `assumptions.*` including `operatingDaysPerMonth` |
 
 **Malzemeler sits inside section 01, after the menu.** It is not a numbered section and not a third mode. Authority for this block, the recipe editor, and the price-rise preview is `docs/RECIPE_REDESIGN_SPEC.md` (owner lock 12 November 2026). In short: one purchase-price editor on the list; recipe lines carry only usage quantity, labelled by unit (`Kaç adet?` / `Kaç gram?` / `Kaç ml?`, never Gramaj); the recipe opens as a full-screen layer below 1024px and as a block under the menu table from 1024px; ingredients may be added from the list or born from the recipe search (Turkish-aware name match). The monthly engine still receives one `unitProductCost` per product (`DETAILED_FINANCIAL_SPEC.md` Appendix A).
 
-**Section 04 is model-driven progressive disclosure:** it renders only when `channelMix.delivery > 0`, which is exactly the condition under which `delivery.mode` becomes required (spec §6.4). No toggle, no "advanced" switch.
+**Section 05 is model-driven progressive disclosure:** it renders only when `channelMix.delivery > 0`, which is exactly the condition under which `delivery.mode` becomes required (spec §6.4). No toggle, no "advanced" switch.
 
-**Two mix tables (the pattern that keeps 02 and 03 small).** Both are three-row tables with a reconciling total row, not a field grid:
+**Satış tahmini (02)** lists the products from 01 in the same order. Each row is the product name (not an input) and `Günlük adet`. No `+ Ürün ekle` here. `operatingDaysPerMonth` is named in a note and stays editable in 11. Empty quantity still reaches the engine as missing/zero the same way it did on the menu row.
+
+**Two mix tables (the pattern that keeps 03 and 04 small).** Both are three-row tables with a reconciling total row, not a field grid:
 
 ```
-02  Kanal          Pay      Ambalaj / sipariş        03  Yöntem        Pay    Komisyon
+03  Kanal          Pay      Ambalaj / sipariş        04  Yöntem        Pay    Komisyon
     Salon          50 %     —                            Nakit         40 %   —
     Al götür       20 %     4,00 TL                      Kart          45 %   3,59 %
     Paket servis   30 %     7,00 TL                      Yemek kartı   15 %   10,00 %
@@ -79,7 +83,8 @@ One pattern, three densities.
 
 | Collection | Fields | Desktop | Mobile |
 | --- | --- | --- | --- |
-| `products[]` | 5 + recipe control | Grid `1fr 120px 120px 72px 112px 88px 48px` (Ürün · Normal fiyat · Online fiyat · Günlük adet · Birim maliyet · Reçete · Kaldır), 11px eyebrow column headers, `#EEF0F2` between rows. The recipe block, when open, sits under the whole table — never as a sub-row. | Collapsed summary row (name · `günde n adet` · `maliyet {tutar} TL · elle/reçeteden`) expanding inline to name + 2×2 grid; recipe is a full-screen layer |
+| `products[]` | 4 + recipe control | Grid `1fr 120px 120px 112px 88px 48px` (Ürün · Normal fiyat · Online fiyat · Birim maliyet · Reçete · Kaldır), 11px eyebrow column headers, `#EEF0F2` between rows. The recipe block, when open, sits under the whole table — never as a sub-row. Daily quantity lives in section 02. | Collapsed summary row (name · `maliyet {tutar} TL · elle/reçeteden`) expanding inline to name + prices + cost; recipe is a full-screen layer |
+| sales forecast | 1 per product | Name + `Günlük adet`. No add/remove. | Same stack, 44px quantity field |
 | `positions[]` | 6 | Two-line block: `1fr 104px 56px` (ad, kişi, Kaldır), then a 4-column per-person grid under 11px eyebrows | Same block, collapsed/expanded as products |
 | `opexLines[]` | 2 | Two-up grid, each cell `1fr 124px 52px` | Single column, 44px rows |
 | `capexItems[]` | 2 | Two-up grid, each cell `1fr 132px 52px` | Single column, 44px rows |
@@ -90,18 +95,18 @@ Add control is a quiet accent text button at the foot: `+ Ürün ekle`, `+ Pozis
 
 **No per-product or per-position derived figure is displayed.** `positionMonthlyCost` and per-product revenue are not in the output contract; computing them in the UI would create a second source of truth for a financial figure (CLAUDE.md §3).
 
-### 2.2 Starter lines (08, 09)
+### 2.2 Starter lines (09, 10)
 
 DF-18/19/20 forbids a blank expense sheet; DF-58 requires custom lines. Twelve empty rows would be visually heavy, so the starter set is a **palette of quiet text controls** under the eyebrow `Sık kullanılan giderler`. Clicking one appends a line with that name and an empty amount and dims the palette entry.
 
-- **08 palette:** Elektrik · Su · Doğalgaz · İnternet · Güvenlik · Yazılım abonelikleri · Mali müşavir · Temizlik · Bakım / onarım · Sigorta · Sarf malzeme · İlaçlama. Security is **one** line; no water-treatment line (DF-20 as superseded).
-- **09 palette:** Tadilat / dekorasyon · Ekipman · Mobilya · Tabela · Açılış stoğu · Kuruluş / açılış giderleri (DF-32, DF-33).
+- **09 palette:** Elektrik · Su · Doğalgaz · İnternet · Güvenlik · Yazılım abonelikleri · Mali müşavir · Temizlik · Bakım / onarım · Sigorta · Sarf malzeme · İlaçlama. Security is **one** line; no water-treatment line (DF-20 as superseded).
+- **10 palette:** Tadilat / dekorasyon · Ekipman · Mobilya · Tabela · Açılış stoğu · Kuruluş / açılış giderleri (DF-32, DF-33).
 
 Chips and pills are excluded by `DESIGN_DIRECTION.md` §3, hence text controls.
 
 > **Resolved (was D-1).** DF-18/19/20 leaves *"which standard lines start empty vs. with a suggested amount"* DEFERRED. This design answers *neither starts with an amount, and none is pre-listed as a row* — a palette. Approved in the design pass and implemented in `components/LineRows.tsx`.
 
-### 2.3 Section 10 — assumptions, two tiers
+### 2.3 Section 11 — assumptions, two tiers
 
 **Visible:** `vatRate`, `operatingDaysPerMonth` (two fields); `projectionHorizonMonths` (segmented 12 / 24 / 36); `rampUpPreset` (segmented Yavaş / Normal / Hızlı, with the active preset's month table as an 11px hint); `scenarioVolumeDeltas` (three fields under Kötü / Baz / İyi eyebrows).
 
@@ -151,7 +156,7 @@ This is the brief's question order: *is it viable* → *what does Base look like
 
 ### 4.2 Özet pane, state A (before first calculation)
 
-Eyebrow `Hazırlık`; the empty-state paragraph; then a **section index** — ten rows, `01 Ürünler ve satış` left, a Mono state right (`4 ürün` / `%100` / `—` / `varsayılan`). This doubles as navigation and as the "what's still empty" answer, and it is why no third navigation column exists. Then `Hesapla` and its hint.
+Eyebrow `Hazırlık`; the empty-state paragraph; then a **section index** — eleven rows (delivery hidden when the mix is 0), `01 Ürünler` left, a Mono state right (`4 ürün` / `günde 170 adet` / `%100` / `—` / `varsayılan`). This doubles as navigation and as the "what's still empty" answer, and it is why no third navigation column exists. Then `Hesapla` and its hint.
 
 ### 4.3 Özet pane, state B (after first calculation)
 
@@ -370,9 +375,9 @@ src/features/detailed/
   hooks/useDetailedCalc.ts         form state, V6 gate, live recompute
   components/
     SectionFrame.tsx               number, title, echo slot, note slot, mobile accordion
-    ProductRows.tsx  PositionRows.tsx  LineRows.tsx  RepeatingRows.ts
+    ProductRows.tsx  SalesForecastRows.tsx  PositionRows.tsx  LineRows.tsx  RepeatingRows.ts
     MixTable.tsx                   used twice (02, 03) — two genuine call sites
-    DetailedForm.tsx               composes the ten sections
+    DetailedForm.tsx               composes the eleven sections
     SummaryPane.tsx                states A and B, plus the shared Hesapla control
                                    (the column tint sits on the grid item in the page,
                                    so it fills the column when the summary is short)

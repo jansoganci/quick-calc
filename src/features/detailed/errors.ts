@@ -73,6 +73,7 @@ const SECTION_BY_ROOT: Record<string, SectionId> = {
 }
 
 export function sectionForPath(path: readonly ValidationPathSegment[]): SectionId | null {
+  if (path[0] === 'products' && path[2] === 'dailyQuantity') return 'sales'
   const root = path[0]
   if (typeof root !== 'string') return null
   return SECTION_BY_ROOT[root] ?? null

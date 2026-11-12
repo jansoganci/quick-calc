@@ -159,7 +159,7 @@ function buildVerdict(result: DetailedResult): VerdictSegment[] {
 function buildSectionEcho(result: DetailedResult): Partial<Record<SectionId, string>> {
   const base = result.scenarios.base.stabilizedMonth
   return {
-    products: `${formatTry(base.grossCustomerSales)} TL`,
+    sales: `${formatCount(base.totalUnits / result.meta.assumptions.operatingDaysPerMonth)} ürün/gün`,
     positions: `${formatTry(base.monthlyPayroll)} TL`,
     owner: `${formatTry(base.monthlyOwnerCost)} TL`,
     occupancy: `${formatTry(base.monthlyOccupancyCost)} TL`,

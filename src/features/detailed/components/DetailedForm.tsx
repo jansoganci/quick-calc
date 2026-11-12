@@ -30,6 +30,7 @@ import { MixTable } from './MixTable.tsx'
 import { PositionRows } from './PositionRows.tsx'
 import { ProductRows } from './ProductRows.tsx'
 import { RecipeEditor } from './RecipeEditor.tsx'
+import { SalesForecastRows } from './SalesForecastRows.tsx'
 import { SampleFillControl } from './SampleFillControl.tsx'
 import { SectionFrame } from './SectionFrame.tsx'
 
@@ -63,7 +64,6 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
         <SampleFillControl draftSaved={calc.draftSaved} onLoadSample={calc.loadSample} />
         <ProductRows
           form={form}
-          dailyUnits={formatCount(typedDailyUnits(form))}
           errorFor={calc.errorFor}
           onBlur={calc.markTouched}
           onChange={calc.setProductField}
@@ -109,6 +109,18 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
           onDelete={calc.deleteIngredient}
           requestedOpenId={focusIngredientId}
           onConsumedOpen={() => setFocusIngredientId(null)}
+        />
+      </SectionFrame>
+
+      <SectionFrame {...frameProps('sales')}>
+        <SalesForecastRows
+          products={form.products}
+          dailyUnits={formatCount(typedDailyUnits(form))}
+          workingDays={form.assumptions.operatingDaysPerMonth}
+          errorFor={calc.errorFor}
+          onBlur={calc.markTouched}
+          onQuantityChange={(index, value) => calc.setProductField(index, 'dailyQuantity', value)}
+          onGoToProducts={() => calc.setOpenSection('products')}
         />
       </SectionFrame>
 

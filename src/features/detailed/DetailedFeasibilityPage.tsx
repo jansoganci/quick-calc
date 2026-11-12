@@ -13,7 +13,7 @@ import { COPY, RECIPE_COPY, SECTION_LABELS } from './labels.ts'
 import { sectionSummary, visibleSections } from './sectionSummary.ts'
 
 /**
- * One page, ten sections, a persistent decision summary. Inputs scroll on the left;
+ * One page, eleven sections, a persistent decision summary. Inputs scroll on the left;
  * the pane on the right answers "is this making money?" while they are edited; the
  * reasoning sits full width below.
  */

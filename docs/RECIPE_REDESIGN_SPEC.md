@@ -86,7 +86,7 @@ The menu table is never split. The recipe block sits under the table, separated 
 
 | Table | Grid columns |
 | --- | --- |
-| Menü | `1fr 120px 120px 72px 112px 88px 48px`, column gap 8px: Ürün · Normal fiyat · Online fiyat · Günlük adet · Birim maliyet · Reçete · Kaldır |
+| Menü | `1fr 120px 120px 112px 88px 48px`, column gap 8px: Ürün · Normal fiyat · Online fiyat · Birim maliyet · Reçete · Kaldır. Günlük adet is entered in Satış tahmini (`DETAILED_FINANCIAL_SPEC.md` Appendix C), not on this row. |
 | Reçete | `1fr 168px 200px 96px 52px`: Malzeme · Bir tanesine · Nasıl alınıyor · Tutar · Çıkar |
 | Malzemeler | `1fr 84px 84px 116px 112px 84px 32px`: Malzeme · Kaç aldın · Birim · Kaça geldi · Birim fiyatı · Kullanıldığı · Sil |
 
@@ -110,7 +110,7 @@ Unit-family lock (the wrong-unit state): once an ingredient is used in any recip
 
 | State | Mobile | Desktop |
 | --- | --- | --- |
-| **B1 Start: typed by hand** | Product row expanded: `Ürün`, then a 2×2 grid of `Normal fiyat` / `Online fiyat` / `Günlük adet` / `Birim maliyet` (editable). Under a hairline: `Tutarı sen yazdın.` + the action `İçine ne koyuyorsun?`. The expanded header shows only the name and `▴`. | The `Reçete` column shows `Reçete yaz`. |
+| **B1 Start: typed by hand** | Product row expanded: `Ürün`, then `Normal fiyat` / `Online fiyat` / `Birim maliyet` (editable). Daily quantity is not on this row — it lives in Satış tahmini. Under a hairline: `Tutarı sen yazdın.` + the action `İçine ne koyuyorsun?`. The expanded header shows only the name and `▴`. | The `Reçete` column shows `Reçete yaz`. |
 | **B2 Recipe layer, first ingredient** | Top bar: `Menüye dön` · `REÇETE` · `Bitti`. Title = the product name. Intro: `İçine ne koyuyorsun? …`. Empty note, then one search field `Malzeme ekle`. Suggestions come from the shared list (`Ekmek` · `listede · 10 adet 80,00 TL` · `Ekle`) plus `«{typed}» adında yeni malzeme` · `Yeni`. Footer total `—`. | `Reçete yaz` is selected (underlined 2px ink). The cost cell locks and shows `—`. The recipe block opens under the table. |
 | **B3 New ingredient created** | A name not in the list opens an inline block: `{Malzeme}` · `listede yok, yeni`, with `Nasıl alıyorsun? Bir kez sorulur, sonra listede durur.`, then `Kaç aldın`, `Kaça geldi`, `Birim`, and `Listeye ekle` / `Vazgeç`. On confirm the ingredient joins the shared list and the line shows only its usage field. | The same fields, inline under the new line, with column headers. |
 | **B4 Done** | `Bitti` returns to the menu. The product row shows `maliyet 55,50 TL · reçeteden`. Products typed by hand and products with recipes sit side by side. | The cost cell is locked and shows the recipe total. The column shows `Reçeteyi aç`. |

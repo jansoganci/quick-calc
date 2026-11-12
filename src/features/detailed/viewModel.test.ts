@@ -110,9 +110,28 @@ describe('section echo', () => {
     expect(Object.keys(result.view.sectionEcho).sort()).toEqual(
       Object.keys(SECTION_ECHO_LABELS).sort(),
     )
+    expect(result.view.sectionEcho.sales).toBe('150 ürün/gün')
     expect(result.view.sectionEcho.owner).toBe('45.000 TL')
     expect(result.view.sectionEcho.occupancy).toBe('60.000 TL')
     expect(result.view.sectionEcho.capex).toBe('500.000 TL')
+  })
+})
+
+describe('sales forecast section', () => {
+  it('is in the section index and summarises typed daily units', () => {
+    const form = viableForm()
+    expect(visibleSections(form)).toContain('sales')
+    expect(sectionSummary(form, 'sales')).toBe('günde 150 adet')
+    expect(sectionSummary(form, 'products')).toBe('1 ürün')
+  })
+
+  it('places a daily-quantity error on Satış tahmini, not Ürünler', () => {
+    const result = evaluate(viableForm((draft) => (draft.products[0]!.dailyQuantity = 'abc')))
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    expect(result.errorSections).toContain('sales')
+    expect(result.errorSections).not.toContain('products')
+    expect(result.errors['products.0.dailyQuantity']).toBeDefined()
   })
 })
 

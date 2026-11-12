@@ -133,6 +133,18 @@ describe('the appendix covers the engine input', () => {
     }
   })
 
+  it('keeps daily quantity on Satış tahmini, not on the menu table', () => {
+    const { groups } = resolve(reportForm())
+    const products = groupFor(groups, 'products')
+    const sales = groupFor(groups, 'sales')
+    expect(products?.content.kind).toBe('table')
+    expect(sales?.content.kind).toBe('table')
+    if (products?.content.kind !== 'table' || sales?.content.kind !== 'table') return
+    expect(products.content.table.columns).not.toContain('Günlük adet')
+    expect(sales.content.table.columns).toEqual(['Ürün', 'Günlük adet'])
+    expect(sales.content.table.rows[0]).toEqual(['Filtre kahve', '140'])
+  })
+
   it('orders groups by the locked ten-section input IA', () => {
     const { groups } = resolve(reportForm())
     const order = groups.map((group) => group.section)
