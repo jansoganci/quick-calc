@@ -314,6 +314,41 @@ export const COPY = {
   productTitle: 'Ürün bazlı katkı',
   productNote:
     'Aynı katkı hesabı, kanal yerine ürüne göre toplanmış. Kanal ekonomisiyle aynı toplamlara ulaşır.',
+  salonMenuTitle: 'Menü ürünleri',
+  salonMenuNote:
+    'Salon fiyatı ve malzemesi. Malzeme payı, KDV düşülmüş fiyata göredir. Ambalaj bu orana girmez.',
+  salonSellingPrice: 'Satış fiyatı',
+  salonCost: 'Malzeme',
+  salonFoodCost: 'Malzeme payı',
+  salonRemaining: 'Her birinden kalan',
+  weakestProductNote: (name: string) => `${name} salon satışında en az kalanı bırakıyor.`,
+  salonMenuCaption: 'Tutarlar TL. Salon satışı, KDV dahil fiyat.',
+
+  fixedCostDaysTitle: 'Kira kaç günde çıkıyor',
+  fixedCostDaysNote: (days: string) =>
+    `Değişken giderlerden sonra kalan aylık tutar, ayda çalışılan ${days} güne bölünür. Sıra: kira, personel, diğer sabit giderler.`,
+  fixedCostDaysUnavailable: 'Değişken giderlerden sonra bir şey kalmıyor; günlere çevrilemez.',
+  fixedCostDaysFirst: (days: string, label: string) =>
+    `Ayın ilk ${days} günü ${label} için çalışıyorsun`,
+  fixedCostDaysNext: (days: string, label: string) => `Sonraki ${days} günü ${label} için`,
+  fixedCostDaysRemainder: (days: string) => `Geri kalan ${days} gün senin`,
+  fixedCostDaysRemainderNone: 'Geri kalan gün yok.',
+  fixedCostDaysUncovered: 'Bu ay sabit giderleri karşılamıyor.',
+  fixedCostDayRent: 'kira',
+  fixedCostDayPayroll: 'personel',
+  fixedCostDayOther: 'diğer sabit giderler',
+
+  januaryTitle: 'Ocak testi',
+  januaryNote:
+    'Asgari ücret ve kira artınca aylık sonuç ve kira-gün satırları nasıl değişir. Yalnızca personel giderine ve kiraya uygulanır; aidat ve kendine ayırdığın tutar durur.',
+  januaryWage: 'Asgari ücret artışı',
+  januaryRent: 'Kira artışı',
+  januaryInvalid: 'Sayı değil; %0 sayılıyor.',
+  januaryBefore: 'Şimdi',
+  januaryAfter: 'Sonra',
+  januaryResult: 'Aylık işletme sonucu',
+  januaryBreakEven: 'Başa baş (günde)',
+
   channelUnits: 'Adet',
   channelGross: 'Brüt satış',
   channelNet: 'Net ciro',

@@ -5,7 +5,7 @@
 
 **Authority order.** `DETAILED_FEASIBILITY_DECISIONS.md` (product decisions, DF-series) → `DETAILED_FINANCIAL_SPEC.md` (formulas, input/output contract) → `DESIGN_DIRECTION.md` (locked visual/UX rules, V-series) → `APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md` (structure) → this document (Detailed screen structure, measurements, copy). `FRONTEND_IMPLEMENTATION_SPEC.md` remains the authority for the Quick / Lite screen; this document never overrides it.
 
-This document adds **no financial inputs, no outputs and no formulas.** Every figure it displays is read from `DetailedResult` or from `DetailedResolvedInput`.
+This document adds **no financial formulas.** Every figure it displays is read from `DetailedResult`, `DetailedResolvedInput`, or the Appendix B display helpers on that same base month (`DETAILED_FINANCIAL_SPEC.md`). The two Ocak testi fields are results-area what-if inputs, not form fields and not draft state.
 
 ---
 
@@ -145,7 +145,7 @@ Frame is `max-w-[1152px]` in **both** modes, at every width, with `border-x bord
 | Tier | Where | Content, in order |
 | --- | --- | --- |
 | 1 | Özet pane (sticky) / mobile results head | ① verdict sentence ② `Aylık işletme sonucu` (base) ③ Başa baş · Geri dönüş · İlk yatırım ④ Kötü / Baz / İyi mini-row ⑤ Dikkat edilecekler ⑥ `Tüm sonuçlar ↓` |
-| 2 | Full width, below inputs | ① Para nereye gidiyor (bar + table) ② Senaryolar ③ Projeksiyon ④ Yatırımın geri dönüşü ⑤ Kanal ekonomisi ⑥ Başa baş noktası ⑦ Varsayımlar |
+| 2 | Full width, below inputs | ① Para nereye gidiyor (bar + table) ② Senaryolar ③ Projeksiyon ④ Yatırımın geri dönüşü ⑤ Kanal ekonomisi ⑥ Menü ürünleri ⑦ Kira kaç günde çıkıyor ⑧ Ocak testi ⑨ Ürün bazlı katkı (DF-84) ⑩ Başa baş noktası ⑪ Varsayımlar |
 
 This is the brief's question order: *is it viable* → *what does Base look like* → *Bad/Good* → *break-even* → *payback* → *how it evolves* → *where the money goes*, with the last two moved into Tier 2 where they have room.
 
@@ -224,14 +224,28 @@ Rules, mirroring Quick/Lite's R7 exactly:
 | Reconciliation (under the bar) | `10px 1fr auto 72px`, 9 rows + `Toplam` | `9px 1fr auto 48px`, 13px, 40px rows |
 | Senaryolar | 4 rows × 3 columns; Baz column in ink/600, the operating-result cell at 16px | Unchanged — 3 columns fit at 390px |
 | Kanal ekonomisi | 3 rows × 7 columns + `Toplam` | **Transposed:** one hairline block per channel, label/value rows, `Katkı` in 600 under a rule |
+| Menü ürünleri | 4 money columns (satış fiyatı, malzeme, malzeme payı, her birinden kalan) + product name. Weakest row: remaining in 500 ink, plus a plain-text note. No red. | **Transposed:** one hairline block per product, `Her birinden kalan` in 600 under a rule |
+| Ürün bazlı katkı (DF-84) | Same columns as kanal ekonomisi, rows summed per product | Same transpose as the channel table |
 | Projeksiyon, ay ay | **Collapsed by default** behind `Ay ay tabloyu göster`. Columns: Ay · Adet · Net ciro · Katkı · Sabit gider · İşletme sonucu | Three columns only: Ay · Net ciro · İşletme sonucu |
 | Varsayımlar | Two-column definition list | Collapsed row `13 satır ▾` |
 
-**Not built:** per-product P&L, per-position cost table, monthly cash table, any channel × month cross table. Dense FP&A tables are not the primary UX; the month table is opt-in precisely because 24–36 rows is where that feeling starts. A `Katkı / adet` column is **rejected** — it is a division of two engine figures, i.e. a new financial figure computed in the UI.
+**Not built:** per-product P&L, per-position cost table, monthly cash table, any channel × month cross table, Yiyecek / İçecek grouping, volume-weighted menu totals. Dense FP&A tables are not the primary UX; the month table is opt-in precisely because 24–36 rows is where that feeling starts. A `Katkı / adet` column on the DF-84 table is **rejected** — it is a division of two engine figures, i.e. a new financial figure computed in the UI. Salon remaining on the menu table is the engine’s §9.4 salon `unitContribution`, not that division.
 
 ### 4.7 Assumptions block (mandatory)
 
 Two-column definition list carrying every field of `meta.assumptions` — **including the three annual rates when they are 0%** — plus `meta.detailedEngineVersion` in Mono 11px. When `channelMix.delivery === 0` the delivery mode and platform fee rows are **suppressed** (spec §15 says the UI should); every other row is unconditional.
+
+### 4.8 Menu remaining, kira-gün, Ocak testi (V2 step 3)
+
+After the first `Hesapla`, three results-area blocks sit between kanal ekonomisi and the DF-84 product table. Formulas: `DETAILED_FINANCIAL_SPEC.md` Appendix B. V6 calculate-then-live is unchanged.
+
+| Block | On screen | Copy |
+| --- | --- | --- |
+| **Menü ürünleri** | Per product: entered salon price, `unitProductCost`, malzeme payı (`unitProductCost / salon net-of-KDV`), her birinden kalan (salon §9.4). Weakest = lowest remaining; omitted on a one-product menu | Sen. Never `marj`, `katkı`, `food cost`. Labels: `Malzeme payı`, `Her birinden kalan` |
+| **Kira kaç günde çıkıyor** | Ordered lines, no chart, no icon. Days = cost / (`totalContribution` / `operatingDaysPerMonth`). Order: kira (`rentCost`), personel (`monthlyPayroll`), diğer (owner + opex + aidat), then remainder. Engine raw; screen nearest whole day; remainder = working days − rounded sum. Unavailable when contribution ≤ 0; uncovered when remainder < 0 | `Ayın ilk {n} günü kira için çalışıyorsun`, then `Sonraki {n} günü …`, then `Geri kalan {n} gün senin` |
+| **Ocak testi** | Two `%` fields, empty = 0: `Asgari ücret artışı`, `Kira artışı`. Live before → after for monthly leftover and break-even (günde). Kira-gün lines follow the what-if. Wage rate × whole `monthlyPayroll`; rent rate × `rentCost`; aidat and owner untouched. Transient — not written to the draft or the URL | Placeholder `0`. Unreadable input counts as 0 with a quiet hint, no red |
+
+These blocks are display helpers. They do not change `calculateDetailed`, Kötü / Baz / İyi, or `detailedEngineVersion`.
 
 ---
 
@@ -350,8 +364,9 @@ src/features/detailed/
   guardrails.ts                    G1–G3 derived from DetailedResolvedInput
   sectionSummary.ts                pre-calculation section stand-ins; visible sections
   viewModel.ts                     DetailedResult -> formatted view; ALL formatting lives here
+  insightsView.ts                  Appendix B salon menu, kira-gün lines, January preview
   resultView.ts                    bar segments, channel rows, chart series, assumption rows
-  viewModel.test.ts                20 tests: reconciliation, guardrails, errors, edge states
+  viewModel.test.ts                reconciliation, guardrails, errors, edge states, sample-café Appendix B
   hooks/useDetailedCalc.ts         form state, V6 gate, live recompute
   components/
     SectionFrame.tsx               number, title, echo slot, note slot, mobile accordion
@@ -364,6 +379,7 @@ src/features/detailed/
     MobileSummaryBar.tsx
     DetailedResults.tsx            Tier 2 composition
     ResultBar.tsx  ScenarioTable.tsx  ChannelTable.tsx  MonthTable.tsx
+    SalonMenuTable.tsx  FixedCostDaysList.tsx  JanuaryTest.tsx
     AssumptionsList.tsx  ProjectionChart.tsx  PaybackChart.tsx  chartGeometry.ts
 ```
 
@@ -373,7 +389,7 @@ Shared with Quick only through `lib/`, `app/` and `components/` (`NumberField`, 
 
 1. No financial formula in a React component. The bar's percentage widths and the chart's pixel coordinates are the only arithmetic allowed in the view layer, and both are pure presentation of engine figures.
 2. Every default, limit and label imported from `core/detailed/defaults.ts`, `core/detailed/limits.ts` and `features/detailed-feasibility/labels.ts` — never restated.
-3. No new input, no new output, no new KPI. If the design appears to need one, it is a spec question, not an implementation detail.
+3. No new form input, no new `calculateDetailed` output, no new KPI. Appendix B display helpers (salon malzeme payı, kira-gün, Ocak testi) are the approved exception; their formulas live in the financial spec, not in React.
 4. `depreciation`, `amortisman`, `netProfit`, `net kâr` must not appear in identifiers, types, comments or strings.
 5. Money formatting always `Intl.NumberFormat('tr-TR')`, full form, unit after a space — `1.027.350 TL`, `%3,59`. Never abbreviated (the mobile chart axis label `250b` in the mock is a **chart tick**, and is the one place an abbreviation is proposed — flag it for approval or replace it with a tick-free axis).
 

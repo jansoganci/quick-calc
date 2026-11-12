@@ -1,12 +1,16 @@
+import { useState } from 'react'
 import { COPY } from '../labels.ts'
-import type { DetailedView } from '../viewModel.ts'
+import { previewJanuary, type DetailedView } from '../viewModel.ts'
 import { AssumptionsList } from './AssumptionsList.tsx'
 import { ChannelTable } from './ChannelTable.tsx'
+import { FixedCostDaysList } from './FixedCostDaysList.tsx'
+import { JanuaryTest } from './JanuaryTest.tsx'
 import { MonthTable } from './MonthTable.tsx'
 import { PaybackChart } from './PaybackChart.tsx'
 import { ProductContributionTable } from './ProductContributionTable.tsx'
 import { ProjectionChart } from './ProjectionChart.tsx'
 import { ResultBar } from './ResultBar.tsx'
+import { SalonMenuTable } from './SalonMenuTable.tsx'
 import { SankeyBreakdown } from './SankeyBreakdown.tsx'
 import { ScenarioTable } from './ScenarioTable.tsx'
 
@@ -25,6 +29,13 @@ export function DetailedResults({
   showMonthTable,
   onToggleMonthTable,
 }: DetailedResultsProps) {
+  const [wageIncrease, setWageIncrease] = useState('')
+  const [rentIncrease, setRentIncrease] = useState('')
+  const january = previewJanuary(view.januaryBasis, wageIncrease, rentIncrease)
+  const breakEvenBefore = view.breakEvenPerDay.available
+    ? view.breakEvenPerDay.value
+    : view.breakEvenPerDay.message
+
   return (
     <div className="qc-report-body border-t border-qc-rule px-[18px] pb-[34px] lg:px-[30px]">
       <div className="py-[26px] lg:pb-[26px] lg:pt-[30px]">
@@ -100,6 +111,26 @@ export function DetailedResults({
 
       <ResultSection title={COPY.channelTitle} note={COPY.channelNote}>
         <ChannelTable channels={view.channels} totals={view.channelTotals} />
+      </ResultSection>
+
+      <ResultSection title={COPY.salonMenuTitle} note={COPY.salonMenuNote}>
+        <SalonMenuTable products={view.salonMenu.products} weakestNote={view.salonMenu.weakestNote} />
+      </ResultSection>
+
+      <ResultSection title={COPY.fixedCostDaysTitle} note={january.days.note}>
+        <FixedCostDaysList days={january.days} />
+      </ResultSection>
+
+      <ResultSection title={COPY.januaryTitle} note={COPY.januaryNote}>
+        <JanuaryTest
+          wageIncrease={wageIncrease}
+          rentIncrease={rentIncrease}
+          onWageIncrease={setWageIncrease}
+          onRentIncrease={setRentIncrease}
+          beforeResult={view.monthlyOperatingResult}
+          beforeBreakEven={breakEvenBefore}
+          preview={january}
+        />
       </ResultSection>
 
       <ResultSection title={COPY.productTitle} note={COPY.productNote}>

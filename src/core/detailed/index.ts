@@ -4,11 +4,22 @@
  * The later feature layer imports from here and from nowhere else inside the
  * module. Internal helpers — `calculateMonth`, the two builders, the ramp-up and
  * escalation functions, the payback scan and `calculateBreakEven` — stay private;
- * tests reach them directly as siblings (architecture R7).
+ * tests reach them directly as siblings (architecture R7). Appendix B display
+ * helpers (`buildSalonMenuEconomics`, `buildFixedCostDays`, `applyJanuaryTest`)
+ * are public, like the recipe helpers; they do not change `calculateDetailed`.
  */
 
 export { calculateDetailed } from './calculate.ts';
 export { DETAILED_DEFAULTS, RAMP_UP_TABLES } from './defaults.ts';
+export { buildFixedCostDays } from './fixedCostDays.ts';
+export type { FixedCostDayBucket, FixedCostDayKey, FixedCostDays } from './fixedCostDays.ts';
+export {
+  buildSalonMenuEconomics,
+  salonFoodCostRate,
+} from './foodCost.ts';
+export type { SalonMenuEconomics, SalonMenuProduct } from './foodCost.ts';
+export { applyJanuaryTest } from './januaryTest.ts';
+export type { JanuaryTestInput, JanuaryTestResult } from './januaryTest.ts';
 export { DETAILED_LIMITS, MIX_TOLERANCE } from './limits.ts';
 export type { FieldLimit } from './limits.ts';
 export {

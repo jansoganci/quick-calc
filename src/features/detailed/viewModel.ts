@@ -10,6 +10,13 @@ import { formatCount } from '../../lib/number.ts'
 import { formatTry } from '../../lib/money.ts'
 import type { DetailedFormState } from './formState.ts'
 import { buildErrorMap, type ErrorMap } from './errors.ts'
+import {
+  buildFixedCostDaysView,
+  buildSalonMenuView,
+  type FixedCostDaysView,
+  type JanuaryBasis,
+  type SalonMenuView,
+} from './insightsView.ts'
 import { buildReportInputGroups, type ReportInputGroup } from './reportView.ts'
 import { collectGuardrails, type Guardrail } from './guardrails.ts'
 import {
@@ -76,6 +83,9 @@ export type DetailedView = {
   channelTotals: Omit<ChannelRow, 'channel' | 'label'>
   products: ProductRow[]
   productTotals: Omit<ProductRow, 'productId' | 'name'>
+  salonMenu: SalonMenuView
+  fixedCostDays: FixedCostDaysView
+  januaryBasis: JanuaryBasis
   projection: ProjectionData
   paybackChart: PaybackData
   monthRows: MonthRow[]
@@ -227,6 +237,13 @@ function buildView(result: DetailedResult, input: DetailedResolvedInput): Detail
     channelTotals: buildChannelTotals(base),
     products: buildProductRows(base),
     productTotals: buildProductTotals(base),
+    salonMenu: buildSalonMenuView(input),
+    fixedCostDays: buildFixedCostDaysView(base, input.assumptions.operatingDaysPerMonth),
+    januaryBasis: {
+      month: base,
+      breakEven: result.breakEven,
+      operatingDaysPerMonth: input.assumptions.operatingDaysPerMonth,
+    },
     projection: buildProjection(result),
     paybackChart: buildPaybackChart(result),
     monthRows: buildMonthRows(result),
@@ -251,6 +268,9 @@ export function evaluateDetailed(
   }
   return { ok: true, view: buildView(calculateDetailed(validation.input), validation.input) }
 }
+
+export { previewJanuary } from './insightsView.ts'
+export type { JanuaryPreview } from './insightsView.ts'
 
 /** The section-header label for an echoed figure, or `null` when a section has none. */
 export function echoLabel(section: SectionId): string | null {

@@ -96,9 +96,43 @@ describe('detailed copy (RECIPE_REDESIGN_SPEC §3.2 O4)', () => {
       RECIPE_COPY.priceRiseUsage('120 g', name),
       GUARDRAIL_COPY.employerCostMissing(name, '2'),
       REPORT_COPY.runningHead(name),
+      COPY.weakestProductNote(name),
     ]
     for (const sample of samples) {
       expect(sample, sample).not.toMatch(suffix)
+    }
+  })
+
+  it('keeps the new results-area copy free of marj, katkı and food cost', () => {
+    const insight = [
+      COPY.salonMenuTitle,
+      COPY.salonMenuNote,
+      COPY.salonSellingPrice,
+      COPY.salonCost,
+      COPY.salonFoodCost,
+      COPY.salonRemaining,
+      COPY.weakestProductNote('Poğaça'),
+      COPY.salonMenuCaption,
+      COPY.fixedCostDaysTitle,
+      COPY.fixedCostDaysNote('30'),
+      COPY.fixedCostDaysUnavailable,
+      COPY.fixedCostDaysFirst('7', 'kira'),
+      COPY.fixedCostDaysNext('4', 'personel'),
+      COPY.fixedCostDaysRemainder('16'),
+      COPY.fixedCostDaysRemainderNone,
+      COPY.fixedCostDaysUncovered,
+      COPY.januaryTitle,
+      COPY.januaryNote,
+      COPY.januaryWage,
+      COPY.januaryRent,
+      COPY.januaryInvalid,
+      COPY.januaryBefore,
+      COPY.januaryAfter,
+      COPY.januaryResult,
+      COPY.januaryBreakEven,
+    ].join('\n').toLocaleLowerCase('tr-TR')
+    for (const banned of ['marj', 'katkı', 'food cost', 'amortisman']) {
+      expect(insight, `new results copy contains "${banned}"`).not.toContain(banned)
     }
   })
 
