@@ -135,7 +135,7 @@ export function NumberField({
             error ? `${id}-error` : hint ? `${id}-hint` : describedBy ? describedBy : undefined
           }
         />
-        <span className="qc-unit">{unit}</span>
+        {unit !== '' ? <span className="qc-unit">{unit}</span> : null}
       </span>
       {error ? (
         <span id={`${id}-error`} className="qc-error" role="alert">

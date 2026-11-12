@@ -168,7 +168,7 @@ function NewIngredientBlock({
           label={RECIPE_COPY.purchaseQuantity}
           value={draft.purchaseQuantity}
           onChange={(value) => onChange({ ...draft, purchaseQuantity: value })}
-          unit=""
+          unit={draft.purchaseUnit}
           grouped
         />
         <NumberField

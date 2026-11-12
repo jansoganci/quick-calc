@@ -185,7 +185,7 @@ function IngredientFields({
           value={ingredient.purchaseQuantity}
           onChange={(value) => onIngredientField(ingredient.id, 'purchaseQuantity', value)}
           onBlur={() => onBlur(quantityPath)}
-          unit=""
+          unit={ingredient.purchaseUnit}
           grouped
           error={errorFor(quantityPath)}
         />
@@ -489,15 +489,7 @@ export function IngredientList({
 
                   {preview && open ? (
                     <div className="mt-3 lg:hidden">
-                      <PricePreview
-                        preview={preview}
-                        onDone={() =>
-                          setSnapshots((current) => ({
-                            ...current,
-                            [ingredient.id]: snapshotOf(ingredient),
-                          }))
-                        }
-                      />
+                      <PricePreview preview={preview} />
                     </div>
                   ) : null}
 
@@ -517,7 +509,6 @@ export function IngredientList({
                     </div>
                   ) : (
                     <>
-                      {preview ? null : (
                       <div className="mt-3 flex items-center justify-between gap-3 lg:hidden">
                         {adding ? (
                           <button
@@ -543,7 +534,6 @@ export function IngredientList({
                           {RECIPE_COPY.done}
                         </button>
                       </div>
-                      )}
                       {adding ? (
                         <div className="mt-3 hidden lg:flex lg:justify-end">
                           <button

@@ -4,10 +4,9 @@ import type { PricePreview as PricePreviewModel } from '../recipePreview.ts'
 
 type PricePreviewProps = {
   preview: PricePreviewModel
-  onDone: () => void
 }
 
-export function PricePreview({ preview, onDone }: PricePreviewProps) {
+export function PricePreview({ preview }: PricePreviewProps) {
   return (
     <div className="border-t border-qc-ink pt-3">
       <p className="text-[15px] font-medium text-qc-ink">{preview.heading}</p>
@@ -65,9 +64,6 @@ export function PricePreview({ preview, onDone }: PricePreviewProps) {
       </div>
 
       <p className="mt-3 text-xs leading-relaxed text-qc-muted">{preview.footnote}</p>
-      <button type="button" className="qc-text-btn mt-3" onClick={onDone}>
-        {RECIPE_COPY.done}
-      </button>
     </div>
   )
 }
@@ -75,10 +71,13 @@ export function PricePreview({ preview, onDone }: PricePreviewProps) {
 export function PricePreviewDesktop({
   preview,
   onDone,
-}: PricePreviewProps) {
+}: PricePreviewProps & { onDone: () => void }) {
   return (
     <div className={cn('mt-4 hidden border-y border-qc-rule-mid bg-qc-surface-result px-3 py-3 lg:block')}>
-      <PricePreview preview={preview} onDone={onDone} />
+      <PricePreview preview={preview} />
+      <button type="button" className="qc-text-btn mt-3" onClick={onDone}>
+        {RECIPE_COPY.done}
+      </button>
     </div>
   )
 }
