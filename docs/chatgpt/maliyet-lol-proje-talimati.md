@@ -210,7 +210,7 @@ Bu tablo formül değildir. “Var / yok” ayrımı içindir. Sayı, varsayıla
 
 Kullanıcının gördüğü cevaplar: satış başı tahmini toplam maliyet, bu tutarın dağılımı, aylık işletme kazancı, brüt kâr marjı, faaliyet kâr marjı, yaklaşık yatırım geri ödemesi, günlük satış adedini −50 / −25 / şu an / +25 / +50 oynatan hacim simülasyonu. Başabaş kullanıcıya gösterilmez. Fire, kanal, fiyat senaryosu ve reçete yoktur. Para birimi TRY. Türkiye yiyecek-içecek hesabıdır.
 
-**Detaylı Fizibilite.** Ayrı motor. Ürün bazında birim maliyet vardır; malzeme reçetesi yoktur. Kanallar: salon, gel-al, paket. Platform kesintisi bu modelin içindedir. Senaryo satış adedini ölçekler; fiyatı, maliyeti ve gideri tek tek oynatmaz. Başabaş birim/gün ve birim/aydır; müşteri, koltuk veya fiş adedi değildir. Fire, kapasite, koltuk devri, reklam kârlılığı, kategori yönetimi ve e-ticaret kargo/iade modeli yoktur.
+**Detaylı Fizibilite.** Ayrı motor. Ürün bazında birim maliyet vardır. İsteğe bağlı reçete bu tutarı doldurabilir; aylık motor reçeteyi görmez. Kanallar: salon, gel-al, paket. Platform kesintisi bu modelin içindedir. Senaryo satış adedini ölçekler; fiyatı, maliyeti ve gideri tek tek oynatmaz. Başabaş birim/gün ve birim/aydır; müşteri, koltuk veya fiş adedi değildir. Food cost oranı, fire, kapasite, koltuk devri, reklam kârlılığı, kategori yönetimi ve e-ticaret kargo/iade modeli yoktur.
 
 **ABD eşlemesi** yazılı bir ürün değildir. Bu projenin konusu Türkiye ve maliyet.lol’dur.
 
@@ -220,7 +220,7 @@ Yön bunları ister. Bugünkü spec çoğunu mevcut formüle koymaz. ChatGPT her
 
 | İstenen | Bugünkü sınır |
 | --- | --- |
-| Reçete maliyeti, food cost | İki motorda da yok. Hızlı Hesap değişken maliyeti tek tutar alır. Detaylı, ürün başı birim tutar alır. |
+| Reçete maliyeti, food cost | Hızlı Hesap’ta yok; değişken maliyet tek tutardır. Detaylı’da isteğe bağlı reçete, ürünün birim tutarını doldurur. Food cost oranı henüz yoktur. |
 | Menü / hedef satış fiyatı | Ayrı bir “istediğim kârdan fiyat” aracı spec’te yok. Marj adları spec’te kilitli. |
 | Günlük başabaş satış | Hızlı Hesap göstermez. Detaylı, birim/gün ve birim/ay gösterir. |
 | Kanal karşılaştırması | Detaylı’da salon, gel-al, paket var. E-ticaret komisyon + kargo + iade yok. |

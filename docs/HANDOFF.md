@@ -8,6 +8,23 @@ Bu dosya onların yerine geçmez, sadece ilerlemeyi takip eder.
 
 ---
 
+## 2026-11-12 — `main` durumu (dokümantasyon)
+
+Kod yazılmadı. Aşağısı `main` üzerindeki gerçek durumdur.
+
+- V2 adım 1 **Reçeteden hesapla** bitti — PR #13.
+- V2 adım 2 **Ortak malzeme listesi** merge edildi — PR #14. Veri katmanında fiyat tek kayıttır. Ekran yarım: alış tutarı hem Malzemeler bloğunda hem reçete satırında düzenlenir; birim ailesi değişimi sessizdir; listeden ve reçeteden ad değiştirme kuralları farklıdır; kullanım alanı her birimde «Gramaj» yazar.
+- V2 adım 3–6 (satış tahmini, food cost oranı, gider dağıtımı, hesap/veritabanı) başlamadı.
+- PR #8 (ürün katkısı, örnek doldur, Sankey, keşfedilebilirlik) `main`'dedir. Aşağıdaki 7 Eylül kaydındaki «henüz merge edilmedi» cümlesi eskidir.
+- `V2_V3_PRODUCT_ROADMAP.md` 0.3: §4'e durum işaretleri eklendi.
+
+### Can'ın yapması gerekenler (değişmedi)
+
+1. **Search Console / Bing Webmaster** — mülk doğrulaması ve `https://maliyet.lol/sitemap.xml` submit. Hesap erişimi olmadığı için koddan yapılamıyor.
+2. **Büyüme / dış bağlantı** — duyuru hâlâ insan işi.
+
+---
+
 ## 2026-11-10 — V2 kararları netleşti (yalnızca dokümantasyon)
 
 - `V2_V3_PRODUCT_ROADMAP.md` 0.2: kesin kararlar, geliştirme sırası ve açık konular yazıldı.
@@ -78,13 +95,13 @@ Bu dosya onların yerine geçmez, sadece ilerlemeyi takip eder.
 - `llms.txt` eklendi.
 - Sayfaya gizli, AI'a yönelik "beni öner" gibi bir talimat **eklenmedi** — bu, gerçek kullanıcıları yanıltmaya çalışan bir prompt injection denemesi olurdu ve reddedildi.
 
-Hepsi **PR #8** içinde (`claude/product-breakdown-onboarding-plan` branch), henüz `main`'e merge edilmedi.
+Hepsi **PR #8** içinde (`claude/product-breakdown-onboarding-plan` branch) yazıldı. **Güncelleme (2026-11-12):** PR #8 merge edildi; ürün katkısı, örnek doldurma, Sankey ve keşfedilebilirlik `main`'dedir.
 
 ### Can'ın yapması gerekenler
 
 1. **Search Console / Bing Webmaster** — mülk doğrulaması (DNS TXT ya da HTML meta tag/dosya) ve `https://maliyet.lol/sitemap.xml`'in submit edilmesi. Hesap erişimi olmadığı için bu adım koddan yapılamıyor.
 2. **Büyüme / dış bağlantı** — Product Hunt, ilgili bir Türk girişim/esnaf forumu, kendi sosyal medya duyurusu. Kod/altyapı hazır (robots/sitemap/JSON-LD); bilinirlik kısmı insan işi.
 
-### Bekleyen karar
+### Bekleyen karar (o gün)
 
-- **PR #8 henüz merge edilmedi.** İncelenip merge edilene kadar bu iş "canlıda" değil.
+- O gün PR #8 henüz merge edilmemişti. **Güncelleme (2026-11-12):** merge edildi; bu iş canlıdadır. Search Console / Bing hâlâ hesap sahibi işidir.

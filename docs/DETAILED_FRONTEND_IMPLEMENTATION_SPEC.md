@@ -54,7 +54,9 @@ Ten sections, fixed order, numbered `01`–`10` in Plex Mono 11px `--qc-subtle`.
 | 09 | İlk yatırım | `capexItems[]` |
 | 10 | Varsayımlar | `assumptions.*` |
 
-**Malzemeler sits inside section 01.** It is not a numbered section. When at least one ingredient has a name, the block is rendered above the product rows. Each row is the ingredient's name, purchase quantity, unit and purchase amount. Gramaj is not edited here; it stays on that product's recipe. The list does not add or remove ingredients.
+**Malzemeler sits inside section 01.** It is not a numbered section and not a third mode. When at least one ingredient has a name, the block is rendered above the product rows. Each row is the ingredient's name, purchase quantity, unit and purchase amount. Gramaj is not edited here; it stays on that product's recipe. The list does not add or remove ingredients. This is the shared list from `DETAILED_FINANCIAL_SPEC.md` Appendix A.1, not a new formula.
+
+**As shipped (PR #14), the list is not the only editor for those purchase fields.** An open recipe line still shows purchase quantity, unit and price next to gramaj. A price typed in either place updates the same ingredient. Renaming from the list updates every product that points at that id; renaming a shared ingredient from a recipe line splits a new ingredient. The usage field is labelled Gramaj for every unit. Changing purchase unit across families (for example `kg` to `g`) does not convert the stored quantities.
 
 **Section 04 is model-driven progressive disclosure:** it renders only when `channelMix.delivery > 0`, which is exactly the condition under which `delivery.mode` becomes required (spec §6.4). No toggle, no "advanced" switch.
 

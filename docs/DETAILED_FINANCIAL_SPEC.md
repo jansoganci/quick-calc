@@ -1,6 +1,6 @@
 # Detailed Feasibility — Financial Specification
 
-**Version:** v1.4
+**Version:** v1.5
 **Status:** Formula contract for `src/core/detailed/`. **Not** implementation.
 **Currency:** TRY · **Country:** Turkey · **Language for v1:** Turkish-first
 **Engine:** `detailedEngineVersion` `1.0.0`
@@ -1047,7 +1047,9 @@ A purchase price of zero is valid. A usage quantity of zero is valid and adds no
 
 ### A.5 What this appendix does not do
 
-No ingredient screen, no food-cost ratio, no price history, no stock, no server. Those stay outside this contract.
+This appendix does not add a food-cost ratio, price history, stock, or a server. Those stay outside this contract. It does not define a separate ingredient **screen** or a third product mode.
+
+The shared list in §A.1 is data, not a screen. The implemented Detailed UI renders that list as a **Malzemeler** block inside section 01 — not a numbered section — as recorded in `DETAILED_FRONTEND_IMPLEMENTATION_SPEC.md`. That block is presentation of these inputs. It does not change `recipeCost`, `unitProductCost`, or any monthly-engine formula. Purchase quantity, unit and price remain editable on each recipe line as well as on that block; that is a UI fact, not a second price in this contract.
 
 ---
 
@@ -1055,6 +1057,7 @@ No ingredient screen, no food-cost ratio, no price history, no stock, no server.
 
 | Version | Change |
 | --- | --- |
+| v1.5 | Appendix A.5 clarified: the Malzemeler block in section 01 is presentation of §A.1, not a new screen and not a formula. No figure in §18.2 changed. |
 | v1.4 | Documentation alignment plus the V2 recipe helper. §16.3 now records `byProduct` / `ProductLine`, which the engine has emitted since DF-84; no formula and no §18.2 figure changed. Appendix A defines the optional recipe total that may fill the entered `unitProductCost`. The monthly engine does not call it (X1 unchanged for `calculateDetailed`). New test T18. |
 | v1.3 | Locked three input-contract decisions. `delivery.mode` is now required when `channelMix.delivery > 0` and is never silently defaulted (§6.4), closing DF-10a's deferred mode-choice question for the input contract; at a 0 delivery share the mode reaches no figure (§15). Empty packaging and empty employer cost are recorded as approved zero-defaults, with the employer-cost case handled by a prominent UI warning rather than a validation error (§4.5a) — no engine contract change. New tests T16 and T17. No figure in §18.2 changed. |
 | v1.2 | Implementation-pass corrections, no figure in §18.2 changed. §17.2: the projection month **loop** belongs to `calculate.ts`, since a loop in `projection.ts` would require importing `calculateMonth` and create a cycle; `projection.ts` keeps the calculator-free helpers. New §4.5a records which inputs are required and which default, including `delivery.mode` defaulting to `platformOnly`. |

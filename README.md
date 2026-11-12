@@ -23,6 +23,7 @@ The two are **separate business logics** by design. They may reasonably produce 
 | Quick / Lite core | Implemented |
 | Quick / Lite frontend | Implemented |
 | Detailed Feasibility | Implemented — engine in `src/core/detailed/`, UI in `src/features/detailed/` |
+| Detailed V2 recipe helper | On `main` (PR #13, #14). Optional recipe fills `unitProductCost`. Shared ingredient list is merged; UI still also edits purchase price on each recipe line. Next steps in `docs/V2_V3_PRODUCT_ROADMAP.md` §4 |
 
 Documentation index: [`docs/README.md`](docs/README.md).
 
