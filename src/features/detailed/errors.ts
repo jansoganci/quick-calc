@@ -2,7 +2,8 @@ import type { ValidationError, ValidationPathSegment } from '../../core/detailed
 import { formatCount, parseTurkishNumber } from '../../lib/number.ts'
 import { formatDecimal } from '../../lib/number.ts'
 import type { DetailedFormState } from './formState.ts'
-import { ERROR_COPY, type SectionId } from './labels.ts'
+import { ERROR_COPY, RECIPE_COPY, type SectionId } from './labels.ts'
+import { productDisplayName } from './recipeForm.ts'
 
 /**
  * `ValidationError[]` → messages keyed by path, plus the set of sections holding an
@@ -113,7 +114,13 @@ export function messageFor(error: ValidationError, form: DetailedFormState): str
   switch (error.code) {
     case 'required':
       if (pathKey(error.path) === 'delivery.mode') return ERROR_COPY.deliveryModeRequired
-      if (isRecipeUnitCost(error.path, form)) return ERROR_COPY.recipeIncomplete
+      if (isRecipeUnitCost(error.path, form)) {
+        const index = error.path[1]
+        const product = typeof index === 'number' ? form.products[index] : undefined
+        const name =
+          product && typeof index === 'number' ? productDisplayName(product, index) : RECIPE_COPY.ingredientName
+        return RECIPE_COPY.hesaplaRecipeIncomplete(name)
+      }
       return ERROR_COPY.required
     case 'not_a_number':
       return ERROR_COPY.not_a_number

@@ -11,7 +11,16 @@ export { calculateDetailed } from './calculate.ts';
 export { DETAILED_DEFAULTS, RAMP_UP_TABLES } from './defaults.ts';
 export { DETAILED_LIMITS, MIX_TOLERANCE } from './limits.ts';
 export type { FieldLimit } from './limits.ts';
-export { PURCHASE_UNITS, isPurchaseUnit, recipeCost, usageUnitFor } from './recipeCost.ts';
+export {
+  PURCHASE_UNITS,
+  isPurchaseUnit,
+  purchaseFactor,
+  recipeCost,
+  remainingPerUnitDelta,
+  salonRestorePrice,
+  unitPriceFromPurchase,
+  usageUnitFor,
+} from './recipeCost.ts';
 export type {
   PurchaseUnit,
   RecipeAmount,

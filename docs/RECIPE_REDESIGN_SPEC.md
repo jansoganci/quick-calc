@@ -1,6 +1,6 @@
 # Recipe and Shared Ingredient List — Redesign Spec
 
-**Status:** Design approved by the product owner on 12 November 2026. Coding is not authorised until the doc changes in §11 are made.
+**Status:** Design approved by the product owner on 12 November 2026. Owner lock 12 November 2026: screens A1–A5, B1–B4, C1–C3, D1–D2 and open decisions O1–O4 as recommended in §10. O4 (*sen* register and muted-grey rule for the rest of Detailed) is a separate follow-up PR; Quick stays out of scope. Desktop per-row quiet `Sil` uses the same confirmation as A5. The Zam geldi summary line uses the purchase as typed (`5 kg 450,00 TL'den…`).
 **Scope:** Detailed Feasibility, section 01 only: the menu rows, the shared ingredient list (`Malzemeler`), the recipe editor, and the price-rise preview ("Zam geldi"). Quick (Hızlı Hesap), the other Detailed sections, the monthly engine and every result view stay as they are.
 **Visual reference:** the design-system artifact “maliyet.lol” (frames `KareA`–`KareD`, components `Alan`, `BirimSecici`, `Dugme`, `Not`, `MalzemeSatiri`, `ReceteSatiri`, `MaliyetKaynagi`).
 **Brief:** the owner's recipe-redesign brief of 12 November 2026.
@@ -320,12 +320,14 @@ Guidelines are in the design system. In code these map to presentational compone
 
 ## 10. Open decisions
 
-| # | Question | Recommendation |
+Owner lock 12 November 2026: O1–O4 as recommended. O4 is not in this build.
+
+| # | Question | Decision |
 | --- | --- | --- |
-| O1 | Deleting an ingredient that is in use: what happens to its recipe lines? | Remove those lines, recalculate the totals, and name the products in the confirmation (already in the copy). The alternative, keeping them as `ingredient_not_found`, blocks Hesapla. |
-| O2 | `Tutarı kendim yazacağım`: what goes in the unlocked box? | The last value typed by hand if there is one, otherwise the recipe total. B4 shows `Elle yazılan 50,00 kenarda durur`, which this would make true. |
-| O3 | A price decrease: show a block? | Yes, as `{Malzeme} ucuzladı` with cost and `Her birinden kalan {x} TL arttı.`, without the restore-price line. |
-| O4 | Should the *sen* register and the muted-grey rule apply to the rest of Detailed? Quick is out of scope. | Yes for Detailed, as a separate copy pass. |
+| O1 | Deleting an ingredient that is in use: what happens to its recipe lines? | **Approved.** Remove those lines, recalculate the totals, and name the products in the confirmation. The alternative, keeping them as `ingredient_not_found`, would block Hesapla. |
+| O2 | `Tutarı kendim yazacağım`: what goes in the unlocked box? | **Approved.** The last value typed by hand if there is one, otherwise the recipe total. |
+| O3 | A price decrease: show a block? | **Approved.** `{Malzeme} ucuzladı` with cost and `Her birinden kalan {x} TL arttı.`, without the restore-price line. |
+| O4 | Should the *sen* register and the muted-grey rule apply to the rest of Detailed? Quick is out of scope. | **Approved, separate PR.** This build applies *sen* and the muted-grey rule only inside section 01 (menu, recipe, Malzemeler, Zam geldi). The rest of Detailed waits. Quick is out of scope. |
 | O5 | Online/takeaway restore prices and commission-aware prices | Roadmap step 6. Not in this build. |
 | O6 | Rounding the restore price (e.g. 229,24 → 230) | No rounding. Rounding is a price suggestion, which belongs to step 6. |
 

@@ -27,7 +27,8 @@ export type IngredientRow = {
   id: string
   name: string
   purchaseQuantity: string
-  purchaseUnit: PurchaseUnit
+  /** Empty until the owner picks a unit (A4). Stored drafts always have one of the five. */
+  purchaseUnit: PurchaseUnit | ''
   purchasePrice: string
 }
 
@@ -151,7 +152,7 @@ export function emptyIngredient(): IngredientRow {
     id: makeId('ingredient'),
     name: '',
     purchaseQuantity: '',
-    purchaseUnit: 'kg',
+    purchaseUnit: '',
     purchasePrice: '',
   }
 }

@@ -9,7 +9,7 @@ import { ReportNameDialog } from './components/ReportNameDialog.tsx'
 import { SummaryPane, type SectionSummary } from './components/SummaryPane.tsx'
 import { useDetailedCalc } from './hooks/useDetailedCalc.ts'
 import { useReportPrint } from './hooks/useReportPrint.ts'
-import { COPY, SECTION_LABELS } from './labels.ts'
+import { COPY, RECIPE_COPY, SECTION_LABELS } from './labels.ts'
 import { sectionSummary, visibleSections } from './sectionSummary.ts'
 
 /**
@@ -32,6 +32,8 @@ export function DetailedFeasibilityPage() {
 
   function buildSubmitHint(): string | null {
     if (calc.canSubmit) return calc.hasCalculated ? null : COPY.calculateLive
+    const incomplete = calc.incompleteRecipeNames()
+    if (incomplete.length > 0) return RECIPE_COPY.hesaplaRecipeIncomplete(incomplete.join(', '))
     if (calc.errorSections.length === 1 && calc.errorSections[0] === 'products') {
       return COPY.calculateNoProducts
     }

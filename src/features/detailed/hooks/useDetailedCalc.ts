@@ -7,6 +7,7 @@ import {
   type RentInputBasis,
 } from '../../../core/detailed/index.ts'
 import {
+  emptyIngredient,
   emptyLine,
   emptyPosition,
   emptyProduct,
@@ -20,12 +21,14 @@ import {
 } from '../formState.ts'
 import type { SectionId } from '../labels.ts'
 import {
-  addRecipeLine,
+  attachIngredientToProduct,
   buildRecipeErrorMap,
   closeRecipe,
   commitIngredientListName,
-  commitRecipeIngredientName,
-  dropUnusedIngredients,
+  createIngredient,
+  deleteIngredient,
+  discardBlankIngredient,
+  incompleteRecipeNames,
   openRecipe,
   removeRecipeLine,
   updateIngredient,
@@ -218,20 +221,39 @@ export function useDetailedCalc() {
       })),
     addProduct: () => update((draft) => ({ ...draft, products: [...draft.products, emptyProduct()] })),
     removeProduct: (index: number) =>
-      update((draft) =>
-        dropUnusedIngredients({
-          ...draft,
-          products: draft.products.filter((_, at) => at !== index),
-        }),
-      ),
+      update((draft) => ({
+        ...draft,
+        products: draft.products.filter((_, at) => at !== index),
+      })),
 
     openRecipe: (index: number) => update((draft) => openRecipe(draft, index)),
     closeRecipe: (index: number) => update((draft) => closeRecipe(draft, index)),
-    addRecipeLine: (index: number) => update((draft) => addRecipeLine(draft, index)),
     removeRecipeLine: (productIndex: number, lineIndex: number) =>
       update((draft) => removeRecipeLine(draft, productIndex, lineIndex)),
-    commitRecipeIngredientName: (productIndex: number, lineIndex: number, name: string) =>
-      update((draft) => commitRecipeIngredientName(draft, productIndex, lineIndex, name)),
+    attachIngredient: (productIndex: number, ingredientId: string) =>
+      update((draft) => attachIngredientToProduct(draft, productIndex, ingredientId)),
+    createAndAttachIngredient: (
+      productIndex: number,
+      fields: {
+        name: string
+        purchaseQuantity: string
+        purchaseUnit: PurchaseUnit | ''
+        purchasePrice: string
+      },
+    ) =>
+      update((draft) => {
+        const created = createIngredient(draft, fields)
+        return attachIngredientToProduct(created.form, productIndex, created.id)
+      }),
+    addBlankIngredient: () => {
+      const ingredient = emptyIngredient()
+      update((draft) => ({ ...draft, ingredients: [...draft.ingredients, ingredient] }))
+      return ingredient.id
+    },
+    discardBlankIngredient: (ingredientId: string) =>
+      update((draft) => discardBlankIngredient(draft, ingredientId)),
+    deleteIngredient: (ingredientId: string) =>
+      update((draft) => deleteIngredient(draft, ingredientId)),
     commitIngredientListName: (ingredientId: string, name: string) => {
       const result = commitIngredientListName(form, ingredientId, name)
       if (result.form !== form) update(() => result.form)
@@ -243,15 +265,16 @@ export function useDetailedCalc() {
       value: string,
     ) =>
       update((draft) => {
-        if (field === 'purchaseUnit' && !isPurchaseUnit(value)) return draft
+        if (field === 'purchaseUnit' && value !== '' && !isPurchaseUnit(value)) return draft
         const patch =
           field === 'purchaseUnit'
-            ? { purchaseUnit: value as PurchaseUnit }
+            ? { purchaseUnit: value as PurchaseUnit | '' }
             : { [field]: value }
         return updateIngredient(draft, ingredientId, patch)
       }),
     setRecipeUsage: (productIndex: number, lineIndex: number, value: string) =>
       update((draft) => updateRecipeUsage(draft, productIndex, lineIndex, value)),
+    incompleteRecipeNames: () => incompleteRecipeNames(form),
 
     setPositionField: (index: number, field: keyof Omit<PositionRow, 'id'>, value: string) =>
       update((draft) => ({

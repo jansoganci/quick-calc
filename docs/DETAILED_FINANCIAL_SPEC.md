@@ -1,6 +1,6 @@
 # Detailed Feasibility — Financial Specification
 
-**Version:** v1.5
+**Version:** v1.6
 **Status:** Formula contract for `src/core/detailed/`. **Not** implementation.
 **Currency:** TRY · **Country:** Turkey · **Language for v1:** Turkish-first
 **Engine:** `detailedEngineVersion` `1.0.0`
@@ -975,6 +975,7 @@ Tier 1 must pass before any Detailed UI work begins.
 | 2 | T17 | Approved zero defaults | Empty packaging resolves to 0 and charges no channel variable cost; empty employer cost resolves to 0, does not block, and contributes no payroll; the warn condition selects `headcount > 0` positions only |
 | 3 | T14 | Structural guards | I2, I3, I4, I5, I7, I13; banned terminology absent from `core/detailed/`; result carries nothing beyond §16 |
 | 2 | T18 | Recipe cost helper | Appendix A: the 16.2 worked example, both units of each family, a two-line sum, purchase quantity zero or empty, a missing ingredient, and no `NaN` or `Infinity`. No figure in §18.2 changes |
+| 2 | T19 | Salon restore-price display helper | Appendix A.6: Hamburger 220 + 8,40 × 1,10 = 229,24; Köfte ekmek 160 + 7,00 × 1,10 = 167,70; remaining-per-unit delta = −Δcost. Not called by `calculateDetailed`. No figure in §18.2 changes |
 
 Tests are colocated as `*.test.ts` under `src/core/detailed/`. No UI test suite.
 
@@ -1049,7 +1050,30 @@ A purchase price of zero is valid. A usage quantity of zero is valid and adds no
 
 This appendix does not add a food-cost ratio, price history, stock, or a server. Those stay outside this contract. It does not define a separate ingredient **screen** or a third product mode.
 
-The shared list in §A.1 is data, not a screen. The implemented Detailed UI renders that list as a **Malzemeler** block inside section 01 — not a numbered section — as recorded in `DETAILED_FRONTEND_IMPLEMENTATION_SPEC.md`. That block is presentation of these inputs. It does not change `recipeCost`, `unitProductCost`, or any monthly-engine formula. Purchase quantity, unit and price remain editable on each recipe line as well as on that block; that is a UI fact, not a second price in this contract.
+The shared list in §A.1 is data, not a screen. The implemented Detailed UI renders that list as a **Malzemeler** block inside section 01 — not a numbered section — as recorded in `DETAILED_FRONTEND_IMPLEMENTATION_SPEC.md` and `RECIPE_REDESIGN_SPEC.md`. That block is presentation of these inputs. It does not change `recipeCost`, `unitProductCost`, or any monthly-engine formula. Purchase quantity, unit and price are edited **only** on that block. A recipe line carries only `usageQuantity`. That is a UI fact, not a second price in this contract.
+
+### A.6 Salon restore price (display helper)
+
+Not part of `calculateDetailed`. The monthly engine never sees a recipe or a restore price. This helper is the owner-approved display formula for the Malzemeler price-rise preview (`RECIPE_REDESIGN_SPEC.md` §7.4). Identifiers must not use the rejected terms (`netProfit`, `margin`, …).
+
+```
+Δcost(p)            = recipeCost_new(p) − recipeCost_old(p)
+Δ remaining per unit = −Δcost(p)          // §9.4, every channel
+salonRestorePrice    = normalPrice(p) + Δcost(p) × (1 + vatRate)
+```
+
+Scope: salon only, KDV included, card and meal-card commissions ignored. Per-channel restore prices wait for roadmap step 6. The result is raw — no rounding.
+
+Fixtures (`vatRate = 0.10`):
+
+| Product | Cost now → after mince 450 | Δ remaining | Salon now → restore |
+| --- | --- | --- | --- |
+| Hamburger | 55,50 → 63,90 | −8,40 | 220,00 → **229,24** |
+| Köfte ekmek | 46,80 → 53,80 | −7,00 | 160,00 → **167,70** |
+
+Worked: `220 + 8,40 × 1,10 = 229,24`; `160 + 7,00 × 1,10 = 167,70`.
+
+On a price **decrease**, the UI shows the cost change and `Her birinden kalan {x} TL arttı.` and omits the restore-price line (owner lock O3). Nothing here writes a selling price.
 
 ---
 
@@ -1057,6 +1081,7 @@ The shared list in §A.1 is data, not a screen. The implemented Detailed UI rend
 
 | Version | Change |
 | --- | --- |
+| v1.6 | Appendix A.5: purchase fields are edited only on the Malzemeler block; recipe lines carry usage only. New Appendix A.6 salon restore-price display helper (Hamburger 229,24 / Köfte ekmek 167,70). New test T19. No figure in §18.2 changed. |
 | v1.5 | Appendix A.5 clarified: the Malzemeler block in section 01 is presentation of §A.1, not a new screen and not a formula. No figure in §18.2 changed. |
 | v1.4 | Documentation alignment plus the V2 recipe helper. §16.3 now records `byProduct` / `ProductLine`, which the engine has emitted since DF-84; no formula and no §18.2 figure changed. Appendix A defines the optional recipe total that may fill the entered `unitProductCost`. The monthly engine does not call it (X1 unchanged for `calculateDetailed`). New test T18. |
 | v1.3 | Locked three input-contract decisions. `delivery.mode` is now required when `channelMix.delivery > 0` and is never silently defaulted (§6.4), closing DF-10a's deferred mode-choice question for the input contract; at a 0 delivery share the mode reaches no figure (§15). Empty packaging and empty employer cost are recorded as approved zero-defaults, with the employer-cost case handled by a prominent UI warning rather than a validation error (§4.5a) — no engine contract change. New tests T16 and T17. No figure in §18.2 changed. |

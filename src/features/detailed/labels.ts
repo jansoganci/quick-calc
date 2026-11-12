@@ -64,7 +64,7 @@ export const SECTION_LABELS: Record<SectionId, string> = {
 
 export const SECTION_NOTES: Partial<Record<SectionId, string>> = {
   products:
-    'Sattığınız ürünleri ve her birinden günde ortalama kaç adet sattığınızı girin. Fiyatlar KDV dahildir.',
+    'Sattığın ürünleri ve her birinden günde ortalama kaç adet sattığını gir. Fiyatlar KDV dahil.',
   channels:
     'Satışlarınızın kanallara dağılımı ve sipariş başına ambalaj maliyeti. Dağılım tüm ürünler için ortaktır.',
   payments:
@@ -471,24 +471,115 @@ export const ERROR_COPY = {
 } as const
 
 export const RECIPE_COPY = {
-  fromRecipe: 'Reçeteden hesapla',
-  manual: 'Elle gir',
-  ingredientName: 'Malzeme',
-  purchaseQuantity: 'Alış miktarı',
-  purchaseUnit: 'Birim',
-  purchasePrice: 'Alış tutarı',
-  usageQuantity: 'Gramaj',
-  addLine: '+ Malzeme ekle',
-  recipeCostLabel: 'Reçete maliyeti',
-  usedBy: (count: string) => `Bu fiyat ${count} üründe kullanılıyor.`,
+  menuHeading: 'Menü',
+  menuRowDaily: (count: string) => `günde ${count} adet`,
+  menuRowCost: (amount: string, source: string) => `maliyet ${amount} TL · ${source}`,
+  sourceManual: 'elle',
+  sourceRecipe: 'reçeteden',
+  costTypedNote: 'Tutarı sen yazdın.',
+  openRecipeNew: 'İçine ne koyuyorsun?',
+  openRecipeNewDesktop: 'Reçete yaz',
+  costFromRecipeNote: (count: string) => `Reçeteden · ${count} malzeme`,
+  openRecipe: 'Reçeteyi aç',
   listHeading: 'Malzemeler',
-  listHint: 'Fiyatı buradan değiştirince bu malzemeyi kullanan bütün ürünler değişir.',
-  duplicateName: 'Bu isimde bir malzeme zaten var.',
-  ingredientMissing: 'Malzemeyi yazın.',
-  purchaseQuantityEmpty: 'Alış miktarını girin.',
+  ingredientCount: (count: number) => `${count} malzeme`,
+  listHint:
+    'Alış fiyatını yalnızca burada yazarsın. Değiştirince bu malzemeyi kullanan bütün ürünler değişir.',
+  listEmpty: 'Henüz malzeme yok.',
+  listEmptyHint:
+    'Bir ürüne «İçine ne koyuyorsun?» ile reçete yazınca, yazdığın malzemeler buraya düşer. Faturan elindeyse fiyatları şimdiden de girebilirsin.',
+  listEmptyHintDesktop:
+    'Bir ürüne «Reçete yaz» ile malzeme eklediğinde buraya düşer. Faturan elindeyse fiyatları şimdiden de girebilirsin.',
+  addIngredient: '+ Malzeme ekle',
+  usedIn: (count: string) => `${count} üründe`,
+  usedInNone: 'henüz üründe değil',
+  unitPriceColumn: 'Birim fiyatı',
+  usedInColumn: 'Kullanıldığı',
+  ingredientName: 'Malzeme',
+  purchaseQuantity: 'Kaç aldın',
+  purchasePrice: 'Kaça geldi',
+  purchaseUnit: 'Birim',
+  unitPriceWord: { adet: 'Tanesi', g: 'Gramı', ml: 'Ml’si' } as const,
+  unitPriceLine: (word: string, value: string, count: string, names: string) =>
+    `${word} ${value} TL. Bu fiyat ${count} üründe: ${names}.`,
+  invoiceHint: 'Faturada yazdığı gibi gir: «2 kg, 640 TL» gibi. Henüz hiçbir üründe değil.',
+  unitFamilyLock: (name: string, used: string, blocked: string) =>
+    `${name} reçetelerde ${used} yazılı. ${blocked} geçemez.`,
+  unitFamilyUsed: { g: 'gramla', ml: 'mililitreyle', adet: 'adetle' } as const,
+  unitFamilyBlocked: {
+    g: 'Adet ya da litreye',
+    ml: 'Adet ya da kiloya',
+    adet: 'Gram ya da litreye',
+  } as const,
+  done: 'Tamam',
+  cancel: 'Vazgeç',
+  deleteIngredient: 'Malzemeyi sil',
+  deleteShort: 'Sil',
+  deleteConfirm: (name: string, count: string, productNames: string) =>
+    `${name} silinsin mi? ${count} üründe kullanılıyor: ${productNames}.`,
+  deleteConfirmUnused: (name: string) => `${name} silinsin mi? Hiçbir üründe kullanılmıyor.`,
+  recipeEyebrow: 'Reçete',
+  backToMenu: 'Menüye dön',
+  finish: 'Bitti',
+  closeBlock: 'Kapat',
+  recipeIntro: 'İçine ne koyuyorsun? Her malzemeye, bir tanesine giden miktarı yaz.',
+  recipeEmpty:
+    'Henüz malzeme yok. Adını yaz; listede varsa fiyatıyla gelir, yoksa bir kez nasıl aldığını sorarız.',
+  searchLabel: 'Malzeme ekle',
+  suggestExisting: (qty: string, unit: string, price: string) =>
+    `listede · ${qty} ${unit} ${price} TL`,
+  suggestAdd: 'Ekle',
+  suggestNew: (typed: string) => `«${typed}» adında yeni malzeme`,
+  suggestNewAction: 'Yeni',
+  newIngredientTag: 'listede yok, yeni',
+  newIngredientAsk: 'Nasıl alıyorsun? Bir kez sorulur, sonra listede durur.',
+  newIngredientAskDesktop: 'Listede yok. Nasıl alıyorsun? Bir kez sorulur, listeye düşer.',
+  addToList: 'Listeye ekle',
+  usageLabel: { adet: 'Kaç adet?', g: 'Kaç gram?', ml: 'Kaç ml?' } as const,
+  usageColumn: 'Bir tanesine',
+  purchaseColumn: 'Nasıl alınıyor',
+  lineCostColumn: 'Tutar',
+  removeLine: 'Çıkar',
+  editPriceInList: 'Fiyatı listede değiştir',
+  recipeTotal: 'Bir tanesinin maliyeti',
+  backToManual: 'Tutarı kendim yazacağım',
+  backToManualNote: 'Reçete silinmez, kenarda durur.',
+  usageEmpty: (name: string) => `${name} için miktar yaz. Bütün satırlar dolunca maliyet çıkar.`,
+  hesaplaRecipeIncomplete: (names: string) => `Reçeteyi tamamla: ${names}`,
+  emptyRecipe: 'Reçeteye en az bir malzeme ekle.',
+  ingredientMissing: 'Malzemeyi listeden seç ya da yeni ekle.',
+  notANumber: 'Lütfen bir sayı gir.',
+  purchaseQuantityEmpty: 'Kaç aldığını yaz.',
   purchaseQuantityZero: 'Alış miktarı 0 olamaz.',
-  purchasePriceEmpty: 'Alış tutarını girin.',
-  usageQuantityEmpty: 'Gramajı girin.',
+  purchasePriceEmpty: 'Kaça geldiğini yaz.',
+  priceRiseHeading: (name: string) => `${name} zamlandı`,
+  priceDropHeading: (name: string) => `${name} ucuzladı`,
+  priceRiseSummary: (purchase: string, from: string, to: string, count: string) =>
+    `${purchase} ${from} TL’den ${to} TL’ye çıktı. Bu fiyat ${count} üründe.`,
+  priceDropSummary: (purchase: string, from: string, to: string, count: string) =>
+    `${purchase} ${from} TL’den ${to} TL’ye indi. Bu fiyat ${count} üründe.`,
+  purchaseAsTyped: {
+    kg: 'Kilosu',
+    g: 'Gramı',
+    L: 'Litresi',
+    ml: 'Ml’si',
+    adet: 'Tanesi',
+  } as const,
+  priceRiseUsage: (usage: string, name: string) => `${usage} ${name}`,
+  priceRiseCost: (from: string, to: string) => `Maliyet ${from} → ${to} TL`,
+  priceRiseRemainingDown: (amount: string) => `Her birinden kalan ${amount} TL azaldı.`,
+  priceRiseRemainingUp: (amount: string) => `Her birinden kalan ${amount} TL arttı.`,
+  priceRiseRestore: (restore: string, current: string) =>
+    `Eski kalan için salon fiyatı ${restore} TL olmalı. Şimdi ${current} TL.`,
+  priceRiseFoot: (rate: string) =>
+    `Salon fiyatı KDV %${rate} dahil. Kart ve yemek kartı kesintisi bu hesaba girmedi. Paket servis ve online fiyat sonra.`,
+  priceRiseColumns: {
+    product: 'Ürün',
+    cost: 'Maliyet',
+    remaining: 'Her birinden kalan',
+    restore: 'Eski kalan için salon fiyatı',
+  },
+  unnamedProduct: (index: number) => `Ürün ${index}`,
 } as const
 
 /** Guardrail copy — notes, never errors. They never block `Hesapla`. */

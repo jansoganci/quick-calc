@@ -75,6 +75,45 @@ export function usageUnitFor(unit: PurchaseUnit): UsageUnit {
   return 'adet';
 }
 
+export function purchaseFactor(unit: PurchaseUnit): number {
+  return FACTOR[unit];
+}
+
+/**
+ * Appendix A `unitPrice`. `null` when the denominator is zero or the inputs
+ * are not finite. Presentation of `gramı` / `tanesi` / `ml’si` lives in the
+ * feature layer.
+ */
+export function unitPriceFromPurchase(
+  purchaseQuantity: number,
+  purchaseUnit: PurchaseUnit,
+  purchasePrice: number,
+): number | null {
+  const denominator = purchaseQuantity * FACTOR[purchaseUnit];
+  if (denominator === 0 || !Number.isFinite(denominator) || !Number.isFinite(purchasePrice)) {
+    return null;
+  }
+  const value = purchasePrice / denominator;
+  return Number.isFinite(value) ? value : null;
+}
+
+/**
+ * Spec §9.4: contribution moves only with `unitProductCost`, so the change in
+ * what's left per unit is −Δcost on every channel. Display helper, not a
+ * `calculateDetailed` input.
+ */
+export function remainingPerUnitDelta(deltaCost: number): number {
+  return -deltaCost;
+}
+
+/**
+ * Appendix A.6. Salon selling price that restores the previous remainder after
+ * a recipe-cost change. Raw; no rounding. Not called by `calculateDetailed`.
+ */
+export function salonRestorePrice(normalPrice: number, deltaCost: number, vatRate: number): number {
+  return normalPrice + deltaCost * (1 + vatRate);
+}
+
 function push(
   errors: RecipeCostError[],
   lineIndex: number,

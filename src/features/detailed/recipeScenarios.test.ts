@@ -5,7 +5,7 @@
 import { describe, expect, it } from 'vitest'
 import { validateDetailedInput } from '../../core/detailed/index.ts'
 import { emptyProduct, initialForm, type DetailedFormState, type IngredientRow, type RecipeLine } from './formState.ts'
-import { ERROR_COPY, RECIPE_COPY } from './labels.ts'
+import { RECIPE_COPY } from './labels.ts'
 import {
   buildRecipeErrorMap,
   closeRecipe,
@@ -152,12 +152,16 @@ describe('recipe scenarios, one at a time', () => {
     )
     expect(resolvedRecipeUnitCost(form, form.products[0]!)).toBeUndefined()
     expect(engineCost(form)).toBeUndefined()
-    expect(buildRecipeErrorMap(form)['products.0.recipeLines.0.purchaseQuantity']).toBe(
+    expect(buildRecipeErrorMap(form)['ingredients.un.purchaseQuantity']).toBe(
       RECIPE_COPY.purchaseQuantityZero,
     )
     const evaluation = evaluateDetailed(form, toDetailedInput(form))
     expect(evaluation.ok).toBe(false)
-    if (!evaluation.ok) expect(evaluation.errors['products.0.unitProductCost']).toBe(ERROR_COPY.recipeIncomplete)
+    if (!evaluation.ok) {
+      expect(evaluation.errors['products.0.unitProductCost']).toBe(
+        RECIPE_COPY.hesaplaRecipeIncomplete('Poğaça'),
+      )
+    }
     expect(JSON.stringify(toDetailedInput(form))).not.toMatch(/Infinity|NaN/)
   })
 

@@ -96,7 +96,7 @@ function isIngredient(value: unknown): boolean {
   return (
     hasStrings(value, ['id', 'name', 'purchaseQuantity', 'purchasePrice']) &&
     isObject(value) &&
-    isOneOf(PURCHASE_UNITS, value.purchaseUnit)
+    (value.purchaseUnit === '' || isOneOf(PURCHASE_UNITS, value.purchaseUnit))
   )
 }
 

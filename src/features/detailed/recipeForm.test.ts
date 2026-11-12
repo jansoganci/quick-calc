@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { validateDetailedInput } from '../../core/detailed/index.ts'
-import { ERROR_COPY, RECIPE_COPY } from './labels.ts'
+import { RECIPE_COPY } from './labels.ts'
 import {
   emptyIngredient,
   emptyProduct,
@@ -9,16 +9,20 @@ import {
   type IngredientRow,
 } from './formState.ts'
 import {
-  addRecipeLine,
+  attachIngredientToProduct,
   buildRecipeErrorMap,
   closeRecipe,
   commitIngredientListName,
-  commitRecipeIngredientName,
+  createIngredient,
+  deleteIngredient,
+  findIngredientByName,
+  isPurchaseUnitAllowed,
+  matchingIngredients,
   listedIngredients,
   openRecipe,
-  productsUsingIngredient,
   removeRecipeLine,
   resolvedRecipeUnitCost,
+  sameIngredientName,
   updateIngredient,
 } from './recipeForm.ts'
 import { toDetailedInput } from './toInput.ts'
@@ -34,7 +38,6 @@ function flour(): IngredientRow {
   }
 }
 
-/** A product the engine will accept once its unit cost is a real number. */
 function priced(mutate: (form: DetailedFormState) => void): DetailedFormState {
   const form = initialForm()
   form.products = [
@@ -111,67 +114,113 @@ describe('recipe cost reaches the engine as unitProductCost', () => {
     const evaluation = evaluateDetailed(form, input)
     expect(evaluation.ok).toBe(false)
     if (evaluation.ok) return
-    expect(evaluation.errors['products.0.unitProductCost']).toBe(ERROR_COPY.recipeIncomplete)
+    expect(evaluation.errors['products.0.unitProductCost']).toBe(
+      RECIPE_COPY.hesaplaRecipeIncomplete('Poğaça'),
+    )
+  })
+})
+
+describe('Turkish-aware name match', () => {
+  it('treats i/İ and ı/I as the same name after trim', () => {
+    expect(sameIngredientName('İsot', 'isot')).toBe(true)
+    expect(sameIngredientName('Iğdır', 'ığdır')).toBe(true)
+    expect(findIngredientByName([flour()], ' un ' )?.id).toBe('flour')
+    expect(findIngredientByName([flour()], 'Un tip 550')).toBeUndefined()
+  })
+
+  it('searches named ingredients with the same Turkish case rules', () => {
+    const isot: IngredientRow = { ...flour(), id: 'isot', name: 'İsot' }
+    expect(matchingIngredients([flour(), isot], 'un').map((item) => item.id)).toEqual(['flour'])
+    expect(matchingIngredients([flour(), isot], 'isot').map((item) => item.id)).toEqual(['isot'])
+    expect(matchingIngredients([flour(), isot], '').map((item) => item.id)).toEqual(['flour', 'isot'])
   })
 })
 
 describe('shared ingredients', () => {
-  it('renames a private ingredient and splits a shared one', () => {
-    const base = initialForm()
-    base.ingredients = [flour()]
-    base.products = [
-      {
-        ...emptyProduct(),
-        id: 'p1',
-        recipeLines: [{ id: 'r1', ingredientId: 'flour', usageQuantity: '180' }],
-      },
-      {
-        ...emptyProduct(),
-        id: 'p2',
-        recipeLines: [{ id: 'r2', ingredientId: 'flour', usageQuantity: '50' }],
-      },
-    ]
-    expect(productsUsingIngredient(base.products, 'flour')).toBe(2)
-
-    const renamed = commitRecipeIngredientName(base, 0, 0, 'un')
-    expect(renamed.ingredients.find((ingredient) => ingredient.id === 'flour')?.name).toBe('un')
-    expect(renamed.products[1]?.recipeLines[0]?.ingredientId).toBe('flour')
-
-    const split = commitRecipeIngredientName(base, 0, 0, 'Un tip 550')
-    expect(split.ingredients.find((ingredient) => ingredient.id === 'flour')?.name).toBe('Un')
-    expect(split.products[1]?.recipeLines[0]?.ingredientId).toBe('flour')
-    const created = split.ingredients.find((ingredient) => ingredient.name === 'Un tip 550')
-    expect(created?.purchasePrice).toBe('450')
-    expect(created?.purchaseUnit).toBe('kg')
-    expect(split.products[0]?.recipeLines[0]?.ingredientId).toBe(created?.id)
+  it('renames from the list in place for every product', () => {
+    const base = twoProductFlour()
+    const renamed = commitIngredientListName(base, 'flour', 'Un tip 550')
+    expect(renamed.ok).toBe(true)
+    if (!renamed.ok) return
+    expect(renamed.form.ingredients).toHaveLength(1)
+    expect(renamed.form.ingredients[0]).toMatchObject({ id: 'flour', name: 'Un tip 550' })
+    expect(renamed.form.products[0]?.recipeLines[0]?.ingredientId).toBe('flour')
+    expect(renamed.form.products[1]?.recipeLines[0]?.ingredientId).toBe('flour')
   })
 
   it('links a typed name to the ingredient that already has it', () => {
     let form = openRecipe(initialForm(), 0)
-    form.ingredients = [...form.ingredients, flour()]
-    const placeholder = form.products[0]?.recipeLines[0]?.ingredientId
-    form = commitRecipeIngredientName(form, 0, 0, 'Un')
-    expect(form.products[0]?.recipeLines[0]?.ingredientId).toBe('flour')
-    expect(form.ingredients.some((ingredient) => ingredient.id === placeholder)).toBe(false)
+    const created = createIngredient(form, {
+      name: 'Un',
+      purchaseQuantity: '5',
+      purchaseUnit: 'kg',
+      purchasePrice: '450',
+    })
+    form = attachIngredientToProduct(created.form, 0, created.id)
+    expect(form.products[0]?.recipeLines[0]?.ingredientId).toBe(created.id)
+    const again = createIngredient(form, {
+      name: 'un',
+      purchaseQuantity: '1',
+      purchaseUnit: 'kg',
+      purchasePrice: '1',
+    })
+    expect(again.id).toBe(created.id)
+    expect(again.form.ingredients).toHaveLength(1)
   })
 
-  it('drops an ingredient when its last line is removed', () => {
-    const opened = openRecipe(initialForm(), 0)
-    const removed = removeRecipeLine(opened, 0, 0)
+  it('keeps an unused ingredient when its last recipe line is removed', () => {
+    const form = attachIngredientToProduct(
+      { ...initialForm(), ingredients: [flour()] },
+      0,
+      'flour',
+    )
+    const removed = removeRecipeLine(form, 0, 0)
     expect(removed.products[0]?.recipeLines).toEqual([])
-    expect(removed.ingredients).toEqual([])
-    expect(removed.products[0]?.costSource).toBe('recipe')
+    expect(removed.ingredients).toEqual([flour()])
+  })
+
+  it('O1: deleting an ingredient in use removes its recipe lines', () => {
+    const form = twoProductFlour()
+    const next = deleteIngredient(form, 'flour')
+    expect(next.ingredients).toEqual([])
+    expect(next.products[0]?.recipeLines).toEqual([])
+    expect(next.products[1]?.recipeLines).toEqual([])
+    expect(resolvedRecipeUnitCost(next, next.products[0]!)).toBeUndefined()
   })
 
   it('keeps the recipe when the owner goes back to typing the cost', () => {
-    const opened = addRecipeLine(openRecipe(initialForm(), 0), 0)
-    expect(opened.products[0]?.recipeLines).toHaveLength(2)
-    const closed = closeRecipe(opened, 0)
+    const withFlour = attachIngredientToProduct(
+      { ...openRecipe(initialForm(), 0), ingredients: [flour()] },
+      0,
+      'flour',
+    )
+    const used = {
+      ...withFlour,
+      products: withFlour.products.map((product, index) =>
+        index === 0 ? { ...product, recipeLines: [{ ...product.recipeLines[0]!, usageQuantity: '180' }] } : product,
+      ),
+    }
+    const closed = closeRecipe(used, 0)
     expect(closed.products[0]?.costSource).toBe('manual')
-    expect(closed.products[0]?.recipeLines).toHaveLength(2)
+    expect(closed.products[0]?.recipeLines).toHaveLength(1)
+    expect(closed.products[0]?.unitProductCost).toBe('16,20')
     const reopened = openRecipe(closed, 0)
-    expect(reopened.products[0]?.recipeLines).toHaveLength(2)
-    expect(reopened.ingredients).toHaveLength(2)
+    expect(reopened.products[0]?.recipeLines).toHaveLength(1)
+    expect(reopened.ingredients).toHaveLength(1)
+  })
+
+  it('O2: restores the last hand-typed value when going back to typing', () => {
+    const form = priced((draft) => {
+      draft.ingredients = [flour()]
+      const product = draft.products[0]
+      if (!product) return
+      product.unitProductCost = '25'
+      product.costSource = 'recipe'
+      product.recipeLines = [{ id: 'r1', ingredientId: 'flour', usageQuantity: '180' }]
+    })
+    const closed = closeRecipe(form, 0)
+    expect(closed.products[0]?.unitProductCost).toBe('25')
+    expect(closed.products[0]?.costSource).toBe('manual')
   })
 })
 
@@ -199,32 +248,13 @@ function twoProductFlour(): DetailedFormState {
 
 describe('ingredient list', () => {
   it('hides an ingredient until it has a name', () => {
-    const opened = openRecipe(initialForm(), 0)
-    expect(listedIngredients(opened)).toEqual([])
-    const id = opened.ingredients[0]?.id
-    expect(id).toBeDefined()
-    if (id === undefined) return
-    const named = commitIngredientListName(opened, id, 'Un')
+    const blank = emptyIngredient()
+    const form = { ...initialForm(), ingredients: [blank] }
+    expect(listedIngredients(form)).toEqual([])
+    const named = commitIngredientListName(form, blank.id, 'Un')
     expect(named.ok).toBe(true)
     if (!named.ok) return
     expect(listedIngredients(named.form).map((ingredient) => ingredient.name)).toEqual(['Un'])
-  })
-
-  it('renames a shared ingredient in place for every product', () => {
-    const base = twoProductFlour()
-    const renamed = commitIngredientListName(base, 'flour', 'Un tip 550')
-    expect(renamed.ok).toBe(true)
-    if (!renamed.ok) return
-    expect(renamed.form.ingredients).toHaveLength(1)
-    expect(renamed.form.ingredients[0]).toMatchObject({ id: 'flour', name: 'Un tip 550' })
-    expect(renamed.form.products[0]?.recipeLines[0]?.ingredientId).toBe('flour')
-    expect(renamed.form.products[1]?.recipeLines[0]?.ingredientId).toBe('flour')
-
-    const cased = commitIngredientListName(base, 'flour', 'un')
-    expect(cased.ok).toBe(true)
-    if (!cased.ok) return
-    expect(cased.form.ingredients[0]?.name).toBe('un')
-    expect(cased.form.products[1]?.recipeLines[0]?.ingredientId).toBe('flour')
   })
 
   it('refuses a blank name and a name another ingredient already has', () => {
@@ -240,18 +270,6 @@ describe('ingredient list', () => {
     expect(form.ingredients[0]?.name).toBe('Un')
   })
 
-  it('drops the list row when the last recipe line is removed', () => {
-    const opened = openRecipe(initialForm(), 0)
-    const id = opened.ingredients[0]?.id
-    if (id === undefined) return
-    const named = commitIngredientListName(opened, id, 'Un')
-    expect(named.ok).toBe(true)
-    if (!named.ok) return
-    expect(listedIngredients(named.form)).toHaveLength(1)
-    const removed = removeRecipeLine(named.form, 0, 0)
-    expect(listedIngredients(removed)).toEqual([])
-  })
-
   it('changes both recipe costs when the shared purchase price changes', () => {
     const form = twoProductFlour()
     const next = updateIngredient(form, 'flour', { purchasePrice: '900' })
@@ -259,23 +277,32 @@ describe('ingredient list', () => {
     expect(resolvedRecipeUnitCost(next, next.products[1]!)).toBeCloseTo(9, 10)
   })
 
-  it('repeats a purchase error on the ingredient list path', () => {
+  it('puts a purchase error on the ingredient list path, not on the recipe line', () => {
     const form = twoProductFlour()
     form.ingredients = [{ ...flour(), purchaseQuantity: '0' }]
     const messages = buildRecipeErrorMap(form)
-    expect(messages['products.0.recipeLines.0.purchaseQuantity']).toBe(RECIPE_COPY.purchaseQuantityZero)
+    expect(messages['products.0.recipeLines.0.purchaseQuantity']).toBeUndefined()
     expect(messages['ingredients.flour.purchaseQuantity']).toBe(RECIPE_COPY.purchaseQuantityZero)
+  })
+
+  it('locks cross-family units once the ingredient is in a recipe', () => {
+    const form = twoProductFlour()
+    expect(isPurchaseUnitAllowed(form, flour(), 'g')).toBe(true)
+    expect(isPurchaseUnitAllowed(form, flour(), 'adet')).toBe(false)
+    expect(isPurchaseUnitAllowed(form, flour(), 'L')).toBe(false)
+    const unused = { ...flour(), id: 'salt', name: 'Tuz' }
+    expect(isPurchaseUnitAllowed({ ...form, ingredients: [...form.ingredients, unused] }, unused, 'adet')).toBe(
+      true,
+    )
   })
 })
 
 describe('openRecipe', () => {
-  it('starts from a blank ingredient rather than a typed cost', () => {
+  it('switches the cost source without inventing a blank ingredient', () => {
     const form = openRecipe(initialForm(), 0)
     expect(form.products[0]?.costSource).toBe('recipe')
     expect(form.products[0]?.unitProductCost).toBe('')
-    expect(form.ingredients).toHaveLength(1)
-    expect(form.ingredients[0]).toMatchObject({ name: '', purchaseUnit: 'kg' })
-    expect(form.products[0]?.recipeLines[0]?.ingredientId).toBe(form.ingredients[0]?.id)
-    expect(emptyIngredient().id).not.toBe(form.ingredients[0]?.id)
+    expect(form.ingredients).toEqual([])
+    expect(form.products[0]?.recipeLines).toEqual([])
   })
 })
