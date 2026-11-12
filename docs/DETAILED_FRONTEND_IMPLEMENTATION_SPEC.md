@@ -54,9 +54,7 @@ Ten sections, fixed order, numbered `01`–`10` in Plex Mono 11px `--qc-subtle`.
 | 09 | İlk yatırım | `capexItems[]` |
 | 10 | Varsayımlar | `assumptions.*` |
 
-**Malzemeler sits inside section 01.** It is not a numbered section and not a third mode. When at least one ingredient has a name, the block is rendered above the product rows. Each row is the ingredient's name, purchase quantity, unit and purchase amount. Gramaj is not edited here; it stays on that product's recipe. The list does not add or remove ingredients. This is the shared list from `DETAILED_FINANCIAL_SPEC.md` Appendix A.1, not a new formula.
-
-**As shipped (PR #14), the list is not the only editor for those purchase fields.** An open recipe line still shows purchase quantity, unit and price next to gramaj. A price typed in either place updates the same ingredient. Renaming from the list updates every product that points at that id; renaming a shared ingredient from a recipe line splits a new ingredient. The usage field is labelled Gramaj for every unit. Changing purchase unit across families (for example `kg` to `g`) does not convert the stored quantities.
+**Malzemeler sits inside section 01, after the menu.** It is not a numbered section and not a third mode. Authority for this block, the recipe editor, and the price-rise preview is `docs/RECIPE_REDESIGN_SPEC.md` (owner lock 12 November 2026). In short: one purchase-price editor on the list; recipe lines carry only usage quantity, labelled by unit (`Kaç adet?` / `Kaç gram?` / `Kaç ml?`, never Gramaj); the recipe opens as a full-screen layer below 1024px and as a block under the menu table from 1024px; ingredients may be added from the list or born from the recipe search (Turkish-aware name match). The monthly engine still receives one `unitProductCost` per product (`DETAILED_FINANCIAL_SPEC.md` Appendix A).
 
 **Section 04 is model-driven progressive disclosure:** it renders only when `channelMix.delivery > 0`, which is exactly the condition under which `delivery.mode` becomes required (spec §6.4). No toggle, no "advanced" switch.
 
@@ -81,7 +79,7 @@ One pattern, three densities.
 
 | Collection | Fields | Desktop | Mobile |
 | --- | --- | --- | --- |
-| `products[]` | 5 | Grid `1fr 104px 104px 92px 104px 56px`, 11px eyebrow column headers, `#EEF0F2` between rows | Collapsed summary row (`Filtre kahve · 65,00 TL · 150 adet ▾`) expanding inline to a `#FCFCFD` block: name field full width, then a 2×2 grid |
+| `products[]` | 5 + recipe control | Grid `1fr 120px 120px 72px 112px 88px 48px` (Ürün · Normal fiyat · Online fiyat · Günlük adet · Birim maliyet · Reçete · Kaldır), 11px eyebrow column headers, `#EEF0F2` between rows. The recipe block, when open, sits under the whole table — never as a sub-row. | Collapsed summary row (name · `günde n adet` · `maliyet {tutar} TL · elle/reçeteden`) expanding inline to name + 2×2 grid; recipe is a full-screen layer |
 | `positions[]` | 6 | Two-line block: `1fr 104px 56px` (ad, kişi, Kaldır), then a 4-column per-person grid under 11px eyebrows | Same block, collapsed/expanded as products |
 | `opexLines[]` | 2 | Two-up grid, each cell `1fr 124px 52px` | Single column, 44px rows |
 | `capexItems[]` | 2 | Two-up grid, each cell `1fr 132px 52px` | Single column, 44px rows |

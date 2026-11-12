@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   recipeCost,
+  remainingPerUnitDelta,
+  salonRestorePrice,
+  unitPriceFromPurchase,
   usageUnitFor,
   type RecipeIngredientCostInput,
   type RecipeLineCostInput,
@@ -163,5 +166,66 @@ describe('recipe cost failures (spec §A.4)', () => {
       ok: false,
       errors: [{ lineIndex: 0, field: 'purchaseUnit', code: 'invalid_unit' }],
     });
+  });
+});
+
+describe('salon restore-price display helper (Appendix A.6 / T19)', () => {
+  const ekmek = ingredient({
+    id: 'ekmek',
+    purchaseQuantity: 10,
+    purchaseUnit: 'adet',
+    purchasePrice: 80,
+  });
+  const kiyma = ingredient({
+    id: 'kiyma',
+    purchaseQuantity: 1,
+    purchaseUnit: 'kg',
+    purchasePrice: 380,
+  });
+  const kiymaZam = { ...kiyma, purchasePrice: 450 };
+  const domates = ingredient({
+    id: 'domates',
+    purchaseQuantity: 1,
+    purchaseUnit: 'kg',
+    purchasePrice: 40,
+  });
+  const marul = ingredient({
+    id: 'marul',
+    purchaseQuantity: 1,
+    purchaseUnit: 'kg',
+    purchasePrice: 35,
+  });
+
+  const hamburger = [
+    line({ ingredientId: 'ekmek', usageQuantity: 1 }),
+    line({ ingredientId: 'kiyma', usageQuantity: 120 }),
+    line({ ingredientId: 'domates', usageQuantity: 30 }),
+    line({ ingredientId: 'marul', usageQuantity: 20 }),
+  ];
+  const kofte = [
+    line({ ingredientId: 'ekmek', usageQuantity: 1 }),
+    line({ ingredientId: 'kiyma', usageQuantity: 100 }),
+    line({ ingredientId: 'domates', usageQuantity: 20 }),
+  ];
+
+  it('prices the Hamburger and Köfte ekmek fixtures', () => {
+    expect(unitPriceFromPurchase(10, 'adet', 80)).toBeCloseTo(8, 10);
+    expect(unitPriceFromPurchase(1, 'kg', 380)).toBeCloseTo(0.38, 10);
+    expect(unitPriceFromPurchase(1, 'kg', 450)).toBeCloseTo(0.45, 10);
+    expect(cost([ekmek, kiyma, domates, marul], hamburger)).toBeCloseTo(55.5, 10);
+    expect(cost([ekmek, kiymaZam, domates, marul], hamburger)).toBeCloseTo(63.9, 10);
+    expect(cost([ekmek, kiyma, domates], kofte)).toBeCloseTo(46.8, 10);
+    expect(cost([ekmek, kiymaZam, domates], kofte)).toBeCloseTo(53.8, 10);
+  });
+
+  it('drops remaining per unit by the cost increase on every channel', () => {
+    expect(remainingPerUnitDelta(8.4)).toBeCloseTo(-8.4, 10);
+    expect(remainingPerUnitDelta(7)).toBeCloseTo(-7, 10);
+    expect(remainingPerUnitDelta(-8.4)).toBeCloseTo(8.4, 10);
+  });
+
+  it('restores the old salon remainder: Hamburger 229,24 and Köfte ekmek 167,70', () => {
+    expect(salonRestorePrice(220, 8.4, 0.1)).toBeCloseTo(229.24, 10);
+    expect(salonRestorePrice(160, 7, 0.1)).toBeCloseTo(167.7, 10);
   });
 });

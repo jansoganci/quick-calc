@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { NumberField } from '../../../components/NumberField.tsx'
 import { cn } from '../../../lib/cn.ts'
 import type { DetailedCalcApi } from '../hooks/useDetailedCalc.ts'
@@ -28,12 +29,15 @@ import { LineRows } from './LineRows.tsx'
 import { MixTable } from './MixTable.tsx'
 import { PositionRows } from './PositionRows.tsx'
 import { ProductRows } from './ProductRows.tsx'
+import { RecipeEditor } from './RecipeEditor.tsx'
 import { SampleFillControl } from './SampleFillControl.tsx'
 import { SectionFrame } from './SectionFrame.tsx'
 
 export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
   const { form, view } = calc
   const sections = visibleSections(form)
+  const [recipeProductIndex, setRecipeProductIndex] = useState<number | null>(null)
+  const [focusIngredientId, setFocusIngredientId] = useState<string | null>(null)
 
   const guardrailsFor = (section: SectionId) =>
     (view?.guardrails ?? []).filter((guardrail) => guardrail.section === section)
@@ -57,13 +61,6 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
     <div className="px-[18px] py-5 lg:px-[30px] lg:py-[26px] lg:pb-[34px]">
       <SectionFrame {...frameProps('products')}>
         <SampleFillControl draftSaved={calc.draftSaved} onLoadSample={calc.loadSample} />
-        <IngredientList
-          form={form}
-          errorFor={calc.errorFor}
-          onBlur={calc.markTouched}
-          onCommitName={calc.commitIngredientListName}
-          onIngredientField={calc.setIngredientField}
-        />
         <ProductRows
           form={form}
           dailyUnits={formatCount(typedDailyUnits(form))}
@@ -72,13 +69,46 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
           onChange={calc.setProductField}
           onAdd={calc.addProduct}
           onRemove={calc.removeProduct}
-          onOpenRecipe={calc.openRecipe}
-          onCloseRecipe={calc.closeRecipe}
-          onAddRecipeLine={calc.addRecipeLine}
-          onRemoveRecipeLine={calc.removeRecipeLine}
-          onCommitRecipeName={calc.commitRecipeIngredientName}
+          recipeProductIndex={recipeProductIndex}
+          onOpenRecipe={(index) => {
+            calc.openRecipe(index)
+            setRecipeProductIndex(index)
+          }}
+        />
+        {recipeProductIndex !== null ? (
+          <RecipeEditor
+            form={form}
+            productIndex={recipeProductIndex}
+            errorFor={calc.errorFor}
+            onBlur={calc.markTouched}
+            onClose={() => setRecipeProductIndex(null)}
+            onBackToManual={() => {
+              calc.closeRecipe(recipeProductIndex)
+              setRecipeProductIndex(null)
+            }}
+            onAttach={(ingredientId) => calc.attachIngredient(recipeProductIndex, ingredientId)}
+            onCreateAndAttach={(fields) =>
+              calc.createAndAttachIngredient(recipeProductIndex, fields)
+            }
+            onRemoveLine={(lineIndex) => calc.removeRecipeLine(recipeProductIndex, lineIndex)}
+            onUsage={(lineIndex, value) => calc.setRecipeUsage(recipeProductIndex, lineIndex, value)}
+            onEditPriceInList={(ingredientId) => {
+              setRecipeProductIndex(null)
+              setFocusIngredientId(ingredientId)
+            }}
+          />
+        ) : null}
+        <IngredientList
+          form={form}
+          errorFor={calc.errorFor}
+          onBlur={calc.markTouched}
+          onCommitName={calc.commitIngredientListName}
           onIngredientField={calc.setIngredientField}
-          onRecipeUsage={calc.setRecipeUsage}
+          onAddBlank={calc.addBlankIngredient}
+          onDiscardBlank={calc.discardBlankIngredient}
+          onDelete={calc.deleteIngredient}
+          requestedOpenId={focusIngredientId}
+          onConsumedOpen={() => setFocusIngredientId(null)}
         />
       </SectionFrame>
 

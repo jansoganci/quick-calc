@@ -1,19 +1,18 @@
 import { NumberField } from '../../../components/NumberField.tsx'
 import { TextField } from '../../../components/TextField.tsx'
 import { cn } from '../../../lib/cn.ts'
+import { formatCount } from '../../../lib/number.ts'
 import type { DetailedFormState, ProductRow } from '../formState.ts'
 import { COPY, GUARDRAIL_COPY, PRODUCT_LABELS, RECIPE_COPY } from '../labels.ts'
 import { useNewestRowOpen } from '../hooks/useNewestRowOpen.ts'
 import { recipeAmountText } from '../recipeForm.ts'
-import { RecipePanel } from './RecipePanel.tsx'
 
-const GRID = 'lg:grid-cols-[1fr_104px_104px_92px_104px_56px]'
+const GRID = 'lg:grid-cols-[minmax(0,1fr)_120px_120px_72px_112px_88px_48px]'
 
 const NUMERIC_FIELDS = [
   { field: 'normalPrice', label: PRODUCT_LABELS.normalPrice, unit: 'TL', grouped: true },
   { field: 'onlinePrice', label: PRODUCT_LABELS.onlinePrice, unit: 'TL', grouped: true },
   { field: 'dailyQuantity', label: PRODUCT_LABELS.dailyQuantity, unit: '', grouped: false },
-  { field: 'unitProductCost', label: PRODUCT_LABELS.unitProductCost, unit: 'TL', grouped: true },
 ] as const
 
 type ProductRowsProps = {
@@ -24,17 +23,24 @@ type ProductRowsProps = {
   onChange: (index: number, field: keyof Omit<ProductRow, 'id' | 'costSource' | 'recipeLines'>, value: string) => void
   onAdd: () => void
   onRemove: (index: number) => void
+  recipeProductIndex: number | null
   onOpenRecipe: (index: number) => void
-  onCloseRecipe: (index: number) => void
-  onAddRecipeLine: (index: number) => void
-  onRemoveRecipeLine: (productIndex: number, lineIndex: number) => void
-  onCommitRecipeName: (productIndex: number, lineIndex: number, name: string) => void
-  onIngredientField: (
-    ingredientId: string,
-    field: 'purchaseQuantity' | 'purchasePrice' | 'purchaseUnit',
-    value: string,
-  ) => void
-  onRecipeUsage: (productIndex: number, lineIndex: number, value: string) => void
+}
+
+function costDisplay(form: DetailedFormState, product: ProductRow): { value: string; locked: boolean } {
+  if (product.costSource !== 'recipe') {
+    return { value: product.unitProductCost, locked: false }
+  }
+  return { value: recipeAmountText(form, product) ?? '—', locked: true }
+}
+
+function collapsedCost(form: DetailedFormState, product: ProductRow): string {
+  const cost = costDisplay(form, product)
+  const source = product.costSource === 'recipe' ? RECIPE_COPY.sourceRecipe : RECIPE_COPY.sourceManual
+  if (cost.value === '' || cost.value === '—') {
+    return product.costSource === 'recipe' ? RECIPE_COPY.menuRowCost('—', source) : ''
+  }
+  return RECIPE_COPY.menuRowCost(cost.value, source)
 }
 
 export function ProductRows({
@@ -45,20 +51,24 @@ export function ProductRows({
   onChange,
   onAdd,
   onRemove,
+  recipeProductIndex,
   onOpenRecipe,
-  onCloseRecipe,
-  onAddRecipeLine,
-  onRemoveRecipeLine,
-  onCommitRecipeName,
-  onIngredientField,
-  onRecipeUsage,
 }: ProductRowsProps) {
   const products = form.products
   const rows = useNewestRowOpen(products.map((product) => product.id))
 
   return (
     <div>
-      <div className={cn('hidden gap-2.5 pb-2 lg:grid', GRID)}>
+      <div className="flex items-baseline justify-between gap-3 pb-2">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+          {RECIPE_COPY.menuHeading}
+        </p>
+        <span className="font-mono text-xs tabular-nums text-qc-muted">
+          {COPY.productCount(products.length)}
+        </span>
+      </div>
+
+      <div className={cn('hidden gap-2 pb-2 lg:grid', GRID)}>
         <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
           {PRODUCT_LABELS.name}
         </span>
@@ -70,15 +80,22 @@ export function ProductRows({
             {column.label}
           </span>
         ))}
+        <span className="text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+          {PRODUCT_LABELS.unitProductCost}
+        </span>
+        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+          {RECIPE_COPY.recipeEyebrow}
+        </span>
         <span />
       </div>
 
       {products.map((product, index) => {
         const open = rows.isOpen(product.id)
-        const summary = [product.normalPrice ? `${product.normalPrice} TL` : null,
-          product.dailyQuantity ? `${product.dailyQuantity} adet` : null]
-          .filter(Boolean)
-          .join(' · ')
+        const cost = costDisplay(form, product)
+        const recipeOpen = recipeProductIndex === index
+        const hasRecipe = product.costSource === 'recipe'
+        const daily = product.dailyQuantity.trim()
+        const dailyText = daily === '' ? '' : RECIPE_COPY.menuRowDaily(daily)
 
         return (
           <div
@@ -90,13 +107,22 @@ export function ProductRows({
               type="button"
               onClick={() => rows.toggle(product.id)}
               aria-expanded={open}
-              className="flex min-h-[44px] w-full items-center justify-between gap-3 text-left lg:hidden"
+              className="flex min-h-[44px] w-full items-center justify-between gap-3 py-1.5 text-left lg:hidden"
             >
-              <span className="text-[15px] text-qc-ink">
-                {product.name.trim() === '' ? `${PRODUCT_LABELS.name} ${index + 1}` : product.name}
+              <span className="truncate text-[15px] text-qc-ink">
+                {product.name.trim() === '' ? RECIPE_COPY.unnamedProduct(index + 1) : product.name}
               </span>
               <span className="flex items-center gap-2.5">
-                <span className="font-mono text-xs tabular-nums text-qc-muted">{summary}</span>
+                {open ? null : (
+                  <span className="text-right">
+                    {dailyText ? (
+                      <span className="block text-xs text-qc-muted">{dailyText}</span>
+                    ) : null}
+                    <span className="block font-mono text-xs tabular-nums text-qc-muted">
+                      {collapsedCost(form, product)}
+                    </span>
+                  </span>
+                )}
                 <span
                   aria-hidden="true"
                   className={cn(
@@ -109,7 +135,7 @@ export function ProductRows({
 
             <div
               className={cn(
-                'grid grid-cols-2 gap-3 pb-3 lg:grid lg:gap-2.5 lg:pb-0',
+                'grid grid-cols-2 gap-3 pb-3 lg:grid lg:gap-2 lg:pb-0',
                 GRID,
                 'lg:items-center',
                 open ? 'grid' : 'hidden lg:grid',
@@ -118,7 +144,7 @@ export function ProductRows({
               <div className="col-span-2 lg:col-span-1">
                 <TextField
                   id={`products.${index}.name`}
-                  label={COPY.productName}
+                  label={PRODUCT_LABELS.name}
                   labelHidden="from-lg"
                   value={product.name}
                   onChange={(value) => onChange(index, 'name', value)}
@@ -126,25 +152,44 @@ export function ProductRows({
                   error={errorFor(`products.${index}.name`)}
                 />
               </div>
-              {NUMERIC_FIELDS.map((column) => {
-                const fromRecipe = column.field === 'unitProductCost' && product.costSource === 'recipe'
-                const recipeAmount = fromRecipe ? recipeAmountText(form, product) : null
-                return (
-                  <NumberField
-                    key={column.field}
-                    id={`products.${index}.${column.field}`}
-                    label={column.label}
-                    labelHidden="from-lg"
-                    value={fromRecipe ? (recipeAmount ?? '') : product[column.field]}
-                    onChange={(value) => onChange(index, column.field, value)}
-                    onBlur={() => onBlur(`products.${index}.${column.field}`)}
-                    unit={column.unit}
-                    error={errorFor(`products.${index}.${column.field}`)}
-                    grouped={column.grouped}
-                    readOnly={fromRecipe}
-                  />
-                )
-              })}
+              {NUMERIC_FIELDS.map((column) => (
+                <NumberField
+                  key={column.field}
+                  id={`products.${index}.${column.field}`}
+                  label={column.label}
+                  labelHidden="from-lg"
+                  value={product[column.field]}
+                  onChange={(value) => onChange(index, column.field, value)}
+                  onBlur={() => onBlur(`products.${index}.${column.field}`)}
+                  unit={column.unit}
+                  error={errorFor(`products.${index}.${column.field}`)}
+                  grouped={column.grouped}
+                />
+              ))}
+              <NumberField
+                id={`products.${index}.unitProductCost`}
+                label={PRODUCT_LABELS.unitProductCost}
+                labelHidden="from-lg"
+                value={cost.value}
+                onChange={(value) => onChange(index, 'unitProductCost', value)}
+                onBlur={() => onBlur(`products.${index}.unitProductCost`)}
+                unit="TL"
+                error={errorFor(`products.${index}.unitProductCost`)}
+                grouped
+                readOnly={cost.locked}
+              />
+              <div className="hidden lg:block">
+                <button
+                  type="button"
+                  className={cn(
+                    'qc-text-btn',
+                    recipeOpen && 'font-medium text-qc-ink underline decoration-2 underline-offset-4',
+                  )}
+                  onClick={() => onOpenRecipe(index)}
+                >
+                  {hasRecipe ? RECIPE_COPY.openRecipe : RECIPE_COPY.openRecipeNewDesktop}
+                </button>
+              </div>
               <button
                 type="button"
                 className="qc-text-btn is-muted col-span-2 text-left lg:col-span-1 lg:text-right"
@@ -153,42 +198,37 @@ export function ProductRows({
               >
                 {COPY.remove}
               </button>
-              <div className="col-span-2 lg:col-span-full">
-                {product.costSource === 'recipe' ? (
+              <div className="col-span-2 border-t border-qc-rule-row pt-3 lg:hidden">
+                {hasRecipe ? (
                   <>
+                    <p className="text-xs text-qc-secondary">
+                      {RECIPE_COPY.costFromRecipeNote(formatCount(product.recipeLines.length))}
+                    </p>
                     <button
                       type="button"
-                      className="qc-text-btn"
-                      onClick={() => onCloseRecipe(index)}
+                      className="qc-text-btn mt-1"
+                      onClick={() => {
+                        if (!rows.isOpen(product.id)) rows.toggle(product.id)
+                        onOpenRecipe(index)
+                      }}
                     >
-                      {RECIPE_COPY.manual}
+                      {RECIPE_COPY.openRecipe}
                     </button>
-                    <RecipePanel
-                      productIndex={index}
-                      product={product}
-                      products={products}
-                      ingredients={form.ingredients}
-                      errorFor={errorFor}
-                      onBlur={onBlur}
-                      onCommitName={(lineIndex, name) => onCommitRecipeName(index, lineIndex, name)}
-                      onIngredientField={onIngredientField}
-                      onUsage={(lineIndex, value) => onRecipeUsage(index, lineIndex, value)}
-                      onAddLine={() => onAddRecipeLine(index)}
-                      onRemoveLine={(lineIndex) => onRemoveRecipeLine(index, lineIndex)}
-                      amountText={recipeAmountText(form, product)}
-                    />
                   </>
                 ) : (
-                  <button
-                    type="button"
-                    className="qc-text-btn is-accent"
-                    onClick={() => {
-                      if (!rows.isOpen(product.id)) rows.toggle(product.id)
-                      onOpenRecipe(index)
-                    }}
-                  >
-                    {RECIPE_COPY.fromRecipe}
-                  </button>
+                  <>
+                    <p className="text-xs text-qc-secondary">{RECIPE_COPY.costTypedNote}</p>
+                    <button
+                      type="button"
+                      className="qc-text-btn mt-1"
+                      onClick={() => {
+                        if (!rows.isOpen(product.id)) rows.toggle(product.id)
+                        onOpenRecipe(index)
+                      }}
+                    >
+                      {RECIPE_COPY.openRecipeNew}
+                    </button>
+                  </>
                 )}
               </div>
             </div>
