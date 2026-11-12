@@ -12,7 +12,7 @@ If two documents appear to disagree, use the authority order in [`CLAUDE.md`](..
 
 | Document | Owns |
 | --- | --- |
-| [`V2_V3_PRODUCT_ROADMAP.md`](./V2_V3_PRODUCT_ROADMAP.md) | V2/V3 product direction, Detailed-only scope additions, easy price/recipe revisions, release boundaries and open decisions. Not a financial specification or implementation authorization |
+| [`V2_V3_PRODUCT_ROADMAP.md`](./V2_V3_PRODUCT_ROADMAP.md) | V2/V3 product direction, Detailed-only scope additions, easy price/recipe revisions, release boundaries, open decisions, and which steps are on `main`. Not a financial specification. New formulas still need their own approved spec |
 | [`quick-calculation-scope-v1.md`](./quick-calculation-scope-v1.md) | Quick / Lite product & financial scope — inputs, formulas, outputs, terminology |
 | [`US_PRODUCT_SCOPE.md`](./US_PRODUCT_SCOPE.md) | US variant of the same product — owner locks US-1…US-4 recorded (v0.2). Implementation not authorised. Does not replace the Turkey specs |
 | [`DETAILED_FEASIBILITY_DECISIONS.md`](./DETAILED_FEASIBILITY_DECISIONS.md) | Detailed Feasibility locked decisions and v1 exclusions. Not yet a full financial specification |

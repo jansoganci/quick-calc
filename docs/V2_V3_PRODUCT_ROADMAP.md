@@ -1,7 +1,7 @@
 # maliyet.lol — V2 / V3 Ürün Yönü ve Kapsam
 
-**Tarih:** 10 Kasım 2026 · **Sürüm:** 0.2
-**Durum:** Kullanıcının onayladığı ürün kararları, geliştirme sırası ve açık konular. Finansal formül sözleşmesi veya uygulama izni değildir. Her adımın ayrıntısı, o adıma gelindiğinde kısaca netleştirilir.
+**Tarih:** 12 Kasım 2026 · **Sürüm:** 0.3
+**Durum:** Kullanıcının onayladığı ürün kararları, geliştirme sırası ve açık konular. Finansal formül sözleşmesi veya uygulama izni değildir. Her adımın ayrıntısı, o adıma gelindiğinde kısaca netleştirilir. §4'teki durum işaretleri `main` üzerindeki kodun kaydıdır; yeni ürün kararı değildir.
 
 ## 1. Ne yapıyoruz
 
@@ -43,12 +43,16 @@
 
 ## 4. Geliştirme sırası
 
-1. **Reçeteden hesapla.** Ürünün maliyetini reçeteden hesaplayan yardımcı: malzeme, alış miktarı ve birimi, alış tutarı, gramaj.
-2. **Ortak malzeme listesi.** Fiyatın tek yerden güncellenmesi; gramajın ürüne özgü kalması.
-3. **Ayrı satış tahmini bölümü.** Menüdeki ürünler için tahmini günlük adet.
-4. **Food cost ve ürün katkısı.** Ürün başına food cost oranı, birim katkı ve tahmini adetle toplam katkı. Yiyecek / İçecek karşılaştırması. Mevcut senaryoların yeni maliyetle çalışması.
-5. **Gider dağıtımı.** V2'de mi V3'te mi olacağı açık; bkz. §5.
-6. **Hesap ve veritabanı.**
+Durum, 12 Kasım 2026 itibarıyla `main` dalındaki koddur.
+
+| # | Adım | Durum |
+| --- | --- | --- |
+| 1 | **Reçeteden hesapla.** Ürünün maliyetini reçeteden hesaplayan yardımcı: malzeme, alış miktarı ve birimi, alış tutarı, gramaj. | **Bitti.** PR #13. Elle girilen maliyet alanı duruyor; reçete seçilince o tutarı doldurur. Aylık motor reçeteyi görmez. |
+| 2 | **Ortak malzeme listesi.** Fiyatın tek yerden güncellenmesi; gramajın ürüne özgü kalması. | **Merge edildi, ekran yarım.** PR #14. Veri katmanında alış fiyatı tek kayıttır. Ürünler bölümünün üstünde Malzemeler bloğu vardır. Ekran niyeti henüz tutmuyor: alış tutarı hem listede hem reçete satırında (`RecipePanel`) düzenlenir; `kg` → `g` birim değişimi miktarı çevirmeden maliyeti binle çarpar; listeden ad değiştirmek bütün ürünleri günceller, reçete satırından aynı değişiklik yeni malzeme ayırır; kullanım alanı her birimde «Gramaj» yazar. |
+| 3 | **Ayrı satış tahmini bölümü.** Menüdeki ürünler için tahmini günlük adet. | **Başlanmadı.** |
+| 4 | **Food cost ve ürün katkısı.** Ürün başına food cost oranı, birim katkı ve tahmini adetle toplam katkı. Yiyecek / İçecek karşılaştırması. Mevcut senaryoların yeni maliyetle çalışması. | **Başlanmadı.** (Detaylı v1'deki ürün katkısı tablosu DF-84'tür; bu adımdaki food cost oranı değildir.) |
+| 5 | **Gider dağıtımı.** V2'de mi V3'te mi olacağı açık; bkz. §5. | **Başlanmadı.** |
+| 6 | **Hesap ve veritabanı.** | **Başlanmadı.** |
 
 Her adım bitip görüldükten sonra sıradakine geçilir. Sıra, kullanıcı kararıyla değişebilir.
 
@@ -89,5 +93,5 @@ Onaylanmayanlar: Star/Dog etiketleri, %70 gibi eşikler, otomatik “menüden ç
 
 - `DETAILED_FEASIBILITY_DECISIONS.md` Detaylı v1'in karar kaydı olarak kalır. Reçete (X1) ve kategori (X21) v1 dışlamalarıdır; bu belge onları yalnızca V2 için genişletir.
 - `TECH_STACK_AND_CONSTRAINTS.md` bugün veritabanı ve hesap olmadığını söyler. Bu doğrudur. Hesap adımına gelindiğinde güncellenir.
-- **Dokümantasyon uyumu:** Detaylı motor `byProduct` ürün katkısını üretiyor (DF-84). `DETAILED_FINANCIAL_SPEC.md` §16.3'teki `MonthResult` şemasında bu alan yazılı değil. Bu bir formül değişikliği değildir; spec, kodla eşitlenmelidir.
+- **Dokümantasyon uyumu:** Detaylı motor `byProduct` ürün katkısını üretiyor (DF-84). `DETAILED_FINANCIAL_SPEC.md` v1.4 §16.3 bu alanı kaydetti. Appendix A.5 ile frontend spec arasındaki «malzeme ekranı» cümlesi v1.5'te, formül değiştirilmeden, mevcut UI bloğuna bağlandı.
 - Bu belge ürün yönüdür. Yeni formüller, varsayılanlar, veri şeması ve ekranlar ilgili adımda ayrıca onaylanır.
