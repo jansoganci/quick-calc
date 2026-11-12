@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { initialForm, type DetailedFormState } from './formState.ts'
+import { initialForm, sampleCafeForm, type DetailedFormState } from './formState.ts'
 import { COPY, SECTION_ECHO_LABELS } from './labels.ts'
 import { sectionSummary, visibleSections } from './sectionSummary.ts'
 import { toDetailedInput } from './toInput.ts'
@@ -272,6 +272,23 @@ describe('section summaries before the first calculation', () => {
     const form = viableForm()
     expect(sectionSummary(form, 'channels')).toBe('%100')
     expect(sectionSummary(form, 'payments')).toBe('%100')
+  })
+})
+
+describe('Appendix B results on the sample café', () => {
+  it('exposes salon menu rows, kira-gün lines and a January basis', () => {
+    const result = evaluate(sampleCafeForm())
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.view.salonMenu.products.map((row) => row.name)).toEqual([
+      'Amerikano',
+      'Poğaça',
+      'Cold Brew',
+    ])
+    expect(result.view.salonMenu.weakestNote).toContain('Poğaça')
+    expect(result.view.fixedCostDays.available).toBe(true)
+    expect(result.view.januaryBasis.operatingDaysPerMonth).toBe(30)
+    expect(result.view.januaryBasis.month.monthlyPayroll).toBe(66_000)
   })
 })
 

@@ -201,11 +201,15 @@ describe('public surface', () => {
         'MIX_TOLERANCE',
         'PURCHASE_UNITS',
         'RAMP_UP_TABLES',
+        'applyJanuaryTest',
+        'buildFixedCostDays',
+        'buildSalonMenuEconomics',
         'calculateDetailed',
         'isPurchaseUnit',
         'purchaseFactor',
         'recipeCost',
         'remainingPerUnitDelta',
+        'salonFoodCostRate',
         'salonRestorePrice',
         'unitPriceFromPurchase',
         'usageUnitFor',
@@ -226,6 +230,7 @@ describe('public surface', () => {
       'resolveRentCost',
       'goldenRawInput',
       'GOLDEN',
+      'sampleCafeRawInput',
     ]) {
       expect(Object.hasOwn(publicApi, internal), `index.ts exposes ${internal}`).toBe(false);
     }

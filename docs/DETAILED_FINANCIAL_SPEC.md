@@ -1,6 +1,6 @@
 # Detailed Feasibility — Financial Specification
 
-**Version:** v1.6
+**Version:** v1.7
 **Status:** Formula contract for `src/core/detailed/`. **Not** implementation.
 **Currency:** TRY · **Country:** Turkey · **Language for v1:** Turkish-first
 **Engine:** `detailedEngineVersion` `1.0.0`
@@ -976,6 +976,7 @@ Tier 1 must pass before any Detailed UI work begins.
 | 3 | T14 | Structural guards | I2, I3, I4, I5, I7, I13; banned terminology absent from `core/detailed/`; result carries nothing beyond §16 |
 | 2 | T18 | Recipe cost helper | Appendix A: the 16.2 worked example, both units of each family, a two-line sum, purchase quantity zero or empty, a missing ingredient, and no `NaN` or `Infinity`. No figure in §18.2 changes |
 | 2 | T19 | Salon restore-price display helper | Appendix A.6: Hamburger 220 + 8,40 × 1,10 = 229,24; Köfte ekmek 160 + 7,00 × 1,10 = 167,70; remaining-per-unit delta = −Δcost. Not called by `calculateDetailed`. No figure in §18.2 changes |
+| 2 | T20 | Menu food-cost, fixed-cost days, January test | Appendix B: salon food-cost = `unitProductCost / salonNetPerUnit`; remaining = §9.4 salon; weakest = lowest remaining; `dailyContribution = totalContribution / operatingDaysPerMonth`; January scales `monthlyPayroll` and `rentCost` only; break-even §14.3 with `fixed'`. Not called by `calculateDetailed`. No figure in §18.2 changes |
 
 Tests are colocated as `*.test.ts` under `src/core/detailed/`. No UI test suite.
 
@@ -1048,7 +1049,7 @@ A purchase price of zero is valid. A usage quantity of zero is valid and adds no
 
 ### A.5 What this appendix does not do
 
-This appendix does not add a food-cost ratio, price history, stock, or a server. Those stay outside this contract. It does not define a separate ingredient **screen** or a third product mode.
+This appendix does not add a food-cost ratio, price history, stock, or a server. The food-cost ratio lives in Appendix B. It does not define a separate ingredient **screen** or a third product mode.
 
 The shared list in §A.1 is data, not a screen. The implemented Detailed UI renders that list as a **Malzemeler** block inside section 01 — not a numbered section — as recorded in `DETAILED_FRONTEND_IMPLEMENTATION_SPEC.md` and `RECIPE_REDESIGN_SPEC.md`. That block is presentation of these inputs. It does not change `recipeCost`, `unitProductCost`, or any monthly-engine formula. Purchase quantity, unit and price are edited **only** on that block. A recipe line carries only `usageQuantity`. That is a UI fact, not a second price in this contract.
 
@@ -1077,10 +1078,92 @@ On a price **decrease**, the UI shows the cost change and `Her birinden kalan {x
 
 ---
 
+## Appendix B — Menu food-cost, fixed-cost days, January test (V2 step 3)
+
+Display helpers for the Detailed **results** area after the first `Hesapla`. They do **not** change `calculateDetailed`, the golden vector, or DF-84. They read the resolved input and the **base** stabilized month. `detailedEngineVersion` stays `1.0.0`.
+
+UI copy is *sen*. The screen never writes `marj`, `katkı`, `food cost`, or `amortisman`. The existing DF-84 table keeps its v1 labels.
+
+### B.1 Salon food-cost rate and remaining per unit
+
+Roadmap: food cost is against the **VAT-exclusive** selling price; packaging is not in the ratio.
+
+```
+salonNetPerUnit(p)     = p.normalPrice / (1 + vatRate)     // §7.3, salon, priceFactor = 1
+salonFoodCostRate(p)   = unitProductCost(p) / salonNetPerUnit(p)
+                       when salonNetPerUnit(p) > 0
+                       else unavailable
+
+salonRemainingPerUnit(p) = unitContribution(p, 'salon')    // §9.4
+```
+
+`salonRemainingPerUnit` is the salon channel's §9.4 figure: net of KDV, minus product cost, minus salon channel variable cost (0), minus the salon payment/platform fee. It is **not** the DF-84 monthly product contribution (that sums every channel).
+
+Selling price on the screen is the entered salon price (`normalPrice`, KDV included). Cost is `unitProductCost`.
+
+The weakest product is the one with the lowest `salonRemainingPerUnit`. Ties take the first product in input order. A single-product menu has no weakest note.
+
+### B.2 Fixed-cost days — «Kira kaç günde çıkıyor»
+
+Uses `assumptions.operatingDaysPerMonth` (default 30, DF-66).
+
+```
+dailyContribution = totalContribution / operatingDaysPerMonth
+```
+
+`totalContribution` is the base stabilized month's §12 figure (what's left after variable costs, before fixed costs).
+
+When `totalContribution ≤ 0` the conversion is **unavailable**: the month cannot be told as days.
+
+Otherwise:
+
+```
+rentDays     = rentCost / dailyContribution
+payrollDays  = monthlyPayroll / dailyContribution
+otherDays    = (monthlyOwnerCost + monthlyOpex + monthlyAidat) / dailyContribution
+remainderDays = monthlyOperatingResult / dailyContribution
+```
+
+`monthlyAidat = monthlyOccupancyCost − rentCost`. **Kira** is `rentCost` (the occupancy rent after net/gross withholding, §10.3), not aidat. **Personel** is `monthlyPayroll` only — owner draw and Bağ-Kur sit in **other**. A zero-cost bucket is omitted on screen.
+
+The engine returns the raw (unrounded) day counts. The screen rounds each of the three cost buckets to the nearest whole day; «geri kalan» is `operatingDaysPerMonth −` that rounded sum, so the lines add up. When that remainder is negative, the month does not cover its fixed costs.
+
+### B.3 January test — «Ocak testi»
+
+A what-if on the **already calculated** base month. It is not a fourth scenario and does not rewrite Kötü / Baz / İyi.
+
+Inputs, empty = 0:
+
+```
+wageIncreaseRate   // «Asgari ücret artışı %», 0.30 means +%30
+rentIncreaseRate   // «Kira artışı %»
+```
+
+```
+payroll'     = monthlyPayroll × (1 + wageIncreaseRate)
+rent'        = rentCost × (1 + rentIncreaseRate)
+occupancy'   = rent' + monthlyAidat
+fixed'       = payroll' + monthlyOwnerCost + occupancy' + monthlyOpex
+result'      = totalContribution − fixed'
+```
+
+Variable costs, volume, VAT and contribution do not change. The wage rate applies to the whole `monthlyPayroll` (every `positions[]` line: employer cost, meal, transport, bonus). It does not apply to owner / Bağ-Kur. The rent rate applies to `rentCost` only, not aidat.
+
+Break-even is §14.3 with `monthlyFixedCost = fixed'` and the same `totalContribution` / `totalUnits`. If the original break-even was unavailable, the test stays unavailable.
+
+§B.2 is then re-run on the adjusted costs so the day lines follow the what-if.
+
+The two rates are **transient** screen state. They are not written to the draft and they are not encoded in the URL.
+
+No figure in §18.2 changes.
+
+---
+
 ## 19. Changelog
 
 | Version | Change |
 | --- | --- |
+| v1.7 | Appendix B: salon food-cost rate, salon remaining per unit, fixed-cost days, January test. Display helpers only. New test T20. No figure in §18.2 changed. `detailedEngineVersion` stays 1.0.0. |
 | v1.6 | Appendix A.5: purchase fields are edited only on the Malzemeler block; recipe lines carry usage only. New Appendix A.6 salon restore-price display helper (Hamburger 229,24 / Köfte ekmek 167,70). New test T19. No figure in §18.2 changed. |
 | v1.5 | Appendix A.5 clarified: the Malzemeler block in section 01 is presentation of §A.1, not a new screen and not a formula. No figure in §18.2 changed. |
 | v1.4 | Documentation alignment plus the V2 recipe helper. §16.3 now records `byProduct` / `ProductLine`, which the engine has emitted since DF-84; no formula and no §18.2 figure changed. Appendix A defines the optional recipe total that may fill the entered `unitProductCost`. The monthly engine does not call it (X1 unchanged for `calculateDetailed`). New test T18. |
