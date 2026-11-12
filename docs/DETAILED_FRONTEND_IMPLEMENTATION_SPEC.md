@@ -84,7 +84,7 @@ One pattern, three densities.
 | `opexLines[]` | 2 | Two-up grid, each cell `1fr 124px 52px` | Single column, 44px rows |
 | `capexItems[]` | 2 | Two-up grid, each cell `1fr 132px 52px` | Single column, 44px rows |
 
-Remove control is the text `Kaldır` in `--qc-muted`, never an icon — `FRONTEND_IMPLEMENTATION_SPEC.md` §7 allows no icons beyond the assumptions chevron and this design needs no amendment to it.
+Remove control is the text `Kaldır` in `--qc-secondary`, never an icon — `FRONTEND_IMPLEMENTATION_SPEC.md` §7 allows no icons beyond the assumptions chevron and this design needs no amendment to it. `RECIPE_REDESIGN_SPEC.md` §3.1 (O4): muted grey is decoration only (section numbers, masthead slogan); anything the owner must read uses `--qc-secondary`.
 
 Add control is a quiet accent text button at the foot: `+ Ürün ekle`, `+ Pozisyon ekle`, `+ Diğer gider ekle`, `+ Yatırım kalemi ekle`. Adding appends, expands (mobile), scrolls into view and focuses the name field.
 
@@ -242,19 +242,19 @@ Two-column definition list carrying every field of `meta.assumptions` — **incl
 | Class | Blocks `Hesapla` | Treatment |
 | --- | --- | --- |
 | **Validation error** — the seven `ValidationErrorCode`s | Yes | `--qc-error #A0503C` border and 11px message, exactly as Lite |
-| **Guardrail note** — UI-derived from resolved input | **No** | 12px `--qc-muted` line under the section, plus an entry in `Dikkat edilecekler`. No box, no icon, no badge, no alarm colour |
-| **Permanent hint** — prevents the mistake rather than reporting it | No | 12px `--qc-muted`, always visible, no counter entry |
+| **Guardrail note** — UI-derived from resolved input | **No** | 12px `--qc-secondary` line under the section, plus an entry in `Dikkat edilecekler`. No box, no icon, no badge, no alarm colour |
+| **Permanent hint** — prevents the mistake rather than reporting it | No | 12px `--qc-secondary`, always visible, no counter entry |
 
-Error copy, from the engine's codes with the breached limit interpolated: `Bu alan gerekli.` · `Lütfen bir sayı girin.` · `En az {min} girilebilir.` · `En fazla {max} girilebilir.` · `Kanal dağılımı %100 olmalı. %{n} eksik.` / `%{n} fazla.` (`mix_not_100`) · `Paket servis satışınız olduğu için bu seçim zorunlu.` (`required` on `['delivery','mode']`) · `En az bir ürün girin.` (`empty_products`).
+Error copy, from the engine's codes with the breached limit interpolated: `Bu alan gerekli.` · `Lütfen bir sayı gir.` · `En az {min} girilebilir.` · `En fazla {max} girilebilir.` · `Kanal dağılımı %100 olmalı. %{n} eksik.` / `%{n} fazla.` (`mix_not_100`) · `Paket servis satışın olduğu için bu seçim zorunlu.` (`required` on `['delivery','mode']`) · `En az bir ürün gir.` (`empty_products`). Copy is *sen* throughout Detaylı (`RECIPE_REDESIGN_SPEC.md` §3.2); Quick is unchanged.
 
 ### 5.2 The six guardrails from the brief
 
 | # | Condition | Class | Copy |
 | --- | --- | --- | --- |
 | G1 | `headcount > 0 && employerCostPerPerson === 0` | Note, **always also in the panel list** (spec §4.5a requires prominence). `headcount === 0` never warns | `"{pozisyon}" pozisyonunda {n} kişi var ama işveren maliyeti girilmedi. Hesaplama 0 TL ile devam ediyor.` |
-| G2 | `owner.monthlyAmount > 0 && positions.length > 0` — static, **no matching algorithm** (DF-79) | Note in 05 | `İşletme sahibini personel listesine eklemeyin. Kendinize ayırdığınız tutar 06'da girilir.` |
-| G3 | `occupancy.monthlyAidat > 0` — static (DF-80) | Note in 08 | `Aidat "Kira ve aidat" bölümünde girildi. Diğer giderlere tekrar eklemeyin.` |
-| G4 | Product COGS scope | **Permanent hint** in 01 | `Birim maliyet yalnızca ürünün kendi malzeme maliyetidir. Ambalaj ve kurye bedelini buraya eklemeyin.` |
+| G2 | `owner.monthlyAmount > 0 && positions.length > 0` — static, **no matching algorithm** (DF-79) | Note in 05 | `İşletme sahibini personel listesine ekleme. Kendine ayırdığın tutar “İşletme sahibi” bölümünde girilir.` |
+| G3 | `occupancy.monthlyAidat > 0` — static (DF-80) | Note in 08 | `Aidat “Kira ve aidat” bölümünde girildi. Diğer giderlere tekrar ekleme.` |
+| G4 | Product COGS scope | **Permanent hint** in 01 | `Birim maliyet yalnızca ürünün kendi malzeme maliyetidir. Ambalaj ve kurye bedelini buraya ekleme.` |
 | G5 | Delivery mode unset while `channelMix.delivery > 0` | **Validation error** (spec §6.4) | see §5.1 |
 | G6 | Either mix ≠ 100 | **Validation error** (spec §6.2) | see §5.1 |
 
@@ -275,9 +275,9 @@ Each union arm gets a sentence in ink; never a blank or a dash.
 
 ### 5.4 Empty and disabled states
 
-Section 01 starts with **one empty product row**. Every other section renders empty; unfilled optional fields resolve to 0, stated once under the section index: `Boş bırakılan bölümler 0 TL olarak hesaplanır. Yalnızca ürünler zorunludur.`
+Section 01 starts with **one empty product row**. Every other section renders empty; unfilled optional fields resolve to 0, stated once under the section index: `Boş bıraktığın bölümler 0 TL sayılır. Yalnızca ürünler zorunlu.`
 
-`Hesapla` disabled fill `--qc-disabled #F1F2F4`, border `--qc-disabled-border`, text `--qc-subtle`, with the reason beneath: `Sonucu görmek için en az bir ürün girin` / `{n} alanı kontrol edin — {bölüm adları}`.
+`Hesapla` disabled fill `--qc-disabled #F1F2F4`, border `--qc-disabled-border`, text `--qc-subtle`, with the reason beneath: `Sonucu görmek için en az bir ürün gir` / `{n} alanı kontrol et — {bölüm adları}`.
 
 ---
 

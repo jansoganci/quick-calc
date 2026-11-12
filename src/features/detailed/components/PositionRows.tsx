@@ -67,7 +67,7 @@ export function PositionRows({
                   : position.name}
               </span>
               <span className="flex items-center gap-2.5">
-                <span className="font-mono text-xs tabular-nums text-qc-muted">
+                <span className="font-mono text-xs tabular-nums text-qc-secondary">
                   {position.headcount === '' ? '' : `${position.headcount} kişi`}
                 </span>
                 <span
@@ -115,7 +115,7 @@ export function PositionRows({
               <div className="mt-2.5 grid grid-cols-2 gap-2.5 lg:grid-cols-4 lg:pr-[66px]">
                 {PER_PERSON_FIELDS.map((column) => (
                   <div key={column.field} className="flex flex-col gap-[5px]">
-                    <span className="flex items-baseline text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+                    <span className="flex items-baseline text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
                       {column.label}
                       {column.info ? <InfoTooltip text={column.info} /> : null}
                     </span>
@@ -135,7 +135,7 @@ export function PositionRows({
               </div>
 
               {guardrail ? (
-                <p className="mt-2.5 max-w-[600px] text-xs leading-relaxed text-qc-muted">
+                <p className="mt-2.5 max-w-[600px] text-xs leading-relaxed text-qc-secondary">
                   {guardrail}
                 </p>
               ) : null}

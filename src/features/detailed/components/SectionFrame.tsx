@@ -51,7 +51,7 @@ export function SectionFrame({
           className="flex w-full min-h-[52px] items-center justify-between gap-3 text-left md:min-h-0 md:cursor-default md:items-baseline"
         >
           <span className="flex items-baseline gap-[10px]">
-            <span className="font-mono text-[11px] tabular-nums text-qc-subtle">
+            <span className="font-mono text-[11px] tabular-nums text-qc-muted">
               {String(index).padStart(2, '0')}
             </span>
             <span className="text-[15px] font-semibold text-qc-ink">
@@ -61,7 +61,7 @@ export function SectionFrame({
           <span className="flex items-center gap-[10px] md:items-baseline">
             {echoValue !== null && echoLabel !== null ? (
               <span className="flex items-baseline gap-2">
-                <span className="hidden text-xs text-qc-muted lg:inline">{echoLabel}</span>
+                <span className="hidden text-xs text-qc-secondary lg:inline">{echoLabel}</span>
                 <span className="font-mono text-sm tabular-nums text-qc-ink">{echoValue}</span>
               </span>
             ) : (
@@ -85,7 +85,7 @@ export function SectionFrame({
         className={cn('pb-[22px] md:block md:pb-0', isOpen ? 'block' : 'hidden')}
       >
         {note ? (
-          <p className="mb-4 mt-1.5 max-w-[600px] text-xs leading-relaxed text-qc-muted">{note}</p>
+          <p className="mb-4 mt-1.5 max-w-[600px] text-xs leading-relaxed text-qc-secondary">{note}</p>
         ) : null}
         {children}
         {nextSection ? (

@@ -28,7 +28,7 @@ export function DetailedResults({
   return (
     <div className="qc-report-body border-t border-qc-rule px-[18px] pb-[34px] lg:px-[30px]">
       <div className="py-[26px] lg:pb-[26px] lg:pt-[30px]">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
           {COPY.detailedResults}
         </span>
       </div>
@@ -94,7 +94,7 @@ export function DetailedResults({
           <PaybackChart data={view.paybackChart} size="printPayback" />
         </div>
         {view.payback.available ? null : (
-          <p className="mt-2.5 text-xs leading-relaxed text-qc-muted">{view.payback.message}</p>
+          <p className="mt-2.5 text-xs leading-relaxed text-qc-secondary">{view.payback.message}</p>
         )}
       </ResultSection>
 
@@ -169,12 +169,12 @@ function ResultSection({
         </h2>
         {figure ? (
           <div className="flex items-baseline gap-2">
-            <span className="text-xs text-qc-muted">{figureLabel}</span>
+            <span className="text-xs text-qc-secondary">{figureLabel}</span>
             <span className="font-mono text-[19px] tabular-nums text-qc-ink">{figure}</span>
           </div>
         ) : null}
       </div>
-      <p className="mb-[18px] mt-1.5 max-w-[720px] text-xs leading-relaxed text-qc-muted">{note}</p>
+      <p className="mb-[18px] mt-1.5 max-w-[720px] text-xs leading-relaxed text-qc-secondary">{note}</p>
       {children}
     </section>
   )
@@ -195,7 +195,7 @@ function BreakEvenCell({
         isLast ? '' : 'lg:border-r lg:border-r-qc-rule'
       }`}
     >
-      <div className="text-xs text-qc-muted">{label}</div>
+      <div className="text-xs text-qc-secondary">{label}</div>
       <div className="mt-1 font-mono text-[22px] tabular-nums text-qc-ink">{value}</div>
     </div>
   )

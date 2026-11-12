@@ -148,6 +148,27 @@
     color: var(--qc-muted);
   }
 
+  /*
+   * RECIPE_REDESIGN_SPEC §3.1: in Detaylı, muted (#8A9199) is decoration only
+   * (section numbers and the masthead slogan). Anything the owner must read
+   * uses secondary. Quick is unchanged.
+   */
+  .qc-detailed .qc-hint:not(.is-error) {
+    color: var(--qc-secondary);
+  }
+
+  .qc-detailed .qc-unit {
+    color: var(--qc-secondary);
+  }
+
+  .qc-detailed .qc-text-btn.is-muted {
+    color: var(--qc-secondary);
+  }
+
+  .qc-detailed .qc-info-btn {
+    color: var(--qc-secondary);
+  }
+
   /* spec §1: the error token covers the invalid input border *and* its message */
   .qc-error {
     font-size: 11px;

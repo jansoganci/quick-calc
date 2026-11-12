@@ -25,7 +25,7 @@ export function SampleFillControl({
     <p className="mb-3.5 mt-1 text-[13px]">
       {confirming ? (
         <>
-          <span className="text-qc-muted">{COPY.loadSampleConfirm}</span>{' '}
+          <span className="text-qc-secondary">{COPY.loadSampleConfirm}</span>{' '}
           <button
             type="button"
             className="qc-text-btn is-accent"

@@ -40,10 +40,10 @@ export function SummaryPane({
   if (view === null) {
     return (
       <div className="px-[18px] py-5 lg:px-7 lg:py-[26px]">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
           {COPY.preparation}
         </span>
-        <p className="mb-5 mt-3 text-xs leading-relaxed text-qc-muted">{COPY.emptyResult}</p>
+        <p className="mb-5 mt-3 text-xs leading-relaxed text-qc-secondary">{COPY.emptyResult}</p>
 
         <div className="hidden lg:block">
           {sections.map((entry, index) => (
@@ -69,7 +69,7 @@ export function SummaryPane({
               </span>
             </button>
           ))}
-          <p className="mt-4 text-xs leading-relaxed text-qc-muted">{COPY.optionalSectionsNote}</p>
+          <p className="mt-4 text-xs leading-relaxed text-qc-secondary">{COPY.optionalSectionsNote}</p>
         </div>
 
         <div className="mt-[22px] hidden lg:block">
@@ -81,7 +81,7 @@ export function SummaryPane({
 
   return (
     <div className="px-[18px] py-5 lg:px-7 lg:py-[26px]">
-      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
         {COPY.baseScenario}
       </span>
 
@@ -103,11 +103,11 @@ export function SummaryPane({
         )}
       </p>
       <button type="button" className="qc-text-btn mt-2.5" onClick={onCopy}>
-        {copied ? <span className="text-qc-muted">{COPY.copied}</span> : COPY.copySummary}
+        {copied ? <span className="text-qc-secondary">{COPY.copied}</span> : COPY.copySummary}
       </button>
 
       <div className="mt-5 border-t border-qc-rule pt-5">
-        <span className="text-[13px] text-qc-muted">{COPY.monthlyOperatingResult}</span>
+        <span className="text-[13px] text-qc-secondary">{COPY.monthlyOperatingResult}</span>
         <div className="mt-1 font-mono text-4xl font-medium leading-tight tracking-[-0.02em] tabular-nums text-qc-accent">
           {view.monthlyOperatingResult}
         </div>
@@ -140,13 +140,13 @@ export function SummaryPane({
       </div>
 
       <div className="mt-[22px]">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
           {COPY.scenariosMonthlyResult}
         </span>
         <div className="mt-2.5 grid grid-cols-3 gap-2 border-t border-qc-rule-row pt-2.5">
           {view.scenarios.map((scenario) => (
             <div key={scenario.key}>
-              <div className={cn('text-xs', scenario.isBase ? 'text-qc-ink' : 'text-qc-muted')}>
+              <div className={cn('text-xs', scenario.isBase ? 'text-qc-ink' : 'text-qc-secondary')}>
                 {scenario.label}
               </div>
               <div
@@ -166,7 +166,7 @@ export function SummaryPane({
         <div className="mt-[22px] border-t border-qc-rule pt-4">
           <div className="flex items-center justify-between gap-3">
             <span className="text-[13px] text-qc-secondary">{COPY.warningsTitle}</span>
-            <span className="font-mono text-[13px] tabular-nums text-qc-muted">
+            <span className="font-mono text-[13px] tabular-nums text-qc-secondary">
               {COPY.warningCount(view.guardrails.length)}
             </span>
           </div>
@@ -179,7 +179,7 @@ export function SummaryPane({
                   index === view.guardrails.length - 1 && 'border-b border-qc-rule-row',
                 )}
               >
-                <p className="m-0 text-xs leading-relaxed text-qc-muted">{guardrail.message}</p>
+                <p className="m-0 text-xs leading-relaxed text-qc-secondary">{guardrail.message}</p>
                 <button
                   type="button"
                   className="qc-text-btn is-accent mt-1 text-xs"
@@ -253,7 +253,7 @@ export function CalculateButton({
         {COPY.calculate}
       </button>
       {submitHint ? (
-        <p className="mt-2 text-center text-xs leading-relaxed text-qc-muted">{submitHint}</p>
+        <p className="mt-2 text-center text-xs leading-relaxed text-qc-secondary">{submitHint}</p>
       ) : null}
     </div>
   )

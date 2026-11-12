@@ -24,5 +24,11 @@ describe('recipe copy (RECIPE_REDESIGN_SPEC §8)', () => {
     expect(RECIPE_COPY.usageEmpty('Domates')).toBe(
       'Domates için miktar yaz. Bütün satırlar dolunca maliyet çıkar.',
     )
+    expect(RECIPE_COPY.deleteConfirmUnused('Un')).toBe(
+      'Un silinsin mi? Hiçbir üründe kullanılmıyor.',
+    )
+    expect(RECIPE_COPY.unitFamilyLock('Kıyma', 'gramla', 'Adet ya da litreye')).toBe(
+      'Kıyma reçetelerde gramla yazılı. Adet ya da litreye geçemez.',
+    )
   })
 })

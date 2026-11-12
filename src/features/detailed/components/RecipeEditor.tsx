@@ -107,7 +107,7 @@ function SuggestionList({
         >
           <span className="min-w-0">
             <span className="block truncate text-[13px] text-qc-ink">{ingredient.name}</span>
-            <span className="block text-xs text-qc-muted">
+            <span className="block text-xs text-qc-secondary">
               {RECIPE_COPY.suggestExisting(
                 ingredient.purchaseQuantity.trim() || '—',
                 ingredient.purchaseUnit || '—',
@@ -158,7 +158,7 @@ function NewIngredientBlock({
     <div className="mt-3 border-t border-qc-rule-row pt-3">
       <div className="flex items-baseline justify-between gap-3">
         <span className="text-[15px] text-qc-ink">{draft.name}</span>
-        <span className="text-xs text-qc-muted">{RECIPE_COPY.newIngredientTag}</span>
+        <span className="text-xs text-qc-secondary">{RECIPE_COPY.newIngredientTag}</span>
       </div>
       <p className="qc-hint mt-1 lg:hidden">{RECIPE_COPY.newIngredientAsk}</p>
       <p className="qc-hint mt-1 hidden lg:block">{RECIPE_COPY.newIngredientAskDesktop}</p>
@@ -270,9 +270,9 @@ function RecipeLineRow({
             />
           </div>
         ) : (
-          <span className="text-xs text-qc-muted">—</span>
+          <span className="text-xs text-qc-secondary">—</span>
         )}
-        <span className="pt-6 text-right text-xs leading-relaxed text-qc-muted lg:pt-0 lg:text-left">
+        <span className="pt-6 text-right text-xs leading-relaxed text-qc-secondary lg:pt-0 lg:text-left">
           {purchase ? <span className="block lg:inline">{purchase}</span> : null}
           {caption ? (
             <span className="block lg:inline">{purchase ? <span className="hidden lg:inline"> · </span> : null}{caption}</span>
@@ -395,7 +395,7 @@ export function RecipeEditor({
           <button type="button" className="qc-text-btn lg:hidden" onClick={onClose}>
             {RECIPE_COPY.backToMenu}
           </button>
-          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
             {RECIPE_COPY.recipeEyebrow}
           </span>
           <button type="button" className="qc-text-btn" onClick={onClose}>
@@ -415,16 +415,16 @@ export function RecipeEditor({
       ) : null}
 
       <div className="mt-3 hidden gap-2 pb-2 lg:grid lg:grid-cols-[minmax(0,1fr)_168px_200px_96px_52px]">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
           {RECIPE_COPY.ingredientName}
         </span>
-        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
           {RECIPE_COPY.usageColumn}
         </span>
-        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
           {RECIPE_COPY.purchaseColumn}
         </span>
-        <span className="text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+        <span className="text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
           {RECIPE_COPY.lineCostColumn}
         </span>
         <span />
@@ -506,7 +506,7 @@ export function RecipeEditor({
           <p className="qc-hint mt-1">{RECIPE_COPY.backToManualNote}</p>
         </div>
         <div className="text-right">
-          <p className="text-xs text-qc-muted">{RECIPE_COPY.recipeTotal}</p>
+          <p className="text-xs text-qc-secondary">{RECIPE_COPY.recipeTotal}</p>
           <p className="font-mono text-[22px] tabular-nums text-qc-ink">
             {total === null ? '—' : `${total} TL`}
           </p>

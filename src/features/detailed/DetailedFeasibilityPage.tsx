@@ -63,7 +63,7 @@ export function DetailedFeasibilityPage() {
   }
 
   return (
-    <div className="pb-[92px] lg:pb-0">
+    <div className="qc-detailed pb-[92px] lg:pb-0">
       {/*
         The report is this same result, printed: a cover ahead of it, the input
         appendix behind it, and the application's own chrome left out. Both are

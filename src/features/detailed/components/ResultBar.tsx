@@ -33,12 +33,12 @@ export function ResultBar({ breakdown, gross }: { breakdown: BreakdownView; gros
         ))}
       </div>
       <div className="mt-[5px] flex justify-between">
-        <span className="font-mono text-[11px] tabular-nums text-qc-muted">0 TL</span>
-        <span className="font-mono text-[11px] tabular-nums text-qc-muted">{gross}</span>
+        <span className="font-mono text-[11px] tabular-nums text-qc-secondary">0 TL</span>
+        <span className="font-mono text-[11px] tabular-nums text-qc-secondary">{gross}</span>
       </div>
 
       {breakdown.deficitCaption ? (
-        <p className="mt-2.5 text-xs leading-relaxed text-qc-muted">{breakdown.deficitCaption}</p>
+        <p className="mt-2.5 text-xs leading-relaxed text-qc-secondary">{breakdown.deficitCaption}</p>
       ) : null}
 
       <div className="mt-5 max-w-[720px]">
@@ -78,7 +78,7 @@ export function ResultBar({ breakdown, gross }: { breakdown: BreakdownView; gros
               <span
                 className={cn(
                   'text-right font-mono text-xs tabular-nums lg:text-[13px]',
-                  isResult ? 'text-qc-secondary' : 'text-qc-muted',
+                  isResult ? 'text-qc-secondary' : 'text-qc-secondary',
                 )}
               >
                 {row.share}
@@ -88,11 +88,11 @@ export function ResultBar({ breakdown, gross }: { breakdown: BreakdownView; gros
         })}
         <div className="grid grid-cols-[9px_1fr_auto_48px] gap-2.5 py-2 lg:grid-cols-[10px_1fr_auto_72px] lg:gap-3 lg:py-[9px]">
           <span />
-          <span className="text-xs text-qc-muted lg:text-[13px]">{COPY.total}</span>
-          <span className="font-mono text-xs tabular-nums text-qc-muted lg:text-[13px]">
+          <span className="text-xs text-qc-secondary lg:text-[13px]">{COPY.total}</span>
+          <span className="font-mono text-xs tabular-nums text-qc-secondary lg:text-[13px]">
             {breakdown.total}
           </span>
-          <span className="text-right font-mono text-xs tabular-nums text-qc-muted lg:text-[13px]">
+          <span className="text-right font-mono text-xs tabular-nums text-qc-secondary lg:text-[13px]">
             %100
           </span>
         </div>

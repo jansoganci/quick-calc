@@ -41,7 +41,7 @@ export function AssumptionsList({ rows }: { rows: AssumptionRow[] }) {
             <span className="font-mono text-[13px] tabular-nums text-qc-ink">{row.value}</span>
           </div>
         ))}
-        <p className="col-span-2 mt-3 text-xs leading-relaxed text-qc-muted">{COPY.resultLimitation}</p>
+        <p className="col-span-2 mt-3 text-xs leading-relaxed text-qc-secondary">{COPY.resultLimitation}</p>
       </div>
     </div>
   )

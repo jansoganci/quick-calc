@@ -28,7 +28,7 @@ export function MobileSummaryBar({
     return (
       <div className="qc-screen-only fixed inset-x-0 bottom-0 z-20 border-t border-qc-rule bg-qc-surface px-[18px] pb-3.5 pt-2.5 lg:hidden">
         {submitHint ? (
-          <p className="mb-1.5 text-center text-xs leading-relaxed text-qc-muted">{submitHint}</p>
+          <p className="mb-1.5 text-center text-xs leading-relaxed text-qc-secondary">{submitHint}</p>
         ) : null}
         <button
           type="button"
@@ -50,7 +50,7 @@ export function MobileSummaryBar({
   return (
     <div className="qc-screen-only fixed inset-x-0 bottom-0 z-20 flex h-[60px] items-center justify-between gap-3 border-t border-qc-rule bg-qc-surface px-[18px] lg:hidden">
       <span className="flex flex-col">
-        <span className="text-[11px] text-qc-muted">{COPY.monthlyOperatingResult}</span>
+        <span className="text-[11px] text-qc-secondary">{COPY.monthlyOperatingResult}</span>
         <span className="font-mono text-base font-medium tabular-nums text-qc-accent">
           {view.monthlyOperatingResult}
         </span>

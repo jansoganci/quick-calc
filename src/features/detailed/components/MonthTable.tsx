@@ -25,37 +25,37 @@ export function MonthTable({ rows }: { rows: MonthRow[] }) {
           <tr>
             <th
               scope="col"
-              className="w-[56px] border-b border-qc-ink pb-2 text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted lg:w-[72px]"
+              className="w-[56px] border-b border-qc-ink pb-2 text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary lg:w-[72px]"
             >
               {COPY.monthColumn}
             </th>
             <th
               scope="col"
-              className="hidden border-b border-qc-ink pb-2 pl-3 text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted lg:table-cell"
+              className="hidden border-b border-qc-ink pb-2 pl-3 text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary lg:table-cell"
             >
               {COPY.unitsColumn}
             </th>
             <th
               scope="col"
-              className="border-b border-qc-ink pb-2 pl-3 text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted"
+              className="border-b border-qc-ink pb-2 pl-3 text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary"
             >
               {COPY.netRevenue}
             </th>
             <th
               scope="col"
-              className="hidden border-b border-qc-ink pb-2 pl-3 text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted lg:table-cell"
+              className="hidden border-b border-qc-ink pb-2 pl-3 text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary lg:table-cell"
             >
               {COPY.contribution}
             </th>
             <th
               scope="col"
-              className="hidden border-b border-qc-ink pb-2 pl-3 text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted lg:table-cell"
+              className="hidden border-b border-qc-ink pb-2 pl-3 text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary lg:table-cell"
             >
               {COPY.fixedCostColumn}
             </th>
             <th
               scope="col"
-              className="border-b border-qc-ink pb-2 pl-3 text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted"
+              className="border-b border-qc-ink pb-2 pl-3 text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary"
             >
               {COPY.monthlyOperatingResult}
             </th>

@@ -69,7 +69,7 @@ export function ReportNameDialog({
         <p id="report-dialog-title" className="m-0 text-[15px] font-semibold text-qc-ink">
           {REPORT_COPY.dialogTitle}
         </p>
-        <p className="m-0 mt-2 text-xs leading-relaxed text-qc-muted">{REPORT_COPY.dialogLede}</p>
+        <p className="m-0 mt-2 text-xs leading-relaxed text-qc-secondary">{REPORT_COPY.dialogLede}</p>
 
         <div className="mt-[18px]">
           <TextField
