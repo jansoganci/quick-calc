@@ -72,6 +72,11 @@ export function productsUsingIngredient(
   ).length
 }
 
+/** Named ingredients, in list order. A blank row opened for a new recipe line stays hidden. */
+export function listedIngredients(form: DetailedFormState): IngredientRow[] {
+  return form.ingredients.filter((ingredient) => ingredient.name.trim() !== '')
+}
+
 /** The raw recipe total, or `undefined` when the recipe cannot price the product. */
 export function resolvedRecipeUnitCost(
   form: DetailedFormState,
@@ -132,9 +137,39 @@ export function buildRecipeErrorMap(form: DetailedFormState): Record<string, str
       if (message === null) continue
       const key = `products.${productIndex}.recipeLines.${error.lineIndex}.${error.field}`
       messages[key] ??= message
+      if (error.field !== 'purchaseQuantity' && error.field !== 'purchasePrice') continue
+      const ingredientId = product.recipeLines[error.lineIndex]?.ingredientId
+      if (!ingredientId) continue
+      messages[`ingredients.${ingredientId}.${error.field}`] ??= message
     }
   })
   return messages
+}
+
+export type IngredientListNameCommit =
+  | { ok: true; form: DetailedFormState }
+  | { ok: false; reason: 'empty' | 'duplicate'; form: DetailedFormState }
+
+/**
+ * Renames the shared ingredient itself. Every recipe that points at it keeps
+ * the same id and therefore the new name. A blank or already-used name is refused.
+ */
+export function commitIngredientListName(
+  form: DetailedFormState,
+  ingredientId: string,
+  rawName: string,
+): IngredientListNameCommit {
+  const current = form.ingredients.find((ingredient) => ingredient.id === ingredientId)
+  if (!current) return { ok: true, form }
+  const trimmed = rawName.trim()
+  if (trimmed === '') return { ok: false, reason: 'empty', form }
+  const taken = form.ingredients.some(
+    (ingredient) =>
+      ingredient.id !== ingredientId && ingredient.name.trim() !== '' && sameName(ingredient.name, trimmed),
+  )
+  if (taken) return { ok: false, reason: 'duplicate', form }
+  if (current.name === trimmed) return { ok: true, form }
+  return { ok: true, form: replaceIngredient(form, { ...current, name: trimmed }) }
 }
 
 function replaceProducts(

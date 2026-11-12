@@ -23,6 +23,7 @@ import {
   addRecipeLine,
   buildRecipeErrorMap,
   closeRecipe,
+  commitIngredientListName,
   commitRecipeIngredientName,
   dropUnusedIngredients,
   openRecipe,
@@ -231,6 +232,11 @@ export function useDetailedCalc() {
       update((draft) => removeRecipeLine(draft, productIndex, lineIndex)),
     commitRecipeIngredientName: (productIndex: number, lineIndex: number, name: string) =>
       update((draft) => commitRecipeIngredientName(draft, productIndex, lineIndex, name)),
+    commitIngredientListName: (ingredientId: string, name: string) => {
+      const result = commitIngredientListName(form, ingredientId, name)
+      if (result.form !== form) update(() => result.form)
+      return result.ok ? null : result.reason
+    },
     setIngredientField: (
       ingredientId: string,
       field: 'purchaseQuantity' | 'purchasePrice' | 'purchaseUnit',

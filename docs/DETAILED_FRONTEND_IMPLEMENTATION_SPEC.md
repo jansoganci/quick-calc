@@ -54,6 +54,8 @@ Ten sections, fixed order, numbered `01`–`10` in Plex Mono 11px `--qc-subtle`.
 | 09 | İlk yatırım | `capexItems[]` |
 | 10 | Varsayımlar | `assumptions.*` |
 
+**Malzemeler sits inside section 01.** It is not a numbered section. When at least one ingredient has a name, the block is rendered above the product rows. Each row is the ingredient's name, purchase quantity, unit and purchase amount. Gramaj is not edited here; it stays on that product's recipe. The list does not add or remove ingredients.
+
 **Section 04 is model-driven progressive disclosure:** it renders only when `channelMix.delivery > 0`, which is exactly the condition under which `delivery.mode` becomes required (spec §6.4). No toggle, no "advanced" switch.
 
 **Two mix tables (the pattern that keeps 02 and 03 small).** Both are three-row tables with a reconciling total row, not a field grid:
