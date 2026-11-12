@@ -171,8 +171,6 @@ function IngredientFields({
   const quantityPath = fieldPath(ingredient.id, 'purchaseQuantity')
   const unitPath = fieldPath(ingredient.id, 'purchaseUnit')
   const pricePath = fieldPath(ingredient.id, 'purchasePrice')
-  const lock = unitLockNote(form, ingredient)
-  const lockId = lock ? `${ingredient.id}-unit-lock` : undefined
 
   return (
     <>
@@ -210,16 +208,10 @@ function IngredientFields({
           id={unitPath}
           form={form}
           ingredient={ingredient}
-          describedBy={lockId}
           labelHidden="from-lg"
           onChange={(unit) => onIngredientField(ingredient.id, 'purchaseUnit', unit)}
           onBlur={() => onBlur(unitPath)}
         />
-        {lock ? (
-          <p id={lockId} className="qc-hint mt-1.5">
-            {lock}
-          </p>
-        ) : null}
       </div>
     </>
   )
@@ -282,6 +274,7 @@ export function IngredientList({
   const [openId, setOpenId] = useState<string | null>(blanks[0]?.id ?? null)
   const [addingId, setAddingId] = useState<string | null>(blanks[0]?.id ?? null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [focusedId, setFocusedId] = useState<string | null>(null)
   const [snapshots, setSnapshots] = useState<Record<string, PurchaseSnapshot>>({})
 
   useEffect(() => {
@@ -347,6 +340,9 @@ export function IngredientList({
     previewSource && snapshots[previewSource.id]
       ? buildPricePreview(form, previewSource, snapshots[previewSource.id]!)
       : null
+  const desktopNoted =
+    form.ingredients.find((item) => item.id === (previewSource?.id ?? focusedId)) ?? null
+  const desktopLock = desktopNoted ? unitLockNote(form, desktopNoted) : null
 
   return (
     <div className="mt-8 lg:mt-6">
@@ -444,7 +440,10 @@ export function IngredientList({
                       'grid grid-cols-2 gap-3 lg:grid lg:items-start lg:gap-2',
                       'lg:grid-cols-[minmax(0,1fr)_84px_84px_116px_112px_84px_32px]',
                     )}
-                    onFocus={() => remember(ingredient)}
+                    onFocus={() => {
+                      remember(ingredient)
+                      setFocusedId(ingredient.id)
+                    }}
                   >
                     <IngredientFields
                       form={form}
@@ -453,7 +452,10 @@ export function IngredientList({
                       onBlur={onBlur}
                       onCommitName={commitName}
                       onIngredientField={onIngredientField}
-                      onPurchaseFocus={() => remember(ingredient)}
+                      onPurchaseFocus={() => {
+                        remember(ingredient)
+                        setFocusedId(ingredient.id)
+                      }}
                     />
                     <p className="hidden self-center text-right font-mono text-xs tabular-nums text-qc-secondary lg:col-start-5 lg:row-start-1 lg:block">
                       {unitPrice ?? '—'}
@@ -474,18 +476,27 @@ export function IngredientList({
                     </div>
                   </div>
 
-                  <p className="qc-hint mt-2 lg:hidden">{openNote(form, ingredient)}</p>
-                  {isIngredientUsedInRecipe(form, ingredient.id) ? (
-                    <p className="qc-hint mt-2 hidden lg:block">{openNote(form, ingredient)}</p>
-                  ) : adding ? (
-                    <p className="qc-hint mt-2 hidden lg:block">{RECIPE_COPY.invoiceHint}</p>
+                  {open ? (
+                    <div className="mt-2 lg:hidden">
+                      {unitLockNote(form, ingredient) ? (
+                        <p id={`${ingredient.id}-unit-lock`} className="qc-hint">
+                          {unitLockNote(form, ingredient)}
+                        </p>
+                      ) : null}
+                      <p className="qc-hint mt-1">{openNote(form, ingredient)}</p>
+                    </div>
                   ) : null}
 
                   {preview && open ? (
                     <div className="mt-3 lg:hidden">
                       <PricePreview
                         preview={preview}
-                        onDone={() => closeRow(ingredient)}
+                        onDone={() =>
+                          setSnapshots((current) => ({
+                            ...current,
+                            [ingredient.id]: snapshotOf(ingredient),
+                          }))
+                        }
                       />
                     </div>
                   ) : null}
@@ -506,6 +517,7 @@ export function IngredientList({
                     </div>
                   ) : (
                     <>
+                      {preview ? null : (
                       <div className="mt-3 flex items-center justify-between gap-3 lg:hidden">
                         {adding ? (
                           <button
@@ -531,6 +543,7 @@ export function IngredientList({
                           {RECIPE_COPY.done}
                         </button>
                       </div>
+                      )}
                       {adding ? (
                         <div className="mt-3 hidden lg:flex lg:justify-end">
                           <button
@@ -576,6 +589,13 @@ export function IngredientList({
             }))
           }
         />
+      ) : null}
+
+      {desktopNoted ? (
+        <div className="mt-2 hidden lg:block">
+          {desktopLock ? <p className="qc-hint">{desktopLock}</p> : null}
+          <p className="qc-hint mt-1">{openNote(form, desktopNoted)}</p>
+        </div>
       ) : null}
 
       {deletingId && rows.some((ingredient) => ingredient.id === deletingId) ? (

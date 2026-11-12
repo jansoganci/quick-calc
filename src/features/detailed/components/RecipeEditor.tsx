@@ -390,17 +390,19 @@ export function RecipeEditor({
       aria-labelledby={titleId}
       className="fixed inset-0 z-30 overflow-y-auto bg-qc-surface px-[18px] py-3 lg:static lg:z-auto lg:mt-3 lg:border-y lg:border-qc-rule-mid lg:bg-qc-surface-result lg:px-3 lg:py-4"
     >
-      <div className="flex items-center justify-between gap-3">
-        <button type="button" className="qc-text-btn lg:hidden" onClick={onClose}>
-          {RECIPE_COPY.backToMenu}
-        </button>
-        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
-          {RECIPE_COPY.recipeEyebrow}
-        </span>
-        <button type="button" className="qc-text-btn" onClick={onClose}>
-          <span className="lg:hidden">{RECIPE_COPY.finish}</span>
-          <span className="hidden lg:inline">{RECIPE_COPY.closeBlock}</span>
-        </button>
+      <div className="sticky top-0 z-10 -mx-[18px] bg-qc-surface px-[18px] py-3 lg:static lg:mx-0 lg:bg-transparent lg:px-0 lg:py-0">
+        <div className="flex items-center justify-between gap-3">
+          <button type="button" className="qc-text-btn lg:hidden" onClick={onClose}>
+            {RECIPE_COPY.backToMenu}
+          </button>
+          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+            {RECIPE_COPY.recipeEyebrow}
+          </span>
+          <button type="button" className="qc-text-btn" onClick={onClose}>
+            <span className="lg:hidden">{RECIPE_COPY.finish}</span>
+            <span className="hidden lg:inline">{RECIPE_COPY.closeBlock}</span>
+          </button>
+        </div>
       </div>
 
       <h3 id={titleId} className="mt-3 text-[22px] font-medium text-qc-ink">
