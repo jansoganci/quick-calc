@@ -317,7 +317,9 @@ This is the moment the offer lands: the reader has their answer and can weigh wh
 
 Both entry points call one function in `App.tsx`, which sets the mode, stamps `#quick-calculation` / `#detailed-feasibility` in the URL, and **scrolls to the top**. The scroll is not cosmetic: without it, a reader taking the handoff from the foot of the Quick page lands in the middle of the Detailed form.
 
-> **Resolved (was D-3) — routing.** Architecture D4 says a router arrives "only when a second real screen requires it". This design proposes **in-page mode state** (`useState` in `App.tsx`, both feature states kept mounted or lifted) and **no router**, because Quick R6 puts URL sharing explicitly out of scope, so nothing needs to be addressable. Consequence: mode state lives for the session only — switching modes and back preserves what was typed; a reload does not restore Quick (Detailed restores from its own draft). No confirmation dialog on switch.
+On first paint, `App.tsx` reads that hash: `#detailed-feasibility` opens Detaylı; any other hash (including `#quick-calculation` and none) opens Hızlı Hesap. The calculator inputs are still not encoded in the URL (Quick R6).
+
+> **Resolved (was D-3) — routing.** Architecture D4 says a router arrives "only when a second real screen requires it". This design proposes **in-page mode state** (`useState` in `App.tsx`, both feature states kept mounted or lifted) and **no router**. Quick R6 still forbids encoding the form in the address bar. The hash only names which of the two screens is showing, so a reload of `#detailed-feasibility` lands in Detaylı. Switching modes and back preserves what was typed; a reload does not restore Quick (Detailed restores from its own draft). No confirmation dialog on switch.
 
 ---
 

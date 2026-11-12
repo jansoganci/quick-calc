@@ -6,6 +6,7 @@ import {
   MODE_DESCRIPTIONS,
   MODE_LABELS,
   SHELL_COPY,
+  modeFromLocationHash,
 } from './shellCopy.ts'
 
 /**
@@ -68,5 +69,14 @@ describe('mode navigation', () => {
     expect(MODE_ANCHORS.quick).toBe('quick-calculation')
     expect(MODE_ANCHORS.detailed).toBe('detailed-feasibility')
     expect(new Set(Object.values(MODE_ANCHORS)).size).toBe(MODES.length)
+  })
+
+  it('opens Detaylı on load only for #detailed-feasibility', () => {
+    expect(modeFromLocationHash('#detailed-feasibility')).toBe('detailed')
+    expect(modeFromLocationHash('detailed-feasibility')).toBe('detailed')
+    expect(modeFromLocationHash('')).toBe('quick')
+    expect(modeFromLocationHash('#quick-calculation')).toBe('quick')
+    expect(modeFromLocationHash('#')).toBe('quick')
+    expect(modeFromLocationHash('#something-else')).toBe('quick')
   })
 })

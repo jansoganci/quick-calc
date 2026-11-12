@@ -56,7 +56,7 @@ Uçtan uca süreç duruyor:
 
 Senaryo satış adedini ölçekler. Fiyatı, birim maliyeti ve gideri tek tek oynatmaz. Başa baş birim/gün ve birim/aydır. Ürün katkısı, kanal tablosuyla aynı toplama varır. Ürün başı kanal karması yoktur.
 
-İki mod aynı sayfada, üstteki satırdan değişir. Hızlı Hesap sonucunun altında Detaylı Fizibilite’ye geçiş vardır. Seçilen mod sayfa yenilenince hatırlanmaz. Adres çubuğundaki `#detailed-feasibility` yazılır ama yenilemede okunmaz; açılış yine Hızlı Hesap’tır.
+İki mod aynı sayfada, üstteki satırdan değişir. Hızlı Hesap sonucunun altında Detaylı Fizibilite’ye geçiş vardır. `#detailed-feasibility` yüklemede Detaylı’yı açar; diğer hash’ler Hızlı Hesap’ı açar. Form durumu URL’de kodlanmaz.
 
 ## Bitti — V2 reçete ve ortak malzeme (Detaylı içinde)
 

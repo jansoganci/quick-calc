@@ -2,21 +2,23 @@ import { useState } from 'react'
 import { DetailedFeasibilityPage } from '../features/detailed/DetailedFeasibilityPage.tsx'
 import { QuickCalcPage } from '../features/quick-calc/QuickCalcPage.tsx'
 import { AppShell } from './AppShell.tsx'
-import { MODE_ANCHORS, type CalculationMode } from './shellCopy.ts'
+import { MODE_ANCHORS, modeFromLocationHash, type CalculationMode } from './shellCopy.ts'
 import { ErrorBoundary } from './ErrorBoundary.tsx'
 
 /**
- * Mode is in-page state, not a route. There is nothing to address — URL sharing is
- * out of scope (Quick R6) — so architecture D4's "a router only when a second real
- * screen requires it" is not yet met.
+ * Mode is in-page state, not a route. Quick R6 still forbids encoding the
+ * calculator in the URL; the hash only names which of the two screens is showing.
+ * `#detailed-feasibility` opens Detaylı on load; anything else opens Hızlı Hesap.
  *
  * Both modes stay mounted so switching away and back preserves what the user typed.
  * Across a reload only Detailed restores, from its own `localStorage` draft
  * (`features/detailed/storage.ts`); Quick is deliberately stateless per
- * TECH_STACK §4.1. Which mode is showing is never persisted.
+ * TECH_STACK §4.1. The mode itself is not written to storage.
  */
 export function App() {
-  const [mode, setMode] = useState<CalculationMode>('quick')
+  const [mode, setMode] = useState<CalculationMode>(() =>
+    modeFromLocationHash(window.location.hash),
+  )
 
   /**
    * Switching modes is the same act however it was asked for — the mode row, or
