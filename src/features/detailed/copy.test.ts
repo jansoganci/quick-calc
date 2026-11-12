@@ -5,6 +5,7 @@ import {
   GUARDRAIL_COPY,
   RECIPE_COPY,
   REPORT_COPY,
+  SECTION_LABELS,
   SECTION_NOTES,
   UNAVAILABLE_COPY,
   VERDICT,
@@ -16,6 +17,7 @@ const COPY_TREES = [
   GUARDRAIL_COPY,
   RECIPE_COPY,
   REPORT_COPY,
+  SECTION_LABELS,
   SECTION_NOTES,
   UNAVAILABLE_COPY,
   VERDICT,
@@ -142,6 +144,9 @@ describe('detailed copy (RECIPE_REDESIGN_SPEC §3.2 O4)', () => {
     )
     expect(COPY.optionalSectionsNote).toBe('Boş bıraktığın bölümler 0 TL sayılır. Yalnızca ürünler zorunlu.')
     expect(COPY.calculateNoProducts).toBe('Sonucu görmek için en az bir ürün gir')
+    expect(SECTION_LABELS.products).toBe('Ürünler')
+    expect(SECTION_LABELS.sales).toBe('Satış tahmini')
+    expect(SECTION_NOTES.sales).toContain('Ürün burada eklenmez')
     expect(ERROR_COPY.not_a_number).toBe('Lütfen bir sayı gir.')
     expect(ERROR_COPY.empty_products).toBe('En az bir ürün gir.')
     expect(ERROR_COPY.deliveryModeRequired).toBe('Paket servis satışın olduğu için bu seçim zorunlu.')

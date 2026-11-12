@@ -124,6 +124,16 @@ function isRecipeExtensionOk(form: Record<string, unknown>): boolean {
   })
 }
 
+/**
+ * v1 drafts already store `dailyQuantity` on each product. V2 step 4 only moves
+ * that field in the UI (Satış tahmini); the stored shape and
+ * `maliyet.detailed.draft.v1` do not change. This hook is identity today so a
+ * draft written before the section still restores the same quantities.
+ */
+export function migrateDraftForm(form: DetailedFormState): DetailedFormState {
+  return form
+}
+
 /** Fills the fields a pre-recipe draft does not have. Does not invent recipe lines. */
 function withRecipeDefaults(form: DetailedFormState): DetailedFormState {
   const stored = form as DetailedFormState & {
@@ -224,5 +234,5 @@ export function decodeDraft(raw: string | null): Draft | null {
   // existed, and a corrupt one is metadata — neither may sink the financial
   // inputs, which is the one thing this codec exists to protect.
   const businessName = typeof parsed.businessName === 'string' ? parsed.businessName : ''
-  return { form: withRecipeDefaults(parsed.form), businessName }
+  return { form: migrateDraftForm(withRecipeDefaults(parsed.form)), businessName }
 }

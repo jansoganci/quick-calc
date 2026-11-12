@@ -1,4 +1,4 @@
-import { formatDecimal, parseTurkishNumber } from '../../lib/number.ts'
+import { formatCount, formatDecimal, parseTurkishNumber } from '../../lib/number.ts'
 import { RAMP_UP_TABLES, type RampUpPreset } from '../../core/detailed/index.ts'
 import { initialForm, type DetailedFormState } from './formState.ts'
 import { COPY, SECTION_IDS, type SectionId } from './labels.ts'
@@ -31,6 +31,10 @@ export function sectionSummary(form: DetailedFormState, section: SectionId): str
   switch (section) {
     case 'products':
       return COPY.productCount(form.products.length)
+    case 'sales': {
+      const units = typedDailyUnits(form)
+      return units === 0 ? COPY.none : COPY.dailyUnits(formatCount(units))
+    }
     case 'channels':
       return mixTotal([form.channelMix.salon, form.channelMix.takeaway, form.channelMix.delivery])
     case 'payments':

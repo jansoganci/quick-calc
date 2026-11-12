@@ -84,15 +84,9 @@ function productTable(products: readonly ResolvedProduct[], hasDelivery: boolean
         PRODUCT_LABELS.name,
         PRODUCT_LABELS.normalPrice,
         PRODUCT_LABELS.onlinePrice,
-        PRODUCT_LABELS.dailyQuantity,
         PRODUCT_LABELS.unitProductCost,
       ]
-    : [
-        PRODUCT_LABELS.name,
-        PRODUCT_LABELS.normalPrice,
-        PRODUCT_LABELS.dailyQuantity,
-        PRODUCT_LABELS.unitProductCost,
-      ]
+    : [PRODUCT_LABELS.name, PRODUCT_LABELS.normalPrice, PRODUCT_LABELS.unitProductCost]
 
   const rows = products.map((product) =>
     hasDelivery
@@ -100,18 +94,19 @@ function productTable(products: readonly ResolvedProduct[], hasDelivery: boolean
           product.name,
           unitMoney(product.normalPrice),
           unitMoney(product.onlinePrice),
-          formatCount(product.dailyQuantity),
           unitMoney(product.unitProductCost),
         ]
-      : [
-          product.name,
-          unitMoney(product.normalPrice),
-          formatCount(product.dailyQuantity),
-          unitMoney(product.unitProductCost),
-        ],
+      : [product.name, unitMoney(product.normalPrice), unitMoney(product.unitProductCost)],
   )
 
   return { columns, rows }
+}
+
+function salesTable(products: readonly ResolvedProduct[]): ReportInputTable {
+  return {
+    columns: [PRODUCT_LABELS.name, PRODUCT_LABELS.dailyQuantity],
+    rows: products.map((product) => [product.name, formatCount(product.dailyQuantity)]),
+  }
 }
 
 function positionTable(positions: readonly ResolvedPosition[]): ReportInputTable {
@@ -150,7 +145,7 @@ function lineTable(
 }
 
 /**
- * The appendix, in the order of the locked ten-section input IA
+ * The appendix, in the order of the locked input IA
  * (DETAILED_FRONTEND_IMPLEMENTATION_SPEC.md §2), so it can be read beside the
  * form that produced it.
  *
@@ -182,6 +177,7 @@ export function buildReportInputGroups(
 
   if (input.products.length > 0) {
     push('products', { kind: 'table', table: productTable(input.products, hasDelivery) })
+    push('sales', { kind: 'table', table: salesTable(input.products) })
   }
 
   push('channels', {

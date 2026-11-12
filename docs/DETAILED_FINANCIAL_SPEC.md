@@ -1,6 +1,6 @@
 # Detailed Feasibility — Financial Specification
 
-**Version:** v1.7
+**Version:** v1.8
 **Status:** Formula contract for `src/core/detailed/`. **Not** implementation.
 **Currency:** TRY · **Country:** Turkey · **Language for v1:** Turkish-first
 **Engine:** `detailedEngineVersion` `1.0.0`
@@ -1126,13 +1126,13 @@ remainderDays = monthlyOperatingResult / dailyContribution
 
 `monthlyAidat = monthlyOccupancyCost − rentCost`. **Kira** is `rentCost` (the occupancy rent after net/gross withholding, §10.3), not aidat. **Personel** is `monthlyPayroll` only — owner draw and Bağ-Kur sit in **other**. A zero-cost bucket is omitted on screen.
 
-The engine returns the raw (unrounded) day counts. The screen rounds each of the three cost buckets to the nearest whole day; «geri kalan» is `operatingDaysPerMonth −` that rounded sum, so the lines add up. When that remainder is negative, the month does not cover its fixed costs.
+The engine returns the raw (unrounded) day counts. The screen rounds each of the three cost buckets to the nearest whole day; a bucket that rounds to 0 days is omitted, same as a zero-cost bucket. «geri kalan» is `operatingDaysPerMonth −` that rounded sum, so the lines add up. Remainder 0 displays as no remaining days (`Geri kalan gün yok.`). When that remainder is negative, the month does not cover its fixed costs.
 
 ### B.3 January test — «Ocak testi»
 
 A what-if on the **already calculated** base month. It is not a fourth scenario and does not rewrite Kötü / Baz / İyi.
 
-Inputs, empty = 0:
+Inputs, empty = 0. An unreadable field also counts as 0 (quiet hint, no red). A negative rate is a decrease.
 
 ```
 wageIncreaseRate   // «Asgari ücret artışı %», 0.30 means +%30
@@ -1151,7 +1151,7 @@ Variable costs, volume, VAT and contribution do not change. The wage rate applie
 
 Break-even is §14.3 with `monthlyFixedCost = fixed'` and the same `totalContribution` / `totalUnits`. If the original break-even was unavailable, the test stays unavailable.
 
-§B.2 is then re-run on the adjusted costs so the day lines follow the what-if.
+§B.2 is then re-run on the adjusted costs so the day lines follow the what-if. The kira-gün list is replaced in place; «Şimdi → Sonra» is only for monthly leftover and break-even.
 
 The two rates are **transient** screen state. They are not written to the draft and they are not encoded in the URL.
 
@@ -1159,10 +1159,25 @@ No figure in §18.2 changes.
 
 ---
 
+## Appendix C — Sales forecast section (V2 step 4)
+
+UI-only. `calculateDetailed` is unchanged. `dailyQuantity` remains a required field of each product in §4.1. The Detailed screen collects it in a separate **Satış tahmini** section that lists the current menu products in input order; that section does not add, remove, or rename products.
+
+`operatingDaysPerMonth` stays in `assumptions` (DF-66, default 30). It is not duplicated as a second input on Satış tahmini.
+
+There is no realised-sales ledger, no Yiyecek / İçecek grouping, and no volume-weighted menu total in this step. Results already consume `products[].dailyQuantity` through the existing monthly engine (I5, §12).
+
+Draft key remains `maliyet.detailed.draft.v1`. `dailyQuantity` stays on each stored product row. A draft written before this section still restores those quantities into Satış tahmini. No version bump.
+
+No figure in §18.2 changes. `detailedEngineVersion` stays `1.0.0`.
+
+---
+
 ## 19. Changelog
 
 | Version | Change |
 | --- | --- |
+| v1.8 | Appendix C: Satış tahmini collects `dailyQuantity` in a separate UI section; engine contract and draft v1 shape unchanged. Appendix B.2/B.3 record the accepted display edges (rounded-zero buckets, remainder-none copy, unreadable/negative Ocak rates, in-place kira-gün). No figure in §18.2 changed. `detailedEngineVersion` stays 1.0.0. |
 | v1.7 | Appendix B: salon food-cost rate, salon remaining per unit, fixed-cost days, January test. Display helpers only. New test T20. No figure in §18.2 changed. `detailedEngineVersion` stays 1.0.0. |
 | v1.6 | Appendix A.5: purchase fields are edited only on the Malzemeler block; recipe lines carry usage only. New Appendix A.6 salon restore-price display helper (Hamburger 229,24 / Köfte ekmek 167,70). New test T19. No figure in §18.2 changed. |
 | v1.5 | Appendix A.5 clarified: the Malzemeler block in section 01 is presentation of §A.1, not a new screen and not a formula. No figure in §18.2 changed. |

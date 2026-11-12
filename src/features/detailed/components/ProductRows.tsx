@@ -7,17 +7,15 @@ import { COPY, GUARDRAIL_COPY, PRODUCT_LABELS, RECIPE_COPY } from '../labels.ts'
 import { useNewestRowOpen } from '../hooks/useNewestRowOpen.ts'
 import { recipeAmountText } from '../recipeForm.ts'
 
-const GRID = 'lg:grid-cols-[minmax(0,1fr)_120px_120px_72px_112px_88px_48px]'
+const GRID = 'lg:grid-cols-[minmax(0,1fr)_120px_120px_112px_88px_48px]'
 
 const NUMERIC_FIELDS = [
   { field: 'normalPrice', label: PRODUCT_LABELS.normalPrice, unit: 'TL', grouped: true },
   { field: 'onlinePrice', label: PRODUCT_LABELS.onlinePrice, unit: 'TL', grouped: true },
-  { field: 'dailyQuantity', label: PRODUCT_LABELS.dailyQuantity, unit: '', grouped: false },
 ] as const
 
 type ProductRowsProps = {
   form: DetailedFormState
-  dailyUnits: string
   errorFor: (path: string) => string | null
   onBlur: (path: string) => void
   onChange: (index: number, field: keyof Omit<ProductRow, 'id' | 'costSource' | 'recipeLines'>, value: string) => void
@@ -45,7 +43,6 @@ function collapsedCost(form: DetailedFormState, product: ProductRow): string {
 
 export function ProductRows({
   form,
-  dailyUnits,
   errorFor,
   onBlur,
   onChange,
@@ -94,8 +91,6 @@ export function ProductRows({
         const cost = costDisplay(form, product)
         const recipeOpen = recipeProductIndex === index
         const hasRecipe = product.costSource === 'recipe'
-        const daily = product.dailyQuantity.trim()
-        const dailyText = daily === '' ? '' : RECIPE_COPY.menuRowDaily(daily)
 
         return (
           <div
@@ -114,13 +109,8 @@ export function ProductRows({
               </span>
               <span className="flex items-center gap-2.5">
                 {open ? null : (
-                  <span className="text-right">
-                    {dailyText ? (
-                      <span className="block text-xs text-qc-secondary">{dailyText}</span>
-                    ) : null}
-                    <span className="block font-mono text-xs tabular-nums text-qc-secondary">
-                      {collapsedCost(form, product)}
-                    </span>
+                  <span className="text-right font-mono text-xs tabular-nums text-qc-secondary">
+                    {collapsedCost(form, product)}
                   </span>
                 )}
                 <span
@@ -241,7 +231,7 @@ export function ProductRows({
           {COPY.addProduct}
         </button>
         <span className="font-mono text-xs tabular-nums text-qc-secondary">
-          {COPY.productCount(products.length)} · {COPY.dailyUnits(dailyUnits)}
+          {COPY.productCount(products.length)}
         </span>
       </div>
 
