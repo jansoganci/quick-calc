@@ -19,7 +19,7 @@ export function ReportAppendix({ view }: { view: DetailedView }) {
   return (
     <div className="qc-print-only qc-report-appendix px-[18px] pb-8 pt-6 lg:px-[30px]">
       <h2 className="m-0 text-[17px] font-semibold text-qc-ink">{REPORT_COPY.appendixTitle}</h2>
-      <p className="mb-6 mt-2 max-w-[620px] text-xs leading-relaxed text-qc-muted">
+      <p className="mb-6 mt-2 max-w-[620px] text-xs leading-relaxed text-qc-secondary">
         {REPORT_COPY.appendixNote}
       </p>
 
@@ -64,7 +64,7 @@ function AppendixGroup({ group }: { group: ReportInputGroup }) {
                 <th
                   key={column}
                   scope="col"
-                  className={`border-b border-qc-ink pb-[7px] text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted ${
+                  className={`border-b border-qc-ink pb-[7px] text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary ${
                     index === 0 ? 'text-left' : 'pl-3 text-right'
                   }`}
                 >

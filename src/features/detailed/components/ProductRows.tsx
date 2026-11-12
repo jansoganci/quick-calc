@@ -60,30 +60,30 @@ export function ProductRows({
   return (
     <div>
       <div className="flex items-baseline justify-between gap-3 pb-2">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
           {RECIPE_COPY.menuHeading}
         </p>
-        <span className="font-mono text-xs tabular-nums text-qc-muted">
+        <span className="font-mono text-xs tabular-nums text-qc-secondary">
           {COPY.productCount(products.length)}
         </span>
       </div>
 
       <div className={cn('hidden gap-2 pb-2 lg:grid', GRID)}>
-        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
           {PRODUCT_LABELS.name}
         </span>
         {NUMERIC_FIELDS.map((column) => (
           <span
             key={column.field}
-            className="text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted"
+            className="text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary"
           >
             {column.label}
           </span>
         ))}
-        <span className="text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+        <span className="text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
           {PRODUCT_LABELS.unitProductCost}
         </span>
-        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
           {RECIPE_COPY.recipeEyebrow}
         </span>
         <span />
@@ -116,9 +116,9 @@ export function ProductRows({
                 {open ? null : (
                   <span className="text-right">
                     {dailyText ? (
-                      <span className="block text-xs text-qc-muted">{dailyText}</span>
+                      <span className="block text-xs text-qc-secondary">{dailyText}</span>
                     ) : null}
-                    <span className="block font-mono text-xs tabular-nums text-qc-muted">
+                    <span className="block font-mono text-xs tabular-nums text-qc-secondary">
                       {collapsedCost(form, product)}
                     </span>
                   </span>
@@ -240,12 +240,12 @@ export function ProductRows({
         <button type="button" className="qc-text-btn is-accent" onClick={onAdd}>
           {COPY.addProduct}
         </button>
-        <span className="font-mono text-xs tabular-nums text-qc-muted">
+        <span className="font-mono text-xs tabular-nums text-qc-secondary">
           {COPY.productCount(products.length)} · {COPY.dailyUnits(dailyUnits)}
         </span>
       </div>
 
-      <p className="mt-3.5 max-w-[600px] text-xs leading-relaxed text-qc-muted">
+      <p className="mt-3.5 max-w-[600px] text-xs leading-relaxed text-qc-secondary">
         {GUARDRAIL_COPY.productCostScope}
       </p>
     </div>

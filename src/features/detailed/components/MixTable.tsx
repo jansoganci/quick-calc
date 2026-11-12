@@ -51,13 +51,13 @@ export function MixTable({
   return (
     <div className="max-w-[600px]">
       <div className="hidden grid-cols-[1fr_120px_160px] gap-2.5 pb-2 lg:grid">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
           {firstColumnLabel}
         </span>
-        <span className="text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+        <span className="text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
           {COPY.mixShare}
         </span>
-        <span className="flex items-baseline justify-end text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+        <span className="flex items-baseline justify-end text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
           {extraColumnLabel}
           {extraColumnInfo ? <InfoTooltip text={extraColumnInfo} /> : null}
         </span>

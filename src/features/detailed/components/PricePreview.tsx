@@ -17,7 +17,7 @@ export function PricePreview({ preview }: PricePreviewProps) {
           <div key={`${line.productIndex}-${line.productName}`}>
             <div className="flex items-baseline justify-between gap-3">
               <span className="text-[13px] text-qc-ink">{line.productName}</span>
-              <span className="text-xs text-qc-muted">{line.usage}</span>
+              <span className="text-xs text-qc-secondary">{line.usage}</span>
             </div>
             <p className="mt-1 font-mono text-xs tabular-nums text-qc-ink">
               {RECIPE_COPY.priceRiseCost(line.costFrom, line.costTo)}
@@ -32,16 +32,16 @@ export function PricePreview({ preview }: PricePreviewProps) {
 
       <div className="mt-3 hidden lg:block">
         <div className="grid grid-cols-[minmax(0,1fr)_120px_1fr_1fr] gap-2 pb-2">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
             {RECIPE_COPY.priceRiseColumns.product}
           </span>
-          <span className="text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+          <span className="text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
             {RECIPE_COPY.priceRiseColumns.cost}
           </span>
-          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
             {RECIPE_COPY.priceRiseColumns.remaining}
           </span>
-          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
             {RECIPE_COPY.priceRiseColumns.restore}
           </span>
         </div>
@@ -52,7 +52,7 @@ export function PricePreview({ preview }: PricePreviewProps) {
           >
             <div>
               <p className="text-[13px] text-qc-ink">{line.productName}</p>
-              <p className="text-xs text-qc-muted">{line.usage}</p>
+              <p className="text-xs text-qc-secondary">{line.usage}</p>
             </div>
             <p className="text-right font-mono text-xs tabular-nums text-qc-ink">
               {line.costFrom} → {line.costTo}
@@ -63,7 +63,7 @@ export function PricePreview({ preview }: PricePreviewProps) {
         ))}
       </div>
 
-      <p className="mt-3 text-xs leading-relaxed text-qc-muted">{preview.footnote}</p>
+      <p className="mt-3 text-xs leading-relaxed text-qc-secondary">{preview.footnote}</p>
     </div>
   )
 }

@@ -22,7 +22,7 @@ export function DraftNotice({ saved, onReset }: { saved: boolean; onReset: () =>
 
   return (
     <div className="mt-7 border-t border-qc-rule pt-4 lg:mt-9">
-      <p className="text-[13px] text-qc-muted">
+      <p className="text-[13px] text-qc-secondary">
         {confirming ? (
           <>
             {COPY.draftResetConfirm}{' '}
@@ -51,7 +51,7 @@ export function DraftNotice({ saved, onReset }: { saved: boolean; onReset: () =>
           </>
         )}
       </p>
-      <p className="mt-1 text-xs leading-relaxed text-qc-muted">{COPY.draftScope}</p>
+      <p className="mt-1 text-xs leading-relaxed text-qc-secondary">{COPY.draftScope}</p>
     </div>
   )
 }

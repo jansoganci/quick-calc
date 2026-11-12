@@ -45,7 +45,7 @@ export function ReportActionButton({
       >
         {REPORT_COPY.action}
       </button>
-      <p className="mt-2 text-xs leading-relaxed text-qc-muted">{hint}</p>
+      <p className="mt-2 text-xs leading-relaxed text-qc-secondary">{hint}</p>
     </div>
   )
 }

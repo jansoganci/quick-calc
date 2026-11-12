@@ -28,13 +28,13 @@ export function ProductContributionTable({ products, totals }: ProductContributi
     <div>
       <div className="hidden lg:block">
         <div className="grid grid-cols-[130px_92px_repeat(6,minmax(0,1fr))]">
-          <span className="pb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+          <span className="pb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
             {PRODUCT_LABELS.name}
           </span>
           {COLUMNS.map((column) => (
             <span
               key={column.key}
-              className="pb-2 text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted"
+              className="pb-2 text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary"
             >
               {column.label}
             </span>
@@ -49,11 +49,11 @@ export function ProductContributionTable({ products, totals }: ProductContributi
             />
           ))}
 
-          <span className="py-2.5 text-[13px] text-qc-muted">{COPY.total}</span>
+          <span className="py-2.5 text-[13px] text-qc-secondary">{COPY.total}</span>
           {COLUMNS.map((column) => (
             <span
               key={column.key}
-              className="py-2.5 text-right font-mono text-[13px] tabular-nums text-qc-muted"
+              className="py-2.5 text-right font-mono text-[13px] tabular-nums text-qc-secondary"
             >
               {totals[column.key]}
             </span>
@@ -73,7 +73,7 @@ export function ProductContributionTable({ products, totals }: ProductContributi
           >
             <div className="flex items-baseline justify-between gap-2.5">
               <span className="text-sm font-semibold text-qc-ink">{row.name}</span>
-              <span className="font-mono text-xs tabular-nums text-qc-muted">
+              <span className="font-mono text-xs tabular-nums text-qc-secondary">
                 {row.units} {COPY.channelUnits.toLocaleLowerCase('tr-TR')}
               </span>
             </div>
@@ -99,7 +99,7 @@ export function ProductContributionTable({ products, totals }: ProductContributi
         ))}
       </div>
 
-      <p className="mt-2.5 text-[11px] leading-relaxed text-qc-muted">
+      <p className="mt-2.5 text-[11px] leading-relaxed text-qc-secondary">
         Tutarlar TL. Katkıdan sabit giderler düşülmemiştir.
       </p>
     </div>

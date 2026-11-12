@@ -297,7 +297,7 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
           .map((guardrail) => (
             <p
               key={guardrail.id}
-              className="mt-3.5 max-w-[600px] text-xs leading-relaxed text-qc-muted"
+              className="mt-3.5 max-w-[600px] text-xs leading-relaxed text-qc-secondary"
             >
               {guardrail.message}
             </p>
@@ -390,7 +390,7 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
         {guardrailsFor('opex').map((guardrail) => (
           <p
             key={guardrail.id}
-            className="mt-3.5 max-w-[600px] text-xs leading-relaxed text-qc-muted"
+            className="mt-3.5 max-w-[600px] text-xs leading-relaxed text-qc-secondary"
           >
             {guardrail.message}
           </p>
@@ -482,7 +482,7 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
                 <span
                   className={cn(
                     'text-[11px] font-semibold uppercase tracking-[0.08em]',
-                    scenario === 'base' ? 'text-qc-ink' : 'text-qc-muted',
+                    scenario === 'base' ? 'text-qc-ink' : 'text-qc-secondary',
                   )}
                 >
                   {SCENARIO_LABELS[scenario]}
@@ -507,7 +507,7 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
         <details className="mt-6 max-w-[600px] border-t border-qc-rule-row pt-4">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-[13px] text-qc-secondary">
             <span>{COPY.advancedAssumptions}</span>
-            <span className="font-mono text-[13px] tabular-nums text-qc-muted">
+            <span className="font-mono text-[13px] tabular-nums text-qc-secondary">
               {`%${form.assumptions.salesPriceAnnualIncrease} · %${form.assumptions.productCogsAnnualIncrease} · %${form.assumptions.fixedCostAnnualIncrease}`}
             </span>
           </summary>
@@ -540,7 +540,7 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
               error={calc.errorFor('assumptions.fixedCostAnnualIncrease')}
             />
           </div>
-          <p className="mt-2 text-xs leading-relaxed text-qc-muted">
+          <p className="mt-2 text-xs leading-relaxed text-qc-secondary">
             {COPY.advancedAssumptionsNote}
           </p>
         </details>

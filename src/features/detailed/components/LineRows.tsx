@@ -50,10 +50,10 @@ export function LineRows({
     <div>
       {lines.length > 0 ? (
         <div className={cn('hidden gap-2.5 pb-2 lg:grid', gridCols)}>
-          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
             {nameLabel}
           </span>
-          <span className="text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+          <span className="text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
             {amountLabel}
           </span>
           <span />
@@ -99,7 +99,7 @@ export function LineRows({
       </div>
 
       <div className={cn('mt-4', lines.length > 0 && 'border-t border-qc-rule-row pt-4')}>
-        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
           {starterLabel}
         </span>
         <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1">

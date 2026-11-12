@@ -66,18 +66,18 @@ export const SECTION_NOTES: Partial<Record<SectionId, string>> = {
   products:
     'Sattığın ürünleri ve her birinden günde ortalama kaç adet sattığını gir. Fiyatlar KDV dahil.',
   channels:
-    'Satışlarınızın kanallara dağılımı ve sipariş başına ambalaj maliyeti. Dağılım tüm ürünler için ortaktır.',
+    'Satışların kanallara dağılımı ve sipariş başına ambalaj maliyeti. Dağılım tüm ürünler için ortaktır.',
   payments:
     'Yalnızca salon ve al götür satışları için. Paket serviste platform kesintisi geçerlidir.',
   delivery: 'Bu bölüm yalnızca paket servis payı %0’dan büyük olduğu için görünüyor.',
   positions:
     'Pozisyon bazlı. Kişi başı tutarlar işverene aylık maliyettir — brüt maaş değil.',
   owner:
-    'İşletmeden kendinize aylık ayırdığınız tutar ve Bağ-Kur ödemeniz. İkisi de aylık işletme gideri sayılır; gelir vergisi hesaplanmaz.',
+    'İşletmeden kendine aylık ayırdığın tutar ve Bağ-Kur ödemen. İkisi de aylık işletme gideri sayılır; gelir vergisi hesaplanmaz.',
   opex:
-    'Hepsi aylık ortalama tutardır. Yılda bir ödenen bir gideri 12’ye bölüp aylık karşılığını girin.',
-  capex: 'Açılmadan önce bir kez harcayacağınız tutarlar. Açılış stoğunu unutmayın.',
-  assumptions: 'Hesaplamanın çerçevesi. Varsayılan değerlerle bırakabilirsiniz.',
+    'Hepsi aylık ortalama tutardır. Yılda bir ödenen bir gideri 12’ye bölüp aylık karşılığını gir.',
+  capex: 'Açılmadan önce bir kez harcayacağın tutarlar. Açılış stoğunu unutma.',
+  assumptions: 'Hesaplamanın çerçevesi. Varsayılan değerlerle bırakabilirsin.',
 }
 
 /** The one engine figure a section header may echo, after the first calculation. */
@@ -189,10 +189,10 @@ export const COPY = {
   baseScenario: 'Baz senaryo',
   detailedResults: 'Detaylı sonuçlar',
   calculate: 'Hesapla',
-  calculateNoProducts: 'Sonucu görmek için en az bir ürün girin',
+  calculateNoProducts: 'Sonucu görmek için en az bir ürün gir',
   calculateLive: 'Hesapladıktan sonra değişiklikler anında yansır',
   calculateInvalid: (count: number, sections: string) =>
-    `${count} alanı kontrol edin — ${sections}`,
+    `${count} alanı kontrol et — ${sections}`,
   copySummary: 'Özeti kopyala',
   copied: 'Kopyalandı',
 
@@ -200,11 +200,11 @@ export const COPY = {
   draftScope:
     'Yalnızca bu tarayıcıda saklanır; iPhone’da uzun süre girilmezse silinebilir.',
   draftReset: 'Baştan başla',
-  draftResetConfirm: 'Girdiklerinizin tamamı silinecek.',
+  draftResetConfirm: 'Girdiklerin tamamı silinecek.',
   draftResetYes: 'Evet, sil',
   draftResetCancel: 'Vazgeç',
   loadSample: 'Nereden başlayacağını bilmiyor musun? Örnek bir kafeyle doldur →',
-  loadSampleConfirm: 'Girdiklerinizin tamamı örnek verilerle değiştirilecek.',
+  loadSampleConfirm: 'Girdiklerin tamamı örnek verilerle değiştirilecek.',
   loadSampleYes: 'Evet, doldur',
   loadSampleCancel: 'Vazgeç',
   allResults: 'Tüm sonuçlar ↓',
@@ -212,9 +212,9 @@ export const COPY = {
   results: 'Sonuçlar ↓',
 
   emptyResult:
-    'Hesapla’dan önce hiçbir sayı gösterilmez. En az bir ürün girip Hesapla’ya bastığınızda aylık işletme sonucu, başa baş noktası ve yatırımın geri dönüşü burada görünür.',
+    'Hesapla’dan önce hiçbir sayı gösterilmez. En az bir ürün girip Hesapla’ya bastığında aylık işletme sonucu, başa baş noktası ve yatırımın geri dönüşü burada görünür.',
   optionalSectionsNote:
-    'Boş bırakılan bölümler 0 TL olarak hesaplanır. Yalnızca ürünler zorunludur.',
+    'Boş bıraktığın bölümler 0 TL sayılır. Yalnızca ürünler zorunlu.',
 
   addProduct: '+ Ürün ekle',
   addPosition: '+ Pozisyon ekle',
@@ -243,23 +243,23 @@ export const COPY = {
 
   deliveryModeQuestion: 'Siparişi kim taşıyor?',
   deliveryModeHint:
-    'Seçim, platform kesinti oranının başlangıç değerini belirler: kendi kuryeniz %15, platformun kuryesi %38.',
+    'Seçim, platform kesinti oranının başlangıç değerini belirler: kendi kuryen %15, platformun kuryesi %38.',
   platformFeeRate: 'Platform kesintisi',
   platformFeeHint: 'KDV dahil toplam kesinti oranı',
   platformFeeInfo:
-    'Kendi kuryenizle teslim ediyorsanız bu, platformun sipariş başına aldığı komisyondur. Platformun kendi kuryesini seçtiyseniz aynı oran teslimatı da kapsar ve daha yüksektir.',
+    'Kendi kuryenle teslim ediyorsan bu, platformun sipariş başına aldığı komisyondur. Platformun kendi kuryesini seçtiysen aynı oran teslimatı da kapsar ve daha yüksektir.',
   ownCourierCost: 'Sipariş başına kurye maliyeti',
-  ownCourierHint: 'Yalnızca kendi kuryenizle çalışırken geçerli',
+  ownCourierHint: 'Yalnızca kendi kuryenle çalışırken geçerli',
   ownCourierDisabledHint: 'Platformun kuryesinde bu tutar hesaba katılmaz.',
 
-  ownerMonthlyAmount: 'Kendinize ayırdığınız aylık tutar',
+  ownerMonthlyAmount: 'Kendine ayırdığın aylık tutar',
   ownerBagKur: 'Aylık Bağ-Kur',
   monthlyRent: 'Aylık kira',
   monthlyRentInfo:
     '"Brüt kira" girdiğin tutarın tamamı işletme çıkışıdır; stopaj bu tutardan kesilip devlete ödenir. "Net kira" ise ev sahibinin eline geçecek tutardır — gerçek nakit çıkışı bundan daha yüksek hesaplanır.',
   monthlyAidat: 'Aylık aidat',
   rentBasisGroup: 'Girilen kira tutarı',
-  aidatOnceHint: 'Aidatı yalnızca burada girin — “Diğer giderler”de tekrar eklemeyin.',
+  aidatOnceHint: 'Aidatı yalnızca burada gir — “Diğer giderler”de tekrar ekleme.',
 
   vatRate: 'KDV oranı',
   operatingDays: 'Ayda çalışılan gün',
@@ -270,7 +270,7 @@ export const COPY = {
     'Tek değişken satış adedidir. Fiyatlar, maliyetler ve sabit giderler senaryolar arasında değişmez.',
   advancedAssumptions: 'Gelişmiş varsayımlar — yıllık artışlar',
   advancedAssumptionsNote:
-    'Satış fiyatı, ürün maliyeti ve sabit gider yıllık artışları. Varsayılan %0 — girdiğiniz tutarlar projeksiyon boyunca aynı kalır. Sonuç ekranında her zaman görünür.',
+    'Satış fiyatı, ürün maliyeti ve sabit gider yıllık artışları. Varsayılan %0 — girdiğin tutarlar projeksiyon boyunca aynı kalır. Sonuç ekranında her zaman görünür.',
   salesPriceAnnualIncrease: 'Satış fiyatı yıllık artışı',
   productCogsAnnualIncrease: 'Ürün maliyeti yıllık artışı',
   fixedCostAnnualIncrease: 'Sabit gider yıllık artışı',
@@ -327,7 +327,7 @@ export const COPY = {
     'Sabit giderleri karşılamak için gereken satış adedi. İlk yatırım bu hesaba dahil değildir; üç senaryoda da aynıdır.',
   breakEvenPerDay: 'Günde',
   breakEvenPerMonth: 'Ayda',
-  plannedVolume: 'Planladığınız satış',
+  plannedVolume: 'Planladığın satış',
 
   assumptionsTitle: 'Hesaplamada kullanılan varsayımlar',
   assumptionsNote:
@@ -371,9 +371,9 @@ export const REPORT_COPY = {
 
   action: 'Fizibilite raporunu indir',
   actionHintDesktop: 'Yazdırma penceresi açılır; hedef olarak “PDF olarak kaydet” seçilir.',
-  actionHintMobile: 'Yazdırma ekranı açılır; oradan “PDF” veya “Dosyalar’a Kaydet” seçebilirsiniz.',
+  actionHintMobile: 'Yazdırma ekranı açılır; oradan “PDF” veya “Dosyalar’a Kaydet” seçebilirsin.',
   printUnavailable:
-    'Bu tarayıcı yazdırmayı desteklemiyor. Sayfayı Safari veya Chrome’da açıp tekrar deneyin.',
+    'Bu tarayıcı yazdırmayı desteklemiyor. Sayfayı Safari veya Chrome’da açıp tekrar dene.',
 
   dialogTitle: 'Fizibilite raporunu indir',
   dialogLede: 'Rapor bu adla başlıklandırılır ve kaydedilen dosyanın adında kullanılır.',
@@ -457,16 +457,16 @@ export const VERDICT = {
 
 export const ERROR_COPY = {
   required: 'Bu alan gerekli.',
-  not_a_number: 'Lütfen bir sayı girin.',
+  not_a_number: 'Lütfen bir sayı gir.',
   below_min: (limit: string) => `En az ${limit} girilebilir.`,
   above_max: (limit: string) => `En fazla ${limit} girilebilir.`,
-  invalid_value: 'Geçerli bir seçim yapın.',
-  empty_products: 'En az bir ürün girin.',
+  invalid_value: 'Geçerli bir seçim yap.',
+  empty_products: 'En az bir ürün gir.',
   channelMixShort: (missing: string) => `Kanal dağılımı %100 olmalı. ${missing} eksik.`,
   channelMixOver: (excess: string) => `Kanal dağılımı %100 olmalı. ${excess} fazla.`,
   paymentMixShort: (missing: string) => `Ödeme dağılımı %100 olmalı. ${missing} eksik.`,
   paymentMixOver: (excess: string) => `Ödeme dağılımı %100 olmalı. ${excess} fazla.`,
-  deliveryModeRequired: 'Paket servis satışınız olduğu için bu seçim zorunlu.',
+  deliveryModeRequired: 'Paket servis satışın olduğu için bu seçim zorunlu.',
   recipeIncomplete: 'Reçeteyi tamamla.',
 } as const
 
@@ -587,11 +587,11 @@ export const GUARDRAIL_COPY = {
   employerCostMissing: (position: string, headcount: string) =>
     `“${position}” pozisyonunda ${headcount} kişi var ama işveren maliyeti girilmedi. Hesaplama 0 TL ile devam ediyor.`,
   ownerNotAnEmployee:
-    'İşletme sahibini personel listesine eklemeyin. Kendinize ayırdığınız tutar “İşletme sahibi” bölümünde girilir.',
+    'İşletme sahibini personel listesine ekleme. Kendine ayırdığın tutar “İşletme sahibi” bölümünde girilir.',
   aidatOnce:
-    'Aidat “Kira ve aidat” bölümünde girildi. Diğer giderlere tekrar eklemeyin.',
+    'Aidat “Kira ve aidat” bölümünde girildi. Diğer giderlere tekrar ekleme.',
   productCostScope:
-    'Birim maliyet yalnızca ürünün kendi malzeme maliyetidir. Ambalaj ve kurye bedelini buraya eklemeyin.',
+    'Birim maliyet yalnızca ürünün kendi malzeme maliyetidir. Ambalaj ve kurye bedelini buraya ekleme.',
 } as const
 
 export const UNAVAILABLE_COPY = {

@@ -1,0 +1,115 @@
+import { describe, expect, it } from 'vitest'
+import {
+  COPY,
+  ERROR_COPY,
+  GUARDRAIL_COPY,
+  RECIPE_COPY,
+  REPORT_COPY,
+  SECTION_NOTES,
+  UNAVAILABLE_COPY,
+  VERDICT,
+} from './labels.ts'
+
+const COPY_TREES = [
+  COPY,
+  ERROR_COPY,
+  GUARDRAIL_COPY,
+  RECIPE_COPY,
+  REPORT_COPY,
+  SECTION_NOTES,
+  UNAVAILABLE_COPY,
+  VERDICT,
+] as const
+
+/** Common siz / formal-plural forms. Not substrings of sen or impersonal copy. */
+const SIZ_FORMS = [
+  'girin',
+  'yapın',
+  'kontrol edin',
+  'eklemeyin',
+  'unutmayın',
+  'bırakabilirsiniz',
+  'bastığınız',
+  'girdiğiniz',
+  'satışınız',
+  'satışlarınız',
+  'kuryeniz',
+  'kendinize',
+  'ayırdığınız',
+  'ödemeniz',
+  'harcayacağınız',
+  'girdiklerinizin',
+  'girdiklerinin',
+  'satışlarınızın',
+  'satışlarının',
+  'seçtiyseniz',
+  'ediyorsanız',
+  'seçebilirsiniz',
+  'deneyin',
+  'planladığınız',
+] as const
+
+function collectStrings(value: unknown, into: string[]): void {
+  if (typeof value === 'string') {
+    into.push(value)
+    return
+  }
+  if (typeof value === 'function') {
+    const args = Array.from({ length: Math.max(value.length, 1) }, (_, index) =>
+      index === 0 ? 'XXXNAME' : '2',
+    )
+    collectStrings(value(...args), into)
+    return
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) collectStrings(item, into)
+    return
+  }
+  if (value && typeof value === 'object') {
+    for (const item of Object.values(value)) collectStrings(item, into)
+  }
+}
+
+describe('detailed copy (RECIPE_REDESIGN_SPEC §3.2 O4)', () => {
+  const strings: string[] = []
+  for (const tree of COPY_TREES) collectStrings(tree, strings)
+  const blob = strings.join('\n')
+
+  it('contains no common siz forms', () => {
+    for (const form of SIZ_FORMS) {
+      expect(blob, `Detailed copy still contains siz form "${form}"`).not.toContain(form)
+    }
+  })
+
+  it('does not attach a suffix to a name the owner typed', () => {
+    const name = 'Hamburger'
+    const suffix = new RegExp(`${name}(?:['’]?(?:ın|in|un|ün)|(?:nın|nin|nun|nün))`)
+    const samples = [
+      RECIPE_COPY.hesaplaRecipeIncomplete(name),
+      RECIPE_COPY.priceRiseHeading(name),
+      RECIPE_COPY.priceDropHeading(name),
+      RECIPE_COPY.deleteConfirm(name, '2', 'Köfte ekmek'),
+      RECIPE_COPY.deleteConfirmUnused(name),
+      RECIPE_COPY.usageEmpty(name),
+      RECIPE_COPY.unitFamilyLock(name, 'gramla', 'Adet ya da litreye'),
+      RECIPE_COPY.suggestNew(name),
+      RECIPE_COPY.priceRiseUsage('120 g', name),
+      GUARDRAIL_COPY.employerCostMissing(name, '2'),
+      REPORT_COPY.runningHead(name),
+    ]
+    for (const sample of samples) {
+      expect(sample, sample).not.toMatch(suffix)
+    }
+  })
+
+  it('uses the sen empty-state and error strings', () => {
+    expect(COPY.emptyResult).toBe(
+      'Hesapla’dan önce hiçbir sayı gösterilmez. En az bir ürün girip Hesapla’ya bastığında aylık işletme sonucu, başa baş noktası ve yatırımın geri dönüşü burada görünür.',
+    )
+    expect(COPY.optionalSectionsNote).toBe('Boş bıraktığın bölümler 0 TL sayılır. Yalnızca ürünler zorunlu.')
+    expect(COPY.calculateNoProducts).toBe('Sonucu görmek için en az bir ürün gir')
+    expect(ERROR_COPY.not_a_number).toBe('Lütfen bir sayı gir.')
+    expect(ERROR_COPY.empty_products).toBe('En az bir ürün gir.')
+    expect(ERROR_COPY.deliveryModeRequired).toBe('Paket servis satışın olduğu için bu seçim zorunlu.')
+  })
+})

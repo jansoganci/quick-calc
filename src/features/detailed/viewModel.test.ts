@@ -139,7 +139,7 @@ describe('delivery mode', () => {
     expect(result.ok).toBe(false)
     if (result.ok) return
     expect(result.errors['delivery.mode']).toBe(
-      'Paket servis satışınız olduğu için bu seçim zorunlu.',
+      'Paket servis satışın olduğu için bu seçim zorunlu.',
     )
   })
 

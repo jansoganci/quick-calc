@@ -240,7 +240,7 @@ function ClosedMobileRow({
         <span className="block truncate text-[15px] text-qc-ink">
           {ingredient.name.trim() || RECIPE_COPY.ingredientName}
         </span>
-        <span className="mt-0.5 block text-xs text-qc-muted">{detail}</span>
+        <span className="mt-0.5 block text-xs text-qc-secondary">{detail}</span>
       </span>
       <span className="flex shrink-0 items-center gap-2">
         <span className="font-mono text-xs tabular-nums text-qc-ink">
@@ -347,10 +347,10 @@ export function IngredientList({
   return (
     <div className="mt-8 lg:mt-6">
       <div className="flex items-baseline justify-between gap-3">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
           {RECIPE_COPY.listHeading}
         </p>
-        <span className="font-mono text-xs tabular-nums text-qc-muted">
+        <span className="font-mono text-xs tabular-nums text-qc-secondary">
           {RECIPE_COPY.ingredientCount(ingredients.length)}
         </span>
       </div>
@@ -370,22 +370,22 @@ export function IngredientList({
               'lg:grid-cols-[minmax(0,1fr)_84px_84px_116px_112px_84px_32px]',
             )}
           >
-            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
               {RECIPE_COPY.ingredientName}
             </span>
-            <span className="text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+            <span className="text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
               {RECIPE_COPY.purchaseQuantity}
             </span>
-            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
               {RECIPE_COPY.purchaseUnit}
             </span>
-            <span className="text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+            <span className="text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
               {RECIPE_COPY.purchasePrice}
             </span>
-            <span className="text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+            <span className="text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
               {RECIPE_COPY.unitPriceColumn}
             </span>
-            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
               {RECIPE_COPY.usedInColumn}
             </span>
             <span />
@@ -460,7 +460,7 @@ export function IngredientList({
                     <p className="hidden self-center text-right font-mono text-xs tabular-nums text-qc-secondary lg:col-start-5 lg:row-start-1 lg:block">
                       {unitPrice ?? '—'}
                     </p>
-                    <p className="hidden self-center text-xs text-qc-muted lg:col-start-6 lg:row-start-1 lg:block">
+                    <p className="hidden self-center text-xs text-qc-secondary lg:col-start-6 lg:row-start-1 lg:block">
                       {usedLabel(form, ingredient.id)}
                     </p>
                     <div className="hidden lg:col-start-7 lg:row-start-1 lg:block">

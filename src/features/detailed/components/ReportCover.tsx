@@ -31,7 +31,7 @@ export function ReportCover({
       </div>
 
       <div className="mt-[86px]">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-muted">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
           {REPORT_COPY.documentTitle}
         </span>
         <h1 className="m-0 mt-3.5 text-[32px] font-medium leading-tight tracking-[-0.02em] text-qc-ink">
@@ -63,7 +63,7 @@ export function ReportCover({
       </div>
 
       <div className="mt-8">
-        <div className="text-[13px] text-qc-muted">{REPORT_COPY.coverHeadline}</div>
+        <div className="text-[13px] text-qc-secondary">{REPORT_COPY.coverHeadline}</div>
         <div className="mt-1.5 font-mono text-[40px] font-medium leading-tight tracking-[-0.02em] tabular-nums text-qc-accent">
           {view.monthlyOperatingResult}
         </div>
@@ -91,13 +91,13 @@ export function ReportCover({
         <div className="mt-9 border-t border-qc-rule pt-4">
           <div className="flex items-baseline justify-between gap-3">
             <span className="text-[13px] text-qc-secondary">{REPORT_COPY.coverWarnings}</span>
-            <span className="font-mono text-xs tabular-nums text-qc-muted">
+            <span className="font-mono text-xs tabular-nums text-qc-secondary">
               {view.guardrails.length}
             </span>
           </div>
           <div className="mt-2.5 flex flex-col gap-2">
             {view.guardrails.map((guardrail) => (
-              <p key={guardrail.id} className="m-0 text-xs leading-relaxed text-qc-muted">
+              <p key={guardrail.id} className="m-0 text-xs leading-relaxed text-qc-secondary">
                 {guardrail.message}
               </p>
             ))}
@@ -106,7 +106,7 @@ export function ReportCover({
       ) : null}
 
       <div className="mt-10 border-t border-qc-rule pt-4">
-        <p className="m-0 max-w-[620px] text-xs leading-relaxed text-qc-muted">
+        <p className="m-0 max-w-[620px] text-xs leading-relaxed text-qc-secondary">
           {REPORT_COPY.disclaimerShort}
         </p>
         <div className="mt-3.5 flex items-baseline justify-between">
@@ -142,7 +142,7 @@ function CoverFigure({
         !isLast && 'border-r border-r-qc-rule',
       )}
     >
-      <div className="text-xs text-qc-muted">{label}</div>
+      <div className="text-xs text-qc-secondary">{label}</div>
       <div
         className={cn(
           'mt-1.5 text-qc-ink',

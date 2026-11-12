@@ -20,7 +20,7 @@ export function ScenarioTable({ scenarios }: { scenarios: ScenarioRow[] }) {
             key={scenario.key}
             className={cn(
               'text-right text-[11px] font-semibold uppercase tracking-[0.08em]',
-              scenario.isBase ? 'text-qc-ink' : 'text-qc-muted',
+              scenario.isBase ? 'text-qc-ink' : 'text-qc-secondary',
             )}
           >
             {scenario.label}
@@ -59,7 +59,7 @@ export function ScenarioTable({ scenarios }: { scenarios: ScenarioRow[] }) {
           })}
         </div>
       ))}
-      <p className="mt-3 text-xs leading-relaxed text-qc-muted">{COPY.scenariosInvariantNote}</p>
+      <p className="mt-3 text-xs leading-relaxed text-qc-secondary">{COPY.scenariosInvariantNote}</p>
     </div>
   )
 }
