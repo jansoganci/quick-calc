@@ -24,6 +24,8 @@ type NumberFieldProps = {
    */
   describedBy?: string
   disabled?: boolean
+  /** Shows the value but does not accept edits. Used for a cost the recipe owns. */
+  readOnly?: boolean
   /**
    * `true` hides the label at every width — the row already names the field.
    * `'from-lg'` keeps it on mobile and hides it from `lg` up, where a column header
@@ -49,6 +51,7 @@ export function NumberField({
   labelHidden = false,
   describedBy,
   disabled = false,
+  readOnly = false,
 }: NumberFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const caretRef = useRef<number | null>(null)
@@ -87,16 +90,19 @@ export function NumberField({
         className={cn(
           'qc-input-wrap',
           error && 'is-error',
-          disabled && 'border-qc-disabled-border bg-qc-disabled',
+          (disabled || readOnly) && 'border-qc-disabled-border bg-qc-disabled',
         )}
       >
         <input
           ref={inputRef}
           id={id}
-          className={cn('qc-input', disabled && 'text-qc-subtle')}
+          className={cn('qc-input', (disabled || readOnly) && 'text-qc-subtle')}
           value={value}
           disabled={disabled}
+          readOnly={readOnly}
+          aria-readonly={readOnly || undefined}
           onChange={(event) => {
+            if (readOnly) return
             const next = event.target.value
             if (!grouped) {
               onChange(next)
@@ -105,13 +111,13 @@ export function NumberField({
             applyGrouped(next, event.target.selectionStart)
           }}
           onBlur={() => {
-            if (grouped && value.trim() !== '') {
+            if (!readOnly && grouped && value.trim() !== '') {
               applyGrouped(value, null)
             }
             onBlur?.()
           }}
           onPaste={(event) => {
-            if (!grouped) return
+            if (readOnly || !grouped) return
             const pasted = event.clipboardData.getData('text')
             if (pasted === '') return
             event.preventDefault()

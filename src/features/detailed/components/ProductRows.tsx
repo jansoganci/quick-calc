@@ -1,9 +1,11 @@
 import { NumberField } from '../../../components/NumberField.tsx'
 import { TextField } from '../../../components/TextField.tsx'
 import { cn } from '../../../lib/cn.ts'
-import type { ProductRow } from '../formState.ts'
-import { COPY, GUARDRAIL_COPY, PRODUCT_LABELS } from '../labels.ts'
+import type { DetailedFormState, ProductRow } from '../formState.ts'
+import { COPY, GUARDRAIL_COPY, PRODUCT_LABELS, RECIPE_COPY } from '../labels.ts'
 import { useNewestRowOpen } from '../hooks/useNewestRowOpen.ts'
+import { recipeAmountText } from '../recipeForm.ts'
+import { RecipePanel } from './RecipePanel.tsx'
 
 const GRID = 'lg:grid-cols-[1fr_104px_104px_92px_104px_56px]'
 
@@ -15,24 +17,43 @@ const NUMERIC_FIELDS = [
 ] as const
 
 type ProductRowsProps = {
-  products: ProductRow[]
+  form: DetailedFormState
   dailyUnits: string
   errorFor: (path: string) => string | null
   onBlur: (path: string) => void
-  onChange: (index: number, field: keyof Omit<ProductRow, 'id'>, value: string) => void
+  onChange: (index: number, field: keyof Omit<ProductRow, 'id' | 'costSource' | 'recipeLines'>, value: string) => void
   onAdd: () => void
   onRemove: (index: number) => void
+  onOpenRecipe: (index: number) => void
+  onCloseRecipe: (index: number) => void
+  onAddRecipeLine: (index: number) => void
+  onRemoveRecipeLine: (productIndex: number, lineIndex: number) => void
+  onCommitRecipeName: (productIndex: number, lineIndex: number, name: string) => void
+  onIngredientField: (
+    ingredientId: string,
+    field: 'purchaseQuantity' | 'purchasePrice' | 'purchaseUnit',
+    value: string,
+  ) => void
+  onRecipeUsage: (productIndex: number, lineIndex: number, value: string) => void
 }
 
 export function ProductRows({
-  products,
+  form,
   dailyUnits,
   errorFor,
   onBlur,
   onChange,
   onAdd,
   onRemove,
+  onOpenRecipe,
+  onCloseRecipe,
+  onAddRecipeLine,
+  onRemoveRecipeLine,
+  onCommitRecipeName,
+  onIngredientField,
+  onRecipeUsage,
 }: ProductRowsProps) {
+  const products = form.products
   const rows = useNewestRowOpen(products.map((product) => product.id))
 
   return (
@@ -105,20 +126,25 @@ export function ProductRows({
                   error={errorFor(`products.${index}.name`)}
                 />
               </div>
-              {NUMERIC_FIELDS.map((column) => (
-                <NumberField
-                  key={column.field}
-                  id={`products.${index}.${column.field}`}
-                  label={column.label}
-                  labelHidden="from-lg"
-                  value={product[column.field]}
-                  onChange={(value) => onChange(index, column.field, value)}
-                  onBlur={() => onBlur(`products.${index}.${column.field}`)}
-                  unit={column.unit}
-                  error={errorFor(`products.${index}.${column.field}`)}
-                  grouped={column.grouped}
-                />
-              ))}
+              {NUMERIC_FIELDS.map((column) => {
+                const fromRecipe = column.field === 'unitProductCost' && product.costSource === 'recipe'
+                const recipeAmount = fromRecipe ? recipeAmountText(form, product) : null
+                return (
+                  <NumberField
+                    key={column.field}
+                    id={`products.${index}.${column.field}`}
+                    label={column.label}
+                    labelHidden="from-lg"
+                    value={fromRecipe ? (recipeAmount ?? '') : product[column.field]}
+                    onChange={(value) => onChange(index, column.field, value)}
+                    onBlur={() => onBlur(`products.${index}.${column.field}`)}
+                    unit={column.unit}
+                    error={errorFor(`products.${index}.${column.field}`)}
+                    grouped={column.grouped}
+                    readOnly={fromRecipe}
+                  />
+                )
+              })}
               <button
                 type="button"
                 className="qc-text-btn is-muted col-span-2 text-left lg:col-span-1 lg:text-right"
@@ -127,6 +153,44 @@ export function ProductRows({
               >
                 {COPY.remove}
               </button>
+              <div className="col-span-2 lg:col-span-full">
+                {product.costSource === 'recipe' ? (
+                  <>
+                    <button
+                      type="button"
+                      className="qc-text-btn"
+                      onClick={() => onCloseRecipe(index)}
+                    >
+                      {RECIPE_COPY.manual}
+                    </button>
+                    <RecipePanel
+                      productIndex={index}
+                      product={product}
+                      products={products}
+                      ingredients={form.ingredients}
+                      errorFor={errorFor}
+                      onBlur={onBlur}
+                      onCommitName={(lineIndex, name) => onCommitRecipeName(index, lineIndex, name)}
+                      onIngredientField={onIngredientField}
+                      onUsage={(lineIndex, value) => onRecipeUsage(index, lineIndex, value)}
+                      onAddLine={() => onAddRecipeLine(index)}
+                      onRemoveLine={(lineIndex) => onRemoveRecipeLine(index, lineIndex)}
+                      amountText={recipeAmountText(form, product)}
+                    />
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    className="qc-text-btn is-accent"
+                    onClick={() => {
+                      if (!rows.isOpen(product.id)) rows.toggle(product.id)
+                      onOpenRecipe(index)
+                    }}
+                  >
+                    {RECIPE_COPY.fromRecipe}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         )

@@ -1,6 +1,7 @@
 import type { DetailedInput } from '../../core/detailed/index.ts'
 import { parseTurkishNumber } from '../../lib/number.ts'
 import type { DetailedFormState } from './formState.ts'
+import { resolvedRecipeUnitCost } from './recipeForm.ts'
 
 /**
  * Form strings → the engine's raw `DetailedInput`. This file interprets nothing:
@@ -38,7 +39,12 @@ export function toDetailedInput(form: DetailedFormState): DetailedInput {
       normalPrice: amount(product.normalPrice),
       onlinePrice: amount(product.onlinePrice),
       dailyQuantity: amount(product.dailyQuantity),
-      unitProductCost: amount(product.unitProductCost),
+      // A recipe replaces the typed cost. An unfinished recipe is a missing cost,
+      // which the engine already rejects as `required`.
+      unitProductCost:
+        product.costSource === 'recipe'
+          ? resolvedRecipeUnitCost(form, product)
+          : amount(product.unitProductCost),
     })),
     channelMix: {
       salon: rate(form.channelMix.salon),

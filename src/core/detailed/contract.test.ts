@@ -199,8 +199,12 @@ describe('public surface', () => {
         'DETAILED_DEFAULTS',
         'DETAILED_LIMITS',
         'MIX_TOLERANCE',
+        'PURCHASE_UNITS',
         'RAMP_UP_TABLES',
         'calculateDetailed',
+        'isPurchaseUnit',
+        'recipeCost',
+        'usageUnitFor',
         'validateDetailedInput',
       ].sort(),
     );

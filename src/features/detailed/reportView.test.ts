@@ -25,6 +25,8 @@ function reportForm(mutate: (draft: DetailedFormState) => void = () => {}): Deta
       onlinePrice: '110',
       dailyQuantity: '140',
       unitProductCost: '28,50',
+      costSource: 'manual',
+      recipeLines: [],
     },
     {
       id: 'p2',
@@ -33,6 +35,8 @@ function reportForm(mutate: (draft: DetailedFormState) => void = () => {}): Deta
       onlinePrice: '190',
       dailyQuantity: '45',
       unitProductCost: '72',
+      costSource: 'manual',
+      recipeLines: [],
     },
   ]
   form.channelMix = { salon: '50', takeaway: '20', delivery: '30' }
