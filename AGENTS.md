@@ -133,7 +133,21 @@ A refactor that changes a result is a financial product change, not a refactor. 
 - Do not edit generated output in `dist/`.
 - Do not deploy or alter Cloudflare configuration unless explicitly requested.
 - When behavior or requirements are ambiguous, use the specifications and current tests first. Ask only when the choice would materially change product behavior.
-- Follow `.cursor/rules/token-budget.mdc` for plan tracking, one-PR-per-batch, and lightweight verification.
+
+### Plans, batches and PRs
+
+- Multi-step work follows a plan file under `docs/`. Mark each finished step `[x]` in the plan file together with its PR link.
+- Complete the whole requested batch and open a single PR. Write a short plan (files to touch, checks to run) in the PR description and proceed without waiting for approval.
+- After opening the PR, report and stop. The report contains: PR link, head SHA, a one-line test summary, and any blocker.
+- Do not start extra work only to report CI status or to say you are waiting for a merge. Do not start the next batch on your own.
+- If the same check fails twice after a fix attempt, stop and report the blocker instead of retrying.
+
+### Context and reporting
+
+- A new agent reads the plan file and only the files its step needs, not earlier chats. Files already read in this session and unchanged since are not read again.
+- Prefer `grep` and line-range reads over whole-file reads. Do not re-read a file after editing it.
+- Keep reports short. Do not paste full diffs, logs, or file contents into a report.
+- Do not dump `node_modules` or `dist` listings or other large files into context.
 
 ## Commands and verification
 
@@ -141,7 +155,7 @@ A refactor that changes a result is a financial product change, not a refactor. 
 npm install          # install dependencies when needed
 npm run dev          # local Vite server
 npm run test:run     # one-shot Vitest suite
-npm run typecheck    # both TypeScript configurations
+npm run typecheck    # both TypeScript configurations (also run by build)
 npm run lint         # ESLint and architecture checks
 npm run build        # typecheck plus production Vite build
 ```
@@ -150,11 +164,18 @@ Use `npm run test:run`, not `npm test`, for a non-interactive verification run.
 
 For a normal code change, run the narrowest relevant tests while iterating. Before handing off a completed implementation, run:
 
-1. `npm run typecheck`
-2. `npm run test:run`
-3. `npm run lint`
-4. `npm run build`
+1. `npm run test:run`
+2. `npm run lint`
+3. `npm run build` — its script starts with the same `tsc` checks as `npm run typecheck`, so a separate typecheck run is not needed.
 
 For financial changes, also verify the relevant golden vector, reconciliation invariants, validation cases, and unavailable edge states. For frontend changes, add desktop/mobile visual verification and check for application-origin console errors.
 
 Report any failed check, skipped verification, documentation conflict, or unrelated pre-existing failure clearly in the final handoff.
+
+### Verification budget
+
+- Use quiet test output: `npm run test:run -- --reporter=dot`. Read only the summary lines of command output (for example `| tail -5`); open the full log only on failure.
+- Run `npx eslint --fix` only on the files you changed (`npx eslint --fix <changed files>`), never on the whole repository. Do not hand-fix issues it can fix.
+- Take screenshots only when what the user sees changes: one at 390px and one at desktop width. No screenshots for config, SEO, data, or docs-only changes.
+- Use `npx wrangler dev --local` only when routing, headers, or `wrangler.jsonc` change.
+- These budget rules never relax the quality, financial, or locked-decision rules in this file.

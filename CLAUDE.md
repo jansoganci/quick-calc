@@ -1,3 +1,5 @@
+@AGENTS.md
+
 # CLAUDE.md — Operating Guide for Coding Models
 
 This file is **operational guidance** for any AI coding model working in this repository. It is not a specification. The specifications live in `docs/`. The index of active vs archived documents is `docs/README.md`.
@@ -88,7 +90,7 @@ A refactor that alters a number is not a refactor. It is a product change and re
 
 For any financial logic:
 
-- run **typecheck**;
+- run **build** (`npm run build` already runs the typecheck);
 - run **tests**;
 - run **lint**;
 - preserve the **golden vectors** and the **structural invariants**;
