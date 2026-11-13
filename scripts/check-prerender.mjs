@@ -68,7 +68,7 @@ const NAMED_BOTS = [
   'Google-Extended',
 ]
 
-const { SEO_PATHS, seoForPath, indexableCanonicalUrls } = await import(
+const { SEO_PATHS, seoForPath, indexableCanonicalUrls, auditPrerenderedJsonLd } = await import(
   pathToFileURL(findSsrEntry()).href
 )
 
@@ -123,6 +123,11 @@ for (const path of SEO_PATHS) {
       assert(propertyMeta(html, 'og:type') === 'website', `${path} og:type is not website`)
     }
     assert(!canonical.includes('hizli-hesap') && !canonical.includes('detayli-hesap'), `${path} Turkish public path`)
+    auditPrerenderedJsonLd(html, {
+      kind: seo.ogType === 'article' ? 'guide' : 'calculator',
+      canonicalUrl: seo.canonicalUrl,
+      description: seo.description,
+    })
     console.log(`ok ${path}${previewBase ? ` (${finalUrl})` : ''}`)
   } catch (error) {
     failures.push(error instanceof Error ? error.message : String(error))
@@ -138,6 +143,19 @@ async function loadPublic(name) {
   const file = join(distDir, name)
   assert(existsSync(file), `missing ${file}`)
   return readFileSync(file, 'utf8')
+}
+
+try {
+  const template = readFileSync(join(root, 'index.html'), 'utf8')
+  const home = seoForPath('/')
+  auditPrerenderedJsonLd(template, {
+    kind: 'calculator',
+    canonicalUrl: home.canonicalUrl,
+    description: home.description,
+  })
+  console.log('ok index.html template JSON-LD')
+} catch (error) {
+  failures.push(error instanceof Error ? error.message : String(error))
 }
 
 try {
