@@ -464,7 +464,7 @@ Keyword research comes later. These slugs are **stubs** so the template and prer
 | `/rehber/bir-satistan-ne-kaliyor` | Bir satıştan işletmede ne kalıyor? | `/` (Hızlı Hesap) |
 | `/rehber/kafe-acmadan-once-hesap` | Kafe açmadan önce hangi sayıları girmelisin? | `/detayli-hesap` |
 
-Each placeholder ships with 2–3 visible FAQ questions that the page actually answers, e.g. “Bu hesap ücretsiz mi?”, “Raqamlar kime gönderilir?” → “Hiç kimseye; tarayıcıda kalır.” Final FAQ text is owner-edited.
+Each placeholder ships with 2–3 visible FAQ questions that the page actually answers, e.g. “Bu hesap ücretsiz mi?”, “Rakamlar kime gönderilir?” → “Hiç kimseye; tarayıcıda kalır.” Final FAQ text is owner-edited.
 
 Do not publish a third slug in the first content PR.
 
