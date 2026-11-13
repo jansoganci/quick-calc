@@ -7,6 +7,14 @@ export function formatDecimal(value: number, maximumFractionDigits: number): str
   return new Intl.NumberFormat('tr-TR', { maximumFractionDigits }).format(value)
 }
 
+/** Fixed fraction digits with a Turkish comma: `5,6`. */
+export function formatDecimalExact(value: number, fractionDigits: number): string {
+  return new Intl.NumberFormat('tr-TR', {
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
+  }).format(value)
+}
+
 export type ParsedNumber =
   | { status: 'empty' }
   | { status: 'invalid' }

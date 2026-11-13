@@ -40,7 +40,7 @@ describe('salon menu view (Appendix B.1)', () => {
 })
 
 describe('fixed-cost day lines (Appendix B.2)', () => {
-  it('rounds each bucket and makes the remainder add up to the working days', () => {
+  it('shows one decimal and takes senin from the unrounded bucket sum', () => {
     const days: Extract<FixedCostDays, { available: true }> = {
       available: true,
       operatingDaysPerMonth: 30,
@@ -55,10 +55,30 @@ describe('fixed-cost day lines (Appendix B.2)', () => {
     }
     const view = formatFixedCostDays(days, 30)
     expect(view.lines).toEqual([
-      'Ayın ilk 7 günü kira için çalışıyorsun',
-      'Sonraki 4 günü personel için',
-      'Sonraki 2 günü diğer sabit giderler için',
-      'Geri kalan 17 gün senin',
+      'Ayın ilk 7,4 günü kira için çalışıyorsun',
+      'Sonraki 4,4 günü personel için',
+      'Sonraki 2,4 günü diğer sabit giderler için',
+      'Geri kalan 15,8 gün senin',
+    ])
+  })
+
+  it('hides empty buckets and still uses the unrounded shown sum', () => {
+    const days: Extract<FixedCostDays, { available: true }> = {
+      available: true,
+      operatingDaysPerMonth: 30,
+      dailyContribution: 10_000,
+      buckets: [
+        { key: 'rent', cost: 56_000, days: 5.6 },
+        { key: 'payroll', cost: 400, days: 0.04 },
+        { key: 'other', cost: 0, days: 0 },
+      ],
+      remainderDays: 24.36,
+      coversMonth: true,
+    }
+    const view = formatFixedCostDays(days, 30)
+    expect(view.lines).toEqual([
+      'Ayın ilk 5,6 günü kira için çalışıyorsun',
+      'Geri kalan 24,4 gün senin',
     ])
   })
 
@@ -85,7 +105,9 @@ describe('fixed-cost day lines (Appendix B.2)', () => {
     if (!evaluation.ok) return
     expect(evaluation.view.fixedCostDays.note).toContain('30')
     expect(evaluation.view.fixedCostDays.available).toBe(true)
-    expect(evaluation.view.fixedCostDays.lines[0]).toMatch(/^Ayın ilk \d+ günü kira için çalışıyorsun$/)
+    expect(evaluation.view.fixedCostDays.lines[0]).toMatch(
+      /^Ayın ilk \d+,\d günü kira için çalışıyorsun$/,
+    )
     expect(evaluation.view.fixedCostDays.lines.some((line) => line.includes('personel'))).toBe(true)
     expect(evaluation.view.fixedCostDays.lines.at(-1)).toMatch(/senin|Geri kalan gün yok/)
   })
@@ -120,7 +142,7 @@ describe('January preview (Appendix B.3)', () => {
     expect(preview.monthlyOperatingResult).toMatch(/TL$/)
     expect(preview.breakEvenValue).not.toBeNull()
     expect(preview.days.lines[0]).not.toBe(evaluation.view.fixedCostDays.lines[0])
-    expect(preview.days.lines[0]).toMatch(/^Ayın ilk \d+ günü kira için çalışıyorsun$/)
+    expect(preview.days.lines[0]).toMatch(/^Ayın ilk \d+,\d günü kira için çalışıyorsun$/)
   })
 
   it('counts an unreadable percent as 0 and sets the quiet hint flag', () => {
