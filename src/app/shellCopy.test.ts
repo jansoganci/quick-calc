@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest'
 import {
   AREA_ANCHORS,
   AREA_LABELS,
+  AREA_PATHS,
   AREAS,
   DOCUMENT_TITLE,
   SHELL_COPY,
   areaFromLocationHash,
+  areaFromPathname,
 } from './shellCopy.ts'
 
 /**
@@ -54,11 +56,17 @@ describe('area navigation', () => {
     expect(SHELL_COPY.quickHandoffLink).toContain('Detaylı Fizibilite')
   })
 
-  it('gives each area a distinct canonical anchor so the entries stay real links', () => {
+  it('gives each area a distinct English path so the entries stay real links', () => {
+    expect(AREA_PATHS.quick).toBe('/')
+    expect(AREA_PATHS.detailed).toBe('/detailed')
+    expect(AREA_PATHS.simulations).toBe('/simulations')
+    expect(new Set(Object.values(AREA_PATHS)).size).toBe(AREAS.length)
+  })
+
+  it('still recognises the legacy hash tokens', () => {
     expect(AREA_ANCHORS.quick).toBe('quick')
     expect(AREA_ANCHORS.detailed).toBe('detailed-feasibility')
     expect(AREA_ANCHORS.simulations).toBe('simulations')
-    expect(new Set(Object.values(AREA_ANCHORS)).size).toBe(AREAS.length)
   })
 
   it('opens Detaylı on load for #detailed-feasibility and its screen suffixes', () => {
@@ -80,5 +88,14 @@ describe('area navigation', () => {
     expect(areaFromLocationHash('#quick-calculation')).toBe('quick')
     expect(areaFromLocationHash('#')).toBe('quick')
     expect(areaFromLocationHash('#something-else')).toBe('quick')
+  })
+
+  it('opens the same three areas from the English pathname', () => {
+    expect(areaFromPathname('/')).toBe('quick')
+    expect(areaFromPathname('/quick')).toBe('quick')
+    expect(areaFromPathname('/detailed')).toBe('detailed')
+    expect(areaFromPathname('/detailed/result')).toBe('detailed')
+    expect(areaFromPathname('/simulations')).toBe('simulations')
+    expect(areaFromPathname('/asdf')).toBe('quick')
   })
 })

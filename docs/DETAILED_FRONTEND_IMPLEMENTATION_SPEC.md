@@ -15,7 +15,7 @@ This document adds **no financial formulas.** Every figure it displays is read f
 
 Detaylı is no longer one long page. The owner sees one of five screens at a time, in this order: **Menü · Malzemeler · Satış · Giderler · Sonuç**. The eleven input *sections* still exist inside those screens (delivery still conditional). A persistent panel on the right (desktop) still answers *is this business making money?* Results live on **Sonuç**, not below the form.
 
-First visit and `#detailed-feasibility` open **Menü**. There is no third calculator. **Simülasyonlar** is a third top-level *area* that reads the Detaylı draft; it does not add inputs, defaults or a second engine.
+First visit (`/`) opens Hızlı Hesap. `/detailed` and `#detailed-feasibility` open **Menü**. There is no third calculator. **Simülasyonlar** is a third top-level *area* that reads the Detaylı draft; it does not add inputs, defaults or a second engine.
 
 Three rules carry the whole design:
 
@@ -46,15 +46,15 @@ Three rules carry the whole design:
 
 Roadmap: Menü, Malzemeler, Satış, Giderler, Sonuç. One screen visible. Form state is a single `DetailedFormState`; hiding a screen does not unmount the fields or rewrite the draft.
 
-| # | Screen | Hash | Contains |
-| --- | --- | --- | --- |
-| 01 | Menü | `#detailed-feasibility` | Ürünler + recipe editor + sample fill |
-| 02 | Malzemeler | `#detailed-feasibility/malzemeler` | shared ingredient list (was inside 01) |
-| 03 | Satış | `#detailed-feasibility/satis` | 02 Satış tahmini, 03 kanallar, 04 ödemeler, 05 paket servis |
-| 04 | Giderler | `#detailed-feasibility/giderler` | 06–11 personel, sahip, kira, opex, capex, varsayımlar |
-| 05 | Sonuç | `#detailed-feasibility/sonuc` | Tier 2 results after `Hesapla`; empty copy + Hesapla before |
+| # | Screen | Path | Hash (compat) | Contains |
+| --- | --- | --- | --- | --- |
+| 01 | Menü | `/detailed` | `#detailed-feasibility` | Ürünler + recipe editor + sample fill |
+| 02 | Malzemeler | `/detailed/ingredients` | `#detailed-feasibility/malzemeler` | shared ingredient list (was inside 01) |
+| 03 | Satış | `/detailed/sales` | `#detailed-feasibility/satis` | 02 Satış tahmini, 03 kanallar, 04 ödemeler, 05 paket servis |
+| 04 | Giderler | `/detailed/expenses` | `#detailed-feasibility/giderler` | 06–11 personel, sahip, kira, opex, capex, varsayımlar |
+| 05 | Sonuç | `/detailed/result` | `#detailed-feasibility/sonuc` | Tier 2 results after `Hesapla`; empty copy + Hesapla before |
 
-**Hash.** No router. Screen changes `pushState` so the browser Back button returns to the previous screen. `#detailed-feasibility` with no suffix is Menü, so existing deep links keep working. An unknown suffix under that root is treated as Menü (`replaceState` to the canonical hash). Form inputs are still not encoded (Quick R6). The draft key and shape stay `maliyet.detailed.draft.v1`; the current screen is not stored.
+**Paths.** No router. Screen changes `pushState` the English path so the browser Back button returns to the previous screen. `/detailed` with no suffix is Menü. `/detailed/menu` 301s to `/detailed`. An unknown suffix under `/detailed/` is treated as Menü (`replaceState` to `/detailed`). Incoming hash bookmarks are rewritten to those paths by an inline script in `index.html` (fragments never reach Cloudflare) and by `applyCanonicalLocation`. Form inputs are still not encoded (Quick R6). The draft key and shape stay `maliyet.detailed.draft.v1`; the current screen is not stored. `/detailed/result` is `noindex` and omitted from the sitemap (`docs/SEO_PRERENDER_PLAN.md` Q10); that meta lands in a later SEO step.
 
 **Chrome.** Each screen has a `01`–`05` eyebrow, the screen name, `n / 5`, and 44px text buttons `Geri: {ad}` / `Sonraki: {ad} →`. Menü has no Geri; Sonuç has no Sonraki. Desktop özet pane lists the five screens before the first calculation. Inner sections (Ürünler, Personel, …) keep their names and lose the numeric prefix so they do not clash with the screen numbers. On a 390px phone the page has `180px` bottom padding and the Geri/Sonraki row has matching `scroll-margin-bottom`, so those controls sit above the sticky Hesapla bar when the owner scrolls to them.
 
@@ -277,7 +277,7 @@ These blocks are display helpers. They do not change `calculateDetailed`, Kötü
 
 ### 4.9 Simülasyonlar area
 
-Third top-level area, not a third calculator. Hash `#simulations` (alias `#simulasyonlar`). Reads the Detaylı draft already in memory / `maliyet.detailed.draft.v1`. No new inputs besides the Ocak `%` fields. If `view` is null (never `Hesapla`), one plain line and a text link to Detaylı Menü. Zam geldi stays on Malzemeler (input-time; no price history, so no restore list here).
+Third top-level area, not a third calculator. Path `/simulations` (hash aliases `#simulations` / `#simulasyonlar`). Reads the Detaylı draft already in memory / `maliyet.detailed.draft.v1`. No new inputs besides the Ocak `%` fields. If `view` is null (never `Hesapla`), one plain line and a text link to Detaylı Menü (`/detailed`). Zam geldi stays on Malzemeler (input-time; no price history, so no restore list here).
 
 ---
 
@@ -345,7 +345,7 @@ Section 01 starts with **one empty product row**. Every other section renders em
 - **Mobile (below `lg`):** a simple horizontal three-column text row under the masthead, the same idea as the old two-mode tabs. Labels only. Each entry is a ≥44px target.
 - **Desktop (`lg+`):** a vertical text list in the **left column of the same 1152px white sheet** as the content (not on the grey page background). The masthead and the colophon span the full sheet; the nav sits between them as the first grid column (`148px`). Sticky below the masthead (`lg:top-14`). This is what keeps the footer aligned with the frame at 1280 and 1440. The sheet itself no longer carries a mode-tabs block.
 - Active: 14px weight 600 `--qc-ink` with a 2px `--qc-ink` underline **under the label**. Inactive: weight 400 `--qc-secondary`, underline `--qc-rule-strong` on hover. **Never the accent**.
-- Each entry is an `<a href="#quick">` / `<a href="#detailed-feasibility">` / `<a href="#simulations">` with `aria-current="page"` on the active one, inside `<nav aria-label="Bölümler">`.
+- Each entry is an `<a href="/">` / `<a href="/detailed">` / `<a href="/simulations">` with `aria-current="page"` on the active one, inside `<nav aria-label="Bölümler">`. Visible labels stay Turkish (`Hızlı Hesap`, `Detaylı Hesap`, `Simülasyonlar`).
 - Does not print (`qc-screen-only`).
 
 The masthead stays sticky from `lg` and the result panes still offset by `lg:top-14`. The desktop area list is itself sticky at `top-14` in the sheet's left column. Switching mid-scroll from a finished Quick result is still served by §6.3.
@@ -358,11 +358,11 @@ This is the moment the offer lands: the reader has their answer and can weigh wh
 
 ### 6.4 Switching, wherever it is asked for
 
-Every entry point — area nav, the Quick handoff, the Simülasyonlar empty-state link — calls one function in `App.tsx`, which `pushState`s the area hash and **scrolls to the top**. The scroll is not cosmetic: without it, a reader taking the handoff from the foot of the Quick page lands in the middle of the Detailed form.
+Every entry point — area nav, the Quick handoff, the Simülasyonlar empty-state link — calls one function in `App.tsx`, which `pushState`s the area **path** and **scrolls to the top**. The scroll is not cosmetic: without it, a reader taking the handoff from the foot of the Quick page lands in the middle of the Detailed form.
 
-On first paint, `App.tsx` reads that hash: `#detailed-feasibility` (and suffixes) opens Detaylı; `#simulations` / `#simulasyonlar` opens Simülasyonlar; any other hash (including `#quick`, `#quick-calculation` and none) opens Hızlı Hesap. The calculator inputs are still not encoded in the URL (Quick R6).
+On first paint, `App.tsx` reads the pathname (after rewriting any leftover hash): `/detailed` (and suffixes) opens Detaylı; `/simulations` opens Simülasyonlar; `/` and `/quick` open Hızlı Hesap. Incoming `#detailed-feasibility` (and suffixes), `#simulations` / `#simulasyonlar`, `#quick` / `#quick-calculation` still work. The calculator inputs are still not encoded in the URL (Quick R6).
 
-> **Resolved (was D-3) — routing.** Architecture D4 says a router arrives "only when a second real screen requires it". There is still **no router**. `App.tsx` holds area + Detailed screen in `useState`. Canonical hashes: `#quick`, `#detailed-feasibility`, `#simulations`. Existing `#quick-calculation` and `#detailed-feasibility/…` keep working. Form inputs are not encoded (Quick R6). `popstate` restores the area (and the Detaylı screen) so Back works. Switching areas `pushState`s so Back returns to the previous area; entering Detaylı from another area lands on Menü. All three area trees stay mounted. A reload of `#detailed-feasibility/satis` opens Detaylı on Satış and restores the draft, not the screen-local accordion. No confirmation dialog on switch.
+> **Resolved (was D-3) — routing.** Architecture D4 says a router arrives "only when a second real screen requires it". There is still **no router**. `App.tsx` holds area + Detailed screen in `useState`. Canonical paths: `/`, `/detailed`, `/simulations` (English; page copy stays Turkish). `/quick` 301s to `/`. Existing hash bookmarks keep working via the inline map. Form inputs are not encoded (Quick R6). `popstate` restores the area (and the Detaylı screen) so Back works. Switching areas `pushState`s so Back returns to the previous area; entering Detaylı from another area lands on Menü. All three area trees stay mounted. A reload of `/detailed/sales` or `#detailed-feasibility/satis` opens Detaylı on Satış and restores the draft, not the screen-local accordion. No confirmation dialog on switch.
 
 ---
 
@@ -401,7 +401,7 @@ src/features/detailed/
     SectionFrame.tsx               number, title, echo slot, note slot, mobile accordion
     ProductRows.tsx  SalesForecastRows.tsx  PositionRows.tsx  LineRows.tsx  RepeatingRows.ts
     MixTable.tsx                   used twice (02, 03) — two genuine call sites
-    screens.ts                     five-screen map, hash, summaries
+    screens.ts                     five-screen map, English paths, hash compat, summaries
     DetailedForm.tsx               composes the sections for the current screen
     DetailedScreenChrome.tsx       01–05 heading and Geri / Sonraki
     SummaryPane.tsx                states A and B, plus the shared Hesapla control
