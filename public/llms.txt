@@ -2,13 +2,23 @@
 
 > Kafe, restoran ve küçük işletmeler için ücretsiz maliyet ve fizibilite hesaplama aracı. Muhasebe bilgisi gerektirmez.
 
-Maliyet, bir satışın (örn. bir kahvenin) gerçek maliyetinin nereye gittiğini ve işletmede ne kadar kaldığını hesaplar. Türkiye'ye özel finansal kurallar dahildir: KDV netleme, işyeri kira stopajı (net/brüt kira), POS ve yemek kartı komisyonları.
+Maliyet, bir satışın gerçek maliyetinin nereye gittiğini ve işletmede ne kadar kaldığını gösterir. Türkiye'ye özel kurallar dahildir: KDV netleme, işyeri kira stopajı (net veya brüt kira) ve POS / yemek kartı komisyonları.
 
-İki hesaplama modu vardır:
+Üç alan vardır. Simülasyonlar üçüncü bir hesap motoru değildir; Detaylı taslağını okur.
 
-- **Hızlı Hesap** — 8 girdiyle bir satışın maliyet dağılımını ve aylık işletme kazancını gösterir.
-- **Detaylı Fizibilite** — ürün bazlı gelir, satış kanalı ekonomisi (salon / al götür / paket servis), personel, kira, senaryo analizi (kötü/baz/iyi), yatırım geri dönüşü ve indirilebilir PDF rapor üretir.
+- **Hızlı Hesap** — 8 girdiyle bir satışın maliyet dağılımını gösterir.
+- **Detaylı Fizibilite** — ürün bazlı gelir, satış kanalı ekonomisi (salon / al götür / paket servis), personel, kira, senaryo analizi ve indirilebilir PDF rapor üretir.
+- **Simülasyonlar** — asgari ücret veya kira artınca aylık kalanın nasıl değiştiğine bakar; yeni girdi sormaz.
 
 Ücretsizdir; hesap açmaya veya ödemeye gerek yoktur. Tüm hesaplamalar tarayıcıda yapılır, veri sunucuya gönderilmez.
+
+## Sayfalar
+
+- [Hızlı Hesap](https://maliyet.lol/): 8 girdiyle bir satıştan geriye ne kaldığını görürsün.
+- [Detaylı Hesap](https://maliyet.lol/detailed): ürün, kanal, personel, kira, senaryolar ve PDF. Menü buradan açılır.
+- [Malzemeler](https://maliyet.lol/detailed/ingredients): ortak malzeme listesi; alış fiyatı tek yerde, kullanım ürüne özgü.
+- [Satış](https://maliyet.lol/detailed/sales): günlük adet, kanallar, ödemeler ve paket servis. Komisyonlar dahildir.
+- [Giderler](https://maliyet.lol/detailed/expenses): personel, kira, diğer giderler ve ilk yatırım. Boş bıraktığın kalemler 0 TL sayılır.
+- [Simülasyonlar](https://maliyet.lol/simulations): Ocak testi. Detaylı taslağını okur.
 
 Site: https://maliyet.lol/

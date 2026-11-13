@@ -56,7 +56,21 @@ function assert(condition, message) {
   if (!condition) throw new Error(message)
 }
 
-const { SEO_PATHS, seoForPath } = await import(pathToFileURL(findSsrEntry()).href)
+const NAMED_BOTS = [
+  'Googlebot',
+  'Bingbot',
+  'GPTBot',
+  'OAI-SearchBot',
+  'ChatGPT-User',
+  'ClaudeBot',
+  'Claude-SearchBot',
+  'PerplexityBot',
+  'Google-Extended',
+]
+
+const { SEO_PATHS, seoForPath, indexableCanonicalUrls } = await import(
+  pathToFileURL(findSsrEntry()).href
+)
 
 async function loadHtml(path) {
   if (previewBase) {
@@ -104,12 +118,54 @@ for (const path of SEO_PATHS) {
   }
 }
 
+async function loadPublic(name) {
+  if (previewBase) {
+    const response = await fetch(`${previewBase}/${name}`)
+    assert(response.ok, `/${name} → HTTP ${response.status}`)
+    return response.text()
+  }
+  const file = join(distDir, name)
+  assert(existsSync(file), `missing ${file}`)
+  return readFileSync(file, 'utf8')
+}
+
+try {
+  const urls = indexableCanonicalUrls()
+  const robots = await loadPublic('robots.txt')
+  const sitemap = await loadPublic('sitemap.xml')
+  const llms = await loadPublic('llms.txt')
+
+  for (const agent of NAMED_BOTS) {
+    assert(robots.includes(`User-agent: ${agent}`), `robots.txt missing ${agent}`)
+  }
+  assert(robots.includes('User-agent: *'), 'robots.txt missing *')
+  assert(robots.includes('Sitemap: https://maliyet.lol/sitemap.xml'), 'robots.txt missing Sitemap line')
+  assert(!/^\s*Disallow:/m.test(robots), 'robots.txt must not Disallow')
+
+  const locs = [...sitemap.matchAll(/<loc>([^<]*)<\/loc>/g)].map((match) => match[1])
+  assert(JSON.stringify(locs) === JSON.stringify(urls), `sitemap loc drift: ${locs.join(' ')}`)
+  assert(!sitemap.includes('/detailed/result'), 'sitemap.xml lists Sonuç')
+  assert(!sitemap.includes('changefreq'), 'sitemap.xml invents changefreq')
+  assert(!sitemap.includes('priority'), 'sitemap.xml invents priority')
+  assert(!sitemap.includes('/quick<'), 'sitemap.xml lists /quick')
+  assert(!sitemap.includes('/guides'), 'sitemap.xml lists TBD guides')
+
+  for (const url of urls) {
+    assert(llms.includes(url), `llms.txt missing ${url}`)
+  }
+  assert(!llms.includes('/detailed/result'), 'llms.txt lists Sonuç')
+  assert(!llms.includes('https://maliyet.lol/quick'), 'llms.txt lists /quick')
+  assert(!/quick calc/i.test(llms), 'llms.txt uses English product name')
+  assert(llms.includes('Simülasyonlar üçüncü bir hesap motoru değildir'), 'llms.txt must not call Simülasyonlar an engine')
+  console.log(`ok /robots.txt /sitemap.xml /llms.txt (${urls.length} indexable URLs)`)
+} catch (error) {
+  failures.push(error instanceof Error ? error.message : String(error))
+}
+
 if (previewBase) {
   for (const alias of ['/quick', '/detailed/menu']) {
     const response = await fetch(`${previewBase}${alias}`, { redirect: 'manual' })
-    // Vite preview does not apply Cloudflare `_redirects`. The built files must
-    // still exist as the SPA fallback (home) or 404 — Cloudflare owns the 301.
-    console.log(`note ${alias} → HTTP ${response.status} (Cloudflare _redirects, not vite preview)`)
+    console.log(`note ${alias} → HTTP ${response.status} (_redirects on Cloudflare / wrangler)`)
   }
 }
 

@@ -24,9 +24,8 @@ function distRelative(path) {
 }
 
 const ssrPath = findSsrEntry()
-const { render, seoForPath, SEO_PATHS, applySeoToHtml, injectRoot } = await import(
-  pathToFileURL(ssrPath).href
-)
+const { render, seoForPath, SEO_PATHS, applySeoToHtml, injectRoot, buildSitemapXml, indexableCanonicalUrls } =
+  await import(pathToFileURL(ssrPath).href)
 
 if (!Array.isArray(SEO_PATHS) || SEO_PATHS.length === 0) {
   throw new Error('SSR bundle did not export SEO_PATHS')
@@ -60,3 +59,8 @@ for (const forbidden of ['quick', 'hizli-hesap', 'detayli-hesap', 'simulasyonlar
     throw new Error(`Must not write dist/${forbidden}/`)
   }
 }
+
+const lastmod = new Date().toISOString().slice(0, 10)
+const sitemap = buildSitemapXml(lastmod)
+writeFileSync(join(distDir, 'sitemap.xml'), sitemap)
+console.log(`sitemap.xml ${indexableCanonicalUrls().join(' ')}`)
