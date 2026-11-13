@@ -24,7 +24,7 @@ type LineRowsProps = {
 /**
  * A flat name-and-amount list plus a starter palette. DF-18/19/20 forbids a blank
  * expense sheet, and twelve empty rows would be worse than none — so the standard
- * lines sit as quiet text controls until one is chosen, and a chosen one dims.
+ * lines sit as quiet text controls until one is chosen, and a chosen one reads as added.
  */
 export function LineRows({
   lines,
@@ -89,7 +89,7 @@ export function LineRows({
             />
             <button
               type="button"
-              className="qc-text-btn is-muted text-right"
+              className="qc-text-btn text-right"
               onClick={() => onRemove(index)}
             >
               {COPY.remove}
@@ -105,8 +105,8 @@ export function LineRows({
         <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1">
           {starters.map((starter) =>
             used.has(starter) ? (
-              <span key={starter} className="text-[13px] text-qc-rule-mid">
-                {starter}
+              <span key={starter} className="text-[13px] text-qc-secondary">
+                {COPY.starterAdded(starter)}
               </span>
             ) : (
               <button

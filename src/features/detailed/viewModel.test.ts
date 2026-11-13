@@ -4,6 +4,7 @@ import { COPY, SECTION_ECHO_LABELS } from './labels.ts'
 import { sectionSummary, visibleSections } from './sectionSummary.ts'
 import { toDetailedInput } from './toInput.ts'
 import { evaluateDetailed } from './viewModel.ts'
+import { recipeAmountText } from './recipeForm.ts'
 
 function formWith(mutate: (draft: DetailedFormState) => void): DetailedFormState {
   const form = initialForm()
@@ -303,6 +304,7 @@ describe('Appendix B results on the sample café', () => {
       'Amerikano',
       'Poğaça',
       'Cold Brew',
+      'Hamburger',
     ])
     expect(result.view.salonMenu.weakestNote).toContain('Poğaça')
     expect(result.view.fixedCostDays.available).toBe(true)
@@ -321,5 +323,15 @@ describe('terminology the product spec rejects', () => {
     for (const banned of ['amortisman', 'net kâr', 'netprofit', 'depreciation']) {
       expect(serialized, `Detailed copy contains "${banned}"`).not.toContain(banned)
     }
+  })
+})
+
+describe('the sample café shows a recipe (UI_UX_FIX_LIST F7)', () => {
+  it('builds Hamburger from the spec fixture: 8,00 + 45,60 + 1,20 + 0,70 = 55,50', () => {
+    const form = sampleCafeForm()
+    const burger = form.products.find((product) => product.name === 'Hamburger')
+    expect(burger?.costSource).toBe('recipe')
+    expect(burger ? recipeAmountText(form, burger) : null).toBe('55,50')
+    expect(form.ingredients.map((ingredient) => ingredient.name)).toEqual(['Ekmek', 'Kıyma', 'Domates', 'Marul'])
   })
 })

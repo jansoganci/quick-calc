@@ -106,7 +106,7 @@ function DeleteConfirm({
     <div className="border-t border-qc-rule-row pt-3">
       <p className="text-xs leading-relaxed text-qc-secondary">{message}</p>
       <div className="mt-2 flex items-center justify-end gap-4">
-        <button type="button" className="qc-text-btn is-muted" onClick={onCancel}>
+        <button type="button" className="qc-text-btn" onClick={onCancel}>
           {RECIPE_COPY.cancel}
         </button>
         <button type="button" className="qc-text-btn" onClick={onDelete}>
@@ -481,7 +481,7 @@ export function IngredientList({
                       {confirming ? null : (
                         <button
                           type="button"
-                          className="qc-text-btn is-muted"
+                          className="qc-text-btn"
                           onClick={() => setDeletingId(ingredient.id)}
                         >
                           {RECIPE_COPY.deleteShort}
@@ -527,7 +527,7 @@ export function IngredientList({
                         {adding ? (
                           <button
                             type="button"
-                            className="qc-text-btn is-muted"
+                            className="qc-text-btn"
                             onClick={() => {
                               if (ingredient.name.trim() === '') onDiscardBlank(ingredient.id)
                               else onDelete(ingredient.id)
@@ -552,7 +552,7 @@ export function IngredientList({
                         <div className="mt-3 hidden lg:flex lg:justify-end">
                           <button
                             type="button"
-                            className="qc-text-btn is-muted"
+                            className="qc-text-btn"
                             onClick={() => {
                               if (ingredient.name.trim() === '') onDiscardBlank(ingredient.id)
                               else onDelete(ingredient.id)
@@ -567,7 +567,7 @@ export function IngredientList({
                         <div className="mt-3 flex justify-end border-t border-qc-rule-row pt-2 lg:hidden">
                           <button
                             type="button"
-                            className="qc-text-btn is-muted"
+                            className="qc-text-btn"
                             onClick={() => setDeletingId(ingredient.id)}
                           >
                             {RECIPE_COPY.deleteIngredient}

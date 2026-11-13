@@ -8,6 +8,7 @@ import {
   initialForm,
   resetIdCounter,
   syncIdCounter,
+  withoutDelivery,
 } from './formState.ts'
 
 function suffixOf(id: string): number {
@@ -102,5 +103,19 @@ describe('resetIdCounter', () => {
     expect(emptyProduct().id).toBe('product-2')
     resetIdCounter()
     expect(initialForm().products[0]?.id).toBe('product-1')
+  })
+})
+
+describe('withoutDelivery', () => {
+  it('moves the delivery share to salon so the mix stays at 100%', () => {
+    const form = initialForm()
+    const next = withoutDelivery({ ...form, channelMix: { salon: '50', takeaway: '20', delivery: '30' } })
+    expect(next.channelMix).toEqual({ salon: '80', takeaway: '20', delivery: '0' })
+  })
+
+  it('still zeroes delivery when a share does not parse', () => {
+    const form = initialForm()
+    const next = withoutDelivery({ ...form, channelMix: { salon: '', takeaway: '20', delivery: '30' } })
+    expect(next.channelMix).toEqual({ salon: '', takeaway: '20', delivery: '0' })
   })
 })

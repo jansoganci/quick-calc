@@ -151,7 +151,7 @@ describe('detailed copy (RECIPE_REDESIGN_SPEC §3.2 O4)', () => {
     )
     expect(
       `${COPY.simulationsEmptyBefore}${COPY.simulationsEmptyLink}${COPY.simulationsEmptyAfter}`,
-    ).toBe('Önce Detaylı Hesap’ı doldur.')
+    ).toBe('Önce Detaylı Hesap’ta Hesapla’ya bas.')
     expect(COPY.optionalSectionsNote).toBe('Boş bıraktığın bölümler 0 TL sayılır. Yalnızca ürünler zorunlu.')
     expect(COPY.calculateNoProducts).toBe('Sonucu görmek için en az bir ürün gir')
     expect(SECTION_LABELS.products).toBe('Ürünler')

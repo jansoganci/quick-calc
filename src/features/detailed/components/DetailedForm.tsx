@@ -190,6 +190,11 @@ export function DetailedForm({
             },
           ]}
         />
+        {hasDelivery(form.channelMix.delivery) ? (
+          <button type="button" className="qc-text-btn mt-3 min-h-[44px]" onClick={calc.clearDelivery}>
+            {COPY.noDelivery}
+          </button>
+        ) : null}
       </SectionFrame>
 
       <SectionFrame {...frameProps('payments')}>
@@ -581,4 +586,10 @@ export function DetailedForm({
       </div>
     </div>
   )
+}
+
+/** Shows "Paket servis yok" only while a delivery share is still entered. */
+function hasDelivery(share: string): boolean {
+  const trimmed = share.trim()
+  return trimmed !== '' && !/^0+([.,]0*)?$/.test(trimmed)
 }

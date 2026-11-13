@@ -14,6 +14,7 @@ import {
   initialForm,
   rateToPercentInput,
   sampleCafeForm,
+  withoutDelivery,
   type DetailedFormState,
   type LineRow,
   type PositionRow,
@@ -330,6 +331,7 @@ export function useDetailedCalc() {
         [collection]: draft[collection].filter((_, at) => at !== index),
       })),
 
+    clearDelivery: () => update(withoutDelivery),
     setChannelShare: (channel: keyof DetailedFormState['channelMix'], value: string) =>
       update((draft) => ({ ...draft, channelMix: { ...draft.channelMix, [channel]: value } })),
     setPackaging: (field: keyof DetailedFormState['packaging'], value: string) =>
