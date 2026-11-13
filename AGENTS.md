@@ -133,6 +133,7 @@ A refactor that changes a result is a financial product change, not a refactor. 
 - Do not edit generated output in `dist/`.
 - Do not deploy or alter Cloudflare configuration unless explicitly requested.
 - When behavior or requirements are ambiguous, use the specifications and current tests first. Ask only when the choice would materially change product behavior.
+- Follow `.cursor/rules/token-budget.mdc` for plan tracking, one-PR-per-batch, and lightweight verification.
 
 ## Commands and verification
 
