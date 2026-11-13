@@ -205,6 +205,8 @@ describe('public surface', () => {
         'buildFixedCostDays',
         'buildSalonMenuEconomics',
         'calculateDetailed',
+        'channelRestorePrice',
+        'esnafPrice',
         'isPurchaseUnit',
         'purchaseFactor',
         'recipeCost',

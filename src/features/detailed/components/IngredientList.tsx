@@ -36,6 +36,11 @@ type IngredientListProps = {
   onAddBlank: () => string
   onDiscardBlank: (ingredientId: string) => void
   onDelete: (ingredientId: string) => void
+  onApplyProductPrice: (
+    productIndex: number,
+    field: 'normalPrice' | 'onlinePrice',
+    value: string,
+  ) => void
   requestedOpenId: string | null
   onConsumedOpen: () => void
 }
@@ -265,6 +270,7 @@ export function IngredientList({
   onAddBlank,
   onDiscardBlank,
   onDelete,
+  onApplyProductPrice,
   requestedOpenId,
   onConsumedOpen,
 }: IngredientListProps) {
@@ -284,7 +290,10 @@ export function IngredientList({
     setOpenId(id)
     setDeletingId(null)
     if (ingredient) {
-      setSnapshots((current) => ({ ...current, [id]: current[id] ?? snapshotOf(ingredient) }))
+      setSnapshots((current) => ({
+        ...current,
+        [id]: current[id] ?? snapshotOf(ingredient, form.products),
+      }))
     }
     onConsumedOpen()
     window.requestAnimationFrame(() => {
@@ -294,11 +303,13 @@ export function IngredientList({
       })
       document.getElementById(fieldPath(id, 'purchasePrice'))?.focus()
     })
-  }, [form.ingredients, onConsumedOpen, requestedOpenId])
+  }, [form.ingredients, form.products, onConsumedOpen, requestedOpenId])
 
   function remember(ingredient: IngredientRow) {
     setSnapshots((current) =>
-      current[ingredient.id] ? current : { ...current, [ingredient.id]: snapshotOf(ingredient) },
+      current[ingredient.id]
+        ? current
+        : { ...current, [ingredient.id]: snapshotOf(ingredient, form.products) },
     )
   }
 
@@ -328,7 +339,10 @@ export function IngredientList({
     setAddingId((current) => (current === ingredient.id ? null : current))
     setOpenId((current) => (current === ingredient.id ? null : current))
     setDeletingId((current) => (current === ingredient.id ? null : current))
-    setSnapshots((current) => ({ ...current, [ingredient.id]: snapshotOf(ingredient) }))
+    setSnapshots((current) => ({
+      ...current,
+      [ingredient.id]: snapshotOf(ingredient, form.products),
+    }))
   }
 
   const previewSource = rows.find((ingredient) => {
@@ -489,7 +503,7 @@ export function IngredientList({
 
                   {preview && open ? (
                     <div className="mt-3 lg:hidden">
-                      <PricePreview preview={preview} />
+                      <PricePreview preview={preview} onApply={onApplyProductPrice} />
                     </div>
                   ) : null}
 
@@ -572,10 +586,11 @@ export function IngredientList({
       {desktopPreview && previewSource ? (
         <PricePreviewDesktop
           preview={desktopPreview}
+          onApply={onApplyProductPrice}
           onDone={() =>
             setSnapshots((current) => ({
               ...current,
-              [previewSource.id]: snapshotOf(previewSource),
+              [previewSource.id]: snapshotOf(previewSource, form.products),
             }))
           }
         />

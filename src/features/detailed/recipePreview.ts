@@ -1,4 +1,6 @@
 import {
+  channelRestorePrice,
+  esnafPrice,
   isPurchaseUnit,
   remainingPerUnitDelta,
   salonRestorePrice,
@@ -17,10 +19,27 @@ import {
   resolvedRecipeUnitCost,
 } from './recipeForm.ts'
 
+export type ProductPriceSnapshot = {
+  normalPrice: string
+  onlinePrice: string
+}
+
 export type PurchaseSnapshot = {
   purchaseQuantity: string
   purchaseUnit: PurchaseUnit | ''
   purchasePrice: string
+  /** Selling prices at open. Restore uses these so a tap does not add Δcost twice. */
+  productPrices: Record<string, ProductPriceSnapshot>
+}
+
+export type PriceSuggestionField = 'normalPrice' | 'onlinePrice'
+
+export type PriceSuggestion = {
+  field: PriceSuggestionField
+  exactText: string
+  suggestedText: string
+  applyValue: string
+  canApply: boolean
 }
 
 export type PricePreviewLine = {
@@ -31,6 +50,8 @@ export type PricePreviewLine = {
   costTo: string
   remainingText: string
   restoreText: string | null
+  restoreOnlineText: string | null
+  suggestions: PriceSuggestion[]
 }
 
 export type PricePreview = {
@@ -108,6 +129,39 @@ function vatRateOf(form: DetailedFormState): number {
   return parsed.value / 100
 }
 
+/** Appendix D: empty platform rate is 0; unreadable is unavailable. */
+function platformFeeRateOf(form: DetailedFormState): number | null {
+  const parsed = parseTurkishNumber(form.delivery.platformFeeRate)
+  if (parsed.status === 'empty') return 0
+  if (parsed.status !== 'ok') return null
+  return parsed.value / 100
+}
+
+function buildSuggestion(
+  field: PriceSuggestionField,
+  current: number | null,
+  exact: number,
+): PriceSuggestion | null {
+  const suggested = esnafPrice(exact)
+  if (suggested === null) return null
+  return {
+    field,
+    exactText: formatMoneyAmount(exact),
+    suggestedText: formatCount(suggested),
+    applyValue: String(suggested),
+    canApply: current !== null && current < suggested,
+  }
+}
+
+function baselineAmount(
+  snapshot: PurchaseSnapshot,
+  product: ProductRow,
+  field: PriceSuggestionField,
+): number | null {
+  const stored = snapshot.productPrices[product.id]?.[field]
+  return numeric(stored !== undefined ? stored : product[field])
+}
+
 function usageText(product: ProductRow, ingredient: IngredientRow): string {
   const line = product.recipeLines.find((item) => item.ingredientId === ingredient.id)
   const usage = line?.usageQuantity.trim() ?? ''
@@ -139,6 +193,7 @@ export function buildPricePreview(
   const count = formatCount(used.length)
   const purchase = purchaseWord(ingredient)
   const vat = vatRateOf(form)
+  const platformFee = platformFeeRateOf(form)
 
   const lines: PricePreviewLine[] = used.map((product) => {
     const productIndex = form.products.indexOf(product)
@@ -147,11 +202,26 @@ export function buildPricePreview(
     const delta = oldCost !== undefined && newCost !== undefined ? newCost - oldCost : 0
     const remaining = remainingPerUnitDelta(delta)
     const remainingAbs = formatMoneyAmount(Math.abs(remaining))
-    const normal = numeric(product.normalPrice)
-    const restore =
-      kind === 'rise' && normal !== null && oldCost !== undefined && newCost !== undefined
-        ? salonRestorePrice(normal, delta, vat)
+    const costsReady = kind === 'rise' && oldCost !== undefined && newCost !== undefined
+    const liveNormal = numeric(product.normalPrice)
+    const liveOnline = numeric(product.onlinePrice)
+    const baselineNormal = baselineAmount(opened, product, 'normalPrice')
+    const baselineOnline = baselineAmount(opened, product, 'onlinePrice')
+    const salonExact =
+      costsReady && baselineNormal !== null ? salonRestorePrice(baselineNormal, delta, vat) : null
+    const onlineExact =
+      costsReady && baselineOnline !== null && platformFee !== null
+        ? channelRestorePrice(baselineOnline, delta, vat, platformFee)
         : null
+    const suggestions: PriceSuggestion[] = []
+    if (salonExact !== null) {
+      const salonSuggest = buildSuggestion('normalPrice', liveNormal, salonExact)
+      if (salonSuggest) suggestions.push(salonSuggest)
+    }
+    if (onlineExact !== null) {
+      const onlineSuggest = buildSuggestion('onlinePrice', liveOnline, onlineExact)
+      if (onlineSuggest) suggestions.push(onlineSuggest)
+    }
     return {
       productIndex,
       productName: productDisplayName(product, productIndex),
@@ -163,9 +233,17 @@ export function buildPricePreview(
           ? RECIPE_COPY.priceRiseRemainingUp(remainingAbs)
           : RECIPE_COPY.priceRiseRemainingDown(remainingAbs),
       restoreText:
-        restore === null || normal === null
+        salonExact === null || liveNormal === null
           ? null
-          : RECIPE_COPY.priceRiseRestore(formatMoneyAmount(restore), formatMoneyAmount(normal)),
+          : RECIPE_COPY.priceRiseRestore(formatMoneyAmount(salonExact), formatMoneyAmount(liveNormal)),
+      restoreOnlineText:
+        onlineExact === null || liveOnline === null
+          ? null
+          : RECIPE_COPY.priceRiseRestoreOnline(
+              formatMoneyAmount(onlineExact),
+              formatMoneyAmount(liveOnline),
+            ),
+      suggestions,
     }
   })
 
@@ -184,11 +262,20 @@ export function buildPricePreview(
   }
 }
 
-export function snapshotOf(ingredient: IngredientRow): PurchaseSnapshot {
+export function snapshotOf(
+  ingredient: IngredientRow,
+  products: readonly ProductRow[] = [],
+): PurchaseSnapshot {
   return {
     purchaseQuantity: ingredient.purchaseQuantity,
     purchaseUnit: ingredient.purchaseUnit,
     purchasePrice: ingredient.purchasePrice,
+    productPrices: Object.fromEntries(
+      products.map((product) => [
+        product.id,
+        { normalPrice: product.normalPrice, onlinePrice: product.onlinePrice },
+      ]),
+    ),
   }
 }
 

@@ -1,6 +1,6 @@
 # Detailed Feasibility — Financial Specification
 
-**Version:** v1.8
+**Version:** v1.9
 **Status:** Formula contract for `src/core/detailed/`. **Not** implementation.
 **Currency:** TRY · **Country:** Turkey · **Language for v1:** Turkish-first
 **Engine:** `detailedEngineVersion` `1.0.0`
@@ -977,6 +977,7 @@ Tier 1 must pass before any Detailed UI work begins.
 | 2 | T18 | Recipe cost helper | Appendix A: the 16.2 worked example, both units of each family, a two-line sum, purchase quantity zero or empty, a missing ingredient, and no `NaN` or `Infinity`. No figure in §18.2 changes |
 | 2 | T19 | Salon restore-price display helper | Appendix A.6: Hamburger 220 + 8,40 × 1,10 = 229,24; Köfte ekmek 160 + 7,00 × 1,10 = 167,70; remaining-per-unit delta = −Δcost. Not called by `calculateDetailed`. No figure in §18.2 changes |
 | 2 | T20 | Menu food-cost, fixed-cost days, January test | Appendix B: salon food-cost = `unitProductCost / salonNetPerUnit`; remaining = §9.4 salon; weakest = lowest remaining; `dailyContribution = totalContribution / operatingDaysPerMonth`; January scales `monthlyPayroll` and `rentCost` only; break-even §14.3 with `fixed'`. Not called by `calculateDetailed`. No figure in §18.2 changes |
+| 2 | T21 | Per-channel restore and esnaf suggestion | Appendix D: salon `feeRate = 0` matches A.6 (220 + 8,40 × 1,10 = 229,24 → 230); online Hamburger 230 + 8,40 / (1/1,10 − 0,15) = 241,07 → 242; Köfte ekmek 180 + 7,00 / (1/1,10 − 0,15) = 189,22 → 190. Not called by `calculateDetailed`. No figure in §18.2 changes |
 
 Tests are colocated as `*.test.ts` under `src/core/detailed/`. No UI test suite.
 
@@ -1063,7 +1064,7 @@ Not part of `calculateDetailed`. The monthly engine never sees a recipe or a res
 salonRestorePrice    = normalPrice(p) + Δcost(p) × (1 + vatRate)
 ```
 
-Scope: salon only, KDV included, card and meal-card commissions ignored. Per-channel restore prices wait for roadmap step 6. The result is raw — no rounding.
+Scope: salon only, KDV included, card and meal-card commissions ignored. Per-channel restore prices, commission-aware online restore, and esnaf rounding live in Appendix D. The A.6 result stays raw — no rounding.
 
 Fixtures (`vatRate = 0.10`):
 
@@ -1157,6 +1158,8 @@ The two rates are **transient** screen state. They are not written to the draft 
 
 No figure in §18.2 changes.
 
+Price suggestion after a recipe-cost change is **Appendix D**. It is an input-time display helper on Malzemeler (Zam geldi), not a results-area figure, so it does not belong in B.1–B.3.
+
 ---
 
 ## Appendix C — Sales forecast section (V2 step 4)
@@ -1173,10 +1176,92 @@ No figure in §18.2 changes. `detailedEngineVersion` stays `1.0.0`.
 
 ---
 
+## Appendix D — Automatic price suggestion (V2 step 6)
+
+Display helpers for the Malzemeler **Zam geldi** preview. They do **not** change `calculateDetailed`, the golden vector, `unitProductCost`, or any selling price. A suggested price is written into the form only after an explicit tap. `detailedEngineVersion` stays `1.0.0`.
+
+Identifiers must not use the rejected terms (`netProfit`, `margin`, …). Copy is *sen*.
+
+### D.1 What is restored
+
+§9.4 remainder after a recipe-cost change moves only with `unitProductCost`:
+
+```
+Δcost(p)             = recipeCost_new(p) − recipeCost_old(p)
+Δ remaining per unit = −Δcost(p)          // every channel; packaging and courier cancel
+```
+
+The selling price that puts remainder back is the channel's VAT-inclusive gross `G` such that contribution is unchanged. From §7.3 and §9.3:
+
+```
+netShare(c)            = 1 / (1 + vatRate) − feeRate(c)
+channelRestorePrice(G, Δcost, vatRate, feeRate)
+                       = G + Δcost / netShare(c)
+                       when netShare(c) > 0
+                       else unavailable
+```
+
+`feeRate` is the percentage fee on **VAT-inclusive gross**, never on net (DF-65):
+
+| Channel | Price field | `feeRate` |
+| --- | --- | --- |
+| salon | `normalPrice` | **0** — locked A.6; card and meal-card stay out |
+| takeaway | *(none — shares `normalPrice`)* | not a third price; see D.4 |
+| delivery | `onlinePrice` | `delivery.platformFeeRate` (DF-49: platform fee and nothing else) |
+
+When `feeRate = 0`, D.1 is identical to A.6: `G + Δcost × (1 + vatRate)`.
+
+Packaging and own-courier stay out: they do not change with `Δcost`, so they cancel in the restore.
+
+### D.2 Worked example — online (Hamburger fixture)
+
+Same Hamburger as A.6 / recipe §7.5. `vatRate = 0.10`. `platformFeeRate = 0.15` (default `platformOnly`). Online price now **230,00 TL**. Δcost **8,40 TL**.
+
+```
+netShare             = 1 / 1,10 − 0,15 = 0,759090…
+onlineRestorePrice   = 230 + 8,40 / 0,759090… = 241,0658…   // 241,07 TL on screen
+esnafPrice           = ⌈241,0658…⌉ = 242 TL
+```
+
+Köfte ekmek, online **180,00 TL**, Δcost **7,00 TL**: `180 + 7,00 / 0,759090… = 189,2215…` → **189,22 TL** on screen → esnaf **190 TL**.
+
+Check (Hamburger, packaging 0): remainder at 230 / 55,50 equals remainder at 241,0658… / 63,90.
+
+Salon stays A.6: `220 + 8,40 × 1,10 = 229,24` (unrounded on the exact line).
+
+### D.3 Esnaf rounding
+
+The exact restore is shown unrounded (two decimals), as A.6. The **suggestion** — the number a tap would write — is a whole lira, rounded **up**:
+
+```
+esnafPrice(x) = x               when x is within 1e-9 of an integer
+              = ⌈x⌉             otherwise, x ≥ 0 finite
+              = unavailable     otherwise
+```
+
+A.6 example: 229,24 → **230**. Köfte salon 167,70 → **168**. Online Hamburger 241,07 → **242**.
+
+Never round down: a lower suggestion would not restore remaining. A price drop (recipe spec O3) has no restore and no suggestion.
+
+`esnafPrice` is not applied until the owner taps `Bu fiyatı yaz` on that channel. `Tamam` / closing the row does not write a selling price. Restore uses the selling prices as they were when the ingredient row opened, so a tap does not add `Δcost` a second time. If the entered price is already ≥ the suggestion, the tap is omitted (do not lower a higher price).
+
+### D.4 Conservative scope
+
+- No third takeaway price. Takeaway sells at `normalPrice` (DF-46). Applying the salon suggestion writes `normalPrice` only.
+- Salon `feeRate` stays 0. Reopening A.6 to include POS / meal-card would change the approved 229,24.
+- Online uses `platformFeeRate` as typed; unreadable rate → no online suggestion. Empty rate → `0` (same algebra as A.6 on the online price).
+- `netShare ≤ 0` (fee so high that a higher price cannot restore remaining) → no online suggestion.
+- No price history. Draft key and shape stay `maliyet.detailed.draft.v1`.
+
+No figure in §18.2 changes.
+
+---
+
 ## 19. Changelog
 
 | Version | Change |
 | --- | --- |
+| v1.9 | Appendix D: per-channel restore (salon = A.6; online accounts for `platformFeeRate` and KDV) and whole-lira-up esnaf suggestion. Suggestion only — a selling price changes after an explicit tap. New test T21. No figure in §18.2 changed. `detailedEngineVersion` stays 1.0.0. |
 | v1.8 | Appendix C: Satış tahmini collects `dailyQuantity` in a separate UI section; engine contract and draft v1 shape unchanged. Appendix B.2/B.3 record the accepted display edges (rounded-zero buckets, remainder-none copy, unreadable/negative Ocak rates, in-place kira-gün). No figure in §18.2 changed. `detailedEngineVersion` stays 1.0.0. |
 | v1.7 | Appendix B: salon food-cost rate, salon remaining per unit, fixed-cost days, January test. Display helpers only. New test T20. No figure in §18.2 changed. `detailedEngineVersion` stays 1.0.0. |
 | v1.6 | Appendix A.5: purchase fields are edited only on the Malzemeler block; recipe lines carry usage only. New Appendix A.6 salon restore-price display helper (Hamburger 229,24 / Köfte ekmek 167,70). New test T19. No figure in §18.2 changed. |

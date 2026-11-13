@@ -6,6 +6,7 @@
  * escalation functions, the payback scan and `calculateBreakEven` — stay private;
  * tests reach them directly as siblings (architecture R7). Appendix B display
  * helpers (`buildSalonMenuEconomics`, `buildFixedCostDays`, `applyJanuaryTest`)
+ * and Appendix D price-suggestion helpers (`channelRestorePrice`, `esnafPrice`)
  * are public, like the recipe helpers; they do not change `calculateDetailed`.
  */
 
@@ -21,6 +22,7 @@ export type { SalonMenuEconomics, SalonMenuProduct } from './foodCost.ts';
 export { applyJanuaryTest } from './januaryTest.ts';
 export type { JanuaryTestInput, JanuaryTestResult } from './januaryTest.ts';
 export { DETAILED_LIMITS, MIX_TOLERANCE } from './limits.ts';
+export { channelRestorePrice, esnafPrice } from './priceSuggestion.ts';
 export type { FieldLimit } from './limits.ts';
 export {
   PURCHASE_UNITS,

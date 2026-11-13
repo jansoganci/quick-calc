@@ -124,6 +124,7 @@ export function DetailedForm({
           onAddBlank={calc.addBlankIngredient}
           onDiscardBlank={calc.discardBlankIngredient}
           onDelete={calc.deleteIngredient}
+          onApplyProductPrice={calc.setProductField}
           requestedOpenId={focusIngredientId}
           onConsumedOpen={() => setFocusIngredientId(null)}
         />

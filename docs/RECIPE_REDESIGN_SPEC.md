@@ -132,8 +132,8 @@ While any product's recipe is incomplete, `Hesapla` is disabled with the reason 
 
 | State | Mobile | Desktop |
 | --- | --- | --- |
-| **D1 New price typed** | Inside the open ingredient row, under the unit picker, a block with a 1px `ink` top rule. Heading `{Malzeme} zamlandı`; under it `Kilosu 380,00 TL’den 450,00 TL’ye çıktı. Bu fiyat 2 üründe.` Then one sub-block per affected product (§7.4): name + `{usage} {malzeme}`; `Maliyet 55,50 → 63,90 TL`; `Her birinden kalan 8,40 TL azaldı.`; `Eski kalan için salon fiyatı 229,24 TL olmalı. Şimdi 220,00 TL.` Footnote: `Salon fiyatı KDV %10 dahil. Kart ve yemek kartı kesintisi bu hesaba girmedi. Paket servis ve online fiyat sonra.` Then `Tamam`, then the separated delete zone. | A tinted block under the `Malzemeler` table, with columns Ürün · Maliyet · Her birinden kalan · Eski kalan için salon fiyatı. |
-| **D2 After `Tamam`** | The block closes. Menu rows show the new costs. Nothing changes a selling price automatically, and no price history is kept. | Locked cost cells show the new costs. |
+| **D1 New price typed** | Inside the open ingredient row, under the unit picker, a block with a 1px `ink` top rule. Heading `{Malzeme} zamlandı`; under it `Kilosu 380,00 TL’den 450,00 TL’ye çıktı. Bu fiyat 2 üründe.` Then one sub-block per affected product (§7.4 and Appendix D): name + `{usage} {malzeme}`; `Maliyet 55,50 → 63,90 TL`; `Her birinden kalan 8,40 TL azaldı.`; exact salon restore; `Öneri 230 TL` + `Bu fiyatı yaz`; exact online restore (platform fee + KDV); `Öneri 242 TL` + `Bu fiyatı yaz`. Footnote names KDV, that salon ignores card/meal-card, that online includes platform kesintisi, and that a tap is required. Then `Tamam`, then the separated delete zone. | A tinted block under the `Malzemeler` table. Restore column holds the exact lines and the suggestion + tap. |
+| **D2 After `Tamam`** | The block closes. Menu rows show the new costs. Selling prices change only if the owner already tapped `Bu fiyatı yaz`. No price history. | Locked cost cells show the new costs. |
 
 **Trigger:** the open row's unit price (`purchasePrice / (purchaseQuantity × factor)`) differs from its value when the row was opened, and the ingredient is used in at least one recipe. The comparison is against the value at open; nothing is stored afterwards.
 
@@ -188,7 +188,7 @@ unitContribution(p, c) = netPerUnit − unitProductCost − unitChannelVariableC
 salonRestorePrice = normalPrice(p) + Δcost(p) × (1 + vatRate)
 ```
 
-Scope: salon only, KDV included, card and meal-card commissions ignored. Per-channel prices (takeaway, delivery/online, commission-aware) wait for roadmap step 6 (automatic price suggestion). The result is shown unrounded.
+Scope of this display line: salon only, KDV included, card and meal-card commissions ignored. The result is shown unrounded. Per-channel restore, commission-aware online restore, and esnaf rounding are Appendix D (roadmap step 6).
 
 Suggested helper: `salonRestorePrice(normalPrice, deltaCost, vatRate)` in `core/detailed/recipeCost.ts` or a sibling, with tests. Don't use the rejected terms (`netProfit`, `margin`, …) in identifiers.
 
@@ -286,8 +286,11 @@ Proposed keys extend or replace `RECIPE_COPY` in `features/detailed/labels.ts`. 
 | `priceRiseCost` | Maliyet {eski} → {yeni} TL | |
 | `priceRiseRemaining` | Her birinden kalan {tutar} TL azaldı. | |
 | `priceRiseRestore` | Eski kalan için salon fiyatı {tutar} TL olmalı. Şimdi {fiyat} TL. | |
-| `priceRiseFoot` | Salon fiyatı KDV %{oran} dahil. Kart ve yemek kartı kesintisi bu hesaba girmedi. Paket servis ve online fiyat sonra. | |
-| `priceRiseColumns` | Ürün · Maliyet · Her birinden kalan · Eski kalan için salon fiyatı | Desktop D table |
+| `priceRiseRestoreOnline` | Eski kalan için online fiyat {tutar} TL olmalı. Şimdi {fiyat} TL. | Appendix D |
+| `priceRiseSuggest` | Öneri {tutar} TL | Appendix D, esnaf |
+| `priceRiseApply` | Bu fiyatı yaz | Appendix D; 44px; not `Tamam` |
+| `priceRiseFoot` | Salon fiyatı KDV %{oran} dahil. Kart ve yemek kartı kesintisi salon hesabına girmedi. Online fiyat platform kesintisi ve KDV ile. Öneri yukarı yuvarlanmış tam lira; yazdığın fiyat ancak «Bu fiyatı yaz»a basınca değişir. | |
+| `priceRiseColumns` | Ürün · Maliyet · Her birinden kalan · Eski kalan için fiyat | Desktop D table |
 | `emptyResult` | Hesapla’dan önce hiçbir sayı gösterilmez. En az bir ürün girip Hesapla’ya bastığında aylık işletme sonucu, başa baş noktası ve yatırımın geri dönüşü burada görünür. | Özet pane (*sen*) |
 | `optionalSectionsNote` | Boş bıraktığın bölümler 0 TL sayılır. Yalnızca ürünler zorunlu. | Özet pane (*sen*) |
 
@@ -329,8 +332,8 @@ Owner lock 12 November 2026: O1–O4 as recommended. O4 is applied across Detayl
 | O2 | `Tutarı kendim yazacağım`: what goes in the unlocked box? | **Approved.** The last value typed by hand if there is one, otherwise the recipe total. |
 | O3 | A price decrease: show a block? | **Approved.** `{Malzeme} ucuzladı` with cost and `Her birinden kalan {x} TL arttı.`, without the restore-price line. |
 | O4 | Should the *sen* register and the muted-grey rule apply to the rest of Detailed? Quick is out of scope. | **Approved and applied** across Detaylı Fizibilite (*sen*, muted only on section numbers and the masthead slogan, no suffix on typed names). Quick remains out of scope. |
-| O5 | Online/takeaway restore prices and commission-aware prices | Roadmap step 6. Not in this build. |
-| O6 | Rounding the restore price (e.g. 229,24 → 230) | No rounding. Rounding is a price suggestion, which belongs to step 6. |
+| O5 | Online/takeaway restore prices and commission-aware prices | **Step 6.** Online restore uses `platformFeeRate` on VAT-inclusive gross (Appendix D). Takeaway shares `normalPrice`; no third price. Salon A.6 unchanged (card/meal-card ignored). |
+| O6 | Rounding the restore price (e.g. 229,24 → 230) | **Step 6.** Exact restore stays unrounded. The suggestion is `esnafPrice` = ceil to a whole lira. Written only after `Bu fiyatı yaz`. |
 
 ## 11. Doc and code changes required before coding
 
