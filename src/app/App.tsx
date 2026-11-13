@@ -6,6 +6,7 @@ import { SimulationsPage } from '../features/detailed/SimulationsPage.tsx'
 import { QuickCalcPage } from '../features/quick-calc/QuickCalcPage.tsx'
 import { AppShell } from './AppShell.tsx'
 import { areaFromLocation, canonicalPathFromLocation, screenFromLocation } from './location.ts'
+import { seoForPath } from './seoCopy.ts'
 import { AREA_PATHS, type AppArea } from './shellCopy.ts'
 import { ErrorBoundary } from './ErrorBoundary.tsx'
 
@@ -19,6 +20,46 @@ export function applyCanonicalLocation(): void {
   const current = `${pathname}${search}`
   if (next === current && !hash) return
   window.history.replaceState(null, '', next)
+}
+
+function setNamedMeta(name: string, content: string) {
+  document.querySelector(`meta[name="${name}"]`)?.setAttribute('content', content)
+}
+
+function setPropertyMeta(property: string, content: string) {
+  document.querySelector(`meta[property="${property}"]`)?.setAttribute('content', content)
+}
+
+/**
+ * Tab title, canonical and OG/Twitter tags for the current English path.
+ * Crawlers that do not run JS still see `index.html` until prerender (step 4).
+ * `/detailed/result` gets `noindex`; leaving that screen removes the tag.
+ */
+export function applyDocumentSeo(): void {
+  const seo = seoForPath(window.location.pathname)
+  document.title = seo.title
+  setNamedMeta('description', seo.description)
+  document.querySelector('link[rel="canonical"]')?.setAttribute('href', seo.canonicalUrl)
+  setPropertyMeta('og:title', seo.title)
+  setPropertyMeta('og:description', seo.description)
+  setPropertyMeta('og:url', seo.canonicalUrl)
+  setPropertyMeta('og:type', seo.ogType)
+  setNamedMeta('twitter:title', seo.title)
+  setNamedMeta('twitter:description', seo.description)
+
+  const robots = document.querySelector('meta[name="robots"]')
+  if (seo.noindex) {
+    if (robots) {
+      robots.setAttribute('content', 'noindex')
+    } else {
+      const meta = document.createElement('meta')
+      meta.setAttribute('name', 'robots')
+      meta.setAttribute('content', 'noindex')
+      document.head.appendChild(meta)
+    }
+  } else {
+    robots?.remove()
+  }
 }
 
 /**
@@ -49,6 +90,10 @@ export function App() {
   const [area, setArea] = useState<AppArea>(() => readLocation().area)
   const [screen, setScreen] = useState<DetailedScreen>(() => readLocation().screen)
   const detailed = useDetailedCalc()
+
+  useEffect(() => {
+    applyDocumentSeo()
+  }, [area, screen])
 
   useEffect(() => {
     function syncFromHistory() {

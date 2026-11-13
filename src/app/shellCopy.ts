@@ -118,7 +118,7 @@ export const AREA_LABELS = {
 
 export const AREAS = ['quick', 'detailed', 'simulations'] as const satisfies readonly AppArea[]
 
-/** Browser tab, bookmarks and share previews. */
+/** Home tab title. Per-path titles live in `seoCopy.ts`. */
 export const DOCUMENT_TITLE = `${SHELL_COPY.productName} — ${SHELL_COPY.slogan}`
 
 /** Canonical address, used by the `index.html` share tags. */
