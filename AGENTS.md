@@ -160,6 +160,8 @@ npm run lint         # ESLint and architecture checks
 npm run build        # typecheck plus production Vite build
 ```
 
+Deploy: merging to `main` deploys to production via `.github/workflows/deploy.yml`.
+
 Use `npm run test:run`, not `npm test`, for a non-interactive verification run.
 
 For a normal code change, run the narrowest relevant tests while iterating. Before handing off a completed implementation, run:
