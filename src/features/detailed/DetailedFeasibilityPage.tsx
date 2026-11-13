@@ -88,7 +88,7 @@ export function DetailedFeasibilityPage({
 
       <main
         id="detailed-feasibility"
-        className="qc-screen-only lg:grid lg:grid-cols-[1fr_1px_372px]"
+        className="qc-screen-only lg:grid lg:grid-cols-[minmax(0,1fr)_1px_372px]"
       >
         <DetailedScreenChrome screen={screen} onGoToScreen={onGoToScreen}>
           <div hidden={screen === 'results'}>
