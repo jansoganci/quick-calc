@@ -174,6 +174,14 @@ export function App({ initialPath }: AppProps) {
     window.scrollTo({ top: 0 })
   }
 
+  /** Simülasyonlar needs a calculation, so its empty state opens Sonuç, where Hesapla is. */
+  function goToDetailedResults() {
+    setArea('detailed')
+    setScreen('results')
+    window.history.pushState(null, '', pathForScreen('results'))
+    window.scrollTo({ top: 0 })
+  }
+
   function goToDetailedScreen(next: DetailedScreen) {
     if (next === screen) {
       window.scrollTo({ top: 0 })
@@ -204,7 +212,7 @@ export function App({ initialPath }: AppProps) {
               />
             </div>
             <div hidden={area !== 'simulations'}>
-              <SimulationsPage view={detailed.view} onGoToDetailed={() => goToArea('detailed')} />
+              <SimulationsPage view={detailed.view} onGoToDetailed={goToDetailedResults} />
             </div>
           </>
         )}

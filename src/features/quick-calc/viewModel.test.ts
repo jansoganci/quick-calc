@@ -203,7 +203,7 @@ describe('evaluateForm', () => {
 describe('errorMessage', () => {
   it('uses the exclusive-zero copy for below_min at 0', () => {
     const error: ValidationError = { field: 'averageTicket', code: 'below_min', limit: 0 }
-    expect(errorMessage(error)).toBe('0’dan büyük bir değer girin.')
+    expect(errorMessage(error)).toBe('0’dan büyük bir değer gir.')
   })
 
   it('formats above_max with the engine limit', () => {

@@ -40,7 +40,7 @@ export function SimulationsPage({
         <p className="mt-6 text-[13px] leading-relaxed text-qc-ink">
           {COPY.simulationsEmptyBefore}
           <a
-            href={pathForScreen('menu')}
+            href={pathForScreen('results')}
             className="inline-flex min-h-[44px] items-center font-medium underline decoration-qc-rule underline-offset-2"
             onClick={(event) => {
               event.preventDefault()

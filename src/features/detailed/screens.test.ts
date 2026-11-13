@@ -80,8 +80,9 @@ describe('Detailed screens (V2 step 5)', () => {
 
   it('summarises a screen from the form, never from a result figure', () => {
     const sample = sampleCafeForm()
-    expect(screenSummary(sample, 'menu')).toBe('3 ürün')
-    expect(screenSummary(sample, 'sales')).toBe('günde 170 adet')
+    expect(screenSummary(sample, 'menu')).toBe('4 ürün')
+    expect(screenSummary(sample, 'sales')).toBe('günde 210 adet')
+    expect(screenSummary(sample, 'ingredients')).toBe('4 malzeme')
     expect(screenSummary(sample, 'costs')).toBe('girildi')
     expect(screenSummary(initialForm(), 'ingredients')).toBe('—')
     expect(screenSummary(initialForm(), 'results')).toBe('—')

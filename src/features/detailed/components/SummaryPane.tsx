@@ -8,6 +8,8 @@ export type ScreenNavEntry = { screen: DetailedScreen; index: number; summary: s
 
 type SummaryPaneProps = {
   view: DetailedView | null
+  /** Sonuç before Hesapla already shows the sentence and the button in the page. */
+  isResultsScreen: boolean
   screens: ScreenNavEntry[]
   canSubmit: boolean
   submitHint: string | null
@@ -28,6 +30,7 @@ type SummaryPaneProps = {
  */
 export function SummaryPane({
   view,
+  isResultsScreen,
   screens,
   canSubmit,
   submitHint,
@@ -42,11 +45,15 @@ export function SummaryPane({
 }: SummaryPaneProps) {
   if (view === null) {
     return (
-      <div className="px-[18px] py-5 lg:px-7 lg:py-[26px]">
+      <div className={cn('px-[18px] py-5 lg:px-7 lg:py-[26px]', isResultsScreen && 'hidden lg:block')}>
         <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
           {COPY.preparation}
         </span>
-        <p className="mb-5 mt-3 text-xs leading-relaxed text-qc-secondary">{COPY.emptyResult}</p>
+        {isResultsScreen ? (
+          <div className="mt-3" />
+        ) : (
+          <p className="mb-5 mt-3 text-xs leading-relaxed text-qc-secondary">{COPY.emptyResult}</p>
+        )}
 
         <div className="hidden lg:block">
           {screens.map((entry, index) => (
@@ -75,9 +82,11 @@ export function SummaryPane({
           <p className="mt-4 text-xs leading-relaxed text-qc-secondary">{COPY.optionalSectionsNote}</p>
         </div>
 
-        <div className="mt-[22px] hidden lg:block">
-          <CalculateButton canSubmit={canSubmit} submitHint={submitHint} onCalculate={onCalculate} />
-        </div>
+        {isResultsScreen ? null : (
+          <div className="mt-[22px] hidden lg:block">
+            <CalculateButton canSubmit={canSubmit} submitHint={submitHint} onCalculate={onCalculate} />
+          </div>
+        )}
       </div>
     )
   }

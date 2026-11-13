@@ -109,8 +109,15 @@ export function ProductRows({
               </span>
               <span className="flex items-center gap-2.5">
                 {open ? null : (
-                  <span className="text-right font-mono text-xs tabular-nums text-qc-secondary">
-                    {collapsedCost(form, product)}
+                  <span className="flex flex-col items-end text-right">
+                    {product.normalPrice.trim() === '' ? null : (
+                      <span className="font-mono text-[15px] tabular-nums text-qc-ink">
+                        {RECIPE_COPY.menuRowPrice(product.normalPrice.trim())}
+                      </span>
+                    )}
+                    <span className="font-mono text-xs tabular-nums text-qc-secondary">
+                      {collapsedCost(form, product)}
+                    </span>
                   </span>
                 )}
                 <span
@@ -182,7 +189,7 @@ export function ProductRows({
               </div>
               <button
                 type="button"
-                className="qc-text-btn is-muted col-span-2 text-left lg:col-span-1 lg:text-right"
+                className="qc-text-btn col-span-2 text-left lg:col-span-1 lg:text-right"
                 onClick={() => onRemove(index)}
                 disabled={products.length === 1}
               >

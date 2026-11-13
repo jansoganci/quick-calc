@@ -299,11 +299,15 @@ export const COPY = {
   scenariosInvariantNote:
     'Başa baş noktası ve ilk yatırım senaryolara göre değişmez; ürün ve kanal dağılımı sabit olduğu için üç senaryoda da aynıdır.',
   netRevenue: 'Aylık net ciro',
-  contribution: 'Aylık katkı',
+  contribution: 'Ürünlerden kalan (aylık)',
 
   projectionNote:
     'İlk aylarda satış hacmi henüz oturmadığı için sonuç düşüktür.',
   showMonthTable: 'Ay ay tabloyu göster',
+  showSankey: 'Akış şemasını göster',
+  hideSankey: 'Akış şemasını gizle',
+  showProductTable: 'Ürün tablosunu göster',
+  hideProductTable: 'Ürün tablosunu gizle',
   hideMonthTable: 'Ay ay tabloyu gizle',
   monthColumn: 'Ay',
   unitsColumn: 'Adet',
@@ -314,10 +318,10 @@ export const COPY = {
 
   channelTitle: 'Kanal ekonomisi',
   channelNote:
-    'Katkı, o kanalın kendi maliyetlerinden sonra işletmeye kalan tutardır. Sabit giderler kanallara dağıtılmaz.',
-  productTitle: 'Ürün bazlı katkı',
+    'Kalan, o kanalın kendi maliyetlerinden sonra işletmeye kalan tutardır. Sabit giderler kanallara dağıtılmaz.',
+  productTitle: 'Üründen kalan',
   productNote:
-    'Aynı katkı hesabı, kanal yerine ürüne göre toplanmış. Kanal ekonomisiyle aynı toplamlara ulaşır.',
+    'Aynı kalan hesabı, kanal yerine ürüne göre toplanmış. Kanal ekonomisiyle aynı toplamlara ulaşır.',
   salonMenuTitle: 'Menü ürünleri',
   salonMenuNote:
     'Salon fiyatı ve malzemesi. Malzeme payı, KDV düşülmüş fiyata göredir. Ambalaj bu orana girmez.',
@@ -347,7 +351,7 @@ export const COPY = {
     'Detaylı Hesap’taki rakamların «ne olur» bakışı. Girdiler orada durur; burada yalnızca yüzde alanları değişir.',
   simulationsEmptyBefore: 'Önce ',
   simulationsEmptyLink: 'Detaylı Hesap',
-  simulationsEmptyAfter: '’ı doldur.',
+  simulationsEmptyAfter: '’ta Hesapla’ya bas.',
 
   januaryTitle: 'Ocak testi',
   januaryNote:
@@ -366,7 +370,8 @@ export const COPY = {
   channelCogs: 'Ürün maliyeti',
   channelVariable: 'Kanal maliyeti',
   channelFee: 'Ödeme / platform',
-  channelContribution: 'Katkı',
+  channelContribution: 'Kalan',
+  remainingTableFoot: 'Tutarlar TL. Kalandan sabit giderler düşülmemiştir.',
 
   breakEvenTitle: 'Başa baş noktası',
   breakEvenNote:
@@ -395,6 +400,9 @@ export const COPY = {
   nextSection: (label: string) => `Sonraki bölüm: ${label} →`,
   nextScreen: (label: string) => `Sonraki: ${label} →`,
   backScreen: (label: string) => `Geri: ${label}`,
+  starterAdded: (name: string) => `${name} · eklendi`,
+  noDelivery: 'Paket servis yok',
+  screenNavigation: 'Detaylı Hesap adımları',
   screenProgress: (index: number, total: number) => `${index} / ${total}`,
   salesWorkingDaysNote: (days: string) => `Ayda çalışılan gün varsayımlarda: ${days} gün.`,
   salesNoProducts: 'Önce Ürünler bölümüne ürün ekle.',
@@ -525,6 +533,7 @@ export const ERROR_COPY = {
 export const RECIPE_COPY = {
   menuHeading: 'Menü',
   menuRowDaily: (count: string) => `günde ${count} adet`,
+  menuRowPrice: (amount: string) => `${amount} TL`,
   menuRowCost: (amount: string, source: string) => `maliyet ${amount} TL · ${source}`,
   sourceManual: 'elle',
   sourceRecipe: 'reçeteden',
@@ -654,7 +663,7 @@ export const UNAVAILABLE_COPY = {
   breakEven: {
     no_sales_volume: 'Satış hacmi girilmediği için başa baş noktası hesaplanamıyor.',
     non_positive_contribution:
-      'Ürün başına katkı sıfır ya da altında; bu fiyatlarla başa baş noktasına ulaşılmıyor.',
+      'Ürün başına kalan sıfır ya da altında; bu fiyatlarla başa baş noktasına ulaşılmıyor.',
   },
   payback: {
     not_reached_within_horizon: (months: string) =>

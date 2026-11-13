@@ -9,6 +9,7 @@ import {
   groupHeading,
   groupSummary,
   payrollHint,
+  quickFieldId,
   rentCostHint,
   type FieldGroup,
   type QuickField,
@@ -152,7 +153,7 @@ function PlainField({
   const format = fieldNumberFormat(field)
   return (
     <NumberField
-      id={field}
+      id={quickFieldId(field)}
       label={fieldLabel(field)}
       value={form[field]}
       onChange={(value) => onChange(field, value)}
@@ -183,7 +184,7 @@ function PayrollRow({ form, errors, dirty, onChange, onBlur }: FieldProps) {
         return (
           <NumberField
             key={field}
-            id={field}
+            id={quickFieldId(field)}
             label={fieldLabel(field)}
             value={form[field]}
             onChange={(value) => onChange(field, value)}
@@ -218,7 +219,7 @@ function RentField({
   return (
     <div className="col-span-full">
       <NumberField
-        id={field}
+        id={quickFieldId(field)}
         label={fieldLabel(field)}
         value={form[field]}
         onChange={(value) => onChange(field, value)}

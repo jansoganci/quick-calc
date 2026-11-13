@@ -38,9 +38,12 @@ export function PaybackChart({ data, size }: { data: PaybackData; size: ChartSiz
         strokeWidth="1"
         strokeDasharray="4 4"
       />
+      {/* Right end: the payback marker sits near the left, where the line
+          crosses this target, so a left-anchored label collides with it. */}
       <text
-        x={frame.left}
+        x={frame.right}
         y={y(data.target) - frame.axisGap}
+        textAnchor="end"
         fontFamily="IBM Plex Sans, sans-serif"
         fontSize={frame.labelSize + 1}
         fill="#8A9199"
