@@ -76,6 +76,8 @@ describe('canonicalPathFromLocation', () => {
     expect(canonicalPathFromLocation('/detailed/sales/', '')).toBe('/detailed/sales')
     expect(canonicalPathFromLocation('/simulations', '')).toBe('/simulations')
     expect(canonicalPathFromLocation('/', '')).toBe('/')
+    expect(canonicalPathFromLocation('/guides/slug-tbd-1', '')).toBe('/guides/slug-tbd-1')
+    expect(canonicalPathFromLocation('/guides/slug-tbd-1/', '')).toBe('/guides/slug-tbd-1')
   })
 
   it('does not rewrite an unknown pathname to / (SPA fallback still paints Hızlı)', () => {

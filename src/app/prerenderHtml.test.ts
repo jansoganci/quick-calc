@@ -13,6 +13,7 @@ const TEMPLATE = `<!DOCTYPE html>
     />
     <link rel="canonical" href="${CANONICAL_URL}" />
     <meta property="og:url" content="${CANONICAL_URL}" />
+    <meta property="og:type" content="website" />
     <meta property="og:title" content="${DOCUMENT_TITLE}" />
     <meta
       property="og:description"
@@ -64,13 +65,44 @@ describe('applySeoToHtml', () => {
     expect(html).not.toMatch(/name="robots"/)
   })
 
-  it('adds noindex only on /detailed/result', () => {
+  it('adds noindex on /detailed/result and keeps calculator JSON-LD', () => {
     const result = applySeoToHtml(TEMPLATE, seoForPath('/detailed/result'))
     expect(result).toContain('<meta name="robots" content="noindex" />')
     expect(result).toContain('https://maliyet.lol/detailed/result')
+    expect(result).toContain('WebApplication')
+    expect(result).toContain('Sık sorulanlar')
 
     for (const path of ['/', '/detailed', '/detailed/ingredients', '/detailed/sales', '/detailed/expenses', '/simulations']) {
       expect(applySeoToHtml(TEMPLATE, seoForPath(path)), path).not.toMatch(/name="robots"/)
     }
+  })
+
+  it('swaps guide files to article JSON-LD and drops Hakkında', () => {
+    const html = applySeoToHtml(TEMPLATE, seoForPath('/guides/slug-tbd-1'))
+    expect(html).toContain('<meta name="robots" content="noindex" />')
+    expect(html).toContain('content="article"')
+    expect(html).toContain('BreadcrumbList')
+    expect(html).toContain('FAQPage')
+    expect(html).toContain('Bu hesap ücretsiz mi?')
+    expect(html).not.toContain('WebApplication')
+    expect(html).not.toContain('<footer>')
+    expect(html).toContain('https://maliyet.lol/og.jpg')
+  })
+
+  it('does not eat <head> when an earlier HTML comment sits above Hakkında', () => {
+    const withComments = TEMPLATE.replace(
+      '</head>',
+      `    <!-- Static fallback for the first paint. -->\n  </head>`,
+    ).replace(
+      '<footer>Sık sorulanlar</footer>',
+      `    <!--\n      Static "Hakkında" content. Deliberately OUTSIDE #root.\n    -->\n    <footer>Sık sorulanlar</footer>`,
+    )
+    const html = applySeoToHtml(withComments, seoForPath('/guides/slug-tbd-1'))
+    expect(html).toContain('<title>Bir satıştan işletmede ne kalıyor? — Maliyet</title>')
+    expect(html).toContain('</head>')
+    expect(html).toContain('<div id="root"></div>')
+    expect(html).not.toContain('Sık sorulanlar')
+    expect(html).toContain('Static fallback for the first paint.')
+    expect(html).not.toContain('Static "Hakkında" content.')
   })
 })

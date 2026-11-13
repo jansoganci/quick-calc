@@ -107,10 +107,21 @@ for (const path of SEO_PATHS) {
       assert(robots === null, `${path} must not have robots, got ${robots}`)
     }
     assert(!root.startsWith('</div>'), `${path} #root is empty`)
-    assert(root.includes('id="quick-calculation"'), `${path} missing Hızlı landmark`)
-    assert(root.includes('id="detailed-feasibility"'), `${path} missing Detaylı landmark`)
-    assert(root.includes('id="simulations"'), `${path} missing Simülasyonlar landmark`)
-    assert(html.includes('Sık sorulanlar'), `${path} missing Hakkında footer`)
+    if (seo.ogType === 'article') {
+      assert(root.includes('<article'), `${path} missing Rehber article`)
+      assert(html.includes('Taslak'), `${path} missing placeholder notice`)
+      assert(html.includes('BreadcrumbList'), `${path} missing BreadcrumbList JSON-LD`)
+      assert(html.includes('FAQPage'), `${path} missing FAQ JSON-LD`)
+      assert(!html.includes('WebApplication'), `${path} still has WebApplication JSON-LD`)
+      assert(propertyMeta(html, 'og:type') === 'article', `${path} og:type is not article`)
+      assert(!html.includes('İşyeri kira stopajı hesaba dahil mi?'), `${path} kept Hakkında FAQ`)
+    } else {
+      assert(root.includes('id="quick-calculation"'), `${path} missing Hızlı landmark`)
+      assert(root.includes('id="detailed-feasibility"'), `${path} missing Detaylı landmark`)
+      assert(root.includes('id="simulations"'), `${path} missing Simülasyonlar landmark`)
+      assert(html.includes('Sık sorulanlar'), `${path} missing Hakkında footer`)
+      assert(propertyMeta(html, 'og:type') === 'website', `${path} og:type is not website`)
+    }
     assert(!canonical.includes('hizli-hesap') && !canonical.includes('detayli-hesap'), `${path} Turkish public path`)
     console.log(`ok ${path}${previewBase ? ` (${finalUrl})` : ''}`)
   } catch (error) {
@@ -154,6 +165,7 @@ try {
     assert(llms.includes(url), `llms.txt missing ${url}`)
   }
   assert(!llms.includes('/detailed/result'), 'llms.txt lists Sonuç')
+  assert(!llms.includes('/guides'), 'llms.txt lists TBD guides')
   assert(!llms.includes('https://maliyet.lol/quick'), 'llms.txt lists /quick')
   assert(!/quick calc/i.test(llms), 'llms.txt uses English product name')
   assert(llms.includes('Simülasyonlar üçüncü bir hesap motoru değildir'), 'llms.txt must not call Simülasyonlar an engine')

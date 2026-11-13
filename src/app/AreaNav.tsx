@@ -16,7 +16,7 @@ export function AreaNav({
   area,
   onAreaChange,
 }: {
-  area: AppArea
+  area: AppArea | null
   onAreaChange: (area: AppArea) => void
 }) {
   return (
@@ -26,13 +26,14 @@ export function AreaNav({
     >
       <div className="grid grid-cols-3 gap-x-2 lg:flex lg:flex-col">
         {AREAS.map((candidate) => {
-          const isActive = candidate === area
+          const isActive = area !== null && candidate === area
           return (
             <a
               key={candidate}
               href={AREA_PATHS[candidate]}
               aria-current={isActive ? 'page' : undefined}
               onClick={(event) => {
+                if (area === null) return
                 event.preventDefault()
                 onAreaChange(candidate)
               }}

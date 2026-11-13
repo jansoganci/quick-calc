@@ -3,7 +3,7 @@ import { SEO_PATHS, seoForPath } from './seoCopy.ts'
 
 const LASTMOD_DAY = /^\d{4}-\d{2}-\d{2}$/
 
-/** Indexable canonical URLs. Same list as prerender, minus `noindex` (Sonuç). */
+/** Indexable canonical URLs. Same list as prerender, minus `noindex` (Sonuç and TBD guides). */
 export function indexableCanonicalUrls(): string[] {
   return SEO_PATHS.filter((path) => !seoForPath(path).noindex).map(
     (path) => seoForPath(path).canonicalUrl,
