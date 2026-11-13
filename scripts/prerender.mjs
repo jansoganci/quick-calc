@@ -39,14 +39,19 @@ if (!template.includes('<div id="root"></div>')) {
 }
 
 for (const path of SEO_PATHS) {
-  if (path.includes('guide') || path.includes('rehber')) {
-    throw new Error(`Guide paths are TBD and must not be prerendered: ${path}`)
+  if (path.includes('rehber')) {
+    throw new Error(`Must not prerender a Turkish /rehber path: ${path}`)
   }
+  const seo = seoForPath(path)
   const markup = render(path)
-  if (!markup.includes('id="quick-calculation"') || !markup.includes('id="detailed-feasibility"')) {
+  if (seo.ogType === 'article') {
+    if (!markup.includes('<article') || !markup.includes('Taslak')) {
+      throw new Error(`SSR markup for ${path} is missing the Rehber article`)
+    }
+  } else if (!markup.includes('id="quick-calculation"') || !markup.includes('id="detailed-feasibility"')) {
     throw new Error(`SSR markup for ${path} is missing calculator landmarks`)
   }
-  const html = applySeoToHtml(injectRoot(template, markup), seoForPath(path))
+  const html = applySeoToHtml(injectRoot(template, markup), seo)
   const relative = distRelative(path)
   const outfile = join(distDir, relative)
   mkdirSync(dirname(outfile), { recursive: true })
@@ -54,7 +59,7 @@ for (const path of SEO_PATHS) {
   console.log(`prerender ${path} → ${relative}`)
 }
 
-for (const forbidden of ['quick', 'hizli-hesap', 'detayli-hesap', 'simulasyonlar', 'rehber', 'guides']) {
+for (const forbidden of ['quick', 'hizli-hesap', 'detayli-hesap', 'simulasyonlar', 'rehber']) {
   if (existsSync(join(distDir, forbidden))) {
     throw new Error(`Must not write dist/${forbidden}/`)
   }

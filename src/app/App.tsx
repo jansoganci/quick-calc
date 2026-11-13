@@ -4,6 +4,8 @@ import { useDetailedCalc } from '../features/detailed/hooks/useDetailedCalc.ts'
 import { pathForScreen, type DetailedScreen } from '../features/detailed/screens.ts'
 import { SimulationsPage } from '../features/detailed/SimulationsPage.tsx'
 import { QuickCalcPage } from '../features/quick-calc/QuickCalcPage.tsx'
+import { RehberPage } from '../features/rehber/RehberPage.tsx'
+import { rehberPageBySlug, rehberPageFromPath } from '../features/rehber/pages.ts'
 import { AppShell } from './AppShell.tsx'
 import { areaFromLocation, canonicalPathFromLocation, screenFromLocation } from './location.ts'
 import { seoForPath } from './seoCopy.ts'
@@ -66,7 +68,9 @@ export function applyDocumentSeo(): void {
 /**
  * Area is in-page state, not a route. Quick R6 still forbids encoding the
  * calculator in the URL. The pathname names which area is showing, and — once
- * Detaylı is open — which of its five screens. `/detailed` is Menü.
+ * Detaylı is open — which of its five screens. `/detailed` is Menü. Known
+ * `/guides/<slug>` paths swap the three calculators for a Rehber article;
+ * Rehber is not a fourth nav area.
  *
  * Incoming hash bookmarks (`#detailed-feasibility/satis`, …) are rewritten to
  * those paths before React paints (`index.html` inline script + `applyCanonicalLocation`).
@@ -78,12 +82,13 @@ export function applyDocumentSeo(): void {
  * written to storage. Simülasyonlar reads the same in-memory Detailed draft.
  */
 
-function readLocation(): { area: AppArea; screen: DetailedScreen } {
+function readLocation(): { area: AppArea; screen: DetailedScreen; guideSlug: string | null } {
   applyCanonicalLocation()
   const { pathname, hash } = window.location
   return {
     area: areaFromLocation(pathname, hash),
     screen: screenFromLocation(pathname, hash),
+    guideSlug: rehberPageFromPath(pathname)?.slug ?? null,
   }
 }
 
@@ -103,17 +108,24 @@ export function App({ initialPath }: AppProps) {
   const [screen, setScreen] = useState<DetailedScreen>(() =>
     initialPath !== undefined ? screenFromLocation(initialPath, '') : readLocation().screen,
   )
+  const [guideSlug, setGuideSlug] = useState<string | null>(() =>
+    initialPath !== undefined
+      ? (rehberPageFromPath(initialPath)?.slug ?? null)
+      : readLocation().guideSlug,
+  )
   const detailed = useDetailedCalc()
+  const guidePage = guideSlug === null ? undefined : rehberPageBySlug(guideSlug)
 
   useEffect(() => {
     applyDocumentSeo()
-  }, [area, screen])
+  }, [area, screen, guideSlug])
 
   useEffect(() => {
     function syncFromHistory() {
       const next = readLocation()
       setArea(next.area)
       setScreen(next.screen)
+      setGuideSlug(next.guideSlug)
     }
 
     window.addEventListener('popstate', syncFromHistory)
@@ -133,7 +145,11 @@ export function App({ initialPath }: AppProps) {
    * the screen.
    */
   function goToArea(next: AppArea) {
-    if (next === area) return
+    if (guideSlug !== null) {
+      setGuideSlug(null)
+    } else if (next === area) {
+      return
+    }
     setArea(next)
     if (next === 'detailed') {
       setScreen('menu')
@@ -156,20 +172,26 @@ export function App({ initialPath }: AppProps) {
 
   return (
     <ErrorBoundary>
-      <AppShell area={area} onAreaChange={goToArea}>
-        <div hidden={area !== 'quick'}>
-          <QuickCalcPage onGoToDetailed={() => goToArea('detailed')} />
-        </div>
-        <div hidden={area !== 'detailed'}>
-          <DetailedFeasibilityPage
-            calc={detailed}
-            screen={screen}
-            onGoToScreen={goToDetailedScreen}
-          />
-        </div>
-        <div hidden={area !== 'simulations'}>
-          <SimulationsPage view={detailed.view} onGoToDetailed={() => goToArea('detailed')} />
-        </div>
+      <AppShell area={guidePage ? null : area} onAreaChange={goToArea}>
+        {guidePage ? (
+          <RehberPage page={guidePage} />
+        ) : (
+          <>
+            <div hidden={area !== 'quick'}>
+              <QuickCalcPage onGoToDetailed={() => goToArea('detailed')} />
+            </div>
+            <div hidden={area !== 'detailed'}>
+              <DetailedFeasibilityPage
+                calc={detailed}
+                screen={screen}
+                onGoToScreen={goToDetailedScreen}
+              />
+            </div>
+            <div hidden={area !== 'simulations'}>
+              <SimulationsPage view={detailed.view} onGoToDetailed={() => goToArea('detailed')} />
+            </div>
+          </>
+        )}
       </AppShell>
     </ErrorBoundary>
   )

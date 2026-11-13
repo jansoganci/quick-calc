@@ -1,4 +1,10 @@
 import { DETAILED_SCREEN_LABELS, pathForScreen, type DetailedScreen } from '../features/detailed/screens.ts'
+import {
+  REHBER_PAGES,
+  pathForRehberPage,
+  rehberJsonLd,
+  rehberPageFromPath,
+} from '../features/rehber/pages.ts'
 import { canonicalPathFromLocation } from './location.ts'
 import { AREA_LABELS, AREA_PATHS, CANONICAL_URL, DOCUMENT_TITLE, SHELL_COPY } from './shellCopy.ts'
 
@@ -14,13 +20,15 @@ export type SeoDocument = {
   description: string
   canonicalUrl: string
   noindex: boolean
-  ogType: 'website'
+  ogType: 'website' | 'article'
+  jsonLd?: readonly unknown[]
 }
 
 type SeoPage = {
   title: string
   description: string
   noindex: boolean
+  ogType: SeoDocument['ogType']
 }
 
 function detailedTitle(screen: DetailedScreen): string {
@@ -33,43 +41,61 @@ const PAGE_SEO: Record<string, SeoPage> = {
     title: DOCUMENT_TITLE,
     description: SHELL_COPY.metaDescription,
     noindex: false,
+    ogType: 'website',
   },
   [pathForScreen('menu')]: {
     title: detailedTitle('menu'),
     description:
       'Ürün, kanal, personel, kira, senaryolar ve indirilebilir PDF. Türkiye’ye özel KDV netleme ve kira stopajı dahildir.',
     noindex: false,
+    ogType: 'website',
   },
   [pathForScreen('ingredients')]: {
     title: detailedTitle('ingredients'),
     description:
       'Ortak malzeme listesi: alış fiyatı tek yerde, kullanım ürüne özgü. Zam gelince etkilenen ürünleri görürsün.',
     noindex: false,
+    ogType: 'website',
   },
   [pathForScreen('sales')]: {
     title: detailedTitle('sales'),
     description:
       'Günlük satış adedi, kanallar, ödemeler ve paket servis. Komisyonlar hesaba dahildir; muhasebe bilgisi gerekmez.',
     noindex: false,
+    ogType: 'website',
   },
   [pathForScreen('costs')]: {
     title: detailedTitle('costs'),
     description:
       'Personel, işletme sahibi, kira, diğer giderler ve ilk yatırım. Boş bıraktığın kalemler 0 TL sayılır.',
     noindex: false,
+    ogType: 'website',
   },
   [pathForScreen('results')]: {
     title: detailedTitle('results'),
     description:
       'Hesapla’dan sonra aylık işletme sonucu burada. Bu sayfada hazır bir sonuç yok.',
     noindex: true,
+    ogType: 'website',
   },
   [AREA_PATHS.simulations]: {
     title: `${AREA_LABELS.simulations} — ${SHELL_COPY.productName}`,
     description:
       'Ocak testi: asgari ücret veya kira artınca aylık kalan nasıl değişir. Detaylı taslağını okur; yeni girdi sormaz.',
     noindex: false,
+    ogType: 'website',
   },
+  ...Object.fromEntries(
+    REHBER_PAGES.map((page) => [
+      pathForRehberPage(page),
+      {
+        title: `${page.h1} — ${SHELL_COPY.productName}`,
+        description: page.lead,
+        noindex: true,
+        ogType: 'article' as const,
+      },
+    ]),
+  ),
 }
 
 export const SEO_PATHS = Object.keys(PAGE_SEO)
@@ -79,19 +105,22 @@ function absoluteUrl(path: string): string {
   return `https://${SHELL_COPY.domain}${path}`
 }
 
-/** Known calculator path, or home copy when the SPA fallback is showing Hızlı. */
+/** Known calculator or guide path, or home copy when the SPA fallback is showing Hızlı. */
 export function seoForPath(pathname: string): SeoDocument {
   const path = canonicalPathFromLocation(pathname, '')
   const home = PAGE_SEO[AREA_PATHS.quick]
   if (home === undefined) throw new Error('Home SEO copy missing')
   const page = PAGE_SEO[path] ?? home
   const canonicalPath = path in PAGE_SEO ? path : AREA_PATHS.quick
-  return {
+  const document: SeoDocument = {
     path: canonicalPath,
     title: page.title,
     description: page.description,
     canonicalUrl: absoluteUrl(canonicalPath),
     noindex: page.noindex,
-    ogType: 'website',
+    ogType: page.ogType,
   }
+  const guide = rehberPageFromPath(canonicalPath)
+  if (guide === undefined) return document
+  return { ...document, jsonLd: rehberJsonLd(guide) }
 }

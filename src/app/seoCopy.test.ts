@@ -14,6 +14,7 @@ describe('seoForPath', () => {
     expect(home.canonicalUrl).toBe(CANONICAL_URL)
     expect(home.noindex).toBe(false)
     expect(home.ogType).toBe('website')
+    expect(home.jsonLd).toBeUndefined()
   })
 
   it('uses the plan’s Turkish titles on English calculator paths', () => {
@@ -30,10 +31,30 @@ describe('seoForPath', () => {
     expect(seoForPath('/detailed/menu')).toEqual(seoForPath('/detailed'))
   })
 
-  it('marks only /detailed/result as noindex', () => {
+  it('marks Sonuç and the placeholder guides as noindex', () => {
     const noindex = SEO_PATHS.filter((path) => seoForPath(path).noindex)
-    expect(noindex).toEqual([pathForScreen('results')])
+    expect(noindex).toEqual([
+      pathForScreen('results'),
+      '/guides/slug-tbd-1',
+      '/guides/slug-tbd-2',
+    ])
     expect(seoForPath('/detailed/result').canonicalUrl).toBe('https://maliyet.lol/detailed/result')
+  })
+
+  it('gives placeholder guides article og:type, noindex, and matching JSON-LD', () => {
+    const first = seoForPath('/guides/slug-tbd-1')
+    expect(first.title).toBe('Bir satıştan işletmede ne kalıyor? — Maliyet')
+    expect(first.noindex).toBe(true)
+    expect(first.ogType).toBe('article')
+    expect(first.canonicalUrl).toBe('https://maliyet.lol/guides/slug-tbd-1')
+    expect(JSON.stringify(first.jsonLd)).toContain('BreadcrumbList')
+    expect(JSON.stringify(first.jsonLd)).toContain('FAQPage')
+    expect(JSON.stringify(first.jsonLd)).not.toContain('WebApplication')
+
+    const unknownGuide = seoForPath('/guides/not-a-page')
+    expect(unknownGuide.path).toBe('/')
+    expect(unknownGuide.ogType).toBe('website')
+    expect(unknownGuide.noindex).toBe(false)
   })
 
   it('writes English canonical URLs with no hash, query, or Turkish public path', () => {

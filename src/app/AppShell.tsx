@@ -4,7 +4,8 @@ import { BrandMark } from './BrandMark.tsx'
 import { SHELL_COPY, type AppArea } from './shellCopy.ts'
 
 type AppShellProps = {
-  area: AppArea
+  /** `null` on a Rehber page so the three area links stay inactive. */
+  area: AppArea | null
   onAreaChange: (area: AppArea) => void
   children: ReactNode
 }

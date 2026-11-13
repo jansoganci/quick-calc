@@ -85,6 +85,36 @@ export default tseslint.config(
               from: './src/features/detailed',
               message: 'Quick features must not import Detailed features (R5).',
             },
+            {
+              target: './src/features/rehber',
+              from: './src/features/quick-calc',
+              message: 'Rehber must not import Quick features (R5).',
+            },
+            {
+              target: './src/features/rehber',
+              from: './src/features/detailed',
+              message: 'Rehber must not import Detailed features (R5).',
+            },
+            {
+              target: './src/features/rehber',
+              from: './src/core/quick',
+              message: 'Rehber must not import Quick business logic (R5).',
+            },
+            {
+              target: './src/features/rehber',
+              from: './src/core/detailed',
+              message: 'Rehber must not import Detailed business logic (R5).',
+            },
+            {
+              target: './src/features/quick-calc',
+              from: './src/features/rehber',
+              message: 'Quick features must not import Rehber (R5).',
+            },
+            {
+              target: './src/features/detailed',
+              from: './src/features/rehber',
+              message: 'Detailed features must not import Rehber (R5).',
+            },
           ],
         },
       ],

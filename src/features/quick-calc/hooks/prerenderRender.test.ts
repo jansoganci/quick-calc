@@ -13,7 +13,8 @@ describe('renderToString App', () => {
     vi.stubGlobal('window', undefined)
     vi.stubGlobal('document', undefined)
 
-    for (const path of SEO_PATHS) {
+    const calculatorPaths = SEO_PATHS.filter((path) => !path.startsWith('/guides/'))
+    for (const path of calculatorPaths) {
       const html = renderToString(
         createElement(StrictMode, null, createElement(App, { initialPath: path })),
       )
@@ -23,6 +24,23 @@ describe('renderToString App', () => {
       expect(html, path).toContain('id="simulations"')
       expect(html, path).toContain('Hızlı Hesap')
     }
+  })
+
+  it('renders placeholder guides as an article, without calculator landmarks', () => {
+    vi.stubGlobal('window', undefined)
+    vi.stubGlobal('document', undefined)
+
+    const html = renderToString(
+      createElement(StrictMode, null, createElement(App, { initialPath: '/guides/slug-tbd-1' })),
+    )
+    expect(html).toContain('<article')
+    expect(html).toContain('Bir satıştan işletmede ne kalıyor?')
+    expect(html).toContain('Taslak')
+    expect(html).toContain('Rehber')
+    expect(html).toContain('Hızlı Hesap’a git')
+    expect(html).not.toContain('id="quick-calculation"')
+    expect(html).not.toContain('id="detailed-feasibility"')
+    expect(html).not.toContain('aria-current="page"')
   })
 
   it('leaves the matching area unhidden', () => {
