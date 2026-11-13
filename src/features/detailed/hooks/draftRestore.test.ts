@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { DraftNotice } from '../components/DraftNotice.tsx'
 import { initialForm } from '../formState.ts'
-import { resolveInitialDraft } from './draftStorage.ts'
+import { loadInitialDraft, resolveInitialDraft } from './draftStorage.ts'
 
 beforeEach(() => vi.stubGlobal('React', React))
 afterEach(() => vi.unstubAllGlobals())
@@ -26,5 +26,14 @@ describe('restored Detailed draft state', () => {
     expect(initialDraft.hasStoredDraft).toBe(true)
     expect(markup).toContain('Taslak bu cihaza kaydedildi')
     expect(markup).toContain('Baştan başla')
+  })
+
+  it('returns a blank form when window is missing, so the first paint can hydrate', () => {
+    vi.stubGlobal('window', undefined)
+    const draft = loadInitialDraft()
+    expect(draft.hasStoredDraft).toBe(false)
+    expect(draft.businessName).toBe('')
+    expect(draft.form.products).toHaveLength(1)
+    expect(draft.form.products[0]?.name).toBe('')
   })
 })

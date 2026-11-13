@@ -18,6 +18,7 @@ import { decodeDraft, encodeDraft, STORAGE_KEY, type Draft } from '../storage.ts
  */
 
 export function readDraft(): Draft | null {
+  if (typeof window === 'undefined') return null
   try {
     return decodeDraft(window.localStorage.getItem(STORAGE_KEY))
   } catch {
@@ -27,6 +28,7 @@ export function readDraft(): Draft | null {
 
 /** `true` when the draft actually reached storage, which drives the saved notice. */
 export function writeDraft(draft: Draft): boolean {
+  if (typeof window === 'undefined') return false
   try {
     window.localStorage.setItem(STORAGE_KEY, encodeDraft(draft))
     return true
@@ -36,6 +38,7 @@ export function writeDraft(draft: Draft): boolean {
 }
 
 export function clearDraft(): void {
+  if (typeof window === 'undefined') return
   try {
     window.localStorage.removeItem(STORAGE_KEY)
   } catch {
@@ -71,7 +74,11 @@ export function resolveInitialDraft(stored: Draft | null): InitialDraft {
   return { form: stored.form, businessName: stored.businessName, hasStoredDraft: true }
 }
 
-/** The `useState` initializer for the form. */
+/**
+ * Browser storage read. Call from `useEffect`, never from the first render —
+ * prerendered Detaylı HTML is the empty form, and hydrating with a restored
+ * draft would disagree with that markup.
+ */
 export function loadInitialDraft(): InitialDraft {
   return resolveInitialDraft(readDraft())
 }
