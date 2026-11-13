@@ -4,7 +4,7 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import importX from 'eslint-plugin-import-x'
 
 export default tseslint.config(
-  { ignores: ['node_modules/**', 'docs/**', 'dist/**', 'dist-ssr/**', 'coverage/**'] },
+  { ignores: ['node_modules/**', 'docs/**', 'dist/**', 'dist-ssr/**', '.wrangler/**', 'coverage/**'] },
   js.configs.recommended,
   {
     files: ['scripts/**/*.mjs'],

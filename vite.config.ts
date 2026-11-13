@@ -18,9 +18,8 @@ function stripTsExtensions() {
 
 /**
  * Vite preview's SPA fallback would otherwise 200 the home HTML at `/detailed`.
- * Cloudflare's default `auto-trailing-slash` 307s `/detailed` → `/detailed/`
- * when `detailed/index.html` exists; this preview-only middleware matches that
- * so `curl` / `check-prerender --url` hit the prerendered file. Dev is unchanged.
+ * Matches wrangler `html_handling: "drop-trailing-slash"`: `/detailed` serves
+ * `detailed/index.html` with 200, `/detailed/` 307s to `/detailed`. Dev is unchanged.
  */
 function previewDirectoryIndex(): Plugin {
   return {
@@ -36,17 +35,23 @@ function previewDirectoryIndex(): Plugin {
         const q = raw.indexOf('?')
         const pathOnly = q === -1 ? raw : raw.slice(0, q)
         const search = q === -1 ? '' : raw.slice(q)
-        if (pathOnly.length <= 1 || pathOnly.endsWith('/')) {
+        if (pathOnly.length > 1 && pathOnly.endsWith('/')) {
+          const noSlash = pathOnly.slice(0, -1)
+          if (existsSync(join(dist, noSlash.slice(1), 'index.html'))) {
+            res.statusCode = 307
+            res.setHeader('Location', `${noSlash}${search}`)
+            res.end()
+            return
+          }
           next()
           return
         }
-        if (!existsSync(join(dist, pathOnly.slice(1), 'index.html'))) {
+        if (pathOnly.length > 1 && existsSync(join(dist, pathOnly.slice(1), 'index.html'))) {
+          req.url = `${pathOnly}/index.html${search}`
           next()
           return
         }
-        res.statusCode = 307
-        res.setHeader('Location', `${pathOnly}/${search}`)
-        res.end()
+        next()
       })
     },
   }
