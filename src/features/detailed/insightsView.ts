@@ -9,7 +9,7 @@ import {
   type MonthResult,
 } from '../../core/detailed/index.ts'
 import { formatTry } from '../../lib/money.ts'
-import { formatCount, parseTurkishNumber } from '../../lib/number.ts'
+import { formatCount, formatDecimalExact, parseTurkishNumber } from '../../lib/number.ts'
 import { formatPercent } from '../../lib/percent.ts'
 import { COPY, UNAVAILABLE_COPY } from './labels.ts'
 
@@ -62,6 +62,15 @@ const DAY_LABELS: Record<FixedCostDayKey, string> = {
   other: COPY.fixedCostDayOther,
 }
 
+/** One-decimal display; 0,0 is empty and stays hidden. */
+function displaysAsDay(days: number): boolean {
+  return Number.isFinite(days) && Math.round(days * 10) !== 0
+}
+
+function formatDayCount(days: number): string {
+  return formatDecimalExact(days, 1)
+}
+
 export function buildSalonMenuView(input: DetailedResolvedInput): SalonMenuView {
   const menu = buildSalonMenuEconomics(input)
   const products = menu.products.map((row) => ({
@@ -95,14 +104,13 @@ export function formatFixedCostDays(
     }
   }
 
-  const rounded = days.buckets
-    .map((bucket) => ({ key: bucket.key, days: Math.round(bucket.days) }))
-    .filter((bucket) => bucket.days > 0)
-  const remainder = days.operatingDaysPerMonth - rounded.reduce((sum, bucket) => sum + bucket.days, 0)
+  const shown = days.buckets.filter((bucket) => displaysAsDay(bucket.days))
+  const remainder =
+    days.operatingDaysPerMonth - shown.reduce((sum, bucket) => sum + bucket.days, 0)
 
   const lines: string[] = []
-  rounded.forEach((bucket, index) => {
-    const count = formatCount(bucket.days)
+  shown.forEach((bucket, index) => {
+    const count = formatDayCount(bucket.days)
     const label = DAY_LABELS[bucket.key]
     lines.push(
       index === 0
@@ -112,10 +120,10 @@ export function formatFixedCostDays(
   })
   if (remainder < 0) {
     lines.push(COPY.fixedCostDaysUncovered)
-  } else if (remainder === 0) {
+  } else if (!displaysAsDay(remainder)) {
     lines.push(COPY.fixedCostDaysRemainderNone)
   } else {
-    lines.push(COPY.fixedCostDaysRemainder(formatCount(remainder)))
+    lines.push(COPY.fixedCostDaysRemainder(formatDayCount(remainder)))
   }
 
   return {

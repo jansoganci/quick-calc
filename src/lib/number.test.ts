@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   caretAfterFormat,
+  formatDecimalExact,
   formatTypedTurkishNumber,
   parseTurkishNumber,
 } from './number.ts'
@@ -58,5 +59,13 @@ describe('caretAfterFormat', () => {
 
   it('stays after a trailing comma', () => {
     expect(caretAfterFormat('14,', 3, '14,')).toBe(3)
+  })
+})
+
+describe('formatDecimalExact', () => {
+  it('keeps one decimal with a Turkish comma', () => {
+    expect(formatDecimalExact(5.6, 1)).toBe('5,6')
+    expect(formatDecimalExact(7, 1)).toBe('7,0')
+    expect(formatDecimalExact(15.84, 1)).toBe('15,8')
   })
 })
