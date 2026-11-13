@@ -134,6 +134,11 @@ describe('detailed copy (RECIPE_REDESIGN_SPEC §3.2 O4)', () => {
       COPY.januaryAfter,
       COPY.januaryResult,
       COPY.januaryBreakEven,
+      COPY.simulationsTitle,
+      COPY.simulationsNote,
+      COPY.simulationsEmptyBefore,
+      COPY.simulationsEmptyLink,
+      COPY.simulationsEmptyAfter,
     ].join('\n').toLocaleLowerCase('tr-TR')
     for (const banned of ['marj', 'katkı', 'food cost', 'amortisman']) {
       expect(insight, `new results copy contains "${banned}"`).not.toContain(banned)
@@ -144,6 +149,9 @@ describe('detailed copy (RECIPE_REDESIGN_SPEC §3.2 O4)', () => {
     expect(COPY.emptyResult).toBe(
       'Hesapla’dan önce hiçbir sayı gösterilmez. En az bir ürün girip Hesapla’ya bastığında aylık işletme sonucu, başa baş noktası ve yatırımın geri dönüşü burada görünür.',
     )
+    expect(
+      `${COPY.simulationsEmptyBefore}${COPY.simulationsEmptyLink}${COPY.simulationsEmptyAfter}`,
+    ).toBe('Önce Detaylı Hesap’ı doldur.')
     expect(COPY.optionalSectionsNote).toBe('Boş bıraktığın bölümler 0 TL sayılır. Yalnızca ürünler zorunlu.')
     expect(COPY.calculateNoProducts).toBe('Sonucu görmek için en az bir ürün gir')
     expect(SECTION_LABELS.products).toBe('Ürünler')

@@ -1,12 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import {
+  AREA_ANCHORS,
+  AREA_LABELS,
+  AREAS,
   DOCUMENT_TITLE,
-  MODES,
-  MODE_ANCHORS,
-  MODE_DESCRIPTIONS,
-  MODE_LABELS,
   SHELL_COPY,
-  modeFromLocationHash,
+  areaFromLocationHash,
 } from './shellCopy.ts'
 
 /**
@@ -23,8 +22,6 @@ describe('brand', () => {
 
   it('keeps the slogan short enough to sit beside the product name', () => {
     expect(SHELL_COPY.slogan).toBe('Bir satıştan geriye ne kalıyor?')
-    // The bound guards the masthead at phone width, where the slogan now shares
-    // the row with the product name alone — the mode switch moved to its own row.
     expect(SHELL_COPY.slogan.length).toBeLessThanOrEqual(32)
   })
 
@@ -43,42 +40,45 @@ describe('document title', () => {
   })
 })
 
-describe('mode navigation', () => {
-  it('offers exactly the two calculation modes, in order', () => {
-    expect(MODES).toEqual(['quick', 'detailed'])
-    expect(MODE_LABELS.quick).toBe('Hızlı Hesap')
-    expect(MODE_LABELS.detailed).toBe('Detaylı Fizibilite')
+describe('area navigation', () => {
+  it('offers exactly the three top-level areas, in order', () => {
+    expect(AREAS).toEqual(['quick', 'detailed', 'simulations'])
+    expect(AREA_LABELS.quick).toBe('Hızlı Hesap')
+    expect(AREA_LABELS.detailed).toBe('Detaylı Hesap')
+    expect(AREA_LABELS.simulations).toBe('Simülasyonlar')
   })
 
-  it('says what each mode is for, because the labels alone did not', () => {
-    // The switch was invisible partly because two names cannot explain two
-    // products. Every mode carries a line; it stays short enough for the row.
-    for (const mode of MODES) {
-      expect(MODE_DESCRIPTIONS[mode].length).toBeGreaterThan(0)
-      expect(MODE_DESCRIPTIONS[mode].length).toBeLessThanOrEqual(40)
-    }
-    expect(MODE_DESCRIPTIONS.detailed).toContain('PDF')
-  })
-
-  it('offers the deeper mode from the foot of a finished Quick result', () => {
+  it('keeps Detaylı Fizibilite as the calculator name in the Quick handoff', () => {
+    expect(SHELL_COPY.detailedMode).toBe('Detaylı Fizibilite')
     expect(SHELL_COPY.quickHandoff).toContain('Detaylı Fizibilite')
     expect(SHELL_COPY.quickHandoffLink).toContain('Detaylı Fizibilite')
   })
 
-  it('gives each mode a distinct anchor so the entries stay real links', () => {
-    expect(MODE_ANCHORS.quick).toBe('quick-calculation')
-    expect(MODE_ANCHORS.detailed).toBe('detailed-feasibility')
-    expect(new Set(Object.values(MODE_ANCHORS)).size).toBe(MODES.length)
+  it('gives each area a distinct canonical anchor so the entries stay real links', () => {
+    expect(AREA_ANCHORS.quick).toBe('quick')
+    expect(AREA_ANCHORS.detailed).toBe('detailed-feasibility')
+    expect(AREA_ANCHORS.simulations).toBe('simulations')
+    expect(new Set(Object.values(AREA_ANCHORS)).size).toBe(AREAS.length)
   })
 
   it('opens Detaylı on load for #detailed-feasibility and its screen suffixes', () => {
-    expect(modeFromLocationHash('#detailed-feasibility')).toBe('detailed')
-    expect(modeFromLocationHash('detailed-feasibility')).toBe('detailed')
-    expect(modeFromLocationHash('#detailed-feasibility/satis')).toBe('detailed')
-    expect(modeFromLocationHash('#detailed-feasibility/sonuc')).toBe('detailed')
-    expect(modeFromLocationHash('')).toBe('quick')
-    expect(modeFromLocationHash('#quick-calculation')).toBe('quick')
-    expect(modeFromLocationHash('#')).toBe('quick')
-    expect(modeFromLocationHash('#something-else')).toBe('quick')
+    expect(areaFromLocationHash('#detailed-feasibility')).toBe('detailed')
+    expect(areaFromLocationHash('detailed-feasibility')).toBe('detailed')
+    expect(areaFromLocationHash('#detailed-feasibility/satis')).toBe('detailed')
+    expect(areaFromLocationHash('#detailed-feasibility/sonuc')).toBe('detailed')
+  })
+
+  it('opens Simülasyonlar for #simulations and the Turkish alias', () => {
+    expect(areaFromLocationHash('#simulations')).toBe('simulations')
+    expect(areaFromLocationHash('simulations')).toBe('simulations')
+    expect(areaFromLocationHash('#simulasyonlar')).toBe('simulations')
+  })
+
+  it('keeps existing Hızlı deep links and treats an unknown hash as Hızlı', () => {
+    expect(areaFromLocationHash('')).toBe('quick')
+    expect(areaFromLocationHash('#quick')).toBe('quick')
+    expect(areaFromLocationHash('#quick-calculation')).toBe('quick')
+    expect(areaFromLocationHash('#')).toBe('quick')
+    expect(areaFromLocationHash('#something-else')).toBe('quick')
   })
 })

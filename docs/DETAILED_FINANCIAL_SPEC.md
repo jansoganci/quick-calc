@@ -1,6 +1,6 @@
 # Detailed Feasibility — Financial Specification
 
-**Version:** v1.10
+**Version:** v1.11
 **Status:** Formula contract for `src/core/detailed/`. **Not** implementation.
 **Currency:** TRY · **Country:** Turkey · **Language for v1:** Turkish-first
 **Engine:** `detailedEngineVersion` `1.0.0`
@@ -1081,7 +1081,7 @@ On a price **decrease**, the UI shows the cost change and `Her birinden kalan {x
 
 ## Appendix B — Menu food-cost, fixed-cost days, January test (V2 step 3)
 
-Display helpers for the Detailed **results** area after the first `Hesapla`. They do **not** change `calculateDetailed`, the golden vector, or DF-84. They read the resolved input and the **base** stabilized month. `detailedEngineVersion` stays `1.0.0`.
+Display helpers on the already calculated **base** stabilized month. They do **not** change `calculateDetailed`, the golden vector, or DF-84. `detailedEngineVersion` stays `1.0.0`. B.1 and B.2 belong on Detaylı Sonuç. B.3 belongs on the Simülasyonlar area. They are not a third calculator and they add no new draft fields.
 
 UI copy is *sen*. The screen never writes `marj`, `katkı`, `food cost`, or `amortisman`. The existing DF-84 table keeps its v1 labels.
 
@@ -1131,7 +1131,9 @@ The engine returns the raw (unrounded) day counts. The screen does **not** round
 
 ### B.3 January test — «Ocak testi»
 
-A what-if on the **already calculated** base month. It is not a fourth scenario and does not rewrite Kötü / Baz / İyi.
+A what-if on the **already calculated** base month, shown on **Simülasyonlar**. It is not a fourth scenario, not a third calculator, and does not rewrite Kötü / Baz / İyi. It does not ask whether to raise price or daily quantity — that comparison is **rejected**.
+
+Simülasyonlar reads the Detaylı draft (same `localStorage` key, same in-memory form). Other than the two `%` fields below, it is read-only. If there is no calculated Detaylı result, the area shows a plain empty line rather than running this helper.
 
 Inputs, empty = 0. An unreadable field also counts as 0 (quiet hint, no red). A negative rate is a decrease.
 
@@ -1152,7 +1154,7 @@ Variable costs, volume, VAT and contribution do not change. The wage rate applie
 
 Break-even is §14.3 with `monthlyFixedCost = fixed'` and the same `totalContribution` / `totalUnits`. If the original break-even was unavailable, the test stays unavailable.
 
-§B.2 is then re-run on the adjusted costs so the day lines follow the what-if. The kira-gün list is replaced in place; «Şimdi → Sonra» is only for monthly leftover and break-even.
+§B.2 is then re-run on the adjusted costs so the day lines follow the what-if. Those what-if day lines live on Simülasyonlar next to the Ocak fields. Detaylı Sonuç keeps the **base** kira-gün list (B.2 on the unadjusted month). «Şimdi → Sonra» is only for monthly leftover and break-even.
 
 The two rates are **transient** screen state. They are not written to the draft and they are not encoded in the URL.
 
@@ -1168,7 +1170,7 @@ UI-only. `calculateDetailed` is unchanged. `dailyQuantity` remains a required fi
 
 `operatingDaysPerMonth` stays in `assumptions` (DF-66, default 30). It is not duplicated as a second input on Satış tahmini.
 
-There is no realised-sales ledger, no Yiyecek / İçecek grouping, and no volume-weighted menu total in this step. Results already consume `products[].dailyQuantity` through the existing monthly engine (I5, §12).
+There is no realised-sales ledger and no volume-weighted menu total in this step. **Yiyecek / İçecek grouping and comparison are rejected** — not deferred. Results already consume `products[].dailyQuantity` through the existing monthly engine (I5, §12).
 
 Draft key remains `maliyet.detailed.draft.v1`. `dailyQuantity` stays on each stored product row. A draft written before this section still restores those quantities into Satış tahmini. No version bump.
 
@@ -1261,6 +1263,7 @@ No figure in §18.2 changes.
 
 | Version | Change |
 | --- | --- |
+| v1.11 | Appendix B.3 moves to the Simülasyonlar area (same draft, same formulas). Detaylı Sonuç keeps base B.2 kira-gün. Price-vs-quantity and Yiyecek / İçecek comparison are rejected, not deferred. No figure in §18.2 changed. `detailedEngineVersion` stays 1.0.0. |
 | v1.10 | Appendix B.2/B.3: kira-gün and Ocak kira-gün lines stop rounding to whole days. One decimal, Turkish comma; senin = `operatingDaysPerMonth −` unrounded shown sum. Empty buckets still omitted. No figure in §18.2 changed. `detailedEngineVersion` stays 1.0.0. |
 | v1.9 | Appendix D: per-channel restore (salon = A.6; online accounts for `platformFeeRate` and KDV) and whole-lira-up esnaf suggestion. Suggestion only — a selling price changes after an explicit tap. New test T21. No figure in §18.2 changed. `detailedEngineVersion` stays 1.0.0. |
 | v1.8 | Appendix C: Satış tahmini collects `dailyQuantity` in a separate UI section; engine contract and draft v1 shape unchanged. Appendix B.2/B.3 record the accepted display edges (rounded-zero buckets, remainder-none copy, unreadable/negative Ocak rates, in-place kira-gün). No figure in §18.2 changed. `detailedEngineVersion` stays 1.0.0. |

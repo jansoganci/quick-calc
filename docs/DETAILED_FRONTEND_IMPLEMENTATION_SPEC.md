@@ -5,7 +5,7 @@
 
 **Authority order.** `DETAILED_FEASIBILITY_DECISIONS.md` (product decisions, DF-series) → `DETAILED_FINANCIAL_SPEC.md` (formulas, input/output contract) → `DESIGN_DIRECTION.md` (locked visual/UX rules, V-series) → `APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md` (structure) → this document (Detailed screen structure, measurements, copy). `FRONTEND_IMPLEMENTATION_SPEC.md` remains the authority for the Quick / Lite screen; this document never overrides it.
 
-This document adds **no financial formulas.** Every figure it displays is read from `DetailedResult`, `DetailedResolvedInput`, the Appendix B display helpers on that same base month, or the Appendix D price-suggestion helpers (`DETAILED_FINANCIAL_SPEC.md`). The two Ocak testi fields are results-area what-if inputs, not form fields and not draft state. Appendix D figures appear on Malzemeler before `Hesapla`; they are inputs, not monthly results.
+This document adds **no financial formulas.** Every figure it displays is read from `DetailedResult`, `DetailedResolvedInput`, the Appendix B display helpers on that same base month, or the Appendix D price-suggestion helpers (`DETAILED_FINANCIAL_SPEC.md`). The two Ocak testi fields are Simülasyonlar what-if inputs, not form fields and not draft state. Appendix D figures appear on Malzemeler before `Hesapla`; they are inputs, not monthly results. They are not listed on Simülasyonlar: there is no stored previous price.
 
 ---
 
@@ -15,7 +15,7 @@ This document adds **no financial formulas.** Every figure it displays is read f
 
 Detaylı is no longer one long page. The owner sees one of five screens at a time, in this order: **Menü · Malzemeler · Satış · Giderler · Sonuç**. The eleven input *sections* still exist inside those screens (delivery still conditional). A persistent panel on the right (desktop) still answers *is this business making money?* Results live on **Sonuç**, not below the form.
 
-First visit and `#detailed-feasibility` open **Menü**. There is no third calculator mode.
+First visit and `#detailed-feasibility` open **Menü**. There is no third calculator. **Simülasyonlar** is a third top-level *area* that reads the Detaylı draft; it does not add inputs, defaults or a second engine.
 
 Three rules carry the whole design:
 
@@ -173,13 +173,13 @@ Frame is `max-w-[1152px]` in **both** modes, at every width, with `border-x bord
 | Tier | Where | Content, in order |
 | --- | --- | --- |
 | 1 | Özet pane (sticky) / mobile results head | ① verdict sentence ② `Aylık işletme sonucu` (base) ③ Başa baş · Geri dönüş · İlk yatırım ④ Kötü / Baz / İyi mini-row ⑤ Dikkat edilecekler ⑥ `Tüm sonuçlar ↓` |
-| 2 | Full width, below inputs | ① Para nereye gidiyor (bar + table) ② Senaryolar ③ Projeksiyon ④ Yatırımın geri dönüşü ⑤ Kanal ekonomisi ⑥ Menü ürünleri ⑦ Kira kaç günde çıkıyor ⑧ Ocak testi ⑨ Ürün bazlı katkı (DF-84) ⑩ Başa baş noktası ⑪ Varsayımlar |
+| 2 | Full width, below inputs | ① Para nereye gidiyor (bar + table) ② Senaryolar ③ Projeksiyon ④ Yatırımın geri dönüşü ⑤ Kanal ekonomisi ⑥ Menü ürünleri ⑦ Kira kaç günde çıkıyor (base month) ⑧ Ürün bazlı katkı (DF-84) ⑨ Başa baş noktası ⑩ Varsayımlar. Ocak testi lives on Simülasyonlar, not here. |
 
 This is the brief's question order: *is it viable* → *what does Base look like* → *Bad/Good* → *break-even* → *payback* → *how it evolves* → *where the money goes*, with the last two moved into Tier 2 where they have room.
 
 ### 4.2 Özet pane, state A (before first calculation)
 
-Eyebrow `Hazırlık`; the empty-state paragraph; then a **screen index** — five rows, `01 Menü` left, a Mono state right (`3 ürün` / `—` / `günde 170 adet` / `girildi` / `—`). This doubles as navigation and as the "what's still empty" answer, and it is why no third navigation column exists. Then `Hesapla` and its hint.
+Eyebrow `Hazırlık`; the empty-state paragraph; then a **screen index** — five rows, `01 Menü` left, a Mono state right (`3 ürün` / `—` / `günde 170 adet` / `girildi` / `—`). This doubles as in-Detaylı navigation and as the "what's still empty" answer; it is not the product-level area menu (that sits in the empty left column on desktop / the top text row on mobile). Then `Hesapla` and its hint.
 
 ### 4.3 Özet pane, state B (after first calculation)
 
@@ -257,7 +257,7 @@ Rules, mirroring Quick/Lite's R7 exactly:
 | Projeksiyon, ay ay | **Collapsed by default** behind `Ay ay tabloyu göster`. Columns: Ay · Adet · Net ciro · Katkı · Sabit gider · İşletme sonucu | Three columns only: Ay · Net ciro · İşletme sonucu |
 | Varsayımlar | Two-column definition list | Collapsed row `13 satır ▾` |
 
-**Not built:** per-product P&L, per-position cost table, monthly cash table, any channel × month cross table, Yiyecek / İçecek grouping, volume-weighted menu totals. Dense FP&A tables are not the primary UX; the month table is opt-in precisely because 24–36 rows is where that feeling starts. A `Katkı / adet` column on the DF-84 table is **rejected** — it is a division of two engine figures, i.e. a new financial figure computed in the UI. Salon remaining on the menu table is the engine’s §9.4 salon `unitContribution`, not that division.
+**Not built:** per-product P&L, per-position cost table, monthly cash table, any channel × month cross table, volume-weighted menu totals. **Yiyecek / İçecek grouping and comparison are rejected**, not deferred. Dense FP&A tables are not the primary UX; the month table is opt-in precisely because 24–36 rows is where that feeling starts. A `Katkı / adet` column on the DF-84 table is **rejected** — it is a division of two engine figures, i.e. a new financial figure computed in the UI. Salon remaining on the menu table is the engine’s §9.4 salon `unitContribution`, not that division.
 
 ### 4.7 Assumptions block (mandatory)
 
@@ -265,15 +265,19 @@ Two-column definition list carrying every field of `meta.assumptions` — **incl
 
 ### 4.8 Menu remaining, kira-gün, Ocak testi (V2 step 3)
 
-After the first `Hesapla`, three results-area blocks sit between kanal ekonomisi and the DF-84 product table. Formulas: `DETAILED_FINANCIAL_SPEC.md` Appendix B. V6 calculate-then-live is unchanged.
+After the first `Hesapla`, two results-area blocks sit between kanal ekonomisi and the DF-84 product table. Ocak testi is **not** on Sonuç; it is the Simülasyonlar area. Formulas: `DETAILED_FINANCIAL_SPEC.md` Appendix B. V6 calculate-then-live is unchanged.
 
 | Block | On screen | Copy |
 | --- | --- | --- |
 | **Menü ürünleri** | Per product: entered salon price, `unitProductCost`, malzeme payı (`unitProductCost / salon net-of-KDV`), her birinden kalan (salon §9.4). Weakest = lowest remaining; omitted on a one-product menu | Sen. Never `marj`, `katkı`, `food cost`. Labels: `Malzeme payı`, `Her birinden kalan` |
-| **Kira kaç günde çıkıyor** | Ordered lines, no chart, no icon. Days = cost / (`totalContribution` / `operatingDaysPerMonth`). Order: kira (`rentCost`), personel (`monthlyPayroll`), diğer (owner + opex + aidat), then remainder. Engine raw; screen one decimal with a Turkish comma (`5,6`); senin = working days − unrounded shown sum, also one decimal. Empty / `0,0` buckets omitted. Unavailable when contribution ≤ 0; uncovered when remainder < 0 | `Ayın ilk {n} günü kira için çalışıyorsun`, then `Sonraki {n} günü …`, then `Geri kalan {n} gün senin` |
-| **Ocak testi** | Two `%` fields, empty = 0: `Asgari ücret artışı`, `Kira artışı`. Live before → after for monthly leftover and break-even (günde). Kira-gün lines follow the what-if. Wage rate × whole `monthlyPayroll`; rent rate × `rentCost`; aidat and owner untouched. Transient — not written to the draft or the URL | Placeholder `0`. Unreadable input counts as 0 with a quiet hint, no red |
+| **Kira kaç günde çıkıyor** | On **Sonuç**, the **base** month. Ordered lines, no chart, no icon. Days = cost / (`totalContribution` / `operatingDaysPerMonth`). Order: kira (`rentCost`), personel (`monthlyPayroll`), diğer (owner + opex + aidat), then remainder. Engine raw; screen one decimal with a Turkish comma (`5,6`); senin = working days − unrounded shown sum, also one decimal. Empty / `0,0` buckets omitted. Unavailable when contribution ≤ 0; uncovered when remainder < 0 | `Ayın ilk {n} günü kira için çalışıyorsun`, then `Sonraki {n} günü …`, then `Geri kalan {n} gün senin` |
+| **Ocak testi** | On **Simülasyonlar**, not Sonuç. Two `%` fields, empty = 0: `Asgari ücret artışı`, `Kira artışı`. Live before → after for monthly leftover and break-even (günde). What-if kira-gün lines sit under the same area. Wage rate × whole `monthlyPayroll`; rent rate × `rentCost`; aidat and owner untouched. Transient — not written to the draft or the URL. Does not ask fiyat vs adet (rejected). | Placeholder `0`. Unreadable input counts as 0 with a quiet hint, no red. Empty area copy: `Önce Detaylı Hesap’ı doldur.` with Detaylı Hesap as a text link |
 
 These blocks are display helpers. They do not change `calculateDetailed`, Kötü / Baz / İyi, or `detailedEngineVersion`.
+
+### 4.9 Simülasyonlar area
+
+Third top-level area, not a third calculator. Hash `#simulations` (alias `#simulasyonlar`). Reads the Detaylı draft already in memory / `maliyet.detailed.draft.v1`. No new inputs besides the Ocak `%` fields. If `view` is null (never `Hesapla`), one plain line and a text link to Detaylı Menü. Zam geldi stays on Malzemeler (input-time; no price history, so no restore list here).
 
 ---
 
@@ -323,9 +327,9 @@ Section 01 starts with **one empty product row**. Every other section renders em
 
 ---
 
-## 6. Quick ↔ Detailed navigation
+## 6. Three-area navigation
 
-*Revised after launch.* The switch used to be two text links in the masthead's top-right corner. It did not work: visitors did not see it, and those who did could not tell what the other mode was for. The evidence was public — replies asking for things the Detailed mode already does. Two faults, both now fixed.
+*Revised.* The product has three top-level areas: **Hızlı Hesap**, **Detaylı Hesap**, **Simülasyonlar**. Detaylı Fizibilite remains the calculator's in-page name (handoff, report); the nav label is `Detaylı Hesap`. There is still **no third calculator engine** and **no router**. The switch used to be two text links in the masthead's top-right corner. It did not work. Two faults, both now fixed in the area nav.
 
 ### 6.1 Why the masthead switch failed
 
@@ -334,20 +338,17 @@ Section 01 starts with **one empty product row**. Every other section renders em
 - **Two labels cannot explain two products.** `Hızlı Hesap` and `Detaylı Fizibilite` name them without saying how they differ, so nobody learned that the second one does channels, staffing, scenarios and a downloadable PDF report.
 - **Quick is the default**, so a visitor who never looked top-right never learned the other mode existed at all.
 
-### 6.2 The mode row **[current]**
+### 6.2 Area nav **[current]**
 
-A full-width row directly under the masthead, above the content, in both modes. `src/app/ModeRow.tsx`.
+`src/app/AreaNav.tsx`. Existing tokens and typography only. No icons, no cards, no `Hesaplama modu` eyebrow, no description lines.
 
-- Eyebrow `HESAPLAMA MODU` in the 11px uppercase style used for input-group headings, then the two modes in a two-column grid at every width.
-- Each entry is its label plus **one line saying what that mode gives you** — this is the half that was missing, and it is what makes the row worth its height:
-  - `Hızlı Hesap` — `8 soruda ön bakış`
-  - `Detaylı Fizibilite` — `Kanal, personel, senaryo, PDF rapor`
-- Active: 14px weight 600 `--qc-ink` with a 2px `--qc-ink` underline **under the label**. Inactive: weight 400 `--qc-secondary`, underline `--qc-rule-strong` on hover. **Never the accent** — V2 reserves it for the headline figure and focus states.
-- Each entry is a ≥44px target, still `<a href="#quick-calculation">` / `<a href="#detailed-feasibility">` with `aria-current="page"` on the active one, inside `<nav aria-label="Hesaplama modu">`.
-- The row does not print (`qc-screen-only`): it is application chrome, not part of the report.
-- Cost: ~100px above the fold, of which ~33px is paid back by the phone-only slogan row it makes unnecessary (`FRONTEND_IMPLEMENTATION_SPEC.md` §6).
+- **Mobile (below `lg`):** a simple horizontal three-column text row under the masthead, the same idea as the old two-mode tabs. Labels only. Each entry is a ≥44px target.
+- **Desktop (`lg+`):** a vertical text list in the currently empty column to the left of the 1152px sheet, on the page background, sticky with the masthead. The sheet itself no longer carries a mode-tabs block.
+- Active: 14px weight 600 `--qc-ink` with a 2px `--qc-ink` underline **under the label**. Inactive: weight 400 `--qc-secondary`, underline `--qc-rule-strong` on hover. **Never the accent**.
+- Each entry is an `<a href="#quick">` / `<a href="#detailed-feasibility">` / `<a href="#simulations">` with `aria-current="page"` on the active one, inside `<nav aria-label="Bölümler">`.
+- Does not print (`qc-screen-only`).
 
-**Not sticky.** The masthead stays sticky from `lg` and the result panes still offset by `lg:top-14`; making the row sticky too would take ~100px of every desktop viewport and force both panes' offsets and max-heights to change. Switching mid-scroll is rare, and the case that does arise — "I have my Quick answer, now I want the real thing" — is served by §6.3 instead.
+The masthead stays sticky from `lg` and the result panes still offset by `lg:top-14`. The desktop area list is itself sticky at `top-0` in the left column. Switching mid-scroll from a finished Quick result is still served by §6.3.
 
 ### 6.3 The handoff at the foot of a finished Quick result
 
@@ -357,11 +358,11 @@ This is the moment the offer lands: the reader has their answer and can weigh wh
 
 ### 6.4 Switching, wherever it is asked for
 
-Both entry points call one function in `App.tsx`, which sets the mode, stamps `#quick-calculation` / `#detailed-feasibility` in the URL, and **scrolls to the top**. The scroll is not cosmetic: without it, a reader taking the handoff from the foot of the Quick page lands in the middle of the Detailed form.
+Every entry point — area nav, the Quick handoff, the Simülasyonlar empty-state link — calls one function in `App.tsx`, which `pushState`s the area hash and **scrolls to the top**. The scroll is not cosmetic: without it, a reader taking the handoff from the foot of the Quick page lands in the middle of the Detailed form.
 
-On first paint, `App.tsx` reads that hash: `#detailed-feasibility` opens Detaylı; any other hash (including `#quick-calculation` and none) opens Hızlı Hesap. The calculator inputs are still not encoded in the URL (Quick R6).
+On first paint, `App.tsx` reads that hash: `#detailed-feasibility` (and suffixes) opens Detaylı; `#simulations` / `#simulasyonlar` opens Simülasyonlar; any other hash (including `#quick`, `#quick-calculation` and none) opens Hızlı Hesap. The calculator inputs are still not encoded in the URL (Quick R6).
 
-> **Resolved (was D-3) — routing.** Architecture D4 says a router arrives "only when a second real screen requires it". There is still **no router**. `App.tsx` holds mode + Detailed screen in `useState`. The hash names the calculator and, inside Detaylı, the screen (`#detailed-feasibility` = Menü, `/malzemeler` `/satis` `/giderler` `/sonuc`). Form inputs are not encoded (Quick R6). `popstate` restores the screen so Back works. Switching Hızlı ↔ Detaylı `replaceState`s the mode hash and lands Detaylı on Menü. Both feature trees stay mounted. A reload of `#detailed-feasibility/satis` opens Detaylı on Satış and restores the draft, not the screen-local accordion. No confirmation dialog on switch.
+> **Resolved (was D-3) — routing.** Architecture D4 says a router arrives "only when a second real screen requires it". There is still **no router**. `App.tsx` holds area + Detailed screen in `useState`. Canonical hashes: `#quick`, `#detailed-feasibility`, `#simulations`. Existing `#quick-calculation` and `#detailed-feasibility/…` keep working. Form inputs are not encoded (Quick R6). `popstate` restores the area (and the Detaylı screen) so Back works. Switching areas `pushState`s so Back returns to the previous area; entering Detaylı from another area lands on Menü. All three area trees stay mounted. A reload of `#detailed-feasibility/satis` opens Detaylı on Satış and restores the draft, not the screen-local accordion. No confirmation dialog on switch.
 
 ---
 
@@ -410,6 +411,7 @@ src/features/detailed/
     DetailedResults.tsx            Tier 2 composition
     ResultBar.tsx  ScenarioTable.tsx  ChannelTable.tsx  MonthTable.tsx
     SalonMenuTable.tsx  FixedCostDaysList.tsx  JanuaryTest.tsx
+    SimulationsPage.tsx            Ocak testi area; reads the same Detailed calc
     AssumptionsList.tsx  ProjectionChart.tsx  PaybackChart.tsx  chartGeometry.ts
 ```
 

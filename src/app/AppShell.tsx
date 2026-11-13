@@ -1,45 +1,44 @@
 import type { ReactNode } from 'react'
+import { AreaNav } from './AreaNav.tsx'
 import { BrandMark } from './BrandMark.tsx'
-import { ModeRow } from './ModeRow.tsx'
-import { SHELL_COPY, type CalculationMode } from './shellCopy.ts'
+import { SHELL_COPY, type AppArea } from './shellCopy.ts'
 
 type AppShellProps = {
-  mode: CalculationMode
-  onModeChange: (mode: CalculationMode) => void
+  area: AppArea
+  onAreaChange: (area: AppArea) => void
   children: ReactNode
 }
 
 /**
- * The page frame both calculation modes render inside: one 1152px sheet, the
- * masthead with the mode switch, and the colophon. Keeping it here rather than in
- * either feature is what lets the two modes share a shell without importing each
- * other (architecture R5).
+ * The page frame every area renders inside: the 1152px sheet, a simplified
+ * masthead, the three-area switch (desktop left column / mobile top row) and
+ * the colophon. Keeping it here rather than in a feature is what lets the
+ * areas share a shell without importing each other (architecture R5).
  */
-export function AppShell({ mode, onModeChange, children }: AppShellProps) {
+export function AppShell({ area, onAreaChange, children }: AppShellProps) {
   return (
-    <div className="qc-sheet mx-auto max-w-[1152px] overflow-x-clip border-x border-qc-rule bg-qc-surface">
-      <AppHeader />
-      <ModeRow mode={mode} onModeChange={onModeChange} />
-      {children}
-      <AppFooter />
+    <div className="flex justify-center">
+      <AreaNav area={area} onAreaChange={onAreaChange} layout="desktop" />
+      <div className="qc-sheet min-w-0 w-full max-w-[1152px] overflow-x-clip border-x border-qc-rule bg-qc-surface">
+        <AppHeader />
+        <AreaNav area={area} onAreaChange={onAreaChange} layout="mobile" />
+        {children}
+        <AppFooter />
+      </div>
     </div>
   )
 }
 
 /**
- * Masthead: the mark, the product name and the slogan.
+ * Masthead: the mark, the product name and the slogan. Area switching lives
+ * in `AreaNav`, not here, so the slogan stays beside the name at every width.
  *
- * The mode switch used to live here, in the top-right corner, where visitors did
- * not find it — see `ModeRow.tsx`. With it gone the slogan fits beside the name at
- * every width, so the phone-only slogan row it used to displace is gone too.
- *
- * Still sticky from `lg`: the result panes in both modes offset by its height
- * (`lg:top-14`), and it keeps the product name in view on a long page.
+ * Still sticky from `lg`: the result panes offset by its height (`lg:top-14`),
+ * and it keeps the product name in view on a long page.
  */
 function AppHeader() {
   return (
     <header className="qc-screen-only flex h-[52px] items-center gap-2.5 border-b border-qc-rule bg-qc-surface px-[18px] lg:sticky lg:top-0 lg:z-10 lg:h-14 lg:px-[30px]">
-      {/* The mark sits tight to the name — 8px, one lockup, not two elements. */}
       <span className="flex shrink-0 items-center gap-2">
         <BrandMark size={18} />
         <span className="text-sm font-semibold tracking-[-0.005em] text-qc-ink lg:text-[15px]">
@@ -58,9 +57,6 @@ function AppFooter() {
         <span>{SHELL_COPY.footerNature}</span>
         <span className="font-mono text-[11px] text-qc-subtle">
           {SHELL_COPY.domain} · {SHELL_COPY.footerScope}
-          {/* Attribution is opt-in: `shellCopy.ts` ships it as null so an
-              unconfigured build renders the three specified items and nothing
-              more, rather than a placeholder handle pointing at a stranger. */}
           {SHELL_COPY.authorHandle && SHELL_COPY.authorUrl ? (
             <>
               {' · '}
