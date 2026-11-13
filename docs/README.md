@@ -25,6 +25,7 @@ If two documents appear to disagree, use the authority order in [`CLAUDE.md`](..
 | [`FRONTEND_IMPLEMENTATION_SPEC.md`](./FRONTEND_IMPLEMENTATION_SPEC.md) | Quick / Lite UI measurements, tokens, field map, copy |
 | [`design.md`](./design.md) | Design index plus layout-frame notes from the HTML preview |
 | [`HANDOFF.md`](./HANDOFF.md) | Living status log — what shipped each session and what still needs a human (accounts, outreach). Not a specification. |
+| [`SEO_PRERENDER_PLAN.md`](./SEO_PRERENDER_PLAN.md) | Plan only — build-time prerender, English public paths with Turkish copy, crawler/LLM discoverability. Owner decisions recorded; not authorised to implement; not a financial spec |
 
 [`CLAUDE.md`](../CLAUDE.md) is operating guidance for coding models. It is not a specification.
 
