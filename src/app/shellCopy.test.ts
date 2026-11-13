@@ -12,8 +12,7 @@ import {
 
 /**
  * The shell owns the product's name, slogan and domain. `main.tsx` applies
- * `DOCUMENT_TITLE` at startup, so the static title in `index.html` is only a
- * first-paint fallback and this module stays the source of truth.
+ * `DOCUMENT_TITLE` as the home tab title. Per-path titles live in `seoCopy.ts`.
  */
 
 describe('brand', () => {

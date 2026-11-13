@@ -1,7 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot, hydrateRoot } from 'react-dom/client'
-import { App, applyCanonicalLocation } from './app/App.tsx'
-import { DOCUMENT_TITLE } from './app/shellCopy.ts'
+import { App, applyCanonicalLocation, applyDocumentSeo } from './app/App.tsx'
 import './app/index.css'
 
 // Hash bookmarks (`#detailed-feasibility/satis`) become real paths before React
@@ -9,10 +8,9 @@ import './app/index.css'
 // on `/detailed/sales`.
 applyCanonicalLocation()
 
-// `index.html` carries a matching static title for the first paint and for crawlers
-// that do not run scripts; this makes `shellCopy.ts` the source of truth afterwards,
-// so the brand copy is stated once for the UI and once for the document, not thrice.
-document.title = DOCUMENT_TITLE
+// Tab title and share tags follow the path. `index.html` stays the crawler
+// fallback until prerender; `seoCopy.ts` is the source of truth afterwards.
+applyDocumentSeo()
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Root element missing')
