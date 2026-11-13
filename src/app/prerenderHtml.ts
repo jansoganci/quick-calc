@@ -49,8 +49,8 @@ function stripHakkindaFooter(html: string): string {
 /**
  * Swap the home share tags baked into `index.html` for this path's copy.
  * Does not touch `og.jpg` URLs — those contain the home origin as a prefix.
- * Guide files replace WebApplication JSON-LD with BreadcrumbList + FAQPage
- * and drop the Hakkında footer.
+ * Every path replaces the template JSON-LD. Guide files use BreadcrumbList +
+ * FAQPage and drop the Hakkında footer.
  */
 export function applySeoToHtml(html: string, seo: SeoDocument): string {
   let out = html.replaceAll(DOCUMENT_TITLE, seo.title)
@@ -67,8 +67,8 @@ export function applySeoToHtml(html: string, seo: SeoDocument): string {
     )
   }
 
-  if (seo.jsonLd) {
-    out = replaceJsonLd(out, seo.jsonLd)
+  out = replaceJsonLd(out, seo.jsonLd)
+  if (seo.ogType === 'article') {
     out = stripHakkindaFooter(out)
   }
 

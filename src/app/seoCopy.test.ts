@@ -14,7 +14,8 @@ describe('seoForPath', () => {
     expect(home.canonicalUrl).toBe(CANONICAL_URL)
     expect(home.noindex).toBe(false)
     expect(home.ogType).toBe('website')
-    expect(home.jsonLd).toBeUndefined()
+    expect(JSON.stringify(home.jsonLd)).toContain('WebApplication')
+    expect(JSON.stringify(home.jsonLd)).toContain('FAQPage')
   })
 
   it('uses the plan’s Turkish titles on English calculator paths', () => {

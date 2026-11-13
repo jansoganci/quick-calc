@@ -5,6 +5,7 @@ import {
   rehberJsonLd,
   rehberPageFromPath,
 } from '../features/rehber/pages.ts'
+import { calculatorJsonLd } from './jsonLd.ts'
 import { canonicalPathFromLocation } from './location.ts'
 import { AREA_LABELS, AREA_PATHS, CANONICAL_URL, DOCUMENT_TITLE, SHELL_COPY } from './shellCopy.ts'
 
@@ -21,7 +22,7 @@ export type SeoDocument = {
   canonicalUrl: string
   noindex: boolean
   ogType: 'website' | 'article'
-  jsonLd?: readonly unknown[]
+  jsonLd: readonly unknown[]
 }
 
 type SeoPage = {
@@ -112,15 +113,18 @@ export function seoForPath(pathname: string): SeoDocument {
   if (home === undefined) throw new Error('Home SEO copy missing')
   const page = PAGE_SEO[path] ?? home
   const canonicalPath = path in PAGE_SEO ? path : AREA_PATHS.quick
-  const document: SeoDocument = {
+  const canonicalUrl = absoluteUrl(canonicalPath)
+  const guide = rehberPageFromPath(canonicalPath)
+  return {
     path: canonicalPath,
     title: page.title,
     description: page.description,
-    canonicalUrl: absoluteUrl(canonicalPath),
+    canonicalUrl,
     noindex: page.noindex,
     ogType: page.ogType,
+    jsonLd:
+      guide !== undefined
+        ? rehberJsonLd(guide)
+        : calculatorJsonLd({ canonicalUrl, description: page.description }),
   }
-  const guide = rehberPageFromPath(canonicalPath)
-  if (guide === undefined) return document
-  return { ...document, jsonLd: rehberJsonLd(guide) }
 }
