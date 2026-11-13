@@ -71,9 +71,11 @@ describe('mode navigation', () => {
     expect(new Set(Object.values(MODE_ANCHORS)).size).toBe(MODES.length)
   })
 
-  it('opens Detaylı on load only for #detailed-feasibility', () => {
+  it('opens Detaylı on load for #detailed-feasibility and its screen suffixes', () => {
     expect(modeFromLocationHash('#detailed-feasibility')).toBe('detailed')
     expect(modeFromLocationHash('detailed-feasibility')).toBe('detailed')
+    expect(modeFromLocationHash('#detailed-feasibility/satis')).toBe('detailed')
+    expect(modeFromLocationHash('#detailed-feasibility/sonuc')).toBe('detailed')
     expect(modeFromLocationHash('')).toBe('quick')
     expect(modeFromLocationHash('#quick-calculation')).toBe('quick')
     expect(modeFromLocationHash('#')).toBe('quick')

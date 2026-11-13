@@ -58,12 +58,15 @@ export const MODE_ANCHORS = {
 } as const satisfies Record<CalculationMode, string>
 
 /**
- * First paint. `#detailed-feasibility` opens Detaylı; any other hash (including
- * `#quick-calculation` and none) opens Hızlı Hesap. Form state is not encoded.
+ * First paint. `#detailed-feasibility` (and any `/…` suffix it owns) opens
+ * Detaylı; any other hash (including `#quick-calculation` and none) opens
+ * Hızlı Hesap. Form state is not encoded.
  */
 export function modeFromLocationHash(hash: string): CalculationMode {
   const raw = hash.startsWith('#') ? hash.slice(1) : hash
-  return raw === MODE_ANCHORS.detailed ? 'detailed' : 'quick'
+  return raw === MODE_ANCHORS.detailed || raw.startsWith(`${MODE_ANCHORS.detailed}/`)
+    ? 'detailed'
+    : 'quick'
 }
 
 export const MODE_LABELS = {

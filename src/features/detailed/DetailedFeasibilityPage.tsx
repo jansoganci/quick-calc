@@ -1,31 +1,57 @@
+import { useEffect } from 'react'
 import { cn } from '../../lib/cn.ts'
 import { DetailedForm } from './components/DetailedForm.tsx'
 import { DetailedResults } from './components/DetailedResults.tsx'
+import { DetailedScreenChrome } from './components/DetailedScreenChrome.tsx'
+import { DraftNotice } from './components/DraftNotice.tsx'
 import { MobileSummaryBar } from './components/MobileSummaryBar.tsx'
 import { ReportActionButton } from './components/ReportActionButton.tsx'
 import { ReportAppendix } from './components/ReportAppendix.tsx'
 import { ReportCover } from './components/ReportCover.tsx'
 import { ReportNameDialog } from './components/ReportNameDialog.tsx'
-import { SummaryPane, type SectionSummary } from './components/SummaryPane.tsx'
+import { CalculateButton, SummaryPane } from './components/SummaryPane.tsx'
 import { useDetailedCalc } from './hooks/useDetailedCalc.ts'
 import { useReportPrint } from './hooks/useReportPrint.ts'
 import { COPY, RECIPE_COPY, SECTION_LABELS } from './labels.ts'
-import { sectionSummary, visibleSections } from './sectionSummary.ts'
+import {
+  DETAILED_SCREENS,
+  screenForSection,
+  screenSummary,
+  sectionsOnScreen,
+  type DetailedScreen,
+} from './screens.ts'
+import { visibleSections } from './sectionSummary.ts'
 
 /**
- * One page, eleven sections, a persistent decision summary. Inputs scroll on the left;
- * the pane on the right answers "is this making money?" while they are edited; the
- * reasoning sits full width below.
+ * Five screens, one visible. Inputs stay in one form state so switching does not
+ * drop a typed value. `#detailed-feasibility` is Menü; the other screens are
+ * suffixes of that hash. No third mode.
  */
-export function DetailedFeasibilityPage() {
+export function DetailedFeasibilityPage({
+  screen,
+  onGoToScreen,
+}: {
+  screen: DetailedScreen
+  onGoToScreen: (screen: DetailedScreen) => void
+}) {
   const calc = useDetailedCalc()
   const report = useReportPrint(calc.businessName, calc.setBusinessName)
   const sections = visibleSections(calc.form)
 
-  const summaries: SectionSummary[] = sections.map((section, index) => ({
-    section,
+  useEffect(() => {
+    const onThisScreen = sectionsOnScreen(screen, sections)
+    if (onThisScreen.length === 0) return
+    if (calc.openSection === null || !onThisScreen.includes(calc.openSection)) {
+      calc.setOpenSection(onThisScreen[0] ?? null)
+    }
+    // Only when the screen changes — not on every form keystroke.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screen])
+
+  const screenIndex = DETAILED_SCREENS.map((id, index) => ({
+    screen: id,
     index: index + 1,
-    summary: sectionSummary(calc.form, section),
+    summary: screenSummary(calc.form, id),
   }))
 
   const submitHint = buildSubmitHint()
@@ -43,88 +69,88 @@ export function DetailedFeasibilityPage() {
     )
   }
 
-  function goToSection(section: string) {
-    calc.setOpenSection(section as (typeof sections)[number])
-    document.getElementById(`detailed-${section}`)?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    })
+  function goToSection(section: (typeof sections)[number]) {
+    onGoToScreen(screenForSection(section))
+    calc.setOpenSection(section)
   }
 
-  function goToResults() {
-    calc.resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-
-  function goToInputs() {
-    document.getElementById('detailed-feasibility')?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    })
+  function calculate() {
+    const ok = calc.canSubmit
+    calc.calculate()
+    if (ok) onGoToScreen('results')
   }
 
   return (
     <div className="qc-detailed pb-[92px] lg:pb-0">
-      {/*
-        The report is this same result, printed: a cover ahead of it, the input
-        appendix behind it, and the application's own chrome left out. Both are
-        print-only, and both render only once a result exists — before `Hesapla`
-        there is nothing to report (V6).
-      */}
       {calc.view ? <ReportCover view={calc.view} businessName={calc.businessName} /> : null}
 
       <main
         id="detailed-feasibility"
         className="qc-screen-only lg:grid lg:grid-cols-[1fr_1px_372px]"
       >
-        <DetailedForm calc={calc} />
+        <DetailedScreenChrome screen={screen} onGoToScreen={onGoToScreen}>
+          <div hidden={screen === 'results'}>
+            <DetailedForm calc={calc} screen={screen} onGoToScreen={onGoToScreen} />
+            <DraftNotice saved={calc.draftSaved} onReset={calc.resetForm} />
+          </div>
+          {screen === 'results' && calc.view === null ? (
+            <div className="max-w-[600px]">
+              <p className="text-[13px] leading-relaxed text-qc-ink">{COPY.emptyResult}</p>
+              <div className="mt-5">
+                <CalculateButton
+                  canSubmit={calc.canSubmit}
+                  submitHint={submitHint}
+                  onCalculate={calculate}
+                />
+              </div>
+            </div>
+          ) : null}
+          {calc.view ? (
+            <div
+              className={
+                screen === 'results' ? 'qc-enter -mx-[18px] lg:-mx-[30px]' : 'qc-print-only'
+              }
+            >
+              <div ref={calc.resultsRef} className={cn(calc.liveFlash && 'qc-live')}>
+                <DetailedResults
+                  view={calc.view}
+                  showMonthTable={calc.showMonthTable}
+                  onToggleMonthTable={calc.toggleMonthTable}
+                />
+                <div className="px-0 pb-4 lg:hidden">
+                  <ReportActionButton
+                    variant="results"
+                    canPrint={report.canPrint}
+                    onOpen={report.open}
+                  />
+                </div>
+                <ReportAppendix view={calc.view} />
+              </div>
+            </div>
+          ) : null}
+        </DetailedScreenChrome>
         <div className="hidden bg-qc-rule lg:block" aria-hidden="true" />
-        {/*
-          The tint sits on the grid item, which stretches to the row height, so the
-          column reads as one sheet however short the summary is; the sticky pane is
-          the inner element. Same arrangement as Quick's result column.
-        */}
         <div className="border-t border-qc-rule lg:border-t-0 lg:bg-qc-surface-result">
           <div className="lg:sticky lg:top-14 lg:max-h-[calc(100vh-3.5rem)] lg:overflow-y-auto">
             <SummaryPane
               view={calc.view}
-              sections={summaries}
+              screens={screenIndex}
               canSubmit={calc.canSubmit}
               submitHint={submitHint}
               copied={calc.copied}
               onCopy={() => {
                 void calc.copySummary()
               }}
-              onCalculate={calc.calculate}
+              onCalculate={calculate}
+              onGoToScreen={onGoToScreen}
               onGoToSection={goToSection}
-              onGoToResults={goToResults}
+              onGoToResults={() => onGoToScreen('results')}
               canPrintReport={report.canPrint}
               onOpenReport={report.open}
             />
           </div>
         </div>
       </main>
-
-      <div ref={calc.resultsRef}>
-        {calc.view ? (
-          <div className={cn('qc-enter', calc.liveFlash && 'qc-live')}>
-            <DetailedResults
-              view={calc.view}
-              showMonthTable={calc.showMonthTable}
-              onToggleMonthTable={calc.toggleMonthTable}
-            />
-            {/* The mobile call site: at the end of the results, where reading ends.
-                Desktop reaches the same control from the summary pane. */}
-            <div className="px-[18px] pb-[34px] lg:hidden">
-              <ReportActionButton
-                variant="results"
-                canPrint={report.canPrint}
-                onOpen={report.open}
-              />
-            </div>
-            <ReportAppendix view={calc.view} />
-          </div>
-        ) : null}
-      </div>
 
       <ReportNameDialog
         open={report.isOpen}
@@ -139,9 +165,9 @@ export function DetailedFeasibilityPage() {
         view={calc.view}
         canSubmit={calc.canSubmit}
         submitHint={submitHint}
-        onCalculate={calc.calculate}
-        onGoToInputs={goToInputs}
-        onGoToResults={goToResults}
+        onCalculate={calculate}
+        onGoToInputs={() => onGoToScreen('costs')}
+        onGoToResults={() => onGoToScreen('results')}
       />
     </div>
   )
