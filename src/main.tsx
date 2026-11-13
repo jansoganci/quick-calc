@@ -1,8 +1,13 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { App } from './app/App.tsx'
+import { App, applyCanonicalLocation } from './app/App.tsx'
 import { DOCUMENT_TITLE } from './app/shellCopy.ts'
 import './app/index.css'
+
+// Hash bookmarks (`#detailed-feasibility/satis`) become real paths before React
+// mounts. `index.html` also runs this map inline so a slow bundle still lands
+// on `/detailed/sales`.
+applyCanonicalLocation()
 
 // `index.html` carries a matching static title for the first paint and for crawlers
 // that do not run scripts; this makes `shellCopy.ts` the source of truth afterwards,

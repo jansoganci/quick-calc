@@ -47,8 +47,19 @@ export const SHELL_COPY = {
 } as const
 
 /**
- * Canonical hash each area writes. `#detailed-feasibility` and its screen
- * suffixes stay the Detaylı deep links; `#quick-calculation` still opens Hızlı.
+ * Canonical public path each area writes. Page copy stays Turkish; the path
+ * tokens are English (`docs/SEO_PRERENDER_PLAN.md` Decisions).
+ */
+export const AREA_PATHS = {
+  quick: '/',
+  detailed: '/detailed',
+  simulations: '/simulations',
+} as const satisfies Record<AppArea, string>
+
+/**
+ * Legacy hash tokens. Incoming `#detailed-feasibility` (and suffixes) still
+ * open Detaylı; `#quick-calculation` still opens Hızlı. New clicks write
+ * `AREA_PATHS` instead.
  */
 export const AREA_ANCHORS = {
   quick: 'quick',
@@ -70,7 +81,7 @@ function hashMatchesArea(raw: string, area: AppArea): boolean {
 }
 
 /**
- * First paint. `#detailed-feasibility` (and any `/…` suffix it owns) opens
+ * Hash bookmarks. `#detailed-feasibility` (and any `/…` suffix it owns) opens
  * Detaylı; `#simulations` / `#simulasyonlar` open Simülasyonlar; any other hash
  * (including `#quick`, `#quick-calculation` and none) opens Hızlı Hesap.
  * Form state is not encoded.
@@ -79,6 +90,23 @@ export function areaFromLocationHash(hash: string): AppArea {
   const raw = hash.startsWith('#') ? hash.slice(1) : hash
   if (hashMatchesArea(raw, 'detailed')) return 'detailed'
   if (hashMatchesArea(raw, 'simulations')) return 'simulations'
+  return 'quick'
+}
+
+function stripTrailingSlash(pathname: string): string {
+  if (pathname.length > 1 && pathname.endsWith('/')) return pathname.slice(0, -1)
+  return pathname
+}
+
+/**
+ * Pathname first-paint. `/detailed` (and any `/…` suffix it owns) opens Detaylı;
+ * `/simulations` opens Simülasyonlar; `/` and `/quick` open Hızlı Hesap.
+ * Unknown paths fall through to Hızlı (SPA fallback) without rewriting the bar.
+ */
+export function areaFromPathname(pathname: string): AppArea {
+  const path = stripTrailingSlash(pathname)
+  if (path === AREA_PATHS.detailed || path.startsWith(`${AREA_PATHS.detailed}/`)) return 'detailed'
+  if (path === AREA_PATHS.simulations) return 'simulations'
   return 'quick'
 }
 

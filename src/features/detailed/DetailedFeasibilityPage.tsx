@@ -24,9 +24,10 @@ import { visibleSections } from './sectionSummary.ts'
 
 /**
  * Five screens, one visible. Inputs stay in one form state so switching does not
- * drop a typed value. `#detailed-feasibility` is Menü; the other screens are
- * suffixes of that hash. Simülasyonlar is a separate area that reads this same
- * `calc`; it is not a third calculator.
+ * drop a typed value. `/detailed` is Menü; the other screens are suffixes of
+ * that path. Incoming `#detailed-feasibility` bookmarks still open Menü.
+ * Simülasyonlar is a separate area that reads this same `calc`; it is not a
+ * third calculator.
  */
 export function DetailedFeasibilityPage({
   calc,

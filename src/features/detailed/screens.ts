@@ -5,10 +5,11 @@ import { formatCount } from '../../lib/number.ts'
 
 /**
  * V2 step 5: Detaylı is five screens, not one long page. The monthly engine and
- * the v1 draft shape do not change. Hash suffixes are ASCII so a phone keyboard
- * and a bookmark both round-trip; `#detailed-feasibility` with no suffix is Menü
- * so the existing deep link keeps working. Simülasyonlar is a separate top-level
- * area, not a sixth Detailed screen and not a third calculator.
+ * the v1 draft shape do not change. Canonical addresses are English paths
+ * (`/detailed`, `/detailed/ingredients`, …). Hash suffixes stay as a one-release
+ * compatibility map so `#detailed-feasibility` still opens Menü. Simülasyonlar
+ * is a separate top-level area, not a sixth Detailed screen and not a third
+ * calculator.
  */
 
 export const DETAILED_SCREENS = ['menu', 'ingredients', 'sales', 'costs', 'results'] as const
@@ -23,22 +24,41 @@ export const DETAILED_SCREEN_LABELS: Record<DetailedScreen, string> = {
   results: 'Sonuç',
 }
 
-const SCREEN_SLUG: Record<Exclude<DetailedScreen, 'menu'>, string> = {
+/** Legacy hash suffixes. New navigations write `PATH_SLUG` under `/detailed`. */
+const HASH_SLUG: Record<Exclude<DetailedScreen, 'menu'>, string> = {
   ingredients: 'malzemeler',
   sales: 'satis',
   costs: 'giderler',
   results: 'sonuc',
 }
 
-const SLUG_TO_SCREEN: Record<string, DetailedScreen> = {
+const HASH_SLUG_TO_SCREEN: Record<string, DetailedScreen> = {
   malzemeler: 'ingredients',
   satis: 'sales',
   giderler: 'costs',
   sonuc: 'results',
 }
 
+const PATH_SLUG: Record<Exclude<DetailedScreen, 'menu'>, string> = {
+  ingredients: 'ingredients',
+  sales: 'sales',
+  costs: 'expenses',
+  results: 'result',
+}
+
+const PATH_SLUG_TO_SCREEN: Record<string, DetailedScreen> = {
+  menu: 'menu',
+  ingredients: 'ingredients',
+  sales: 'sales',
+  expenses: 'costs',
+  result: 'results',
+}
+
 /** Same token as `AREA_ANCHORS.detailed` in the shell. Kept here so this module does not import `app/`. */
 export const DETAILED_HASH_ROOT = 'detailed-feasibility'
+
+/** Canonical Detaylı Menü path. `/detailed/menu` is a 301 alias, not written. */
+export const DETAILED_PATH_ROOT = '/detailed'
 
 const SECTION_SCREEN: Record<SectionId, DetailedScreen> = {
   products: 'menu',
@@ -56,7 +76,7 @@ const SECTION_SCREEN: Record<SectionId, DetailedScreen> = {
 
 export function hashForScreen(screen: DetailedScreen): string {
   if (screen === 'menu') return DETAILED_HASH_ROOT
-  return `${DETAILED_HASH_ROOT}/${SCREEN_SLUG[screen]}`
+  return `${DETAILED_HASH_ROOT}/${HASH_SLUG[screen]}`
 }
 
 /**
@@ -69,7 +89,30 @@ export function detailedScreenFromHash(hash: string): DetailedScreen | null {
   if (raw === DETAILED_HASH_ROOT || raw === `${DETAILED_HASH_ROOT}/`) return 'menu'
   if (!raw.startsWith(`${DETAILED_HASH_ROOT}/`)) return null
   const slug = raw.slice(DETAILED_HASH_ROOT.length + 1)
-  return SLUG_TO_SCREEN[slug] ?? 'menu'
+  return HASH_SLUG_TO_SCREEN[slug] ?? 'menu'
+}
+
+export function pathForScreen(screen: DetailedScreen): string {
+  if (screen === 'menu') return DETAILED_PATH_ROOT
+  return `${DETAILED_PATH_ROOT}/${PATH_SLUG[screen]}`
+}
+
+function stripTrailingSlash(pathname: string): string {
+  if (pathname.length > 1 && pathname.endsWith('/')) return pathname.slice(0, -1)
+  return pathname
+}
+
+/**
+ * `null` when the path is not a Detaylı address. `/detailed/menu` is Menü (the
+ * production 301 lands on `/detailed`; the SPA still understands the alias).
+ * An unknown suffix under `/detailed/` is Menü, matching the hash behaviour.
+ */
+export function detailedScreenFromPath(pathname: string): DetailedScreen | null {
+  const path = stripTrailingSlash(pathname)
+  if (path === DETAILED_PATH_ROOT || path === `${DETAILED_PATH_ROOT}/menu`) return 'menu'
+  if (!path.startsWith(`${DETAILED_PATH_ROOT}/`)) return null
+  const slug = path.slice(DETAILED_PATH_ROOT.length + 1)
+  return PATH_SLUG_TO_SCREEN[slug] ?? 'menu'
 }
 
 export function screenForSection(section: SectionId): DetailedScreen {

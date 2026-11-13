@@ -1,8 +1,8 @@
 import { cn } from '../lib/cn.ts'
 import {
   AREAS,
-  AREA_ANCHORS,
   AREA_LABELS,
+  AREA_PATHS,
   SHELL_COPY,
   type AppArea,
 } from './shellCopy.ts'
@@ -30,7 +30,7 @@ export function AreaNav({
           return (
             <a
               key={candidate}
-              href={`#${AREA_ANCHORS[candidate]}`}
+              href={AREA_PATHS[candidate]}
               aria-current={isActive ? 'page' : undefined}
               onClick={(event) => {
                 event.preventDefault()

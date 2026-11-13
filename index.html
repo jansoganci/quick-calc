@@ -123,6 +123,42 @@
         ]
       }
     </script>
+    <!--
+      Hash fragments never reach Cloudflare. This runs before the module bundle
+      so a bookmarked https://maliyet.lol/#detailed-feasibility/satis still
+      opens Satış. Keep the map in sync with HASH_REDIRECTS in src/app/location.ts.
+    -->
+    <script>
+      (function () {
+        var hash = location.hash.replace(/^#/, '')
+        if (!hash) return
+        var map = {
+          'quick': '/',
+          'quick-calculation': '/',
+          'detailed-feasibility': '/detailed',
+          'detailed-feasibility/malzemeler': '/detailed/ingredients',
+          'detailed-feasibility/satis': '/detailed/sales',
+          'detailed-feasibility/giderler': '/detailed/expenses',
+          'detailed-feasibility/sonuc': '/detailed/result',
+          'simulations': '/simulations',
+          'simulasyonlar': '/simulations'
+        }
+        var dest = map[hash]
+        if (dest === undefined) {
+          if (hash === 'detailed-feasibility' || hash.indexOf('detailed-feasibility/') === 0) dest = '/detailed'
+          else if (
+            hash === 'simulations' ||
+            hash.indexOf('simulations/') === 0 ||
+            hash === 'simulasyonlar' ||
+            hash.indexOf('simulasyonlar/') === 0
+          ) dest = '/simulations'
+          else dest = '/'
+        }
+        var next = dest + location.search
+        if (location.pathname + location.search === next && !location.hash) return
+        history.replaceState(null, '', next)
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

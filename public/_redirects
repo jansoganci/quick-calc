@@ -1,0 +1,4 @@
+# Cloudflare Workers Static Assets. Fragments never reach the origin — hash
+# bookmarks are rewritten in index.html, not here.
+/quick / 301
+/detailed/menu /detailed 301
