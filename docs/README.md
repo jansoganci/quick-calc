@@ -31,6 +31,17 @@ If two documents appear to disagree, use the authority order in [`CLAUDE.md`](..
 
 ---
 
+## Design briefs (not product authority)
+
+These are prompts and audit notes for visual redesign. They do not change locked formulas, defaults, or UI specs. Implementation still needs an approved spec after the design is chosen.
+
+| Document | Owns |
+| --- | --- |
+| [`design/RECIPE_REDESIGN_BRIEF.md`](./design/RECIPE_REDESIGN_BRIEF.md) | Claude Design brief: recipe + shared ingredient list in Detailed, mobile first |
+| [`design/UX_AUDIT_NERDE_KARISIYOR.md`](./design/UX_AUDIT_NERDE_KARISIYOR.md) | 12 Nov 2026 UI/UX audit — “Nerede karışıyor”, field counts, screenshot index. Not a spec |
+
+---
+
 ## Archive
 
 | Document | Why it is archived |

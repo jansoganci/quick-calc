@@ -11,6 +11,8 @@ Visual and UX authority for the Quick Calculation product UI. Financial formulas
 | --- | --- |
 | [DESIGN_DIRECTION.md](./DESIGN_DIRECTION.md) | Visual language, type, colour, layout, motion, Turkish copy. From Claude Design. |
 | [FRONTEND_IMPLEMENTATION_SPEC.md](./FRONTEND_IMPLEMENTATION_SPEC.md) | Screen structure, recompute (V6), field map, stacked bar, four outputs, simulation table, copy, clipboard. From Claude Design. |
+| [design/RECIPE_REDESIGN_BRIEF.md](./design/RECIPE_REDESIGN_BRIEF.md) | Claude Design brief for the Detailed recipe + shared ingredient list only. Not a spec. |
+| [design/UX_AUDIT_NERDE_KARISIYOR.md](./design/UX_AUDIT_NERDE_KARISIYOR.md) | UI/UX audit that the recipe brief answers. Not a spec. |
 | This file | Index plus frame notes from the Claude Design HTML preview. |
 
 The Design HTML preview (`Quick Calculation Reference.dc.html`) is a **layout mock**. Numbers in that mock (for example 120 daily sales, 107,56 TL cost per sale) are **illustrative**. Production must use engine outputs from `calculateQuick` / `simulateQuick`.
