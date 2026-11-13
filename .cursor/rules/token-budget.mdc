@@ -1,0 +1,36 @@
+---
+description: "Token budget rules for coding agents working in this repo"
+alwaysApply: true
+---
+
+# Token budget rules
+
+## Plan tracking
+- Multi-step work follows a plan file under `docs/`. Each finished step is marked `[x]` in the plan file together with its PR link.
+- A new agent reads the plan file and only the files that step needs — not earlier chats.
+- Files already read in this session and unchanged since are not read again.
+
+## One PR per batch
+- Complete the whole requested batch, open a SINGLE PR, report, and stop.
+- The report contains: PR link, head SHA, a one-line test summary, and any blocker.
+- Do not start extra work just to report CI status or to say "waiting for merge".
+- Do not start the next batch on your own.
+
+## Lightweight verification
+- While developing, run only the narrow relevant tests.
+- Before opening the PR, run: `npm run test:run`, `npm run lint`, `npm run build` (`build` already runs typecheck).
+- Read only the summary lines of their output (e.g. `| tail -5`). Open the full log only on failure.
+
+## Screenshots
+- Take screenshots only when what the user sees changes: one at 390px, one at desktop width.
+- No screenshots for config, SEO, data, or docs-only changes.
+
+## Local Worker runtime
+- Use `npx wrangler dev --local` only when routing, headers, or `wrangler.jsonc` change.
+
+## Reporting and context
+- Keep reports short. Do not paste full diffs, logs, or file contents into the report.
+- Do not dump `node_modules`/`dist` listings or large files into context.
+
+## Scope
+- These rules do not relax the quality rules in `AGENTS.md`.
