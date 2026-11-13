@@ -19,15 +19,15 @@ type ProductContributionTableProps = {
 
 /**
  * Same anatomy as `ChannelTable` — same columns, same reconciling totals row, same
- * mobile transpose below `lg` — with rows summed per product instead of per channel
+ * mobile transpose below `xl` — with rows summed per product instead of per channel
  * (DF-84). No new visual language: this is the channel table's data read a different
  * way, not a different component design.
  */
 export function ProductContributionTable({ products, totals }: ProductContributionTableProps) {
   return (
     <div>
-      <div className="hidden lg:block">
-        <div className="grid grid-cols-[130px_92px_repeat(6,minmax(0,1fr))]">
+      <div className="hidden xl:block">
+        <div className="grid grid-cols-[110px_72px_repeat(6,minmax(0,1fr))] [&>*:not(:nth-child(8n+1))]:pl-2.5">
           <span className="pb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
             {PRODUCT_LABELS.name}
           </span>
@@ -61,7 +61,7 @@ export function ProductContributionTable({ products, totals }: ProductContributi
         </div>
       </div>
 
-      <div className="lg:hidden">
+      <div className="xl:hidden">
         {products.map((row, index) => (
           <div
             key={row.productId}

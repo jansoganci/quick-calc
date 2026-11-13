@@ -381,7 +381,7 @@ export function IngredientList({
           <div
             className={cn(
               'mt-3 hidden gap-2 pb-2 lg:grid',
-              'lg:grid-cols-[minmax(0,1fr)_84px_84px_116px_112px_84px_32px]',
+              'lg:grid-cols-[minmax(8rem,1fr)_minmax(3.5rem,84px)_84px_minmax(6rem,116px)_minmax(4rem,112px)_minmax(4rem,84px)_32px]',
             )}
           >
             <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
@@ -452,7 +452,7 @@ export function IngredientList({
                   <div
                     className={cn(
                       'grid grid-cols-2 gap-3 lg:grid lg:items-start lg:gap-2',
-                      'lg:grid-cols-[minmax(0,1fr)_84px_84px_116px_112px_84px_32px]',
+                      'lg:grid-cols-[minmax(8rem,1fr)_minmax(3.5rem,84px)_84px_minmax(6rem,116px)_minmax(4rem,112px)_minmax(4rem,84px)_32px]',
                     )}
                     onFocus={() => {
                       remember(ingredient)

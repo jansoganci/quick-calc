@@ -206,7 +206,7 @@ function BreakEvenCell({
       }`}
     >
       <div className="text-xs text-qc-secondary">{label}</div>
-      <div className="mt-1 font-mono text-[22px] tabular-nums text-qc-ink">{value}</div>
+      <div className="mt-1 whitespace-nowrap font-mono text-[22px] tabular-nums text-qc-ink lg:text-[20px]">{value}</div>
     </div>
   )
 }

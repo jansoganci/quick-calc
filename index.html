@@ -175,13 +175,13 @@
       Uses the app's real qc-* Tailwind classes, not hand-picked hex values —
       tailwind.config.ts already scans this file (`content: ['./index.html', …]`),
       so these compile into the same stylesheet as the rest of the app. The
-      wrapper mirrors AppShell.tsx's own sheet (`max-w-[1152px] border-x
+      wrapper mirrors AppShell.tsx's own sheet (`max-w-[1152px] xl:max-w-[1300px] border-x
       bg-qc-surface`) so this reads as a continuation of that sheet, not a
       block dropped onto the page's gray background below it. Text mirrors
       the JSON-LD above and the share tags at the top of <head> — same claims,
       same wording, everywhere.
     -->
-    <footer class="mx-auto max-w-[1152px] overflow-x-clip border-x border-qc-rule bg-qc-surface px-[18px] pb-[34px] pt-[26px] lg:px-[30px]">
+    <footer class="mx-auto max-w-[1152px] overflow-x-clip xl:max-w-[1300px] border-x border-qc-rule bg-qc-surface px-[18px] pb-[34px] pt-[26px] lg:px-[30px]">
       <div class="border-t border-qc-rule pt-[26px]">
         <h1 class="m-0 text-[15px] font-semibold tracking-[-0.005em] text-qc-ink">Maliyet</h1>
         <p class="mt-2.5 max-w-[640px] text-[13px] leading-relaxed text-qc-secondary">

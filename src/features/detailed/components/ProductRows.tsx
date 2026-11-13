@@ -7,7 +7,7 @@ import { COPY, GUARDRAIL_COPY, PRODUCT_LABELS, RECIPE_COPY } from '../labels.ts'
 import { useNewestRowOpen } from '../hooks/useNewestRowOpen.ts'
 import { recipeAmountText } from '../recipeForm.ts'
 
-const GRID = 'lg:grid-cols-[minmax(0,1fr)_120px_120px_112px_88px_48px]'
+const GRID = 'lg:grid-cols-[minmax(8rem,1fr)_minmax(5.5rem,120px)_minmax(5.5rem,120px)_minmax(5.5rem,112px)_88px_48px]'
 
 const NUMERIC_FIELDS = [
   { field: 'normalPrice', label: PRODUCT_LABELS.normalPrice, unit: 'TL', grouped: true },
