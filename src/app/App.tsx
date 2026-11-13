@@ -32,8 +32,9 @@ function setPropertyMeta(property: string, content: string) {
 
 /**
  * Tab title, canonical and OG/Twitter tags for the current English path.
- * Crawlers that do not run JS still see `index.html` until prerender (step 4).
- * `/detailed/result` gets `noindex`; leaving that screen removes the tag.
+ * Prerender writes the same strings into each path's HTML file; this keeps
+ * the tab in sync after `pushState`. `/detailed/result` gets `noindex`; leaving
+ * that screen removes the tag.
  */
 export function applyDocumentSeo(): void {
   const seo = seoForPath(window.location.pathname)
@@ -86,9 +87,22 @@ function readLocation(): { area: AppArea; screen: DetailedScreen } {
   }
 }
 
-export function App() {
-  const [area, setArea] = useState<AppArea>(() => readLocation().area)
-  const [screen, setScreen] = useState<DetailedScreen>(() => readLocation().screen)
+type AppProps = {
+  /**
+   * SSR only. The client hydrates from `window.location` so the first paint at
+   * `/detailed` matches the file prerender wrote for that path. Passing the URL
+   * in from `main.tsx` would be a second source of truth.
+   */
+  initialPath?: string
+}
+
+export function App({ initialPath }: AppProps) {
+  const [area, setArea] = useState<AppArea>(() =>
+    initialPath !== undefined ? areaFromLocation(initialPath, '') : readLocation().area,
+  )
+  const [screen, setScreen] = useState<DetailedScreen>(() =>
+    initialPath !== undefined ? screenFromLocation(initialPath, '') : readLocation().screen,
+  )
   const detailed = useDetailedCalc()
 
   useEffect(() => {

@@ -83,7 +83,7 @@ export function useReportPrint(
     name,
     setName,
     canGenerate: isValidBusinessName(name),
-    canPrint: typeof window.print === 'function',
+    canPrint: typeof window !== 'undefined' && typeof window.print === 'function',
     open: () => {
       // Prefilled from the saved name, so a returning owner confirms rather than retypes.
       setName(businessName)

@@ -1,7 +1,14 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { cn } from '../lib/cn.ts'
 import { caretAfterFormat, formatTypedTurkishNumber } from '../lib/number.ts'
 import { InfoTooltip } from './InfoTooltip.tsx'
+
+/**
+ * Caret restore must run before paint (otherwise a grouped `1.000` jump is
+ * visible). `useLayoutEffect` warns during `renderToString`; the client bundle
+ * still uses it because this module is evaluated with `window` present.
+ */
+const useBrowserLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
 type NumberFieldProps = {
   id: string
@@ -56,7 +63,7 @@ export function NumberField({
   const inputRef = useRef<HTMLInputElement>(null)
   const caretRef = useRef<number | null>(null)
 
-  useLayoutEffect(() => {
+  useBrowserLayoutEffect(() => {
     const node = inputRef.current
     const caret = caretRef.current
     if (node === null || caret === null) return

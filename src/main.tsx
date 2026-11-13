@@ -8,8 +8,8 @@ import './app/index.css'
 // on `/detailed/sales`.
 applyCanonicalLocation()
 
-// Tab title and share tags follow the path. `index.html` stays the crawler
-// fallback until prerender; `seoCopy.ts` is the source of truth afterwards.
+// Tab title and share tags follow the path. Prerender already wrote them into
+// each HTML file; this keeps in-app navigations aligned with `seoCopy.ts`.
 applyDocumentSeo()
 
 const root = document.getElementById('root')

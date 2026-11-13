@@ -5,7 +5,7 @@ import { AREA_LABELS, AREA_PATHS, CANONICAL_URL, DOCUMENT_TITLE, SHELL_COPY } fr
 /**
  * Per-path document copy. Titles and descriptions stay Turkish; canonical URLs
  * are the English paths (`docs/SEO_PRERENDER_PLAN.md` §3). The prerender script
- * (step 4) will import this same module so HTML files cannot drift from the tab.
+ * and the client tab helper import this same module so HTML files cannot drift.
  */
 
 export type SeoDocument = {
