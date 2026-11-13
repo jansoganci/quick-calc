@@ -23,6 +23,7 @@ export type SeoDocument = {
   noindex: boolean
   ogType: 'website' | 'article'
   jsonLd: readonly unknown[]
+  hakkindaFooter: boolean
 }
 
 type SeoPage = {
@@ -101,22 +102,47 @@ const PAGE_SEO: Record<string, SeoPage> = {
 
 export const SEO_PATHS = Object.keys(PAGE_SEO)
 
+/** Visible 404 copy. The file is `dist/404.html`; it is not a public `/404` route. */
+export const NOT_FOUND_COPY = {
+  heading: 'Bu sayfa yok.',
+  lead: 'Aradığın adres Maliyet’te yok. Hızlı Hesap, Detaylı Hesap veya Simülasyonlar’dan devam edersin.',
+  title: `Bu sayfa yok — ${SHELL_COPY.productName}`,
+  description:
+    'Bu adres Maliyet’te yok. Hızlı Hesap, Detaylı Hesap veya Simülasyonlar’dan devam edersin. Muhasebe bilgisi gerekmez.',
+} as const
+
 function absoluteUrl(path: string): string {
   if (path === '/' || path === '') return CANONICAL_URL
   return `https://${SHELL_COPY.domain}${path}`
 }
 
-/** Known calculator or guide path, or home copy when the SPA fallback is showing Hızlı. */
+export function hasSeoPage(pathname: string): boolean {
+  const path = canonicalPathFromLocation(pathname, '')
+  return Object.hasOwn(PAGE_SEO, path)
+}
+
+function notFoundDocument(): SeoDocument {
+  return {
+    path: '',
+    title: NOT_FOUND_COPY.title,
+    description: NOT_FOUND_COPY.description,
+    canonicalUrl: CANONICAL_URL,
+    noindex: true,
+    ogType: 'website',
+    jsonLd: [],
+    hakkindaFooter: false,
+  }
+}
+
+/** Known calculator or guide path. Unknown pathnames are the 404 page (Q3). */
 export function seoForPath(pathname: string): SeoDocument {
   const path = canonicalPathFromLocation(pathname, '')
-  const home = PAGE_SEO[AREA_PATHS.quick]
-  if (home === undefined) throw new Error('Home SEO copy missing')
-  const page = PAGE_SEO[path] ?? home
-  const canonicalPath = path in PAGE_SEO ? path : AREA_PATHS.quick
-  const canonicalUrl = absoluteUrl(canonicalPath)
-  const guide = rehberPageFromPath(canonicalPath)
+  const page = PAGE_SEO[path]
+  if (page === undefined) return notFoundDocument()
+  const canonicalUrl = absoluteUrl(path)
+  const guide = rehberPageFromPath(path)
   return {
-    path: canonicalPath,
+    path,
     title: page.title,
     description: page.description,
     canonicalUrl,
@@ -126,5 +152,6 @@ export function seoForPath(pathname: string): SeoDocument {
       guide !== undefined
         ? rehberJsonLd(guide)
         : calculatorJsonLd({ canonicalUrl, description: page.description }),
+    hakkindaFooter: guide === undefined,
   }
 }

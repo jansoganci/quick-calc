@@ -68,11 +68,11 @@ describe('pathname', () => {
 })
 
 describe('canonicalPathFromLocation', () => {
-  it('rewrites hashes, /quick and /detailed/menu, and unknown Detailed suffixes', () => {
+  it('rewrites hashes, /quick and /detailed/menu; leaves unknown pathnames alone', () => {
     expect(canonicalPathFromLocation('/', '#detailed-feasibility/satis')).toBe('/detailed/sales')
     expect(canonicalPathFromLocation('/quick', '')).toBe('/')
     expect(canonicalPathFromLocation('/detailed/menu', '')).toBe('/detailed')
-    expect(canonicalPathFromLocation('/detailed/fiyat', '')).toBe('/detailed')
+    expect(canonicalPathFromLocation('/detailed/fiyat', '')).toBe('/detailed/fiyat')
     expect(canonicalPathFromLocation('/detailed/sales/', '')).toBe('/detailed/sales')
     expect(canonicalPathFromLocation('/simulations', '')).toBe('/simulations')
     expect(canonicalPathFromLocation('/', '')).toBe('/')
@@ -80,7 +80,7 @@ describe('canonicalPathFromLocation', () => {
     expect(canonicalPathFromLocation('/guides/slug-tbd-1/', '')).toBe('/guides/slug-tbd-1')
   })
 
-  it('does not rewrite an unknown pathname to / (SPA fallback still paints Hızlı)', () => {
+  it('does not rewrite an unknown pathname to a calculator (honest 404)', () => {
     expect(canonicalPathFromLocation('/asdf', '')).toBe('/asdf')
     expect(AREA_PATHS.quick).toBe('/')
   })

@@ -89,6 +89,15 @@ describe('applySeoToHtml', () => {
     expect(html).toContain('https://maliyet.lol/og.jpg')
   })
 
+  it('writes a noindex 404 file without WebApplication or Hakkında', () => {
+    const html = applySeoToHtml(TEMPLATE, seoForPath('/asdf'))
+    expect(html).toContain('<meta name="robots" content="noindex" />')
+    expect(html).toContain('Bu sayfa yok — Maliyet')
+    expect(html).not.toContain('WebApplication')
+    expect(html).not.toContain('<script type="application/ld+json">')
+    expect(html).not.toContain('<footer>')
+  })
+
   it('does not eat <head> when an earlier HTML comment sits above Hakkında', () => {
     const withComments = TEMPLATE.replace(
       '</head>',

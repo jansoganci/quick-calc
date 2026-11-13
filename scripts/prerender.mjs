@@ -59,6 +59,17 @@ for (const path of SEO_PATHS) {
   console.log(`prerender ${path} → ${relative}`)
 }
 
+const notFoundSeo = seoForPath('/asdf')
+const notFoundMarkup = render('/asdf')
+if (!notFoundMarkup.includes('Bu sayfa yok')) {
+  throw new Error('SSR markup for 404.html is missing the not-found heading')
+}
+if (notFoundMarkup.includes('id="quick-calculation"')) {
+  throw new Error('404.html must not render calculator landmarks')
+}
+writeFileSync(join(distDir, '404.html'), applySeoToHtml(injectRoot(template, notFoundMarkup), notFoundSeo))
+console.log('prerender 404 → 404.html')
+
 for (const forbidden of ['quick', 'hizli-hesap', 'detayli-hesap', 'simulasyonlar', 'rehber']) {
   if (existsSync(join(distDir, forbidden))) {
     throw new Error(`Must not write dist/${forbidden}/`)

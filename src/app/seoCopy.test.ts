@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { pathForScreen } from '../features/detailed/screens.ts'
-import { seoForPath, SEO_PATHS } from './seoCopy.ts'
+import { hasSeoPage, seoForPath, SEO_PATHS } from './seoCopy.ts'
 import { AREA_PATHS, CANONICAL_URL, DOCUMENT_TITLE, SHELL_COPY } from './shellCopy.ts'
 
 const BANNED = ['marj', 'amortisman', 'net kâr', 'net kar', 'garanti', 'yapay zeka', 'depreciation', 'netProfit']
@@ -14,6 +14,7 @@ describe('seoForPath', () => {
     expect(home.canonicalUrl).toBe(CANONICAL_URL)
     expect(home.noindex).toBe(false)
     expect(home.ogType).toBe('website')
+    expect(home.hakkindaFooter).toBe(true)
     expect(JSON.stringify(home.jsonLd)).toContain('WebApplication')
     expect(JSON.stringify(home.jsonLd)).toContain('FAQPage')
   })
@@ -53,9 +54,9 @@ describe('seoForPath', () => {
     expect(JSON.stringify(first.jsonLd)).not.toContain('WebApplication')
 
     const unknownGuide = seoForPath('/guides/not-a-page')
-    expect(unknownGuide.path).toBe('/')
-    expect(unknownGuide.ogType).toBe('website')
-    expect(unknownGuide.noindex).toBe(false)
+    expect(unknownGuide.noindex).toBe(true)
+    expect(unknownGuide.title).toBe('Bu sayfa yok — Maliyet')
+    expect(unknownGuide.jsonLd).toEqual([])
   })
 
   it('writes English canonical URLs with no hash, query, or Turkish public path', () => {
@@ -90,11 +91,19 @@ describe('seoForPath', () => {
     expect(result.noindex).toBe(true)
   })
 
-  it('treats an unknown path as home copy (SPA fallback paints Hızlı)', () => {
+  it('treats an unknown path as the 404 document (noindex, not in sitemap)', () => {
     const unknown = seoForPath('/asdf')
-    expect(unknown.title).toBe(DOCUMENT_TITLE)
-    expect(unknown.path).toBe('/')
+    expect(unknown.title).toBe('Bu sayfa yok — Maliyet')
+    expect(unknown.noindex).toBe(true)
+    expect(unknown.jsonLd).toEqual([])
+    expect(unknown.hakkindaFooter).toBe(false)
     expect(unknown.canonicalUrl).toBe(CANONICAL_URL)
-    expect(unknown.noindex).toBe(false)
+    expect(SEO_PATHS).not.toContain('/asdf')
+    expect(SEO_PATHS).not.toContain('/404')
+    expect(seoForPath('/detailed/fiyat').noindex).toBe(true)
+    expect(hasSeoPage('/')).toBe(true)
+    expect(hasSeoPage('/detailed/menu')).toBe(true)
+    expect(hasSeoPage('/asdf')).toBe(false)
+    expect(hasSeoPage('/detailed/fiyat')).toBe(false)
   })
 })
