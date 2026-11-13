@@ -57,7 +57,6 @@ export function DetailedForm({
     const nextSection = onThisScreen[index + 1] ?? null
     return {
       section,
-      index: sections.indexOf(section) + 1,
       echoLabel: echoLabel(section),
       echoValue: view?.sectionEcho[section] ?? null,
       summary: sectionSummary(form, section),

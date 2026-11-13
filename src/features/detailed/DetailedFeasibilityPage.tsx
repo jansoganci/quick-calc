@@ -81,7 +81,7 @@ export function DetailedFeasibilityPage({
   }
 
   return (
-    <div className="qc-detailed pb-[92px] lg:pb-0">
+    <div className="qc-detailed pb-[180px] lg:pb-0">
       {calc.view ? <ReportCover view={calc.view} businessName={calc.businessName} /> : null}
 
       <main

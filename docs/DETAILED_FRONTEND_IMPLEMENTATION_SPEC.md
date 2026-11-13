@@ -48,7 +48,7 @@ Roadmap: Menü, Malzemeler, Satış, Giderler, Sonuç. One screen visible. Form 
 
 | # | Screen | Hash | Contains |
 | --- | --- | --- | --- |
-| 01 | Menü | `#detailed-feasibility` | section 01 Ürünler + recipe editor + sample fill |
+| 01 | Menü | `#detailed-feasibility` | Ürünler + recipe editor + sample fill |
 | 02 | Malzemeler | `#detailed-feasibility/malzemeler` | shared ingredient list (was inside 01) |
 | 03 | Satış | `#detailed-feasibility/satis` | 02 Satış tahmini, 03 kanallar, 04 ödemeler, 05 paket servis |
 | 04 | Giderler | `#detailed-feasibility/giderler` | 06–11 personel, sahip, kira, opex, capex, varsayımlar |
@@ -56,13 +56,13 @@ Roadmap: Menü, Malzemeler, Satış, Giderler, Sonuç. One screen visible. Form 
 
 **Hash.** No router. Screen changes `pushState` so the browser Back button returns to the previous screen. `#detailed-feasibility` with no suffix is Menü, so existing deep links keep working. An unknown suffix under that root is treated as Menü (`replaceState` to the canonical hash). Form inputs are still not encoded (Quick R6). The draft key and shape stay `maliyet.detailed.draft.v1`; the current screen is not stored.
 
-**Chrome.** Each screen has a `01`–`05` eyebrow, the screen name, `n / 5`, and 44px text buttons `Geri: {ad}` / `Sonraki: {ad} →`. Menü has no Geri; Sonuç has no Sonraki. Desktop özet pane lists the five screens before the first calculation.
+**Chrome.** Each screen has a `01`–`05` eyebrow, the screen name, `n / 5`, and 44px text buttons `Geri: {ad}` / `Sonraki: {ad} →`. Menü has no Geri; Sonuç has no Sonraki. Desktop özet pane lists the five screens before the first calculation. Inner sections (Ürünler, Personel, …) keep their names and lose the numeric prefix so they do not clash with the screen numbers. On a 390px phone the page has `180px` bottom padding and the Geri/Sonraki row has matching `scroll-margin-bottom`, so those controls sit above the sticky Hesapla bar when the owner scrolls to them.
 
 **Hesapla.** Still V6. A successful press opens Sonuç (`pushState`), which is the old “scroll to results” in screen form. Invalid stays put. Back from Sonuç returns to the screen the owner calculated from.
 
 **Grouping (conservative).** Channels, payments and delivery sit on Satış (how you sell), not Giderler. `operatingDaysPerMonth` stays in Giderler / Varsayımlar. Recipe “fiyatı listede değiştir” jumps to Malzemeler.
 
-Eleven sections, fixed order, numbered in Plex Mono 11px `--qc-subtle`. Order is what you sell → how many → how you sell → what it costs to run → what it costs to open → framing.
+Eleven sections, fixed order, **unnumbered** on screen (the `01`–`05` Mono prefix belongs only to the five screens). Order is what you sell → how many → how you sell → what it costs to run → what it costs to open → framing.
 
 | # | Section | Engine fields |
 | --- | --- | --- |
@@ -155,8 +155,9 @@ Frame is `max-w-[1152px]` in **both** modes, at every width, with `border-x bord
 
 ### 3.1 Mobile interaction model
 
-- Accordion header: `min-h-[52px]`, `01` eyebrow + section name (15px ink) left; right side shows the section echo figure after calculation, otherwise a count (`4 ürün`, `%100`, `3 pozisyon`) or `—`.
+- Accordion header: `min-h-[52px]`, section name (15px ink) left, no numeric prefix; right side shows the section echo figure after calculation, otherwise a count (`4 ürün`, `%100`, `3 pozisyon`) or `—`.
 - Each expanded section that is not the last on its screen ends with `Sonraki bölüm: {ad} →`. Screen-to-screen movement is `Geri: {ad}` / `Sonraki: {ad} →` at the foot of the screen.
+- The screen’s `Geri` / `Sonraki` row must remain reachable above that bar: the page uses `180px` bottom padding below `lg`, and the nav row has the same `scroll-margin-bottom`, so a scrolled-to-end 44px control is not covered, including when the Hesapla hint line is showing.
 - **Sticky bottom bar**, 60px, white, top hairline — the mobile re-expression of the desktop sticky column that `DESIGN_DIRECTION.md` §1.1 requires:
   - before first calculation: the full-width `Hesapla` button (48px), its disabled reason in 12px muted above it;
   - after: `Aylık işletme sonucu · 122.660 TL` in Mono accent, left; `Girdilere dön ↑` / `Sonuçlar ↓` right.

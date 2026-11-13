@@ -33,7 +33,7 @@ export function DetailedScreenChrome({ screen, onGoToScreen, children }: Detaile
 
       {children}
 
-      <div className="mt-6 flex items-center justify-between gap-3 border-t border-qc-rule pt-4">
+      <div className="mt-6 mb-[180px] flex scroll-mb-[180px] items-center justify-between gap-3 border-t border-qc-rule pt-4 lg:mb-0 lg:scroll-mb-0">
         {prev ? (
           <button
             type="button"

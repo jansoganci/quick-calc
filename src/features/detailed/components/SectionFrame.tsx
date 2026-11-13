@@ -4,7 +4,6 @@ import { COPY, SECTION_LABELS, SECTION_NOTES, type SectionId } from '../labels.t
 
 type SectionFrameProps = {
   section: SectionId
-  index: number
   echoLabel: string | null
   echoValue: string | null
   /** Collapsed-state stand-in shown before the first calculation: `4 ürün`, `%100`, `—`. */
@@ -23,7 +22,6 @@ type SectionFrameProps = {
  */
 export function SectionFrame({
   section,
-  index,
   echoLabel,
   echoValue,
   summary,
@@ -50,14 +48,7 @@ export function SectionFrame({
           aria-controls={`${section}-content`}
           className="flex w-full min-h-[52px] items-center justify-between gap-3 text-left md:min-h-0 md:cursor-default md:items-baseline"
         >
-          <span className="flex items-baseline gap-[10px]">
-            <span className="font-mono text-[11px] tabular-nums text-qc-muted">
-              {String(index).padStart(2, '0')}
-            </span>
-            <span className="text-[15px] font-semibold text-qc-ink">
-              {SECTION_LABELS[section]}
-            </span>
-          </span>
+          <span className="text-[15px] font-semibold text-qc-ink">{SECTION_LABELS[section]}</span>
           <span className="flex items-center gap-[10px] md:items-baseline">
             {echoValue !== null && echoLabel !== null ? (
               <span className="flex items-baseline gap-2">
