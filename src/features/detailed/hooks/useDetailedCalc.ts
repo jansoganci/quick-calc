@@ -44,8 +44,7 @@ import { clearDraft, loadInitialDraft, writeDraft } from './draftStorage.ts'
  * every valid change after it updates the result live.
  */
 export function useDetailedCalc() {
-  const [initialDraft] = useState(loadInitialDraft)
-  const [form, setForm] = useState<DetailedFormState>(initialDraft.form)
+  const [form, setForm] = useState<DetailedFormState>(initialForm)
   const [touched, setTouched] = useState<Record<string, boolean>>({})
   const [submitted, setSubmitted] = useState(false)
   const [hasCalculated, setHasCalculated] = useState(false)
@@ -54,22 +53,22 @@ export function useDetailedCalc() {
   const [copied, setCopied] = useState(false)
   const [openSection, setOpenSection] = useState<SectionId | null>('products')
   const [showMonthTable, setShowMonthTable] = useState(false)
-  const [draftSaved, setDraftSaved] = useState(initialDraft.hasStoredDraft)
+  const [draftSaved, setDraftSaved] = useState(false)
   /**
    * Report metadata, not a financial input: it titles the report and names the
    * saved file, and it is deliberately NOT part of `DetailedFormState`, so it
    * cannot reach `toInput.ts`, validation or the engine even by accident. The ref
    * mirrors it for the autosave writer, which runs outside React's render.
    */
-  const [businessName, setBusinessNameState] = useState(initialDraft.businessName)
-  const businessNameRef = useRef(initialDraft.businessName)
+  const [businessName, setBusinessNameState] = useState('')
+  const businessNameRef = useRef('')
   const resultsRef = useRef<HTMLDivElement>(null)
   const previousViewKeyRef = useRef<string | null>(null)
   const draftSaveQueueRef = useRef<ReturnType<typeof createDraftSaveQueue> | null>(null)
   if (draftSaveQueueRef.current === null) {
     draftSaveQueueRef.current = createDraftSaveQueue(
-      initialDraft.form,
-      (form) => writeDraft({ form, businessName: businessNameRef.current }),
+      form,
+      (nextForm) => writeDraft({ form: nextForm, businessName: businessNameRef.current }),
       () => {
         setDraftSaved(true)
       },
@@ -96,11 +95,28 @@ export function useDetailedCalc() {
   }, [hasCalculated, evaluation])
 
   /**
+   * First paint is always the empty form so prerendered HTML can hydrate.
+   * Restore the `localStorage` draft after commit (one frame of empty Menü).
+   * `reset` marks that form handled so restore does not rewrite storage.
+   * `hasCalculated` is not in the draft — V6 still waits for Hesapla.
+   */
+  useEffect(() => {
+    const restored = loadInitialDraft()
+    if (!restored.hasStoredDraft) return
+    businessNameRef.current = restored.businessName
+    setBusinessNameState(restored.businessName)
+    setDraftSaved(true)
+    draftSaveQueue.reset(restored.form)
+    setForm(restored.form)
+  }, [draftSaveQueue])
+
+  /**
    * Autosave, debounced so a burst of typing writes once.
    *
    * It watches `form` rather than hooking into `update()`, so any mutator added
-   * later is covered without being remembered. The queue begins with the hydrated
-   * form marked handled, so mount does not rewrite either a blank or restored form.
+   * later is covered without being remembered. The queue begins with the
+   * first-paint blank form marked handled; the restore effect above `reset`s
+   * to the stored form when there is one.
    */
   useEffect(() => {
     draftSaveQueue.schedule()
