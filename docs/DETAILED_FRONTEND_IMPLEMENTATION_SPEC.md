@@ -11,9 +11,11 @@ This document adds **no financial formulas.** Every figure it displays is read f
 
 ## 1. Design concept
 
-**Tek sayfa, on bir bölüm, kalıcı karar özeti.**
+**Beş ekran, kalıcı karar özeti.** (V2 step 5)
 
-One scrolling page. Inputs are eleven hairline-separated sections in a fixed order (delivery still conditional). A persistent panel on the right answers one question continuously — *is this business making money?* — while the depth (projection, scenarios, channel economics, assumptions) sits full-width below the inputs, reached deliberately.
+Detaylı is no longer one long page. The owner sees one of five screens at a time, in this order: **Menü · Malzemeler · Satış · Giderler · Sonuç**. The eleven input *sections* still exist inside those screens (delivery still conditional). A persistent panel on the right (desktop) still answers *is this business making money?* Results live on **Sonuç**, not below the form.
+
+First visit and `#detailed-feasibility` open **Menü**. There is no third calculator mode.
 
 Three rules carry the whole design:
 
@@ -40,7 +42,27 @@ Three rules carry the whole design:
 
 ## 2. Input information architecture
 
-Eleven sections, fixed order, numbered in Plex Mono 11px `--qc-subtle`. Order is what you sell → how many → how you sell → what it costs to run → what it costs to open → framing.
+### 2.0 Five screens (V2 step 5)
+
+Roadmap: Menü, Malzemeler, Satış, Giderler, Sonuç. One screen visible. Form state is a single `DetailedFormState`; hiding a screen does not unmount the fields or rewrite the draft.
+
+| # | Screen | Hash | Contains |
+| --- | --- | --- | --- |
+| 01 | Menü | `#detailed-feasibility` | Ürünler + recipe editor + sample fill |
+| 02 | Malzemeler | `#detailed-feasibility/malzemeler` | shared ingredient list (was inside 01) |
+| 03 | Satış | `#detailed-feasibility/satis` | 02 Satış tahmini, 03 kanallar, 04 ödemeler, 05 paket servis |
+| 04 | Giderler | `#detailed-feasibility/giderler` | 06–11 personel, sahip, kira, opex, capex, varsayımlar |
+| 05 | Sonuç | `#detailed-feasibility/sonuc` | Tier 2 results after `Hesapla`; empty copy + Hesapla before |
+
+**Hash.** No router. Screen changes `pushState` so the browser Back button returns to the previous screen. `#detailed-feasibility` with no suffix is Menü, so existing deep links keep working. An unknown suffix under that root is treated as Menü (`replaceState` to the canonical hash). Form inputs are still not encoded (Quick R6). The draft key and shape stay `maliyet.detailed.draft.v1`; the current screen is not stored.
+
+**Chrome.** Each screen has a `01`–`05` eyebrow, the screen name, `n / 5`, and 44px text buttons `Geri: {ad}` / `Sonraki: {ad} →`. Menü has no Geri; Sonuç has no Sonraki. Desktop özet pane lists the five screens before the first calculation. Inner sections (Ürünler, Personel, …) keep their names and lose the numeric prefix so they do not clash with the screen numbers. On a 390px phone the page has `180px` bottom padding and the Geri/Sonraki row has matching `scroll-margin-bottom`, so those controls sit above the sticky Hesapla bar when the owner scrolls to them.
+
+**Hesapla.** Still V6. A successful press opens Sonuç (`pushState`), which is the old “scroll to results” in screen form. Invalid stays put. Back from Sonuç returns to the screen the owner calculated from.
+
+**Grouping (conservative).** Channels, payments and delivery sit on Satış (how you sell), not Giderler. `operatingDaysPerMonth` stays in Giderler / Varsayımlar. Recipe “fiyatı listede değiştir” jumps to Malzemeler.
+
+Eleven sections, fixed order, **unnumbered** on screen (the `01`–`05` Mono prefix belongs only to the five screens). Order is what you sell → how many → how you sell → what it costs to run → what it costs to open → framing.
 
 | # | Section | Engine fields |
 | --- | --- | --- |
@@ -56,7 +78,7 @@ Eleven sections, fixed order, numbered in Plex Mono 11px `--qc-subtle`. Order is
 | 10 | İlk yatırım | `capexItems[]` |
 | 11 | Varsayımlar | `assumptions.*` including `operatingDaysPerMonth` |
 
-**Malzemeler sits inside section 01, after the menu.** It is not a numbered section and not a third mode. Authority for this block, the recipe editor, and the price-rise preview is `docs/RECIPE_REDESIGN_SPEC.md` (owner lock 12 November 2026). In short: one purchase-price editor on the list; recipe lines carry only usage quantity, labelled by unit (`Kaç adet?` / `Kaç gram?` / `Kaç ml?`, never Gramaj); the recipe opens as a full-screen layer below 1024px and as a block under the menu table from 1024px; ingredients may be added from the list or born from the recipe search (Turkish-aware name match). The monthly engine still receives one `unitProductCost` per product (`DETAILED_FINANCIAL_SPEC.md` Appendix A).
+**Malzemeler is screen 02.** Authority for this block, the recipe editor, and the price-rise preview remains `docs/RECIPE_REDESIGN_SPEC.md` (owner lock 12 November 2026). In short: one purchase-price editor on the list; recipe lines carry only usage quantity, labelled by unit (`Kaç adet?` / `Kaç gram?` / `Kaç ml?`, never Gramaj); the recipe opens as a full-screen layer below 1024px and as a block under the menu table from 1024px; ingredients may be added from the list or born from the recipe search (Turkish-aware name match). The monthly engine still receives one `unitProductCost` per product (`DETAILED_FINANCIAL_SPEC.md` Appendix A).
 
 **Section 05 is model-driven progressive disclosure:** it renders only when `channelMix.delivery > 0`, which is exactly the condition under which `delivery.mode` becomes required (spec §6.4). No toggle, no "advanced" switch.
 
@@ -122,7 +144,7 @@ Frame is `max-w-[1152px]` in **both** modes, at every width, with `border-x bord
 
 | Breakpoint | Sections | Layout | Result access |
 | --- | --- | --- | --- |
-| `< md` (mobile) | Accordion, **one open at a time**; first visit opens 01 | Single column, `px-[18px]` | Sticky bottom bar |
+| `< md` (mobile) | One of five screens; sections on that screen still accordion, **one open at a time** | Single column, `px-[18px]` | Sticky bottom bar |
 | `md` – `< lg` (tablet / narrow desktop) | Always open, hairline-separated (the desktop IA) | Single column; repeating rows keep their stacked form, which switches to the desktop grid at `lg` with the layout | Sticky bottom bar |
 | `lg` – `< xl` (standard desktop) | Always open | `grid-cols-[1fr_1px_372px]` — inputs 779px, hairline, sticky özet pane | Sticky özet pane |
 | `≥ xl` (wide desktop) | Identical to `lg` | Identical to `lg` | Identical to `lg` |
@@ -133,12 +155,13 @@ Frame is `max-w-[1152px]` in **both** modes, at every width, with `border-x bord
 
 ### 3.1 Mobile interaction model
 
-- Accordion header: `min-h-[52px]`, `01` eyebrow + section name (15px ink) left; right side shows the section echo figure after calculation, otherwise a count (`4 ürün`, `%100`, `3 pozisyon`) or `—`.
-- Each expanded section ends with `Sonraki bölüm: {ad} →` — sequence without a wizard, and revisiting stays one tap.
+- Accordion header: `min-h-[52px]`, section name (15px ink) left, no numeric prefix; right side shows the section echo figure after calculation, otherwise a count (`4 ürün`, `%100`, `3 pozisyon`) or `—`.
+- Each expanded section that is not the last on its screen ends with `Sonraki bölüm: {ad} →`. Screen-to-screen movement is `Geri: {ad}` / `Sonraki: {ad} →` at the foot of the screen.
+- The screen’s `Geri` / `Sonraki` row must remain reachable above that bar: the page uses `180px` bottom padding below `lg`, and the nav row has the same `scroll-margin-bottom`, so a scrolled-to-end 44px control is not covered, including when the Hesapla hint line is showing.
 - **Sticky bottom bar**, 60px, white, top hairline — the mobile re-expression of the desktop sticky column that `DESIGN_DIRECTION.md` §1.1 requires:
   - before first calculation: the full-width `Hesapla` button (48px), its disabled reason in 12px muted above it;
   - after: `Aylık işletme sonucu · 122.660 TL` in Mono accent, left; `Girdilere dön ↑` / `Sonuçlar ↓` right.
-- Results render as a full-width region after section 10; on the first `Hesapla` the page scrolls so the summary sentence and headline land in view (R3 behaviour).
+- Results render on the **Sonuç** screen. On the first successful `Hesapla` that screen opens (R3 behaviour, as a screen rather than a scroll).
 - Every interactive target ≥ 44px. Nothing scrolls horizontally.
 
 ---
@@ -156,7 +179,7 @@ This is the brief's question order: *is it viable* → *what does Base look like
 
 ### 4.2 Özet pane, state A (before first calculation)
 
-Eyebrow `Hazırlık`; the empty-state paragraph; then a **section index** — eleven rows (delivery hidden when the mix is 0), `01 Ürünler` left, a Mono state right (`4 ürün` / `günde 170 adet` / `%100` / `—` / `varsayılan`). This doubles as navigation and as the "what's still empty" answer, and it is why no third navigation column exists. Then `Hesapla` and its hint.
+Eyebrow `Hazırlık`; the empty-state paragraph; then a **screen index** — five rows, `01 Menü` left, a Mono state right (`3 ürün` / `—` / `günde 170 adet` / `girildi` / `—`). This doubles as navigation and as the "what's still empty" answer, and it is why no third navigation column exists. Then `Hesapla` and its hint.
 
 ### 4.3 Özet pane, state B (after first calculation)
 
@@ -338,7 +361,7 @@ Both entry points call one function in `App.tsx`, which sets the mode, stamps `#
 
 On first paint, `App.tsx` reads that hash: `#detailed-feasibility` opens Detaylı; any other hash (including `#quick-calculation` and none) opens Hızlı Hesap. The calculator inputs are still not encoded in the URL (Quick R6).
 
-> **Resolved (was D-3) — routing.** Architecture D4 says a router arrives "only when a second real screen requires it". This design proposes **in-page mode state** (`useState` in `App.tsx`, both feature states kept mounted or lifted) and **no router**. Quick R6 still forbids encoding the form in the address bar. The hash only names which of the two screens is showing, so a reload of `#detailed-feasibility` lands in Detaylı. Switching modes and back preserves what was typed; a reload does not restore Quick (Detailed restores from its own draft). No confirmation dialog on switch.
+> **Resolved (was D-3) — routing.** Architecture D4 says a router arrives "only when a second real screen requires it". There is still **no router**. `App.tsx` holds mode + Detailed screen in `useState`. The hash names the calculator and, inside Detaylı, the screen (`#detailed-feasibility` = Menü, `/malzemeler` `/satis` `/giderler` `/sonuc`). Form inputs are not encoded (Quick R6). `popstate` restores the screen so Back works. Switching Hızlı ↔ Detaylı `replaceState`s the mode hash and lands Detaylı on Menü. Both feature trees stay mounted. A reload of `#detailed-feasibility/satis` opens Detaylı on Satış and restores the draft, not the screen-local accordion. No confirmation dialog on switch.
 
 ---
 
@@ -377,7 +400,9 @@ src/features/detailed/
     SectionFrame.tsx               number, title, echo slot, note slot, mobile accordion
     ProductRows.tsx  SalesForecastRows.tsx  PositionRows.tsx  LineRows.tsx  RepeatingRows.ts
     MixTable.tsx                   used twice (02, 03) — two genuine call sites
-    DetailedForm.tsx               composes the eleven sections
+    screens.ts                     five-screen map, hash, summaries
+    DetailedForm.tsx               composes the sections for the current screen
+    DetailedScreenChrome.tsx       01–05 heading and Geri / Sonraki
     SummaryPane.tsx                states A and B, plus the shared Hesapla control
                                    (the column tint sits on the grid item in the page,
                                    so it fills the column when the summary is short)

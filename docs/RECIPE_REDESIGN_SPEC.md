@@ -77,10 +77,11 @@ The sticky bottom bar (`Hesapla`) is unchanged on the page. The recipe layer has
 
 ### 4.2 Desktop (1024px and up)
 
-Section 01 in the 779px input column, in this order:
+V2 step 5 splits Detaylı into screens. The `MENÜ` table and the recipe block live on **Menü**. The `MALZEMELER` table lives on **Malzemeler**. Recipe “Fiyatı listede değiştir” opens that screen.
+
+On Menü, in the input column, in this order:
 1. The `MENÜ` table.
 2. The recipe block for the selected product, when open.
-3. The `MALZEMELER` table.
 
 The menu table is never split. The recipe block sits under the table, separated by `rule-mid` hairlines above and below and tinted `surface-result`.
 

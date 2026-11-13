@@ -1,18 +1,20 @@
 import { cn } from '../../../lib/cn.ts'
 import { COPY, SECTION_LABELS, type SectionId } from '../labels.ts'
+import { DETAILED_SCREEN_LABELS, type DetailedScreen } from '../screens.ts'
 import type { DetailedView } from '../viewModel.ts'
 import { ReportActionButton } from './ReportActionButton.tsx'
 
-export type SectionSummary = { section: SectionId; index: number; summary: string }
+export type ScreenNavEntry = { screen: DetailedScreen; index: number; summary: string }
 
 type SummaryPaneProps = {
   view: DetailedView | null
-  sections: SectionSummary[]
+  screens: ScreenNavEntry[]
   canSubmit: boolean
   submitHint: string | null
   copied: boolean
   onCopy: () => void
   onCalculate: () => void
+  onGoToScreen: (screen: DetailedScreen) => void
   onGoToSection: (section: SectionId) => void
   onGoToResults: () => void
   canPrintReport: boolean
@@ -26,12 +28,13 @@ type SummaryPaneProps = {
  */
 export function SummaryPane({
   view,
-  sections,
+  screens,
   canSubmit,
   submitHint,
   copied,
   onCopy,
   onCalculate,
+  onGoToScreen,
   onGoToSection,
   onGoToResults,
   canPrintReport,
@@ -46,18 +49,18 @@ export function SummaryPane({
         <p className="mb-5 mt-3 text-xs leading-relaxed text-qc-secondary">{COPY.emptyResult}</p>
 
         <div className="hidden lg:block">
-          {sections.map((entry, index) => (
+          {screens.map((entry, index) => (
             <button
-              key={entry.section}
+              key={entry.screen}
               type="button"
-              onClick={() => onGoToSection(entry.section)}
+              onClick={() => onGoToScreen(entry.screen)}
               className={cn(
-                'flex w-full items-center justify-between gap-3 border-t border-qc-rule-row py-[9px] text-left',
-                index === sections.length - 1 && 'border-b border-qc-rule-row',
+                'flex w-full min-h-[44px] items-center justify-between gap-3 border-t border-qc-rule-row py-[9px] text-left',
+                index === screens.length - 1 && 'border-b border-qc-rule-row',
               )}
             >
               <span className="text-[13px] text-qc-ink">
-                {String(entry.index).padStart(2, '0')} {SECTION_LABELS[entry.section]}
+                {String(entry.index).padStart(2, '0')} {DETAILED_SCREEN_LABELS[entry.screen]}
               </span>
               <span
                 className={cn(

@@ -10,9 +10,11 @@ import {
   UNAVAILABLE_COPY,
   VERDICT,
 } from './labels.ts'
+import { DETAILED_SCREEN_LABELS } from './screens.ts'
 
 const COPY_TREES = [
   COPY,
+  DETAILED_SCREEN_LABELS,
   ERROR_COPY,
   GUARDRAIL_COPY,
   RECIPE_COPY,
@@ -147,6 +149,8 @@ describe('detailed copy (RECIPE_REDESIGN_SPEC §3.2 O4)', () => {
     expect(SECTION_LABELS.products).toBe('Ürünler')
     expect(SECTION_LABELS.sales).toBe('Satış tahmini')
     expect(SECTION_NOTES.sales).toContain('Ürün burada eklenmez')
+    expect(COPY.nextScreen('Malzemeler')).toBe('Sonraki: Malzemeler →')
+    expect(COPY.backScreen('Menü')).toBe('Geri: Menü')
     expect(ERROR_COPY.not_a_number).toBe('Lütfen bir sayı gir.')
     expect(ERROR_COPY.empty_products).toBe('En az bir ürün gir.')
     expect(ERROR_COPY.deliveryModeRequired).toBe('Paket servis satışın olduğu için bu seçim zorunlu.')

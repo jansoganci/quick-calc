@@ -386,6 +386,9 @@ export const COPY = {
     'Aylık işletme sonucu basitleştirilmiş bir tahmindir; kurumlar vergisi, gelir vergisi, finansman giderleri ve kredi ödemeleri hesaba katılmamıştır. İşletme sahibine ayrılan tutar ve Bağ-Kur ise bir gider olarak yukarıda yer alır.',
 
   nextSection: (label: string) => `Sonraki bölüm: ${label} →`,
+  nextScreen: (label: string) => `Sonraki: ${label} →`,
+  backScreen: (label: string) => `Geri: ${label}`,
+  screenProgress: (index: number, total: number) => `${index} / ${total}`,
   salesWorkingDaysNote: (days: string) => `Ayda çalışılan gün varsayımlarda: ${days} gün.`,
   salesNoProducts: 'Önce Ürünler bölümüne ürün ekle.',
 

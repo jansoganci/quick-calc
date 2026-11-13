@@ -1,5 +1,6 @@
 import { NumberField } from '../../../components/NumberField.tsx'
-import { COPY, PRODUCT_LABELS, RECIPE_COPY, SECTION_LABELS } from '../labels.ts'
+import { COPY, PRODUCT_LABELS, RECIPE_COPY } from '../labels.ts'
+import { DETAILED_SCREEN_LABELS } from '../screens.ts'
 import type { ProductRow } from '../formState.ts'
 
 type SalesForecastRowsProps = {
@@ -26,7 +27,7 @@ export function SalesForecastRows({
       <div>
         <p className="text-[13px] leading-relaxed text-qc-ink">{COPY.salesNoProducts}</p>
         <button type="button" className="qc-text-btn is-accent mt-3 min-h-[44px]" onClick={onGoToProducts}>
-          {COPY.goToSection(SECTION_LABELS.products)}
+          {COPY.goToSection(DETAILED_SCREEN_LABELS.menu)}
         </button>
       </div>
     )
@@ -67,7 +68,7 @@ export function SalesForecastRows({
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-qc-rule-row pt-3">
         <button type="button" className="qc-text-btn min-h-[44px]" onClick={onGoToProducts}>
-          {COPY.goToSection(SECTION_LABELS.products)}
+          {COPY.goToSection(DETAILED_SCREEN_LABELS.menu)}
         </button>
         <span className="font-mono text-xs tabular-nums text-qc-secondary">
           {COPY.dailyUnits(dailyUnits)}

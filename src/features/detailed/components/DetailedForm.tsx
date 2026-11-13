@@ -20,10 +20,10 @@ import {
   SECTION_LABELS,
   type SectionId,
 } from '../labels.ts'
+import { sectionsOnScreen, type DetailedScreen } from '../screens.ts'
 import { rampUpTableHint, sectionSummary, typedDailyUnits, visibleSections } from '../sectionSummary.ts'
 import { echoLabel } from '../viewModel.ts'
 import { formatCount } from '../../../lib/number.ts'
-import { DraftNotice } from './DraftNotice.tsx'
 import { IngredientList } from './IngredientList.tsx'
 import { LineRows } from './LineRows.tsx'
 import { MixTable } from './MixTable.tsx'
@@ -34,7 +34,15 @@ import { SalesForecastRows } from './SalesForecastRows.tsx'
 import { SampleFillControl } from './SampleFillControl.tsx'
 import { SectionFrame } from './SectionFrame.tsx'
 
-export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
+export function DetailedForm({
+  calc,
+  screen,
+  onGoToScreen,
+}: {
+  calc: DetailedCalcApi
+  screen: DetailedScreen
+  onGoToScreen: (screen: DetailedScreen) => void
+}) {
   const { form, view } = calc
   const sections = visibleSections(form)
   const [recipeProductIndex, setRecipeProductIndex] = useState<number | null>(null)
@@ -44,22 +52,26 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
     (view?.guardrails ?? []).filter((guardrail) => guardrail.section === section)
 
   const frameProps = (section: SectionId) => {
-    const index = sections.indexOf(section)
+    const onThisScreen = sectionsOnScreen(screen, sections)
+    const index = onThisScreen.indexOf(section)
+    const nextSection = onThisScreen[index + 1] ?? null
     return {
       section,
-      index: index + 1,
       echoLabel: echoLabel(section),
       echoValue: view?.sectionEcho[section] ?? null,
       summary: sectionSummary(form, section),
       isOpen: calc.openSection === section,
       onToggle: () => calc.toggleSection(section),
-      nextSection: sections[index + 1] ?? null,
-      onGoToNext: () => calc.setOpenSection(sections[index + 1] ?? null),
+      nextSection,
+      onGoToNext: () => {
+        if (nextSection) calc.setOpenSection(nextSection)
+      },
     }
   }
 
   return (
-    <div className="px-[18px] py-5 lg:px-[30px] lg:py-[26px] lg:pb-[34px]">
+    <div>
+      <div hidden={screen !== 'menu'}>
       <SectionFrame {...frameProps('products')}>
         <SampleFillControl draftSaved={calc.draftSaved} onLoadSample={calc.loadSample} />
         <ProductRows
@@ -95,9 +107,14 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
             onEditPriceInList={(ingredientId) => {
               setRecipeProductIndex(null)
               setFocusIngredientId(ingredientId)
+              onGoToScreen('ingredients')
             }}
           />
         ) : null}
+      </SectionFrame>
+      </div>
+
+      <div hidden={screen !== 'ingredients'}>
         <IngredientList
           form={form}
           errorFor={calc.errorFor}
@@ -110,8 +127,9 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
           requestedOpenId={focusIngredientId}
           onConsumedOpen={() => setFocusIngredientId(null)}
         />
-      </SectionFrame>
+      </div>
 
+      <div hidden={screen !== 'sales'}>
       <SectionFrame {...frameProps('sales')}>
         <SalesForecastRows
           products={form.products}
@@ -120,7 +138,7 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
           errorFor={calc.errorFor}
           onBlur={calc.markTouched}
           onQuantityChange={(index, value) => calc.setProductField(index, 'dailyQuantity', value)}
-          onGoToProducts={() => calc.setOpenSection('products')}
+          onGoToProducts={() => onGoToScreen('menu')}
         />
       </SectionFrame>
 
@@ -289,7 +307,9 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
           </div>
         </SectionFrame>
       ) : null}
+      </div>
 
+      <div hidden={screen !== 'costs'}>
       <SectionFrame {...frameProps('positions')}>
         <PositionRows
           positions={form.positions}
@@ -557,8 +577,7 @@ export function DetailedForm({ calc }: { calc: DetailedCalcApi }) {
           </p>
         </details>
       </SectionFrame>
-
-      <DraftNotice saved={calc.draftSaved} onReset={calc.resetForm} />
+      </div>
     </div>
   )
 }
