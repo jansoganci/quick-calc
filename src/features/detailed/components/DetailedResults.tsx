@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { COPY } from '../labels.ts'
 import type { DetailedView } from '../viewModel.ts'
 import { AssumptionsList } from './AssumptionsList.tsx'
@@ -27,6 +28,11 @@ export function DetailedResults({
   showMonthTable,
   onToggleMonthTable,
 }: DetailedResultsProps) {
+  // The Sankey repeats the bar, and the product table repeats the channel
+  // totals: both stay one tap away on screen and always print (F13).
+  const [showSankey, setShowSankey] = useState(false)
+  const [showProductTable, setShowProductTable] = useState(false)
+
   return (
     <div className="qc-report-body border-t border-qc-rule px-[18px] pb-[34px] lg:px-[30px]">
       <div className="py-[26px] lg:pb-[26px] lg:pt-[30px]">
@@ -43,7 +49,19 @@ export function DetailedResults({
         figureLabel={COPY.grossCustomerSales}
       >
         <ResultBar breakdown={view.breakdown} gross={view.breakdown.total} />
-        <SankeyBreakdown breakdown={view.breakdown} gross={view.breakdown.total} />
+        <div className="qc-screen-only mt-3.5 border-t border-qc-rule-row pt-3.5">
+          <button
+            type="button"
+            className="qc-text-btn"
+            aria-expanded={showSankey}
+            onClick={() => setShowSankey((value) => !value)}
+          >
+            {showSankey ? COPY.hideSankey : COPY.showSankey}
+          </button>
+        </div>
+        <div className={showSankey ? 'block' : 'hidden qc-print-only'}>
+          <SankeyBreakdown breakdown={view.breakdown} gross={view.breakdown.total} />
+        </div>
       </ResultSection>
 
       <ResultSection title={COPY.scenariosTitle} note={COPY.scenariosNote}>
@@ -113,7 +131,19 @@ export function DetailedResults({
       </ResultSection>
 
       <ResultSection title={COPY.productTitle} note={COPY.productNote}>
-        <ProductContributionTable products={view.products} totals={view.productTotals} />
+        <div className="qc-screen-only">
+          <button
+            type="button"
+            className="qc-text-btn"
+            aria-expanded={showProductTable}
+            onClick={() => setShowProductTable((value) => !value)}
+          >
+            {showProductTable ? COPY.hideProductTable : COPY.showProductTable}
+          </button>
+        </div>
+        <div className={showProductTable ? 'mt-3 block' : 'hidden qc-print-only'}>
+          <ProductContributionTable products={view.products} totals={view.productTotals} />
+        </div>
       </ResultSection>
 
       <ResultSection title={COPY.breakEvenTitle} note={COPY.breakEvenNote}>

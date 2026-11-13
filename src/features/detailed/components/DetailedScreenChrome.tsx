@@ -19,6 +19,36 @@ export function DetailedScreenChrome({ screen, onGoToScreen, children }: Detaile
 
   return (
     <div className="px-[18px] py-5 lg:px-[30px] lg:py-[26px] lg:pb-[34px]">
+      {/* Phone wayfinding: every screen one tap away. Desktop has the same
+          index in the özet pane, so this row stops at lg. */}
+      <nav aria-label={COPY.screenNavigation} className="-mt-2 mb-3 border-b border-qc-rule lg:hidden">
+        <ol className="m-0 flex list-none justify-between p-0">
+          {DETAILED_SCREENS.map((candidate) => {
+            const isCurrent = candidate === screen
+            return (
+              <li key={candidate}>
+                <button
+                  type="button"
+                  aria-current={isCurrent ? 'step' : undefined}
+                  onClick={() => onGoToScreen(candidate)}
+                  className="flex min-h-[44px] items-center"
+                >
+                  <span
+                    className={
+                      isCurrent
+                        ? 'border-b-2 border-b-qc-ink pb-0.5 text-[13px] font-semibold text-qc-ink'
+                        : 'border-b-2 border-b-transparent pb-0.5 text-[13px] text-qc-secondary'
+                    }
+                  >
+                    {DETAILED_SCREEN_LABELS[candidate]}
+                  </span>
+                </button>
+              </li>
+            )
+          })}
+        </ol>
+      </nav>
+
       <div className="flex items-baseline justify-between gap-3 pb-4">
         <p className="m-0 flex items-baseline gap-[10px]">
           <span className="font-mono text-[11px] tabular-nums text-qc-muted">

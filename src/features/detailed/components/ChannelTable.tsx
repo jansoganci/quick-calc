@@ -100,7 +100,7 @@ export function ChannelTable({ channels, totals }: ChannelTableProps) {
       </div>
 
       <p className="mt-2.5 text-[11px] leading-relaxed text-qc-secondary">
-        Tutarlar TL. Katkıdan sabit giderler düşülmemiştir.
+        {COPY.remainingTableFoot}
       </p>
     </div>
   )

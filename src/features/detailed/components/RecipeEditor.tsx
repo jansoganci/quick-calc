@@ -189,7 +189,7 @@ function NewIngredientBlock({
         </div>
       </div>
       <div className="mt-3 flex items-center justify-end gap-4">
-        <button type="button" className="qc-text-btn is-muted" onClick={onCancel}>
+        <button type="button" className="qc-text-btn" onClick={onCancel}>
           {RECIPE_COPY.cancel}
         </button>
         <button
@@ -283,7 +283,7 @@ function RecipeLineRow({
         </span>
         <button
           type="button"
-          className="qc-text-btn is-muted hidden lg:inline"
+          className="qc-text-btn hidden lg:inline"
           onClick={onRemove}
         >
           {RECIPE_COPY.removeLine}
@@ -291,7 +291,7 @@ function RecipeLineRow({
       </div>
       {focused ? (
         <div className="mt-2 flex flex-wrap items-center justify-between gap-3 lg:hidden">
-          <button type="button" className="qc-text-btn is-muted" onClick={onRemove}>
+          <button type="button" className="qc-text-btn" onClick={onRemove}>
             {RECIPE_COPY.removeLine}
           </button>
           <button type="button" className="qc-text-btn" onClick={onEditPrice}>
@@ -399,7 +399,7 @@ export function RecipeEditor({
             {RECIPE_COPY.recipeEyebrow}
           </span>
           <button type="button" className="qc-text-btn" onClick={onClose}>
-            <span className="lg:hidden">{RECIPE_COPY.finish}</span>
+            <span className="font-semibold text-qc-ink lg:hidden">{RECIPE_COPY.finish}</span>
             <span className="hidden lg:inline">{RECIPE_COPY.closeBlock}</span>
           </button>
         </div>

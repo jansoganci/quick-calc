@@ -6,7 +6,7 @@ import {
   type RampUpPreset,
   type RentInputBasis,
 } from '../../core/detailed/index.ts'
-import { formatDecimal } from '../../lib/number.ts'
+import { formatDecimal, parseTurkishNumber } from '../../lib/number.ts'
 
 /**
  * The form holds raw strings, exactly as typed. Nothing here interprets them —
@@ -244,6 +244,19 @@ export function initialForm(): DetailedFormState {
   }
 }
 
+function sampleIngredient(
+  name: string,
+  purchaseQuantity: string,
+  purchaseUnit: PurchaseUnit,
+  purchasePrice: string,
+): IngredientRow {
+  return { ...emptyIngredient(), name, purchaseQuantity, purchaseUnit, purchasePrice }
+}
+
+function sampleLine(ingredientId: string, usageQuantity: string): RecipeLine {
+  return { ...emptyRecipeLine(ingredientId), usageQuantity }
+}
+
 /**
  * A realistic small-cafe example, for the "Örnekle doldur" onboarding affordance.
  *
@@ -254,8 +267,15 @@ export function initialForm(): DetailedFormState {
  */
 export function sampleCafeForm(): DetailedFormState {
   const base = initialForm()
+  // One product built from a recipe, so the sample shows the shared
+  // ingredient list and the price-rise preview (RECIPE_REDESIGN_SPEC §7.5).
+  const bread = sampleIngredient('Ekmek', '10', 'adet', '80')
+  const mince = sampleIngredient('Kıyma', '1', 'kg', '380')
+  const tomato = sampleIngredient('Domates', '1', 'kg', '40')
+  const lettuce = sampleIngredient('Marul', '1', 'kg', '35')
   return {
     ...base,
+    ingredients: [bread, mince, tomato, lettuce],
     products: [
       {
         ...emptyProduct(),
@@ -281,6 +301,20 @@ export function sampleCafeForm(): DetailedFormState {
         dailyQuantity: '30',
         unitProductCost: '35',
       },
+      {
+        ...emptyProduct(),
+        name: 'Hamburger',
+        normalPrice: '220',
+        onlinePrice: '250',
+        dailyQuantity: '40',
+        costSource: 'recipe',
+        recipeLines: [
+          sampleLine(bread.id, '1'),
+          sampleLine(mince.id, '120'),
+          sampleLine(tomato.id, '30'),
+          sampleLine(lettuce.id, '20'),
+        ],
+      },
     ],
     packaging: { takeawayPerOrder: '5', deliveryPerOrder: '8' },
     delivery: { ...base.delivery, mode: 'platformOnly' },
@@ -289,21 +323,37 @@ export function sampleCafeForm(): DetailedFormState {
         ...emptyPosition(),
         name: 'Barista',
         headcount: '2',
-        employerCostPerPerson: '28000',
-        mealCostPerPerson: '2500',
-        transportCostPerPerson: '1500',
-        averageBonusPerPerson: '1000',
+        employerCostPerPerson: '28.000',
+        mealCostPerPerson: '2.500',
+        transportCostPerPerson: '1.500',
+        averageBonusPerPerson: '1.000',
       },
     ],
-    owner: { monthlyAmount: '25000', bagKurMonthlyCost: '6000' },
-    occupancy: { ...base.occupancy, monthlyRent: '65000', monthlyAidat: '3000' },
+    owner: { monthlyAmount: '25.000', bagKurMonthlyCost: '6.000' },
+    occupancy: { ...base.occupancy, monthlyRent: '65.000', monthlyAidat: '3.000' },
     opexLines: [
-      { ...emptyLine('opex', 'Elektrik'), amount: '6000' },
-      { ...emptyLine('opex', 'Su'), amount: '1200' },
+      { ...emptyLine('opex', 'Elektrik'), amount: '6.000' },
+      { ...emptyLine('opex', 'Su'), amount: '1.200' },
     ],
     capexItems: [
-      { ...emptyLine('capex', 'Tadilat'), amount: '350000' },
-      { ...emptyLine('capex', 'Ekipman'), amount: '180000' },
+      { ...emptyLine('capex', 'Tadilat'), amount: '350.000' },
+      { ...emptyLine('capex', 'Ekipman'), amount: '180.000' },
     ],
   }
+}
+
+/**
+ * "Paket servis yok" (UI_UX_FIX_LIST F8, option b): the delivery share goes to 0
+ * and moves to salon so the mix still totals 100%. A form edit only — the engine
+ * default mix is untouched. When either share does not parse, delivery still
+ * goes to 0 and the owner sees the usual mix_not_100 message.
+ */
+export function withoutDelivery(form: DetailedFormState): DetailedFormState {
+  const salon = parseTurkishNumber(form.channelMix.salon)
+  const delivery = parseTurkishNumber(form.channelMix.delivery)
+  const nextSalon =
+    salon.status === 'ok' && delivery.status === 'ok'
+      ? formatDecimal(salon.value + delivery.value, 2)
+      : form.channelMix.salon
+  return { ...form, channelMix: { ...form.channelMix, salon: nextSalon, delivery: '0' } }
 }

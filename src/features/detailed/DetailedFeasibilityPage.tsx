@@ -99,7 +99,7 @@ export function DetailedFeasibilityPage({
           {screen === 'results' && calc.view === null ? (
             <div className="max-w-[600px]">
               <p className="text-[13px] leading-relaxed text-qc-ink">{COPY.emptyResult}</p>
-              <div className="mt-5">
+              <div className="mt-5 hidden lg:block">
                 <CalculateButton
                   canSubmit={calc.canSubmit}
                   submitHint={submitHint}
@@ -137,6 +137,7 @@ export function DetailedFeasibilityPage({
           <div className="lg:sticky lg:top-14 lg:max-h-[calc(100vh-3.5rem)] lg:overflow-y-auto">
             <SummaryPane
               view={calc.view}
+              isResultsScreen={screen === 'results'}
               screens={screenIndex}
               canSubmit={calc.canSubmit}
               submitHint={submitHint}

@@ -32,7 +32,7 @@ export const SHELL_COPY = {
    * their answer is the moment "there is a deeper version" is worth saying.
    */
   quickHandoff:
-    'Bu bir ön bakış. Kanal kırılımı, personel dökümü, senaryolar ve indirilebilir PDF rapor için Detaylı Fizibilite’yi kullanın.',
+    'Bu bir ön bakış. Kanal kırılımı, personel dökümü, senaryolar ve indirilebilir PDF rapor için Detaylı Fizibilite’yi kullan.',
   quickHandoffLink: 'Detaylı Fizibilite’ye geç →',
   footerScope: 'TRY · Türkiye',
   footerNature: 'Basitleştirilmiş bir ön değerlendirmedir.',

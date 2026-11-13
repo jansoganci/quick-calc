@@ -98,7 +98,8 @@
   }
 
   /* A quiet text-level control: add/remove row, section jump, disclosure.
-     No icon, no fill, no radius — underline on hover only. */
+     No icon, no fill, no radius. Underlined at rest, because touch has no
+     hover: an action must read as one before it is pressed. */
   .qc-text-btn {
     font-size: 13px;
     color: var(--qc-secondary);
@@ -107,21 +108,19 @@
     padding: 0;
     cursor: pointer;
     text-align: left;
+    text-decoration: underline;
+    text-decoration-color: var(--qc-rule-strong);
+    text-underline-offset: 3px;
   }
 
   .qc-text-btn:hover {
-    text-decoration: underline;
-    text-underline-offset: 2px;
+    color: var(--qc-ink);
+    text-decoration-color: var(--qc-ink);
   }
 
   .qc-text-btn.is-accent {
     color: var(--qc-accent);
     font-weight: 500;
-  }
-
-  .qc-text-btn.is-muted {
-    color: var(--qc-muted);
-    font-size: 12px;
   }
 
   .qc-text-btn:disabled {
@@ -158,10 +157,6 @@
   }
 
   .qc-detailed .qc-unit {
-    color: var(--qc-secondary);
-  }
-
-  .qc-detailed .qc-text-btn.is-muted {
     color: var(--qc-secondary);
   }
 

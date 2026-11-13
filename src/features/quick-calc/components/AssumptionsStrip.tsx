@@ -3,6 +3,7 @@ import { COPY } from '../labels.ts'
 import {
   assumptionRows,
   fieldNumberFormat,
+  quickFieldId,
   vatRateFormatted,
   rentWithholdingRateFormatted,
   type QuickField,
@@ -54,7 +55,7 @@ export function AssumptionsStrip({
             return (
               <NumberField
                 key={row.field}
-                id={row.field}
+                id={quickFieldId(row.field)}
                 label={row.label}
                 value={form[row.field]}
                 onChange={(value) => onChange(row.field, value)}

@@ -329,6 +329,15 @@ export function groupSummary(form: QuickFormState, id: FieldGroupId): string | n
   return monthlyCostsTotal(form) ?? COPY.noValue
 }
 
+/**
+ * DOM id for a Quick input. Both calculators stay mounted (only one is shown),
+ * and Detailed has a field of the same name (`posCommissionRate`); a shared id
+ * pointed Detailed's label at Quick's hidden input and left it unnamed.
+ */
+export function quickFieldId(field: QuickField): string {
+  return `quick-${field}`
+}
+
 export function fieldLabel(field: QuickField): string {
   return FIELD_LABELS[field]
 }

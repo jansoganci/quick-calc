@@ -95,8 +95,8 @@ export const COPY = {
     `${BREAKDOWN_LABELS.payroll}: ${count} × ${perEmployee} = ${total}`,
   assumptions: 'Varsayımlar',
   calculate: 'Hesapla',
-  calculateDisabled: 'Sonucu görmek için tüm alanları doldurun',
-  calculateInvalid: 'Girişleri kontrol edin',
+  calculateDisabled: 'Sonucu görmek için tüm alanları doldur',
+  calculateInvalid: 'Girişleri kontrol et',
   copySummary: 'Özeti Kopyala',
   copied: 'Kopyalandı',
   resultSection: 'Sonuç',
@@ -116,7 +116,7 @@ export const COPY = {
   simFootnote:
     'Simülasyonda kira, personel ve diğer sabit giderlerin değişmediği varsayılmıştır. Satış hacmi arttıkça satış başına maliyetin düşmesinin nedeni budur.',
   emptyResult:
-    'Hesapla’dan önce sonuç alanında hiçbir sayı gösterilmez. Tüm alanları doldurup Hesapla’ya bastığınızda satış başına maliyet, işletmede kalan tutar ve aylık kazanç burada görünür.',
+    'Hesapla’dan önce sonuç alanında hiçbir sayı gösterilmez. Tüm alanları doldurup Hesapla’ya bastığında satış başına maliyet, işletmede kalan tutar ve aylık kazanç burada görünür.',
   total: 'Toplam',
   headlineSentence: (ticket: string, cost: string, remaining: string): HeadlineSegment[] => [
     { text: ticket, tone: 'amount' },
@@ -151,9 +151,9 @@ export const COPY = {
 
 export const ERROR_COPY = {
   required: 'Bu alan gerekli.',
-  notANumber: 'Lütfen bir sayı girin.',
+  notANumber: 'Lütfen bir sayı gir.',
   aboveMax: (formatted: string) => `En fazla ${formatted} girilebilir.`,
   belowMin: (formatted: string) => `En az ${formatted} girilebilir.`,
-  exclusiveZero: '0’dan büyük bir değer girin.',
-  invalidValue: 'Lütfen geçerli bir seçim yapın.',
+  exclusiveZero: '0’dan büyük bir değer gir.',
+  invalidValue: 'Lütfen geçerli bir seçim yap.',
 } as const
