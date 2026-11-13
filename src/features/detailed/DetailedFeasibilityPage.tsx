@@ -10,8 +10,8 @@ import { ReportAppendix } from './components/ReportAppendix.tsx'
 import { ReportCover } from './components/ReportCover.tsx'
 import { ReportNameDialog } from './components/ReportNameDialog.tsx'
 import { CalculateButton, SummaryPane } from './components/SummaryPane.tsx'
-import { useDetailedCalc } from './hooks/useDetailedCalc.ts'
 import { useReportPrint } from './hooks/useReportPrint.ts'
+import type { DetailedCalcApi } from './hooks/useDetailedCalc.ts'
 import { COPY, RECIPE_COPY, SECTION_LABELS } from './labels.ts'
 import {
   DETAILED_SCREENS,
@@ -25,16 +25,18 @@ import { visibleSections } from './sectionSummary.ts'
 /**
  * Five screens, one visible. Inputs stay in one form state so switching does not
  * drop a typed value. `#detailed-feasibility` is Menü; the other screens are
- * suffixes of that hash. No third mode.
+ * suffixes of that hash. Simülasyonlar is a separate area that reads this same
+ * `calc`; it is not a third calculator.
  */
 export function DetailedFeasibilityPage({
+  calc,
   screen,
   onGoToScreen,
 }: {
+  calc: DetailedCalcApi
   screen: DetailedScreen
   onGoToScreen: (screen: DetailedScreen) => void
 }) {
-  const calc = useDetailedCalc()
   const report = useReportPrint(calc.businessName, calc.setBusinessName)
   const sections = visibleSections(calc.form)
 
@@ -86,7 +88,7 @@ export function DetailedFeasibilityPage({
 
       <main
         id="detailed-feasibility"
-        className="qc-screen-only lg:grid lg:grid-cols-[1fr_1px_372px]"
+        className="qc-screen-only lg:grid lg:grid-cols-[minmax(0,1fr)_1px_372px]"
       >
         <DetailedScreenChrome screen={screen} onGoToScreen={onGoToScreen}>
           <div hidden={screen === 'results'}>

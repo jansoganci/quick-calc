@@ -1,43 +1,47 @@
 import { useEffect, useState } from 'react'
 import { DetailedFeasibilityPage } from '../features/detailed/DetailedFeasibilityPage.tsx'
+import { useDetailedCalc } from '../features/detailed/hooks/useDetailedCalc.ts'
 import {
   DETAILED_HASH_ROOT,
   detailedScreenFromHash,
   hashForScreen,
   type DetailedScreen,
 } from '../features/detailed/screens.ts'
+import { SimulationsPage } from '../features/detailed/SimulationsPage.tsx'
 import { QuickCalcPage } from '../features/quick-calc/QuickCalcPage.tsx'
 import { AppShell } from './AppShell.tsx'
-import { MODE_ANCHORS, modeFromLocationHash, type CalculationMode } from './shellCopy.ts'
+import { AREA_ANCHORS, areaFromLocationHash, type AppArea } from './shellCopy.ts'
 import { ErrorBoundary } from './ErrorBoundary.tsx'
 
 /**
- * Mode is in-page state, not a route. Quick R6 still forbids encoding the
- * calculator in the URL. The hash names which calculator is showing, and — once
+ * Area is in-page state, not a route. Quick R6 still forbids encoding the
+ * calculator in the URL. The hash names which area is showing, and — once
  * Detaylı is open — which of its five screens. `#detailed-feasibility` is Menü.
  *
- * Both modes stay mounted so switching away and back preserves what the user typed.
- * Across a reload only Detailed restores, from its own `localStorage` draft
- * (`features/detailed/storage.ts`); Quick is deliberately stateless per
- * TECH_STACK §4.1. The mode itself is not written to storage.
+ * All three areas stay mounted so switching away and back preserves what the
+ * user typed, including the Ocak testi % fields. Across a reload only Detailed
+ * restores, from its own `localStorage` draft (`features/detailed/storage.ts`);
+ * Quick is deliberately stateless per TECH_STACK §4.1. The area itself is not
+ * written to storage. Simülasyonlar reads the same in-memory Detailed draft.
  */
 
-function readLocation(): { mode: CalculationMode; screen: DetailedScreen } {
+function readLocation(): { area: AppArea; screen: DetailedScreen } {
   const hash = window.location.hash
   return {
-    mode: modeFromLocationHash(hash),
+    area: areaFromLocationHash(hash),
     screen: detailedScreenFromHash(hash) ?? 'menu',
   }
 }
 
 export function App() {
-  const [mode, setMode] = useState<CalculationMode>(() => readLocation().mode)
+  const [area, setArea] = useState<AppArea>(() => readLocation().area)
   const [screen, setScreen] = useState<DetailedScreen>(() => readLocation().screen)
+  const detailed = useDetailedCalc()
 
   useEffect(() => {
     function syncFromHistory() {
       const next = readLocation()
-      setMode(next.mode)
+      setArea(next.area)
       setScreen(next.screen)
     }
 
@@ -58,23 +62,21 @@ export function App() {
   }, [])
 
   /**
-   * Switching modes is the same act however it was asked for — the mode row, or
-   * the handoff at the foot of a Quick result — so it lives here rather than in
-   * each caller: stamp the mode in the URL, and start the new mode at its top.
-   * Without the scroll, a reader who switches from the foot of one page lands in
-   * the middle of the other one's form.
-   *
-   * Clicking Detaylı while already there does not reset the screen: Back/hash
-   * own that. Entering Detaylı from Hızlı Hesap always lands on Menü.
+   * Switching areas is the same act however it was asked for — the left / top
+   * nav, the Quick handoff, or the empty-state link on Simülasyonlar — so it
+   * lives here: push the area hash so Back returns to the previous area, and
+   * start the new area at its top. Entering Detaylı from another area always
+   * lands on Menü; clicking Detaylı Hesap while already there does not reset
+   * the screen.
    */
-  function goToMode(next: CalculationMode) {
-    if (next === mode) return
-    setMode(next)
+  function goToArea(next: AppArea) {
+    if (next === area) return
+    setArea(next)
     if (next === 'detailed') {
       setScreen('menu')
-      window.history.replaceState(null, '', `#${hashForScreen('menu')}`)
+      window.history.pushState(null, '', `#${hashForScreen('menu')}`)
     } else {
-      window.history.replaceState(null, '', `#${MODE_ANCHORS.quick}`)
+      window.history.pushState(null, '', `#${AREA_ANCHORS[next]}`)
     }
     window.scrollTo({ top: 0 })
   }
@@ -91,12 +93,19 @@ export function App() {
 
   return (
     <ErrorBoundary>
-      <AppShell mode={mode} onModeChange={goToMode}>
-        <div hidden={mode !== 'quick'}>
-          <QuickCalcPage onGoToDetailed={() => goToMode('detailed')} />
+      <AppShell area={area} onAreaChange={goToArea}>
+        <div hidden={area !== 'quick'}>
+          <QuickCalcPage onGoToDetailed={() => goToArea('detailed')} />
         </div>
-        <div hidden={mode !== 'detailed'}>
-          <DetailedFeasibilityPage screen={screen} onGoToScreen={goToDetailedScreen} />
+        <div hidden={area !== 'detailed'}>
+          <DetailedFeasibilityPage
+            calc={detailed}
+            screen={screen}
+            onGoToScreen={goToDetailedScreen}
+          />
+        </div>
+        <div hidden={area !== 'simulations'}>
+          <SimulationsPage view={detailed.view} onGoToDetailed={() => goToArea('detailed')} />
         </div>
       </AppShell>
     </ErrorBoundary>

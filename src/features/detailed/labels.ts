@@ -342,6 +342,13 @@ export const COPY = {
   fixedCostDayPayroll: 'personel',
   fixedCostDayOther: 'diğer sabit giderler',
 
+  simulationsTitle: 'Simülasyonlar',
+  simulationsNote:
+    'Detaylı Hesap’taki rakamların «ne olur» bakışı. Girdiler orada durur; burada yalnızca yüzde alanları değişir.',
+  simulationsEmptyBefore: 'Önce ',
+  simulationsEmptyLink: 'Detaylı Hesap',
+  simulationsEmptyAfter: '’ı doldur.',
+
   januaryTitle: 'Ocak testi',
   januaryNote:
     'Asgari ücret ve kira artınca aylık sonuç ve kira-gün satırları nasıl değişir. Yalnızca personel giderine ve kiraya uygulanır; aidat ve kendine ayırdığın tutar durur.',

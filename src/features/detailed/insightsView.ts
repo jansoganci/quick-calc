@@ -62,13 +62,18 @@ const DAY_LABELS: Record<FixedCostDayKey, string> = {
   other: COPY.fixedCostDayOther,
 }
 
+/** One-decimal tenths used on screen. Shared by hiding, labels and senin. */
+function dayTenths(days: number): number {
+  return Math.round(days * 10)
+}
+
 /** One-decimal display; 0,0 is empty and stays hidden. */
 function displaysAsDay(days: number): boolean {
-  return Number.isFinite(days) && Math.round(days * 10) !== 0
+  return Number.isFinite(days) && dayTenths(days) !== 0
 }
 
 function formatDayCount(days: number): string {
-  return formatDecimalExact(days, 1)
+  return formatDecimalExact(dayTenths(days) / 10, 1)
 }
 
 export function buildSalonMenuView(input: DetailedResolvedInput): SalonMenuView {
@@ -105,8 +110,9 @@ export function formatFixedCostDays(
   }
 
   const shown = days.buckets.filter((bucket) => displaysAsDay(bucket.days))
-  const remainder =
-    days.operatingDaysPerMonth - shown.reduce((sum, bucket) => sum + bucket.days, 0)
+  const shownTenths = shown.reduce((sum, bucket) => sum + dayTenths(bucket.days), 0)
+  const remainderTenths = dayTenths(days.operatingDaysPerMonth) - shownTenths
+  const remainder = remainderTenths / 10
 
   const lines: string[] = []
   shown.forEach((bucket, index) => {
@@ -118,9 +124,9 @@ export function formatFixedCostDays(
         : COPY.fixedCostDaysNext(count, label),
     )
   })
-  if (remainder < 0) {
+  if (remainderTenths < 0) {
     lines.push(COPY.fixedCostDaysUncovered)
-  } else if (!displaysAsDay(remainder)) {
+  } else if (remainderTenths === 0) {
     lines.push(COPY.fixedCostDaysRemainderNone)
   } else {
     lines.push(COPY.fixedCostDaysRemainder(formatDayCount(remainder)))
@@ -131,7 +137,7 @@ export function formatFixedCostDays(
     note,
     lines,
     unavailableMessage: null,
-    coversMonth: remainder >= 0,
+    coversMonth: remainderTenths >= 0,
   }
 }
 

@@ -1,13 +1,13 @@
 /**
- * Copy owned by the application shell — the masthead, the mode switch and the
- * colophon. It sits here rather than in a feature because both calculation modes
- * render inside the same shell, and U4 allows exactly one home per label.
+ * Copy owned by the application shell — the masthead, the three-area switch and
+ * the colophon. It sits here rather than in a feature because every area renders
+ * inside the same shell, and U4 allows exactly one home per label.
  *
  * `features/quick-calc/labels.ts` re-exports these into its own `COPY` so the
  * Quick module keeps a single import surface. This file imports nothing.
  */
 
-export type CalculationMode = 'quick' | 'detailed'
+export type AppArea = 'quick' | 'detailed' | 'simulations'
 
 export const SHELL_COPY = {
   productName: 'Maliyet',
@@ -22,16 +22,11 @@ export const SHELL_COPY = {
   /** Document metadata only. The UI does not need a second explanatory sentence. */
   metaDescription:
     'Kafe, restoran ve küçük işletmeler için sade bir maliyet ve fizibilite hesabı. Muhasebe bilgisi gerektirmez.',
-  modeNavigation: 'Hesaplama modu',
+  areaNavigation: 'Bölümler',
   quickMode: 'Hızlı Hesap',
   detailedMode: 'Detaylı Fizibilite',
-  /**
-   * What each mode is for. The labels alone never told a first-time visitor which
-   * calculator they needed — `Hızlı Hesap` and `Detaylı Fizibilite` name two things
-   * without saying how they differ — so the mode row states it in five words.
-   */
-  quickModeSummary: '8 soruda ön bakış',
-  detailedModeSummary: 'Kanal, personel, senaryo, PDF rapor',
+  detailedNav: 'Detaylı Hesap',
+  simulationsMode: 'Simülasyonlar',
   /**
    * The handoff at the foot of a finished Quick result: the moment the reader has
    * their answer is the moment "there is a deeper version" is worth saying.
@@ -51,36 +46,49 @@ export const SHELL_COPY = {
   authorUrl: null as string | null,
 } as const
 
-/** The anchor each mode owns, so the masthead entries stay real links. */
-export const MODE_ANCHORS = {
-  quick: 'quick-calculation',
+/**
+ * Canonical hash each area writes. `#detailed-feasibility` and its screen
+ * suffixes stay the Detaylı deep links; `#quick-calculation` still opens Hızlı.
+ */
+export const AREA_ANCHORS = {
+  quick: 'quick',
   detailed: 'detailed-feasibility',
-} as const satisfies Record<CalculationMode, string>
+  simulations: 'simulations',
+} as const satisfies Record<AppArea, string>
+
+const AREA_ANCHOR_ALIASES: Record<AppArea, readonly string[]> = {
+  quick: ['quick-calculation'],
+  detailed: [],
+  simulations: ['simulasyonlar'],
+}
+
+function hashMatchesArea(raw: string, area: AppArea): boolean {
+  if (raw === AREA_ANCHORS[area] || raw.startsWith(`${AREA_ANCHORS[area]}/`)) return true
+  return AREA_ANCHOR_ALIASES[area].some(
+    (alias) => raw === alias || raw.startsWith(`${alias}/`),
+  )
+}
 
 /**
  * First paint. `#detailed-feasibility` (and any `/…` suffix it owns) opens
- * Detaylı; any other hash (including `#quick-calculation` and none) opens
- * Hızlı Hesap. Form state is not encoded.
+ * Detaylı; `#simulations` / `#simulasyonlar` open Simülasyonlar; any other hash
+ * (including `#quick`, `#quick-calculation` and none) opens Hızlı Hesap.
+ * Form state is not encoded.
  */
-export function modeFromLocationHash(hash: string): CalculationMode {
+export function areaFromLocationHash(hash: string): AppArea {
   const raw = hash.startsWith('#') ? hash.slice(1) : hash
-  return raw === MODE_ANCHORS.detailed || raw.startsWith(`${MODE_ANCHORS.detailed}/`)
-    ? 'detailed'
-    : 'quick'
+  if (hashMatchesArea(raw, 'detailed')) return 'detailed'
+  if (hashMatchesArea(raw, 'simulations')) return 'simulations'
+  return 'quick'
 }
 
-export const MODE_LABELS = {
+export const AREA_LABELS = {
   quick: SHELL_COPY.quickMode,
-  detailed: SHELL_COPY.detailedMode,
-} as const satisfies Record<CalculationMode, string>
+  detailed: SHELL_COPY.detailedNav,
+  simulations: SHELL_COPY.simulationsMode,
+} as const satisfies Record<AppArea, string>
 
-/** One line per mode, shown under its label in the mode row. */
-export const MODE_DESCRIPTIONS = {
-  quick: SHELL_COPY.quickModeSummary,
-  detailed: SHELL_COPY.detailedModeSummary,
-} as const satisfies Record<CalculationMode, string>
-
-export const MODES = ['quick', 'detailed'] as const satisfies readonly CalculationMode[]
+export const AREAS = ['quick', 'detailed', 'simulations'] as const satisfies readonly AppArea[]
 
 /** Browser tab, bookmarks and share previews. */
 export const DOCUMENT_TITLE = `${SHELL_COPY.productName} — ${SHELL_COPY.slogan}`

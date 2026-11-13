@@ -89,7 +89,7 @@ Assumptions: one row, label left, current values as a Mono summary right, `▾`.
 
 **Sticky from `lg` (`lg:sticky lg:top-0 lg:z-10`).** *Corrected — this previously read "Not sticky", which contradicted the shipped code and the Detailed pane's positioning.* The two sticky elements do not compete because the result column offsets by the masthead's own height (`lg:top-14`) instead of `lg:top-0`. Both modes use the same offset.
 
-*Revised again with the mode row.* This previously justified the sticky masthead by the mode switch it carried — "a switch that scrolls away is a switch the user has to hunt for". The switch has moved to a row of its own (`DETAILED_FRONTEND_IMPLEMENTATION_SPEC.md` §6), which does not scroll with it, and the justification now rests on what remains: both result panes position against the masthead's height, and the product name stays in view on a long page. Reaching the other mode after scrolling is served by the handoff at the foot of a finished Quick result, which is where that need actually arises.
+*Revised with the three-area nav.* This previously justified the sticky masthead by the mode switch it carried — "a switch that scrolls away is a switch the user has to hunt for". Area switching now lives in a desktop left-column list and a mobile top text row (`DETAILED_FRONTEND_IMPLEMENTATION_SPEC.md` §6). The masthead still stays sticky so both result panes can offset by `lg:top-14`, and the product name stays in view on a long page. Reaching Detaylı after scrolling a finished Quick result is served by the handoff at the foot of that result.
 
 **Colophon.** Above a `--qc-rule` top rule, `18px` padding, 12px `--qc-muted`. One row with `space-between` from `lg`, stacked with a 5px gap below it. Three items: the v1 scope (scope §26), a six-word statement of what the tool is, and the engine version in Plex Mono 11px `--qc-subtle`. The version is read from `meta.quickEngineVersion`, never typed — scope §18 requires a formula change to be detectable as a version difference.
 
@@ -156,7 +156,7 @@ Breakpoint: single column below `lg` (1024px), two columns at and above.
 
 ## 6. Turkish copy — draft for review
 
-**Masthead / colophon:** the 18px mark + `Maliyet` (product name, **locked**) as one lockup · slogan `Bir satıştan geriye ne kalıyor?` in 12px muted beside the name, at every width · `maliyet.lol · TRY · Türkiye` · `Basitleştirilmiş bir ön değerlendirmedir.` The mode switch is no longer in the masthead — see the mode row.
+**Masthead / colophon:** the 18px mark + `Maliyet` (product name, **locked**) as one lockup · slogan `Bir satıştan geriye ne kalıyor?` in 12px muted beside the name, at every width · `maliyet.lol · TRY · Türkiye` · `Basitleştirilmiş bir ön değerlendirmedir.` Area switching is not in the masthead — see the three-area nav in `DETAILED_FRONTEND_IMPLEMENTATION_SPEC.md` §6.
 
 **Handoff copy (Quick result foot):** `Bu bir ön bakış. Kanal kırılımı, personel dökümü, senaryolar ve indirilebilir PDF rapor için Detaylı Fizibilite'yi kullanın.` + `Detaylı Fizibilite'ye geç →`. It renders only after a calculation: an empty result column is no place to advertise a second product.
 

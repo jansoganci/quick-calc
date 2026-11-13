@@ -7,7 +7,8 @@ import { formatCount } from '../../lib/number.ts'
  * V2 step 5: Detaylı is five screens, not one long page. The monthly engine and
  * the v1 draft shape do not change. Hash suffixes are ASCII so a phone keyboard
  * and a bookmark both round-trip; `#detailed-feasibility` with no suffix is Menü
- * so the existing deep link keeps working.
+ * so the existing deep link keeps working. Simülasyonlar is a separate top-level
+ * area, not a sixth Detailed screen and not a third calculator.
  */
 
 export const DETAILED_SCREENS = ['menu', 'ingredients', 'sales', 'costs', 'results'] as const
@@ -36,7 +37,7 @@ const SLUG_TO_SCREEN: Record<string, DetailedScreen> = {
   sonuc: 'results',
 }
 
-/** Same token as `MODE_ANCHORS.detailed` in the shell. Kept here so this module does not import `app/`. */
+/** Same token as `AREA_ANCHORS.detailed` in the shell. Kept here so this module does not import `app/`. */
 export const DETAILED_HASH_ROOT = 'detailed-feasibility'
 
 const SECTION_SCREEN: Record<SectionId, DetailedScreen> = {

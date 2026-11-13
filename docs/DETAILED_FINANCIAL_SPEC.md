@@ -1,6 +1,6 @@
 # Detailed Feasibility — Financial Specification
 
-**Version:** v1.10
+**Version:** v1.11
 **Status:** Formula contract for `src/core/detailed/`. **Not** implementation.
 **Currency:** TRY · **Country:** Turkey · **Language for v1:** Turkish-first
 **Engine:** `detailedEngineVersion` `1.0.0`
@@ -976,7 +976,7 @@ Tier 1 must pass before any Detailed UI work begins.
 | 3 | T14 | Structural guards | I2, I3, I4, I5, I7, I13; banned terminology absent from `core/detailed/`; result carries nothing beyond §16 |
 | 2 | T18 | Recipe cost helper | Appendix A: the 16.2 worked example, both units of each family, a two-line sum, purchase quantity zero or empty, a missing ingredient, and no `NaN` or `Infinity`. No figure in §18.2 changes |
 | 2 | T19 | Salon restore-price display helper | Appendix A.6: Hamburger 220 + 8,40 × 1,10 = 229,24; Köfte ekmek 160 + 7,00 × 1,10 = 167,70; remaining-per-unit delta = −Δcost. Not called by `calculateDetailed`. No figure in §18.2 changes |
-| 2 | T20 | Menu food-cost, fixed-cost days, January test | Appendix B: salon food-cost = `unitProductCost / salonNetPerUnit`; remaining = §9.4 salon; weakest = lowest remaining; `dailyContribution = totalContribution / operatingDaysPerMonth`; kira-gün screen is one decimal, senin = `operatingDaysPerMonth −` unrounded shown sum; January scales `monthlyPayroll` and `rentCost` only; break-even §14.3 with `fixed'`. Not called by `calculateDetailed`. No figure in §18.2 changes |
+| 2 | T20 | Menu food-cost, fixed-cost days, January test | Appendix B: salon food-cost = `unitProductCost / salonNetPerUnit`; remaining = §9.4 salon; weakest = lowest remaining; `dailyContribution = totalContribution / operatingDaysPerMonth`; kira-gün screen is one decimal, senin = `operatingDaysPerMonth −` the displayed (one-decimal) shown buckets so the printed lines add up exactly; January scales `monthlyPayroll` and `rentCost` only; break-even §14.3 with `fixed'`. Not called by `calculateDetailed`. No figure in §18.2 changes |
 | 2 | T21 | Per-channel restore and esnaf suggestion | Appendix D: salon `feeRate = 0` matches A.6 (220 + 8,40 × 1,10 = 229,24 → 230); online Hamburger 230 + 8,40 / (1/1,10 − 0,15) = 241,07 → 242; Köfte ekmek 180 + 7,00 / (1/1,10 − 0,15) = 189,22 → 190. Not called by `calculateDetailed`. No figure in §18.2 changes |
 
 Tests are colocated as `*.test.ts` under `src/core/detailed/`. No UI test suite.
@@ -1081,7 +1081,7 @@ On a price **decrease**, the UI shows the cost change and `Her birinden kalan {x
 
 ## Appendix B — Menu food-cost, fixed-cost days, January test (V2 step 3)
 
-Display helpers for the Detailed **results** area after the first `Hesapla`. They do **not** change `calculateDetailed`, the golden vector, or DF-84. They read the resolved input and the **base** stabilized month. `detailedEngineVersion` stays `1.0.0`.
+Display helpers on the already calculated **base** stabilized month. They do **not** change `calculateDetailed`, the golden vector, or DF-84. `detailedEngineVersion` stays `1.0.0`. B.1 and B.2 belong on Detaylı Sonuç. B.3 belongs on the Simülasyonlar area. They are not a third calculator and they add no new draft fields.
 
 UI copy is *sen*. The screen never writes `marj`, `katkı`, `food cost`, or `amortisman`. The existing DF-84 table keeps its v1 labels.
 
@@ -1127,11 +1127,13 @@ remainderDays = monthlyOperatingResult / dailyContribution
 
 `monthlyAidat = monthlyOccupancyCost − rentCost`. **Kira** is `rentCost` (the occupancy rent after net/gross withholding, §10.3), not aidat. **Personel** is `monthlyPayroll` only — owner draw and Bağ-Kur sit in **other**. A zero-cost bucket is omitted on screen.
 
-The engine returns the raw (unrounded) day counts. The screen does **not** round to whole days. Each shown bucket is formatted to **one decimal** with a Turkish comma (`5,6`). A zero-cost bucket is omitted; a bucket whose one-decimal display is `0,0` is omitted the same way. «geri kalan» / senin days is `operatingDaysPerMonth −` the **unrounded** sum of the shown buckets, also one decimal. Remainder that displays as `0,0` is no remaining days (`Geri kalan gün yok.`). When that unrounded remainder is negative, the month does not cover its fixed costs.
+The engine returns the raw (unrounded) day counts. The screen does **not** round to whole days. Each shown bucket is formatted to **one decimal** with a Turkish comma (`5,6`). A zero-cost bucket is omitted; a bucket whose one-decimal display is `0,0` is omitted the same way. «geri kalan» / senin days is `operatingDaysPerMonth −` the sum of those **displayed** (one-decimal) bucket values, also one decimal, so the printed lines add up to the working month exactly (tenths arithmetic, not a second rounding of the unrounded remainder). Remainder that displays as `0,0` is no remaining days (`Geri kalan gün yok.`). When that displayed remainder is negative, the month does not cover its fixed costs.
 
 ### B.3 January test — «Ocak testi»
 
-A what-if on the **already calculated** base month. It is not a fourth scenario and does not rewrite Kötü / Baz / İyi.
+A what-if on the **already calculated** base month, shown on **Simülasyonlar**. It is not a fourth scenario, not a third calculator, and does not rewrite Kötü / Baz / İyi. It does not ask whether to raise price or daily quantity — that comparison is **rejected**.
+
+Simülasyonlar reads the Detaylı draft (same `localStorage` key, same in-memory form). Other than the two `%` fields below, it is read-only. If there is no calculated Detaylı result, the area shows a plain empty line rather than running this helper.
 
 Inputs, empty = 0. An unreadable field also counts as 0 (quiet hint, no red). A negative rate is a decrease.
 
@@ -1152,7 +1154,7 @@ Variable costs, volume, VAT and contribution do not change. The wage rate applie
 
 Break-even is §14.3 with `monthlyFixedCost = fixed'` and the same `totalContribution` / `totalUnits`. If the original break-even was unavailable, the test stays unavailable.
 
-§B.2 is then re-run on the adjusted costs so the day lines follow the what-if. The kira-gün list is replaced in place; «Şimdi → Sonra» is only for monthly leftover and break-even.
+§B.2 is then re-run on the adjusted costs so the day lines follow the what-if. Those what-if day lines live on Simülasyonlar next to the Ocak fields. Detaylı Sonuç keeps the **base** kira-gün list (B.2 on the unadjusted month). «Şimdi → Sonra» is only for monthly leftover and break-even.
 
 The two rates are **transient** screen state. They are not written to the draft and they are not encoded in the URL.
 
@@ -1168,7 +1170,7 @@ UI-only. `calculateDetailed` is unchanged. `dailyQuantity` remains a required fi
 
 `operatingDaysPerMonth` stays in `assumptions` (DF-66, default 30). It is not duplicated as a second input on Satış tahmini.
 
-There is no realised-sales ledger, no Yiyecek / İçecek grouping, and no volume-weighted menu total in this step. Results already consume `products[].dailyQuantity` through the existing monthly engine (I5, §12).
+There is no realised-sales ledger and no volume-weighted menu total in this step. **Yiyecek / İçecek grouping and comparison are rejected** — not deferred. Results already consume `products[].dailyQuantity` through the existing monthly engine (I5, §12).
 
 Draft key remains `maliyet.detailed.draft.v1`. `dailyQuantity` stays on each stored product row. A draft written before this section still restores those quantities into Satış tahmini. No version bump.
 
@@ -1261,6 +1263,8 @@ No figure in §18.2 changes.
 
 | Version | Change |
 | --- | --- |
+| v1.12 | Appendix B.2/B.3 kira-gün senin is `operatingDaysPerMonth −` the **displayed** one-decimal shown buckets (not the unrounded sum), so the printed lines add up exactly. Same helper on Sonuç and Simülasyonlar. No figure in §18.2 changed. `detailedEngineVersion` stays 1.0.0. |
+| v1.11 | Appendix B.3 moves to the Simülasyonlar area (same draft, same formulas). Detaylı Sonuç keeps base B.2 kira-gün. Price-vs-quantity and Yiyecek / İçecek comparison are rejected, not deferred. No figure in §18.2 changed. `detailedEngineVersion` stays 1.0.0. |
 | v1.10 | Appendix B.2/B.3: kira-gün and Ocak kira-gün lines stop rounding to whole days. One decimal, Turkish comma; senin = `operatingDaysPerMonth −` unrounded shown sum. Empty buckets still omitted. No figure in §18.2 changed. `detailedEngineVersion` stays 1.0.0. |
 | v1.9 | Appendix D: per-channel restore (salon = A.6; online accounts for `platformFeeRate` and KDV) and whole-lira-up esnaf suggestion. Suggestion only — a selling price changes after an explicit tap. New test T21. No figure in §18.2 changed. `detailedEngineVersion` stays 1.0.0. |
 | v1.8 | Appendix C: Satış tahmini collects `dailyQuantity` in a separate UI section; engine contract and draft v1 shape unchanged. Appendix B.2/B.3 record the accepted display edges (rounded-zero buckets, remainder-none copy, unreadable/negative Ocak rates, in-place kira-gün). No figure in §18.2 changed. `detailedEngineVersion` stays 1.0.0. |

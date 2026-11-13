@@ -1,6 +1,6 @@
 # maliyet.lol — V2 / V3 Ürün Yönü ve Kapsam
 
-**Tarih:** 12 Kasım 2026 · **Sürüm:** 0.4
+**Tarih:** 13 Kasım 2026 · **Sürüm:** 0.5
 **Durum:** Kullanıcının onayladığı ürün kararları, geliştirme sırası, kullanıcı kuralları ve açık konular. Finansal formül sözleşmesi değildir. Her adımın formül ve ekran ayrıntısı, o adıma gelindiğinde kısaca netleştirilir. Ürün henüz üretime hazır V2 değildir.
 
 ## 1. Ne yapıyoruz
@@ -9,7 +9,7 @@
 - Kullanıcı: kafe açmayı planlayanlar ve küçük yiyecek-içecek işletmesi sahipleri.
 - V2'nin hedefi, bu kişilerin ürün maliyetini, fiyatını ve menü kararlarını kolaylaştırmaktır.
 - V2, **Detaylı Fizibilite** içinde geliştirilir. **Hızlı Hesap**'ın sekiz girdisine, motoruna, varsayılanlarına ve ekranına dokunulmaz.
-- Hızlı Hesap ve Detaylı Fizibilite ayrı hesap motorları olarak kalır.
+- Hızlı Hesap ve Detaylı Fizibilite ayrı hesap motorları olarak kalır. **Simülasyonlar** üçüncü bir alanıdır; üçüncü bir hesap motoru değildir. Detaylı taslağını okur, yeni girdi sormaz.
 - Mevcut yatırım, başa baş, kanal ekonomisi, ürün katkısı ve projeksiyon korunur. V2 adına sessizce yeniden tanımlanmaz.
 - Muhasebe, ERP, stok ya da kasa uygulamasına dönüşmeyiz. Kullanıcının yerine karar veren bir sistem kurmayız.
 
@@ -49,12 +49,13 @@ Sahibin 12 Kasım 2026 kararları. Yeni ürün kararı uydurulmaz.
 | Birimler | Kullanıcı malzemeyi aldığı gibi girer: kg, g, L, ml veya adet. Örneğin “5 kg, 450 TL”. Uygulama bunu gram, mililitre veya adet fiyatına çevirir. Aileler karışmaz: gram adet olmaz |
 | Food cost | KDV hariç satış fiyatına göre hesaplanır. Ambalaj bu orana girmez; ayrı bir maliyet olarak sonradan eklenir |
 | Kira kaç günde çıkıyor | Food cost adımında. Mevcut aylık sonucu esnaf diline çevirir: örneğin «ayın ilk 7 günü kiraya, 5 günü faturalara, 3 günü personele çalışıyorsun, kalan günler senin». Mevcut motor sayılarının sunumudur. Onaysız yeni formül yoktur |
-| Ocak testi | Food cost adımında. «Ne olur» bakışı: örneğin asgari ücret +%30 veya kira yenileme +%50 → aylık kalan nasıl değişir, bunu dengelemek için fiyat mı yoksa günlük adet mi ne kadar artmalı. Mevcut Kötü / Baz / İyi senaryolarının yerine geçmez |
+| Ocak testi | **Simülasyonlar** alanında. «Ne olur» bakışı: asgari ücret veya kira % artınca aylık kalan ve başa baş nasıl değişir. Detaylı taslağını okur; yüzde alanları dışında girdi sormaz. Mevcut Kötü / Baz / İyi senaryolarının yerine geçmez. Fiyat mı adet mi karşılaştırması **reddedildi** |
 | Satış tahmini | Ayrı bir bölümdür. Menüdeki ürünler orada listelenir; ürün yeniden oluşturulmaz. Mevcut **tahmini günlük adet** ve çalışma günü modeli kullanılır. Gerçekleşen satış takibi yoktur |
-| Menü grupları | İlk karşılaştırmada yalnızca **Yiyecek** ve **İçecek** kullanılır |
-| Alt gruplar | V2'de var, isteğe bağlı ve sınırlıdır. Yiyecek: ana yemek, başlangıç/ara sıcak, tatlı, diğer. İçecek: sıcak, soğuk, diğer. İlk karşılaştırmaya alınmaz. Kategori yönetim sistemi yoktur |
+| Menü grupları | **Reddedildi.** Yiyecek / İçecek karşılaştırması yapılmaz |
+| Alt gruplar | **Reddedildi.** Karşılaştırma için grup ve alt grup yok. Kategori yönetim sistemi yoktur |
 | Senaryolar | Mevcut Kötü / Baz / İyi yapısı aynen kalır ve yalnızca satış adedini değiştirir. Ocak testi ayrı bir bakıştır; yeni senaryo sistemi kurulmaz |
-| Detaylı ekranlar | Üçüncü mod açılmaz. Detaylı tek uzun sayfa olmaktan çıkıp şu ekranlara bölünür: Menü, Malzemeler, Satış, Giderler, Sonuç. İlk değer Menü'de gelir |
+| Detaylı ekranlar | Üçüncü hesap motoru açılmaz. Detaylı tek uzun sayfa olmaktan çıkıp şu ekranlara bölünür: Menü, Malzemeler, Satış, Giderler, Sonuç. İlk değer Menü'de gelir. **Simülasyonlar** üçüncü alandır |
+| Üst gezinme | Üç alan: Hızlı Hesap, Detaylı Hesap, Simülasyonlar. Masaüstünde sol sütunda dikey metin menü; telefonda üstte yatay metin satırı. Hash: `#quick`, `#detailed-feasibility`, `#simulations`. Router yok |
 | Kayıt | Veriler şimdilik tarayıcıdaki `localStorage`'dadır. iPhone'da bir hafta ziyaret edilmeyen sitenin verisinin silinebileceği bilinerek kabul edildi. JSON dışa/içe aktarma **düşürüldü**: hedef kullanıcı dosya yönetmez. Bu, `TECH_STACK_AND_CONSTRAINTS.md` §4.2'deki JSON yedek maddesinin yerine geçer |
 | Hesap ve veritabanı | Takvimde yok. Maliyet ve kişisel veri kurallarına dokunur; soru işaretidir |
 | Kabul ekranı | Şimdilik ertelendi. Hukuki metin ve inceleme sonra ele alınacak |
@@ -62,16 +63,17 @@ Sahibin 12 Kasım 2026 kararları. Yeni ürün kararı uydurulmaz.
 
 ## 5. Geliştirme sırası
 
-Durum sütunu, 12 Kasım 2026 itibarıyla `main` dalındaki koddur. Sıra, sahibin 0.4 kararıdır.
+Durum sütunu, 13 Kasım 2026 itibarıyla bu dalın kodudur. Sıra, sahibin 0.4 kararıdır; adım 7, 13 Kasım 2026 gezinme / Simülasyonlar kararıdır.
 
 | # | Adım | Durum |
 | --- | --- | --- |
 | 1 | **Reçeteden hesapla (sadeleştir).** Yardımcı duruyor: malzeme, alış miktarı ve birimi, alış tutarı, ürüne özgü kullanım miktarı. Etiket birime uymalı (`g` / `ml` / `adet`); «Gramaj» her birimde yanıltır (hamburger ekmeği = 1 adet). Reçete, ürün satırının altındaki tablo içi alt satır gibi açılmamalıdır. | **Bitti, sadeleşecek.** PR #13. Elle maliyet alanı duruyor; reçete seçilince o tutarı doldurur. Aylık motor reçeteyi görmez. Etiket ve açılış düzeni henüz sade değil. |
 | 2 | **Ortak malzeme listesi (tamamla).** Alış fiyatı tek yerden. Gramaj/kullanım ürüne özgü kalır. **Zam geldi:** kullanıcı malzemeye yeni fiyatı kendisi yazar (dış kaynak yok). Etkilenen ürünler, «bu üründen kalan»ın düşüşü ve eski kalanı geri getiren satış fiyatı gösterilir. | **Merge edildi, tamamlanacak.** PR #14. Veride fiyat tektir. Ekranda alış tutarı hem listede hem reçete satırında düzenlenir; bu adımda tek yere inecektir. |
-| 3 | **Food cost ve ürün katkısı.** Ürün başına food cost oranı, birim «bu üründen kalan» ve tahmini adetle toplam. Yiyecek / İçecek karşılaştırması. Mevcut senaryoların yeni maliyetle çalışması. **Kira kaç günde çıkıyor** ve **Ocak testi** bu adımdadır. | **Sonuç alanı (kısmi).** Salon malzeme payı, salon «her birinden kalan», kira-gün listesi ve Ocak testi (asgari / kira % → aylık kalan ve başa baş). Yiyecek / İçecek karşılaştırması ve tahmini adetle toplam bu dilimde yok. DF-84 ürün katkısı tablosu durur. Formül: `DETAILED_FINANCIAL_SPEC.md` Appendix B. |
+| 3 | **Food cost ve ürün katkısı.** Ürün başına food cost oranı, birim «bu üründen kalan» ve tahmini adetle toplam. Mevcut senaryoların yeni maliyetle çalışması. **Kira kaç günde çıkıyor** bu adımdadır. | **Sonuç alanı (kısmi).** Salon malzeme payı, salon «her birinden kalan», kira-gün listesi. Yiyecek / İçecek karşılaştırması **reddedildi** (yapılmadı, ertelenmedi). Tahmini adetle toplam bu dilimde yok. DF-84 ürün katkısı tablosu durur. Formül: `DETAILED_FINANCIAL_SPEC.md` Appendix B. Ocak testi adım 7'de Simülasyonlar'a taşındı. |
 | 4 | **Ayrı satış tahmini bölümü.** Menüdeki ürünler için tahmini günlük adet. | **Sonuç alanı (kısmi) değil — girdi bölümü.** Ayrı «Satış tahmini» bölümü menü ürünlerini listeler; günlük adet orada girilir. Ürün orada eklenmez. `dailyQuantity` motorda üründe kalır; taslak `maliyet.detailed.draft.v1` aynı kalır. Çalışma günü varsayımlarda durur. Formül: `DETAILED_FINANCIAL_SPEC.md` Appendix C. |
-| 5 | **Detaylı'yı ekranlara bölme.** Menü, Malzemeler, Satış, Giderler, Sonuç. Üçüncü mod yok. | **Ekranlar.** Beş ekran, bir görünür. `#detailed-feasibility` Menü’dür; diğerleri `/malzemeler` `/satis` `/giderler` `/sonuc`. Taslak v1 aynı. Router yok. `DETAILED_FRONTEND_IMPLEMENTATION_SPEC.md` §2.0. |
-| 6 | **Otomatik fiyat tavsiyesi.** | **Zam geldi.** Salon restore A.6 durur. Online, platform kesintisi ve KDV ile (ör. 230 + 8,40 / (1/1,10 − 0,15) = 241,07 → öneri 242). Esnaf: yukarı tam lira. Öneri; fiyat ancak «Bu fiyatı yaz»a basınca yazılır. Formül: `DETAILED_FINANCIAL_SPEC.md` Appendix D. |
+| 5 | **Detaylı'yı ekranlara bölme.** Menü, Malzemeler, Satış, Giderler, Sonuç. Üçüncü hesap motoru yok. | **Ekranlar.** Beş ekran, bir görünür. `#detailed-feasibility` Menü’dür; diğerleri `/malzemeler` `/satis` `/giderler` `/sonuc`. Taslak v1 aynı. Router yok. `DETAILED_FRONTEND_IMPLEMENTATION_SPEC.md` §2.0. |
+| 6 | **Otomatik fiyat tavsiyesi.** | **Zam geldi.** Salon restore A.6 durur. Online, platform kesintisi ve KDV ile (ör. 230 + 8,40 / (1/1,10 − 0,15) = 241,07 → öneri 242). Esnaf: yukarı tam lira. Öneri; fiyat ancak «Bu fiyatı yaz»a basınca yazılır. Malzemeler’de kalır (girdi anı). Formül: `DETAILED_FINANCIAL_SPEC.md` Appendix D. |
+| 7 | **Üst gezinme ve Simülasyonlar.** Üç alan: Hızlı Hesap, Detaylı Hesap, Simülasyonlar. Ocak testi Sonuç’tan Simülasyonlar’a. | **Bu dal.** Masaüstü sol metin menü, telefon üst satır. Hash `#quick` / `#detailed-feasibility` / `#simulations`. Ocak testi Simülasyonlar’da; Zam geldi Malzemeler’de kalır (fiyat geçmişi yok, restore listesi taşınmadı). |
 
 Her adım bitip görüldükten sonra sıradakine geçilir. Sıra, kullanıcı kararıyla değişebilir.
 
@@ -94,7 +96,7 @@ Bunlar geliştirmeyi durdurmaz. Yanındaki not karar değildir; ilgili adıma ge
 | Birim dönüşümü sınırı | Yalnızca aynı tür birimler arasında dönüşüm: kilodan grama, litreden mililitreye, adetten adede. Gramdan adede geçiş olmasın |
 | “Fiyatı artırırsam ne olur?” | Son hesaplanan sonuç, yeni sonucun yanında küçük bir “önceki” satırı olarak dursun. Senaryo sistemi değildir. Ocak testi ve Zam geldi bunun yerine geçmez |
 | Sonuç notu | Her sonuç alanında kısa bir not: “Bu hesap yaklaşıktır; kendi rakamlarınla kontrol et.” Kabul ekranının yerine mi geçeceği, yoksa ara çözüm mü olacağı açık |
-| Menü karşılaştırmasının sunumu | Sıralama ve “beklentiye göre” satırı için ayrı hedef girişi gerekip gerekmediği açık |
+| Menü karşılaştırmasının sunumu | **Reddedildi** — §7. Yiyecek / İçecek karşılaştırması yapılmaz |
 | Hazırlık süresi | Açıktır. Gelişmiş gider dağıtımı ile karıştırılmaz; dağıtım park |
 
 ## 7. Düşürülenler
@@ -105,6 +107,8 @@ Sahip kararı. Geri alınmadıkça yazılmaz.
 | --- | --- | --- |
 | V3-03 | POS, Yemeksepeti ve benzeri platform entegrasyonu | Otomatik satış çekme yok |
 | — | JSON dışa / içe aktarma yedeği | Hedef kullanıcı dosya yönetmez. `TECH_STACK_AND_CONSTRAINTS.md` §4.2'deki JSON yedek maddesinin yerine bu geçer. `localStorage` taslağı durur |
+| — | Yiyecek / İçecek karşılaştırması ve menü grupları | Sahip reddetti. Grup, alt grup ve «karşılaştırma sunumu» yazılmaz |
+| — | Ocak testi «fiyat mı adet mi» | Sahip reddetti. Ocak testi yalnızca asgari / kira % → aylık kalan, başa baş ve kira-gün |
 
 Onaylanmayanlar durur: Star/Dog etiketleri, %70 gibi eşikler, otomatik “menüden çıkar” önerisi, alım partileri, FIFO ve stok değerleme.
 
