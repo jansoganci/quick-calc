@@ -101,7 +101,7 @@ function stripTrailingSlash(pathname: string): string {
 /**
  * Pathname first-paint. `/detailed` (and any `/…` suffix it owns) opens Detaylı;
  * `/simulations` opens Simülasyonlar; `/` and `/quick` open Hızlı Hesap.
- * Unknown paths fall through to Hızlı (SPA fallback) without rewriting the bar.
+ * Unknown paths still classify as Hızlı here; App paints NotFound instead.
  */
 export function areaFromPathname(pathname: string): AppArea {
   const path = stripTrailingSlash(pathname)

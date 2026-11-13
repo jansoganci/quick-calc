@@ -43,6 +43,21 @@ describe('renderToString App', () => {
     expect(html).not.toContain('aria-current="page"')
   })
 
+  it('renders an unknown path as Bu sayfa yok, without calculator landmarks', () => {
+    vi.stubGlobal('window', undefined)
+    vi.stubGlobal('document', undefined)
+
+    const html = renderToString(
+      createElement(StrictMode, null, createElement(App, { initialPath: '/asdf' })),
+    )
+    expect(html).toContain('Bu sayfa yok')
+    expect(html).toContain('href="/"')
+    expect(html).toContain('href="/detailed"')
+    expect(html).toContain('href="/simulations"')
+    expect(html).not.toContain('id="quick-calculation"')
+    expect(html).not.toContain('aria-current="page"')
+  })
+
   it('leaves the matching area unhidden', () => {
     const home = renderToString(createElement(App, { initialPath: '/' }))
     expect(home).toMatch(/<div><main id="quick-calculation"/)

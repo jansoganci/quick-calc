@@ -178,16 +178,43 @@ try {
   assert(!sitemap.includes('priority'), 'sitemap.xml invents priority')
   assert(!sitemap.includes('/quick<'), 'sitemap.xml lists /quick')
   assert(!sitemap.includes('/guides'), 'sitemap.xml lists TBD guides')
+  assert(!sitemap.includes('404'), 'sitemap.xml lists 404')
 
   for (const url of urls) {
     assert(llms.includes(url), `llms.txt missing ${url}`)
   }
   assert(!llms.includes('/detailed/result'), 'llms.txt lists Sonuç')
   assert(!llms.includes('/guides'), 'llms.txt lists TBD guides')
+  assert(!llms.includes('404.html'), 'llms.txt lists 404.html')
   assert(!llms.includes('https://maliyet.lol/quick'), 'llms.txt lists /quick')
   assert(!/quick calc/i.test(llms), 'llms.txt uses English product name')
   assert(llms.includes('Simülasyonlar üçüncü bir hesap motoru değildir'), 'llms.txt must not call Simülasyonlar an engine')
   console.log(`ok /robots.txt /sitemap.xml /llms.txt (${urls.length} indexable URLs)`)
+} catch (error) {
+  failures.push(error instanceof Error ? error.message : String(error))
+}
+
+try {
+  const seo = seoForPath('/asdf')
+  const file = join(distDir, '404.html')
+  assert(existsSync(file), 'missing dist/404.html')
+  assert(!existsSync(join(distDir, '404', 'index.html')), 'must not write dist/404/index.html')
+  let html = readFileSync(file, 'utf8')
+  if (previewBase) {
+    const response = await fetch(`${previewBase}/asdf`, { redirect: 'manual' })
+    assert(response.status === 404, `/asdf → HTTP ${response.status}, expected 404`)
+    html = await response.text()
+  }
+  assert(documentTitle(html) === seo.title, `404 title: ${JSON.stringify(documentTitle(html))}`)
+  assert(namedMeta(html, 'robots') === 'noindex', '404.html missing noindex')
+  assert(html.includes('Bu sayfa yok'), '404.html missing heading')
+  assert(html.includes('href="/"'), '404.html missing Hızlı link')
+  assert(html.includes('href="/detailed"'), '404.html missing Detaylı link')
+  assert(html.includes('href="/simulations"'), '404.html missing Simülasyonlar link')
+  assert(!html.includes('WebApplication'), '404.html still has WebApplication JSON-LD')
+  assert(!html.includes('id="quick-calculation"'), '404.html rendered Hızlı')
+  assert(!html.includes('İşyeri kira stopajı hesaba dahil mi?'), '404.html kept Hakkında FAQ')
+  console.log(`ok 404.html${previewBase ? ' (/asdf → 404)' : ''}`)
 } catch (error) {
   failures.push(error instanceof Error ? error.message : String(error))
 }

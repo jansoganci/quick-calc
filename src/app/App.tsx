@@ -7,8 +7,9 @@ import { QuickCalcPage } from '../features/quick-calc/QuickCalcPage.tsx'
 import { RehberPage } from '../features/rehber/RehberPage.tsx'
 import { rehberPageBySlug, rehberPageFromPath } from '../features/rehber/pages.ts'
 import { AppShell } from './AppShell.tsx'
+import { NotFoundPage } from './NotFoundPage.tsx'
 import { areaFromLocation, canonicalPathFromLocation, screenFromLocation } from './location.ts'
-import { seoForPath } from './seoCopy.ts'
+import { hasSeoPage, seoForPath } from './seoCopy.ts'
 import { AREA_PATHS, type AppArea } from './shellCopy.ts'
 import { ErrorBoundary } from './ErrorBoundary.tsx'
 
@@ -18,9 +19,10 @@ import { ErrorBoundary } from './ErrorBoundary.tsx'
  */
 export function applyCanonicalLocation(): void {
   const { pathname, hash, search } = window.location
-  const next = `${canonicalPathFromLocation(pathname, hash)}${search}`
+  const useHash = pathname === '/' || pathname === ''
+  const next = `${canonicalPathFromLocation(pathname, useHash ? hash : '')}${search}`
   const current = `${pathname}${search}`
-  if (next === current && !hash) return
+  if (next === current && !(useHash && hash)) return
   window.history.replaceState(null, '', next)
 }
 
@@ -70,7 +72,7 @@ export function applyDocumentSeo(): void {
  * calculator in the URL. The pathname names which area is showing, and — once
  * Detaylı is open — which of its five screens. `/detailed` is Menü. Known
  * `/guides/<slug>` paths swap the three calculators for a Rehber article;
- * Rehber is not a fourth nav area.
+ * Rehber is not a fourth nav area. Unknown pathnames render `NotFoundPage`.
  *
  * Incoming hash bookmarks (`#detailed-feasibility/satis`, …) are rewritten to
  * those paths before React paints (`index.html` inline script + `applyCanonicalLocation`).
@@ -82,13 +84,19 @@ export function applyDocumentSeo(): void {
  * written to storage. Simülasyonlar reads the same in-memory Detailed draft.
  */
 
-function readLocation(): { area: AppArea; screen: DetailedScreen; guideSlug: string | null } {
+function readLocation(): {
+  area: AppArea
+  screen: DetailedScreen
+  guideSlug: string | null
+  notFound: boolean
+} {
   applyCanonicalLocation()
   const { pathname, hash } = window.location
   return {
     area: areaFromLocation(pathname, hash),
     screen: screenFromLocation(pathname, hash),
     guideSlug: rehberPageFromPath(pathname)?.slug ?? null,
+    notFound: !hasSeoPage(pathname),
   }
 }
 
@@ -113,12 +121,15 @@ export function App({ initialPath }: AppProps) {
       ? (rehberPageFromPath(initialPath)?.slug ?? null)
       : readLocation().guideSlug,
   )
+  const [notFound, setNotFound] = useState(() =>
+    initialPath !== undefined ? !hasSeoPage(initialPath) : readLocation().notFound,
+  )
   const detailed = useDetailedCalc()
   const guidePage = guideSlug === null ? undefined : rehberPageBySlug(guideSlug)
 
   useEffect(() => {
     applyDocumentSeo()
-  }, [area, screen, guideSlug])
+  }, [area, screen, guideSlug, notFound])
 
   useEffect(() => {
     function syncFromHistory() {
@@ -126,6 +137,7 @@ export function App({ initialPath }: AppProps) {
       setArea(next.area)
       setScreen(next.screen)
       setGuideSlug(next.guideSlug)
+      setNotFound(next.notFound)
     }
 
     window.addEventListener('popstate', syncFromHistory)
@@ -145,7 +157,9 @@ export function App({ initialPath }: AppProps) {
    * the screen.
    */
   function goToArea(next: AppArea) {
-    if (guideSlug !== null) {
+    if (notFound) {
+      setNotFound(false)
+    } else if (guideSlug !== null) {
       setGuideSlug(null)
     } else if (next === area) {
       return
@@ -172,8 +186,10 @@ export function App({ initialPath }: AppProps) {
 
   return (
     <ErrorBoundary>
-      <AppShell area={guidePage ? null : area} onAreaChange={goToArea}>
-        {guidePage ? (
+      <AppShell area={notFound || guidePage ? null : area} onAreaChange={goToArea}>
+        {notFound ? (
+          <NotFoundPage />
+        ) : guidePage ? (
           <RehberPage page={guidePage} />
         ) : (
           <>

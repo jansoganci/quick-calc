@@ -69,9 +69,8 @@ export function screenFromLocation(pathname: string, hash: string): DetailedScre
 
 /**
  * Path the address bar should show. Hash bookmarks become real paths. `/quick`
- * and `/detailed/menu` collapse to their parents. Unknown `/detailed/…`
- * suffixes collapse to `/detailed`. Other unknown pathnames are left alone
- * (SPA fallback still paints Hızlı).
+ * and `/detailed/menu` collapse to their parents. Unknown pathnames stay as
+ * written so `404.html` can hydrate on the same URL the edge returned.
  */
 export function canonicalPathFromLocation(pathname: string, hash: string): string {
   const raw = hash.startsWith('#') ? hash.slice(1) : hash
@@ -80,10 +79,6 @@ export function canonicalPathFromLocation(pathname: string, hash: string): strin
   const path = pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname
   const alias = PATH_ALIASES.find((entry) => entry.from === path)
   if (alias) return alias.to
-  if (path === AREA_PATHS.detailed || path.startsWith(`${AREA_PATHS.detailed}/`)) {
-    return pathForScreen(detailedScreenFromPath(path) ?? 'menu')
-  }
-  if (path === AREA_PATHS.simulations) return AREA_PATHS.simulations
   if (path === '' || path === '/') return AREA_PATHS.quick
   return path
 }

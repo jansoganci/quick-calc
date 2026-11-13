@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
@@ -18,8 +18,10 @@ function stripTsExtensions() {
 
 /**
  * Vite preview's SPA fallback would otherwise 200 the home HTML at `/detailed`.
- * Matches wrangler `html_handling: "drop-trailing-slash"`: `/detailed` serves
- * `detailed/index.html` with 200, `/detailed/` 307s to `/detailed`. Dev is unchanged.
+ * Matches wrangler `html_handling: "drop-trailing-slash"` and
+ * `not_found_handling: "404-page"`: `/detailed` serves `detailed/index.html`
+ * with 200, `/detailed/` 307s to `/detailed`, unknown paths serve `404.html`
+ * with 404. Dev is unchanged.
  */
 function previewDirectoryIndex(): Plugin {
   return {
@@ -49,6 +51,19 @@ function previewDirectoryIndex(): Plugin {
         if (pathOnly.length > 1 && existsSync(join(dist, pathOnly.slice(1), 'index.html'))) {
           req.url = `${pathOnly}/index.html${search}`
           next()
+          return
+        }
+        const notFound = join(dist, '404.html')
+        const relative = pathOnly.replace(/^\//, '')
+        if (
+          pathOnly !== '/' &&
+          existsSync(notFound) &&
+          !existsSync(join(dist, relative)) &&
+          !existsSync(join(dist, relative, 'index.html'))
+        ) {
+          res.statusCode = 404
+          res.setHeader('Content-Type', 'text/html; charset=utf-8')
+          res.end(readFileSync(notFound))
           return
         }
         next()

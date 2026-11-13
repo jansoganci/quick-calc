@@ -68,7 +68,7 @@ export function applySeoToHtml(html: string, seo: SeoDocument): string {
   }
 
   out = replaceJsonLd(out, seo.jsonLd)
-  if (seo.ogType === 'article') {
+  if (!seo.hakkindaFooter) {
     out = stripHakkindaFooter(out)
   }
 

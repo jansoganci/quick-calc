@@ -130,6 +130,8 @@
     -->
     <script>
       (function () {
+        var path = location.pathname
+        if (path !== '/' && path !== '') return
         var hash = location.hash.replace(/^#/, '')
         if (!hash) return
         var map = {
