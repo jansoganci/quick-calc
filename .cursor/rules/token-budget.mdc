@@ -32,5 +32,15 @@ alwaysApply: true
 - Keep reports short. Do not paste full diffs, logs, or file contents into the report.
 - Do not dump `node_modules`/`dist` listings or large files into context.
 
+## Session and loop limits
+- One session per batch: after opening the PR, end the session. The next batch starts fresh from the plan file and `AGENTS.md`, not from chat history.
+- If the same check fails twice after a fix attempt, stop and report the blocker instead of retrying.
+- Before starting a batch, post a plan of at most 5 lines (files to touch, checks to run) and wait for approval.
+
+## Quiet output and targeted reads
+- Use quiet test output: `npm run test:run -- --reporter=dot`.
+- Prefer `grep` and line-range reads over whole-file reads. Do not re-read a file after editing it.
+- Do not hand-fix formatting or lint issues that `npx eslint --fix` can fix.
+
 ## Scope
 - These rules do not relax the quality rules in `AGENTS.md`.
