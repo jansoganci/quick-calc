@@ -11,20 +11,20 @@ type AppShellProps = {
 
 /**
  * The page frame every area renders inside: the 1152px sheet, a simplified
- * masthead, the three-area switch (desktop left column / mobile top row) and
- * the colophon. Keeping it here rather than in a feature is what lets the
- * areas share a shell without importing each other (architecture R5).
+ * masthead, the three-area switch (desktop left column of this same sheet /
+ * mobile top row) and the colophon. Keeping it here rather than in a feature
+ * is what lets the areas share a shell without importing each other
+ * (architecture R5).
  */
 export function AppShell({ area, onAreaChange, children }: AppShellProps) {
   return (
-    <div className="flex justify-center">
-      <AreaNav area={area} onAreaChange={onAreaChange} layout="desktop" />
-      <div className="qc-sheet min-w-0 w-full max-w-[1152px] overflow-x-clip border-x border-qc-rule bg-qc-surface">
-        <AppHeader />
-        <AreaNav area={area} onAreaChange={onAreaChange} layout="mobile" />
-        {children}
-        <AppFooter />
+    <div className="qc-sheet mx-auto min-w-0 w-full max-w-[1152px] overflow-x-clip border-x border-qc-rule bg-qc-surface">
+      <AppHeader />
+      <div className="qc-area-frame lg:grid lg:grid-cols-[148px_minmax(0,1fr)]">
+        <AreaNav area={area} onAreaChange={onAreaChange} />
+        <div className="min-w-0">{children}</div>
       </div>
+      <AppFooter />
     </div>
   )
 }

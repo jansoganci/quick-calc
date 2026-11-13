@@ -270,7 +270,7 @@ After the first `Hesapla`, two results-area blocks sit between kanal ekonomisi a
 | Block | On screen | Copy |
 | --- | --- | --- |
 | **Menü ürünleri** | Per product: entered salon price, `unitProductCost`, malzeme payı (`unitProductCost / salon net-of-KDV`), her birinden kalan (salon §9.4). Weakest = lowest remaining; omitted on a one-product menu | Sen. Never `marj`, `katkı`, `food cost`. Labels: `Malzeme payı`, `Her birinden kalan` |
-| **Kira kaç günde çıkıyor** | On **Sonuç**, the **base** month. Ordered lines, no chart, no icon. Days = cost / (`totalContribution` / `operatingDaysPerMonth`). Order: kira (`rentCost`), personel (`monthlyPayroll`), diğer (owner + opex + aidat), then remainder. Engine raw; screen one decimal with a Turkish comma (`5,6`); senin = working days − unrounded shown sum, also one decimal. Empty / `0,0` buckets omitted. Unavailable when contribution ≤ 0; uncovered when remainder < 0 | `Ayın ilk {n} günü kira için çalışıyorsun`, then `Sonraki {n} günü …`, then `Geri kalan {n} gün senin` |
+| **Kira kaç günde çıkıyor** | On **Sonuç**, the **base** month. Ordered lines, no chart, no icon. Days = cost / (`totalContribution` / `operatingDaysPerMonth`). Order: kira (`rentCost`), personel (`monthlyPayroll`), diğer (owner + opex + aidat), then remainder. Engine raw; screen one decimal with a Turkish comma (`5,6`); senin = working days − the **displayed** (one-decimal) shown buckets, also one decimal, so the printed lines add up exactly. Empty / `0,0` buckets omitted. Unavailable when contribution ≤ 0; uncovered when the displayed remainder is negative | `Ayın ilk {n} günü kira için çalışıyorsun`, then `Sonraki {n} günü …`, then `Geri kalan {n} gün senin` |
 | **Ocak testi** | On **Simülasyonlar**, not Sonuç. Two `%` fields, empty = 0: `Asgari ücret artışı`, `Kira artışı`. Live before → after for monthly leftover and break-even (günde). What-if kira-gün lines sit under the same area. Wage rate × whole `monthlyPayroll`; rent rate × `rentCost`; aidat and owner untouched. Transient — not written to the draft or the URL. Does not ask fiyat vs adet (rejected). | Placeholder `0`. Unreadable input counts as 0 with a quiet hint, no red. Empty area copy: `Önce Detaylı Hesap’ı doldur.` with Detaylı Hesap as a text link |
 
 These blocks are display helpers. They do not change `calculateDetailed`, Kötü / Baz / İyi, or `detailedEngineVersion`.
@@ -343,12 +343,12 @@ Section 01 starts with **one empty product row**. Every other section renders em
 `src/app/AreaNav.tsx`. Existing tokens and typography only. No icons, no cards, no `Hesaplama modu` eyebrow, no description lines.
 
 - **Mobile (below `lg`):** a simple horizontal three-column text row under the masthead, the same idea as the old two-mode tabs. Labels only. Each entry is a ≥44px target.
-- **Desktop (`lg+`):** a vertical text list in the currently empty column to the left of the 1152px sheet, on the page background, sticky with the masthead. The sheet itself no longer carries a mode-tabs block.
+- **Desktop (`lg+`):** a vertical text list in the **left column of the same 1152px white sheet** as the content (not on the grey page background). The masthead and the colophon span the full sheet; the nav sits between them as the first grid column (`148px`). Sticky below the masthead (`lg:top-14`). This is what keeps the footer aligned with the frame at 1280 and 1440. The sheet itself no longer carries a mode-tabs block.
 - Active: 14px weight 600 `--qc-ink` with a 2px `--qc-ink` underline **under the label**. Inactive: weight 400 `--qc-secondary`, underline `--qc-rule-strong` on hover. **Never the accent**.
 - Each entry is an `<a href="#quick">` / `<a href="#detailed-feasibility">` / `<a href="#simulations">` with `aria-current="page"` on the active one, inside `<nav aria-label="Bölümler">`.
 - Does not print (`qc-screen-only`).
 
-The masthead stays sticky from `lg` and the result panes still offset by `lg:top-14`. The desktop area list is itself sticky at `top-0` in the left column. Switching mid-scroll from a finished Quick result is still served by §6.3.
+The masthead stays sticky from `lg` and the result panes still offset by `lg:top-14`. The desktop area list is itself sticky at `top-14` in the sheet's left column. Switching mid-scroll from a finished Quick result is still served by §6.3.
 
 ### 6.3 The handoff at the foot of a finished Quick result
 

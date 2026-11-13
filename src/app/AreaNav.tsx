@@ -8,32 +8,23 @@ import {
 } from './shellCopy.ts'
 
 /**
- * The three top-level areas. Desktop: a vertical text list in the empty column
- * to the left of the sheet. Mobile: a simple horizontal text row under the
- * masthead, the same idea as the old two-mode tabs, without the eyebrow, the
- * descriptions, icons or cards.
+ * The three top-level areas. One landmark: a horizontal text row under the
+ * masthead below `lg`, and a vertical list in the sheet's left column from
+ * `lg`. No eyebrow, no descriptions, no icons, no cards.
  */
 export function AreaNav({
   area,
   onAreaChange,
-  layout,
 }: {
   area: AppArea
   onAreaChange: (area: AppArea) => void
-  layout: 'mobile' | 'desktop'
 }) {
-  const isDesktop = layout === 'desktop'
-
   return (
     <nav
       aria-label={SHELL_COPY.areaNavigation}
-      className={
-        isDesktop
-          ? 'qc-screen-only hidden w-[148px] shrink-0 self-start lg:sticky lg:top-0 lg:block lg:px-3 lg:pt-5'
-          : 'qc-screen-only border-b border-qc-rule bg-qc-surface px-[18px] lg:hidden'
-      }
+      className="qc-screen-only border-b border-qc-rule bg-qc-surface px-[18px] lg:sticky lg:top-14 lg:self-start lg:border-b-0 lg:border-r lg:border-qc-rule lg:px-3 lg:pt-5"
     >
-      <div className={isDesktop ? 'flex flex-col' : 'grid grid-cols-3 gap-x-2'}>
+      <div className="grid grid-cols-3 gap-x-2 lg:flex lg:flex-col">
         {AREAS.map((candidate) => {
           const isActive = candidate === area
           return (
@@ -47,7 +38,7 @@ export function AreaNav({
               }}
               className={cn(
                 'flex min-h-[44px]',
-                isDesktop ? 'items-start pt-1' : 'items-center justify-center',
+                'items-center justify-center lg:items-start lg:justify-start lg:pt-1',
               )}
             >
               <span

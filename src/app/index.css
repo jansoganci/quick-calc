@@ -411,6 +411,11 @@
     border: 0 !important;
   }
 
+  /* Nav is `qc-screen-only`; drop the desktop left column so print is one sheet. */
+  .qc-area-frame {
+    display: block !important;
+  }
+
   .qc-report-cover,
   .qc-report-appendix,
   .qc-report-body {
