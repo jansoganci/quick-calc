@@ -1,12 +1,82 @@
 import { cn } from '../../../lib/cn.ts'
 import { RECIPE_COPY } from '../labels.ts'
-import type { PricePreview as PricePreviewModel } from '../recipePreview.ts'
+import type {
+  PricePreview as PricePreviewModel,
+  PricePreviewLine,
+  PriceSuggestion,
+  PriceSuggestionField,
+} from '../recipePreview.ts'
 
 type PricePreviewProps = {
   preview: PricePreviewModel
+  onApply?: (productIndex: number, field: PriceSuggestionField, value: string) => void
 }
 
-export function PricePreview({ preview }: PricePreviewProps) {
+function SuggestionRow({
+  suggestion,
+  onApply,
+}: {
+  suggestion: PriceSuggestion
+  onApply?: () => void
+}) {
+  return (
+    <div className="mt-1 flex items-center justify-between gap-3">
+      <p className="font-mono text-xs tabular-nums text-qc-ink">
+        {RECIPE_COPY.priceRiseSuggest(suggestion.suggestedText)}
+      </p>
+      {suggestion.canApply && onApply ? (
+        <button type="button" className="qc-text-btn is-accent min-h-[44px] lg:min-h-0" onClick={onApply}>
+          {RECIPE_COPY.priceRiseApply}
+        </button>
+      ) : (
+        <span />
+      )}
+    </div>
+  )
+}
+
+function ProductRestore({
+  line,
+  onApply,
+}: {
+  line: PricePreviewLine
+  onApply?: PricePreviewProps['onApply']
+}) {
+  return (
+    <>
+      {line.restoreText ? (
+        <p className="mt-0.5 text-xs text-qc-secondary">{line.restoreText}</p>
+      ) : null}
+      {line.suggestions
+        .filter((item) => item.field === 'normalPrice')
+        .map((item) => (
+          <SuggestionRow
+            key={item.field}
+            suggestion={item}
+            onApply={
+              onApply ? () => onApply(line.productIndex, item.field, item.applyValue) : undefined
+            }
+          />
+        ))}
+      {line.restoreOnlineText ? (
+        <p className="mt-1 text-xs text-qc-secondary">{line.restoreOnlineText}</p>
+      ) : null}
+      {line.suggestions
+        .filter((item) => item.field === 'onlinePrice')
+        .map((item) => (
+          <SuggestionRow
+            key={item.field}
+            suggestion={item}
+            onApply={
+              onApply ? () => onApply(line.productIndex, item.field, item.applyValue) : undefined
+            }
+          />
+        ))}
+    </>
+  )
+}
+
+export function PricePreview({ preview, onApply }: PricePreviewProps) {
   return (
     <div className="border-t border-qc-ink pt-3">
       <p className="text-[15px] font-medium text-qc-ink">{preview.heading}</p>
@@ -23,9 +93,7 @@ export function PricePreview({ preview }: PricePreviewProps) {
               {RECIPE_COPY.priceRiseCost(line.costFrom, line.costTo)}
             </p>
             <p className="mt-0.5 text-xs text-qc-secondary">{line.remainingText}</p>
-            {line.restoreText ? (
-              <p className="mt-0.5 text-xs text-qc-secondary">{line.restoreText}</p>
-            ) : null}
+            <ProductRestore line={line} onApply={onApply} />
           </div>
         ))}
       </div>
@@ -58,7 +126,9 @@ export function PricePreview({ preview }: PricePreviewProps) {
               {line.costFrom} → {line.costTo}
             </p>
             <p className="text-xs text-qc-secondary">{line.remainingText}</p>
-            <p className="text-xs text-qc-secondary">{line.restoreText ?? '—'}</p>
+            <div>
+              <ProductRestore line={line} onApply={onApply} />
+            </div>
           </div>
         ))}
       </div>
@@ -71,10 +141,11 @@ export function PricePreview({ preview }: PricePreviewProps) {
 export function PricePreviewDesktop({
   preview,
   onDone,
+  onApply,
 }: PricePreviewProps & { onDone: () => void }) {
   return (
     <div className={cn('mt-4 hidden border-y border-qc-rule-mid bg-qc-surface-result px-3 py-3 lg:block')}>
-      <PricePreview preview={preview} />
+      <PricePreview preview={preview} onApply={onApply} />
       <button type="button" className="qc-text-btn mt-3" onClick={onDone}>
         {RECIPE_COPY.done}
       </button>

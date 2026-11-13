@@ -69,6 +69,22 @@ describe('Zam geldi preview (O3, §7.4 fixtures)', () => {
     expect(hamburger?.remainingText).toBe(RECIPE_COPY.priceRiseRemainingDown('8,40'))
     expect(hamburger?.restoreText).toContain('229,24')
     expect(hamburger?.restoreText).toContain('220,00')
+    const salon = hamburger?.suggestions.find((item) => item.field === 'normalPrice')
+    expect(salon?.suggestedText).toBe('230')
+    expect(salon?.applyValue).toBe('230')
+    expect(salon?.canApply).toBe(true)
+  })
+
+  it('shows Hamburger online restore 241,07 and esnaf 242 without writing the price', () => {
+    const preview = buildPricePreview(form, kiyma, opened)
+    const hamburger = preview?.lines.find((line) => line.productName === 'Hamburger')
+    expect(hamburger?.restoreOnlineText).toContain('241,07')
+    expect(hamburger?.restoreOnlineText).toContain('230,00')
+    const online = hamburger?.suggestions.find((item) => item.field === 'onlinePrice')
+    expect(online?.suggestedText).toBe('242')
+    expect(online?.applyValue).toBe('242')
+    expect(online?.canApply).toBe(true)
+    expect(form.products[0]?.onlinePrice).toBe('230')
   })
 
   it('shows Köfte ekmek 46,80 → 53,80 and salon restore 167,70', () => {
@@ -78,6 +94,9 @@ describe('Zam geldi preview (O3, §7.4 fixtures)', () => {
     expect(kofte?.costTo).toBe('53,80')
     expect(kofte?.remainingText).toBe(RECIPE_COPY.priceRiseRemainingDown('7,00'))
     expect(kofte?.restoreText).toContain('167,70')
+    expect(kofte?.restoreOnlineText).toContain('189,22')
+    expect(kofte?.suggestions.find((item) => item.field === 'normalPrice')?.suggestedText).toBe('168')
+    expect(kofte?.suggestions.find((item) => item.field === 'onlinePrice')?.suggestedText).toBe('190')
   })
 
   it('O3: a price drop has no restore line and says arttı', () => {
@@ -86,7 +105,25 @@ describe('Zam geldi preview (O3, §7.4 fixtures)', () => {
     expect(preview?.kind).toBe('drop')
     expect(preview?.heading).toBe(RECIPE_COPY.priceDropHeading('Kıyma'))
     expect(preview?.lines[0]?.restoreText).toBeNull()
+    expect(preview?.lines[0]?.restoreOnlineText).toBeNull()
+    expect(preview?.lines[0]?.suggestions).toEqual([])
     expect(preview?.lines.every((line) => line.remainingText.includes('arttı'))).toBe(true)
+  })
+
+  it('omits Bu fiyatı yaz after a tap so Δcost is not added twice', () => {
+    const openedAt = snapshotOf({ ...ingredients[1]!, purchasePrice: '380' }, form.products)
+    const applied = {
+      ...form,
+      products: form.products.map((product, index) =>
+        index === 0 ? { ...product, normalPrice: '230', onlinePrice: '242' } : product,
+      ),
+    }
+    const preview = buildPricePreview(applied, kiyma, openedAt)
+    const hamburger = preview?.lines.find((line) => line.productName === 'Hamburger')
+    expect(hamburger?.restoreText).toContain('229,24')
+    expect(hamburger?.restoreText).toContain('230,00')
+    expect(hamburger?.suggestions.find((item) => item.field === 'normalPrice')?.canApply).toBe(false)
+    expect(hamburger?.suggestions.find((item) => item.field === 'onlinePrice')?.canApply).toBe(false)
   })
 
   it('does not preview when the ingredient is unused', () => {

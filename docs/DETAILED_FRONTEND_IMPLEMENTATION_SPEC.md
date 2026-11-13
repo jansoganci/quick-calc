@@ -5,7 +5,7 @@
 
 **Authority order.** `DETAILED_FEASIBILITY_DECISIONS.md` (product decisions, DF-series) → `DETAILED_FINANCIAL_SPEC.md` (formulas, input/output contract) → `DESIGN_DIRECTION.md` (locked visual/UX rules, V-series) → `APP_ARCHITECTURE_AND_PROJECT_STRUCTURE.md` (structure) → this document (Detailed screen structure, measurements, copy). `FRONTEND_IMPLEMENTATION_SPEC.md` remains the authority for the Quick / Lite screen; this document never overrides it.
 
-This document adds **no financial formulas.** Every figure it displays is read from `DetailedResult`, `DetailedResolvedInput`, or the Appendix B display helpers on that same base month (`DETAILED_FINANCIAL_SPEC.md`). The two Ocak testi fields are results-area what-if inputs, not form fields and not draft state.
+This document adds **no financial formulas.** Every figure it displays is read from `DetailedResult`, `DetailedResolvedInput`, the Appendix B display helpers on that same base month, or the Appendix D price-suggestion helpers (`DETAILED_FINANCIAL_SPEC.md`). The two Ocak testi fields are results-area what-if inputs, not form fields and not draft state. Appendix D figures appear on Malzemeler before `Hesapla`; they are inputs, not monthly results.
 
 ---
 
@@ -78,7 +78,7 @@ Eleven sections, fixed order, **unnumbered** on screen (the `01`–`05` Mono pre
 | 10 | İlk yatırım | `capexItems[]` |
 | 11 | Varsayımlar | `assumptions.*` including `operatingDaysPerMonth` |
 
-**Malzemeler is screen 02.** Authority for this block, the recipe editor, and the price-rise preview remains `docs/RECIPE_REDESIGN_SPEC.md` (owner lock 12 November 2026). In short: one purchase-price editor on the list; recipe lines carry only usage quantity, labelled by unit (`Kaç adet?` / `Kaç gram?` / `Kaç ml?`, never Gramaj); the recipe opens as a full-screen layer below 1024px and as a block under the menu table from 1024px; ingredients may be added from the list or born from the recipe search (Turkish-aware name match). The monthly engine still receives one `unitProductCost` per product (`DETAILED_FINANCIAL_SPEC.md` Appendix A).
+**Malzemeler is screen 02.** Authority for this block, the recipe editor, and the price-rise preview remains `docs/RECIPE_REDESIGN_SPEC.md` (owner lock 12 November 2026), with step-6 restore/suggestion in `DETAILED_FINANCIAL_SPEC.md` Appendix D. In short: one purchase-price editor on the list; recipe lines carry only usage quantity, labelled by unit (`Kaç adet?` / `Kaç gram?` / `Kaç ml?`, never Gramaj); the recipe opens as a full-screen layer below 1024px and as a block under the menu table from 1024px; ingredients may be added from the list or born from the recipe search (Turkish-aware name match). Zam geldi shows exact salon and online restore prices plus a whole-lira-up suggestion; `Bu fiyatı yaz` writes that channel’s field and nothing else. The monthly engine still receives one `unitProductCost` per product (`DETAILED_FINANCIAL_SPEC.md` Appendix A).
 
 **Section 05 is model-driven progressive disclosure:** it renders only when `channelMix.delivery > 0`, which is exactly the condition under which `delivery.mode` becomes required (spec §6.4). No toggle, no "advanced" switch.
 
@@ -419,7 +419,7 @@ Shared with Quick only through `lib/`, `app/` and `components/` (`NumberField`, 
 
 1. No financial formula in a React component. The bar's percentage widths and the chart's pixel coordinates are the only arithmetic allowed in the view layer, and both are pure presentation of engine figures.
 2. Every default, limit and label imported from `core/detailed/defaults.ts`, `core/detailed/limits.ts` and `features/detailed-feasibility/labels.ts` — never restated.
-3. No new form input, no new `calculateDetailed` output, no new KPI. Appendix B display helpers (salon malzeme payı, kira-gün, Ocak testi) are the approved exception; their formulas live in the financial spec, not in React.
+3. No new form input, no new `calculateDetailed` output, no new KPI. Appendix B display helpers (salon malzeme payı, kira-gün, Ocak testi) and Appendix D price-suggestion helpers are the approved exceptions; their formulas live in the financial spec, not in React. A suggestion does not write `normalPrice` / `onlinePrice` until `Bu fiyatı yaz`.
 4. `depreciation`, `amortisman`, `netProfit`, `net kâr` must not appear in identifiers, types, comments or strings.
 5. Money formatting always `Intl.NumberFormat('tr-TR')`, full form, unit after a space — `1.027.350 TL`, `%3,59`. Never abbreviated (the mobile chart axis label `250b` in the mock is a **chart tick**, and is the one place an abbreviation is proposed — flag it for approval or replace it with a tick-free axis).
 

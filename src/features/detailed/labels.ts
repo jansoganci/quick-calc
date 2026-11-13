@@ -616,13 +616,17 @@ export const RECIPE_COPY = {
   priceRiseRemainingUp: (amount: string) => `Her birinden kalan ${amount} TL arttı.`,
   priceRiseRestore: (restore: string, current: string) =>
     `Eski kalan için salon fiyatı ${restore} TL olmalı. Şimdi ${current} TL.`,
+  priceRiseRestoreOnline: (restore: string, current: string) =>
+    `Eski kalan için online fiyat ${restore} TL olmalı. Şimdi ${current} TL.`,
+  priceRiseSuggest: (amount: string) => `Öneri ${amount} TL`,
+  priceRiseApply: 'Bu fiyatı yaz',
   priceRiseFoot: (rate: string) =>
-    `Salon fiyatı KDV %${rate} dahil. Kart ve yemek kartı kesintisi bu hesaba girmedi. Paket servis ve online fiyat sonra.`,
+    `Salon fiyatı KDV %${rate} dahil. Kart ve yemek kartı kesintisi salon hesabına girmedi. Online fiyat platform kesintisi ve KDV ile. Öneri yukarı yuvarlanmış tam lira; yazdığın fiyat ancak «Bu fiyatı yaz»a basınca değişir.`,
   priceRiseColumns: {
     product: 'Ürün',
     cost: 'Maliyet',
     remaining: 'Her birinden kalan',
-    restore: 'Eski kalan için salon fiyatı',
+    restore: 'Eski kalan için fiyat',
   },
   unnamedProduct: (index: number) => `Ürün ${index}`,
 } as const
