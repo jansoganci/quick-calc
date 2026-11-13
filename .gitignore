@@ -1,5 +1,7 @@
 node_modules/
 dist/
+dist-ssr/
+.wrangler/
 *.tsbuildinfo
 .DS_Store
 coverage/

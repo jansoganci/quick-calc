@@ -11,6 +11,9 @@
   ],
   "assets": {
     "directory": "./dist",
+    // Canonicals are no-slash (`/detailed`). Default auto-trailing-slash 307s
+    // those URLs to `/detailed/`, which Google flags as canonical→redirect.
+    "html_handling": "drop-trailing-slash",
     "not_found_handling": "single-page-application"
   }
 }

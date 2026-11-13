@@ -6,6 +6,7 @@ import {
   emptyProduct,
   emptyRecipeLine,
   initialForm,
+  resetIdCounter,
   syncIdCounter,
 } from './formState.ts'
 
@@ -91,5 +92,15 @@ describe('syncIdCounter', () => {
     const form = initialForm()
     form.products = []
     expect(() => syncIdCounter(form)).not.toThrow()
+  })
+})
+
+describe('resetIdCounter', () => {
+  it('lets a later blank form mint product-1 again', () => {
+    resetIdCounter()
+    expect(initialForm().products[0]?.id).toBe('product-1')
+    expect(emptyProduct().id).toBe('product-2')
+    resetIdCounter()
+    expect(initialForm().products[0]?.id).toBe('product-1')
   })
 })

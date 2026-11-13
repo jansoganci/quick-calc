@@ -106,6 +106,15 @@ function makeId(prefix: string): string {
 }
 
 /**
+ * The prerender script renders every calculator path in one Node process, so
+ * this module's counter would otherwise keep climbing (`product-8` on the last
+ * page). The browser starts at 0, and hydrate compares the ids as React keys.
+ */
+export function resetIdCounter(): void {
+  nextId = 0
+}
+
+/**
  * Point the counter past every id already in `form`.
  *
  * `nextId` starts at 0 on every page load, so a draft restored from storage carries
