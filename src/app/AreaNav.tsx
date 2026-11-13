@@ -22,9 +22,9 @@ export function AreaNav({
   return (
     <nav
       aria-label={SHELL_COPY.areaNavigation}
-      className="qc-screen-only border-b border-qc-rule bg-qc-surface px-[18px] lg:sticky lg:top-14 lg:self-start lg:border-b-0 lg:border-r lg:border-qc-rule lg:px-3 lg:pt-5"
+      className="qc-screen-only border-b border-qc-rule bg-qc-surface px-[18px] xl:sticky xl:top-14 xl:self-start xl:border-b-0 xl:border-r xl:border-qc-rule xl:px-3 xl:pt-5"
     >
-      <div className="grid grid-cols-3 gap-x-2 lg:flex lg:flex-col">
+      <div className="grid grid-cols-3 gap-x-2 xl:flex xl:flex-col">
         {AREAS.map((candidate) => {
           const isActive = area !== null && candidate === area
           return (
@@ -39,7 +39,7 @@ export function AreaNav({
               }}
               className={cn(
                 'flex min-h-[44px]',
-                'items-center justify-center lg:items-start lg:justify-start lg:pt-1',
+                'items-center justify-center xl:items-start xl:justify-start xl:pt-1',
               )}
             >
               <span

@@ -246,7 +246,7 @@ function RecipeLineRow({
       className={cn('border-t border-qc-rule-row py-3', focused && 'bg-qc-surface-result')}
       onFocus={onFocus}
     >
-      <div className="grid grid-cols-2 items-start gap-3 lg:grid-cols-[minmax(0,1fr)_168px_200px_96px_52px] lg:items-center">
+      <div className="grid grid-cols-2 items-start gap-3 lg:grid-cols-[minmax(7rem,1fr)_minmax(7rem,168px)_minmax(0,200px)_96px_52px] lg:items-center">
         <div className="col-span-2 flex items-baseline justify-between gap-3 lg:col-span-1 lg:block">
           <span className="truncate text-[15px] text-qc-ink lg:text-[13px]">
             {ingredient?.name.trim() || RECIPE_COPY.ingredientName}
@@ -414,7 +414,7 @@ export function RecipeEditor({
         <p className="mt-4 text-[13px] text-qc-secondary">{RECIPE_COPY.recipeEmpty}</p>
       ) : null}
 
-      <div className="mt-3 hidden gap-2 pb-2 lg:grid lg:grid-cols-[minmax(0,1fr)_168px_200px_96px_52px]">
+      <div className="mt-3 hidden gap-2 pb-2 lg:grid lg:grid-cols-[minmax(7rem,1fr)_minmax(7rem,168px)_minmax(0,200px)_96px_52px]">
         <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
           {RECIPE_COPY.ingredientName}
         </span>

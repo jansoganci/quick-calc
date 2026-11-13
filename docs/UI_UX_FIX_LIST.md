@@ -18,7 +18,7 @@ Priority: **P0** broken · **P1** drift from approved rules · **P2** polish.
 
 ## P0: broken
 
-### F1. The desktop area menu squeezes every section-01 grid
+### [x] F1. The desktop area menu squeezes every section-01 grid
 
 - **Cause:** `src/app/AppShell.tsx:23` adds a `148px` left column (`lg:grid-cols-[148px_minmax(0,1fr)]`). The Detailed grids still use fixed tracks sized for the old 779px input column, so the `minmax(0,1fr)` name track collapses.
 - **Seen at 1280px:**
@@ -29,7 +29,7 @@ Priority: **P0** broken · **P1** drift from approved rules · **P2** polish.
   - b) Keep the left menu, and below `xl` render Menü, Recipe and Malzemeler in their stacked (mobile) form.
 - **Done when:** at 1024, 1280 and 1440px, the longest sample names (`Kahve çekirdeği`, `Köfte ekmek`) are fully visible, and no header overlaps.
 
-### F2. Desktop result tables are clipped or run together
+### [x] F2. Desktop result tables are clipped or run together
 
 - **Same cause as F1**, on the Sonuç screen at 1280px:
   - **Senaryolar:** the İyi column is clipped (`602.386 T`, `219.217` cut), and row labels wrap to 3 lines.

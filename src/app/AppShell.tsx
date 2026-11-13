@@ -11,17 +11,17 @@ type AppShellProps = {
 }
 
 /**
- * The page frame every area renders inside: the 1152px sheet, a simplified
+ * The page frame every area renders inside: the 1152px sheet (1300px from `xl`), a simplified
  * masthead, the three-area switch (desktop left column of this same sheet /
- * mobile top row) and the colophon. Keeping it here rather than in a feature
+ * mobile and narrow-desktop top row; left column from `xl`, where the sheet widens by the column's 148px so the calculators keep their designed width) and the colophon. Keeping it here rather than in a feature
  * is what lets the areas share a shell without importing each other
  * (architecture R5).
  */
 export function AppShell({ area, onAreaChange, children }: AppShellProps) {
   return (
-    <div className="qc-sheet mx-auto min-w-0 w-full max-w-[1152px] overflow-x-clip border-x border-qc-rule bg-qc-surface">
+    <div className="qc-sheet mx-auto min-w-0 w-full max-w-[1152px] overflow-x-clip xl:max-w-[1300px] border-x border-qc-rule bg-qc-surface">
       <AppHeader />
-      <div className="qc-area-frame lg:grid lg:grid-cols-[148px_minmax(0,1fr)]">
+      <div className="qc-area-frame xl:grid xl:grid-cols-[148px_minmax(0,1fr)]">
         <AreaNav area={area} onAreaChange={onAreaChange} />
         <div className="min-w-0">{children}</div>
       </div>

@@ -13,7 +13,7 @@ const ROWS = [
 export function ScenarioTable({ scenarios }: { scenarios: ScenarioRow[] }) {
   return (
     <div className="max-w-[820px]">
-      <div className="grid grid-cols-[1fr_repeat(3,minmax(0,1fr))] gap-3 border-b border-qc-ink pb-2 lg:grid-cols-[1fr_180px_180px_180px]">
+      <div className="grid grid-cols-[1fr_repeat(3,minmax(0,1fr))] gap-3 border-b border-qc-ink pb-2 lg:grid-cols-[minmax(0,1fr)_repeat(3,minmax(0,150px))]">
         <span />
         {scenarios.map((scenario) => (
           <span
@@ -32,7 +32,7 @@ export function ScenarioTable({ scenarios }: { scenarios: ScenarioRow[] }) {
         <div
           key={row.key}
           className={cn(
-            'grid grid-cols-[1fr_repeat(3,minmax(0,1fr))] items-baseline gap-3 py-[11px] lg:grid-cols-[1fr_180px_180px_180px]',
+            'grid grid-cols-[1fr_repeat(3,minmax(0,1fr))] items-baseline gap-3 py-[11px] lg:grid-cols-[minmax(0,1fr)_repeat(3,minmax(0,150px))]',
             index === ROWS.length - 1 ? 'border-b border-qc-ink' : 'border-b border-qc-rule-row',
           )}
         >
@@ -47,7 +47,7 @@ export function ScenarioTable({ scenarios }: { scenarios: ScenarioRow[] }) {
                   'text-right',
                   isSentence
                     ? 'text-xs lg:text-[13px]'
-                    : 'font-mono tabular-nums text-[13px] lg:text-sm',
+                    : 'whitespace-nowrap font-mono tabular-nums text-[13px] lg:text-sm',
                   scenario.isBase
                     ? cn('text-qc-ink', row.emphasise ? 'font-semibold lg:text-base' : 'font-medium')
                     : 'text-qc-secondary',

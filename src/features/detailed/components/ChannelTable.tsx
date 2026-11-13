@@ -18,16 +18,16 @@ type ChannelTableProps = {
 }
 
 /**
- * Seven columns work at desktop width and nowhere near a phone, so below `lg` the
+ * Seven columns work at desktop width and nowhere near a phone, so below `xl` the
  * table transposes into one block per channel rather than scrolling sideways.
  */
 export function ChannelTable({ channels, totals }: ChannelTableProps) {
   return (
     <div>
-      <div className="hidden lg:block">
+      <div className="hidden xl:block">
         {/* Eight tracks for eight cells a row: the channel, `Adet`, and the six
             money columns. */}
-        <div className="grid grid-cols-[130px_92px_repeat(6,minmax(0,1fr))]">
+        <div className="grid grid-cols-[110px_72px_repeat(6,minmax(0,1fr))] [&>*:not(:nth-child(8n+1))]:pl-2.5">
           <span className="pb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
             {COPY.channelColumn}
           </span>
@@ -61,7 +61,7 @@ export function ChannelTable({ channels, totals }: ChannelTableProps) {
         </div>
       </div>
 
-      <div className="lg:hidden">
+      <div className="xl:hidden">
         {channels.map((row, index) => (
           <div
             key={row.channel}
