@@ -103,3 +103,18 @@ For any financial logic:
 Implement **only the requested phase**. Nothing adjacent, nothing anticipatory.
 
 If something outside the current phase seems necessary, say so and wait. Do not implement it.
+
+---
+
+## 7. Working rules (Akış work, hard)
+
+- Read only files and line ranges named in a task. No repo exploration, no directory listings, no codebase summaries. For anything unlisted: targeted grep for the exact symbol, read only those lines.
+- Do not re-read docs in full; read only cited sections.
+- Run targeted tests first (npx vitest run <file>); run npm run test:run, npm run lint, npm run build once at the end of each PR.
+- Short replies. PR descriptions under 25 lines. No big pastes.
+- NEVER merge any PR. NEVER push to main. main auto-deploys to production (.github/workflows/deploy.yml); do not touch that file or wrangler.jsonc.
+- Money formulas live only in src/core. No formulas in React components.
+- Never claim a check you did not do (for example a visual check at 390px if you could not run the app). Say what you could not verify.
+- If a task contradicts DF-85 or the PR plan, stop and report instead of improvising.
+
+Akış decisions: DF-85 in `docs/DETAILED_FEASIBILITY_DECISIONS.md`; PR plan: `docs/AKIS_DF85_IMPACT.md` section 6.
