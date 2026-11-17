@@ -36,7 +36,8 @@ import {
   updateRecipeUsage,
 } from '../recipeForm.ts'
 import { toDetailedInput } from '../toInput.ts'
-import { evaluateDetailed, type DetailedView } from '../viewModel.ts'
+import { evaluateDetailed } from '../viewModel.ts'
+import { selectShownResult } from '../shownResult.ts'
 import { createDraftSaveQueue, registerDraftLifecycleFlush } from './draftAutosave.ts'
 import { clearDraft, loadInitialDraft, writeDraft } from './draftStorage.ts'
 
@@ -49,7 +50,6 @@ export function useDetailedCalc() {
   const [touched, setTouched] = useState<Record<string, boolean>>({})
   const [submitted, setSubmitted] = useState(false)
   const [hasCalculated, setHasCalculated] = useState(false)
-  const [view, setView] = useState<DetailedView | null>(null)
   const [liveFlash, setLiveFlash] = useState(false)
   const [copied, setCopied] = useState(false)
   const [openSection, setOpenSection] = useState<SectionId | null>('products')
@@ -81,6 +81,8 @@ export function useDetailedCalc() {
   const evaluation = useMemo(() => evaluateDetailed(form, toDetailedInput(form)), [form])
   const recipeErrors = useMemo(() => buildRecipeErrorMap(form), [form])
   const canSubmit = evaluation.ok
+  // Derived, never stored: an invalid draft hides the last result (DF-85 D6).
+  const view = selectShownResult(hasCalculated, evaluation)
 
   useEffect(() => {
     if (!hasCalculated || !evaluation.ok) return
@@ -88,7 +90,6 @@ export function useDetailedCalc() {
     if (previousViewKeyRef.current === key) return
     const isFirstResult = previousViewKeyRef.current === null
     previousViewKeyRef.current = key
-    setView(evaluation.view)
     if (isFirstResult) return
     setLiveFlash(true)
     const timer = window.setTimeout(() => setLiveFlash(false), 180)
@@ -170,7 +171,6 @@ export function useDetailedCalc() {
     setTouched({})
     setSubmitted(false)
     setHasCalculated(false)
-    setView(null)
     setDraftSaved(false)
     setOpenSection('products')
     setShowMonthTable(false)
@@ -188,7 +188,6 @@ export function useDetailedCalc() {
     setTouched({})
     setSubmitted(false)
     setHasCalculated(false)
-    setView(null)
     setOpenSection('products')
     setShowMonthTable(false)
     previousViewKeyRef.current = null
@@ -404,7 +403,6 @@ export function useDetailedCalc() {
       setSubmitted(true)
       if (!evaluation.ok) return
       setHasCalculated(true)
-      setView(evaluation.view)
       window.requestAnimationFrame(() => {
         resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
       })

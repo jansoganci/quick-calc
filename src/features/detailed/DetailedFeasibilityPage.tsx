@@ -1,5 +1,6 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { cn } from '../../lib/cn.ts'
+import { AkisResults } from './components/AkisResults.tsx'
 import { DetailedForm } from './components/DetailedForm.tsx'
 import { DetailedResults } from './components/DetailedResults.tsx'
 import { DetailedScreenChrome } from './components/DetailedScreenChrome.tsx'
@@ -12,7 +13,7 @@ import { ReportNameDialog } from './components/ReportNameDialog.tsx'
 import { CalculateButton, SummaryPane } from './components/SummaryPane.tsx'
 import { useReportPrint } from './hooks/useReportPrint.ts'
 import type { DetailedCalcApi } from './hooks/useDetailedCalc.ts'
-import { COPY, RECIPE_COPY, SECTION_LABELS } from './labels.ts'
+import { AKIS_COPY, COPY, RECIPE_COPY, SECTION_LABELS } from './labels.ts'
 import {
   DETAILED_SCREENS,
   screenForSection,
@@ -21,6 +22,14 @@ import {
   type DetailedScreen,
 } from './screens.ts'
 import { visibleSections } from './sectionSummary.ts'
+
+/** Klasik / Akış (DF-85). Screen-only React state: never in the form or the draft. */
+const RESULT_VIEWS = ['classic', 'flow'] as const
+type ResultViewMode = (typeof RESULT_VIEWS)[number]
+const RESULT_VIEW_LABELS: Record<ResultViewMode, string> = {
+  classic: AKIS_COPY.classic,
+  flow: AKIS_COPY.flow,
+}
 
 /**
  * Five screens, one visible. Inputs stay in one form state so switching does not
@@ -39,6 +48,7 @@ export function DetailedFeasibilityPage({
   onGoToScreen: (screen: DetailedScreen) => void
 }) {
   const report = useReportPrint(calc.businessName, calc.setBusinessName)
+  const [resultView, setResultView] = useState<ResultViewMode>('classic')
   const sections = visibleSections(calc.form)
 
   useEffect(() => {
@@ -98,7 +108,9 @@ export function DetailedFeasibilityPage({
           </div>
           {screen === 'results' && calc.view === null ? (
             <div className="max-w-[600px]">
-              <p className="text-[13px] leading-relaxed text-qc-ink">{COPY.emptyResult}</p>
+              <p className="text-[13px] leading-relaxed text-qc-ink">
+                {calc.hasCalculated ? COPY.resultHiddenInvalid : COPY.emptyResult}
+              </p>
               <div className="mt-5 hidden lg:block">
                 <CalculateButton
                   canSubmit={calc.canSubmit}
@@ -115,11 +127,34 @@ export function DetailedFeasibilityPage({
               }
             >
               <div ref={calc.resultsRef} className={cn(calc.liveFlash && 'qc-live')}>
-                <DetailedResults
-                  view={calc.view}
-                  showMonthTable={calc.showMonthTable}
-                  onToggleMonthTable={calc.toggleMonthTable}
-                />
+                <div className="qc-screen-only px-[18px] pb-4 lg:px-[30px]">
+                  <div className="qc-segment" role="group" aria-label={AKIS_COPY.viewGroup}>
+                    {RESULT_VIEWS.map((mode) => (
+                      <button
+                        key={mode}
+                        type="button"
+                        className="qc-segment-btn"
+                        aria-pressed={resultView === mode}
+                        onClick={() => setResultView(mode)}
+                      >
+                        {RESULT_VIEW_LABELS[mode]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {/* Print always carries Klasik; Akış is screen-only. */}
+                <div className={resultView === 'flow' ? 'qc-print-only' : undefined}>
+                  <DetailedResults
+                    view={calc.view}
+                    showMonthTable={calc.showMonthTable}
+                    onToggleMonthTable={calc.toggleMonthTable}
+                  />
+                </div>
+                {resultView === 'flow' ? (
+                  <div className="qc-screen-only">
+                    <AkisResults view={calc.view} />
+                  </div>
+                ) : null}
                 <div className="px-0 pb-4 lg:hidden">
                   <ReportActionButton
                     variant="results"
