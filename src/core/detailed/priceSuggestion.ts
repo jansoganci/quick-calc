@@ -19,21 +19,24 @@ export function channelRestorePrice(
   deltaCost: number,
   vatRate: number,
   feeRate: number,
+  discountRate = 0,
 ): number | null {
   if (
     !Number.isFinite(grossPrice) ||
     !Number.isFinite(deltaCost) ||
     !Number.isFinite(vatRate) ||
-    !Number.isFinite(feeRate)
+    !Number.isFinite(feeRate) ||
+    !Number.isFinite(discountRate)
   ) {
     return null;
   }
-  if (vatRate < 0 || feeRate < 0) return null;
+  if (vatRate < 0 || feeRate < 0 || discountRate < 0 || discountRate >= 1) return null;
   const vatDivisor = 1 + vatRate;
   if (!(vatDivisor > 0) || !Number.isFinite(vatDivisor)) return null;
   const netShare = 1 / vatDivisor - feeRate;
   if (!(netShare > 0) || !Number.isFinite(netShare)) return null;
-  const next = grossPrice + deltaCost / netShare;
+  const increase = deltaCost / netShare;
+  const next = discountRate === 0 ? grossPrice + increase : grossPrice + increase / (1 - discountRate);
   return Number.isFinite(next) ? next : null;
 }
 

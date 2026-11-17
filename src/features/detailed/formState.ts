@@ -7,6 +7,7 @@ import {
   type RentInputBasis,
 } from '../../core/detailed/index.ts'
 import { formatDecimal, parseTurkishNumber } from '../../lib/number.ts'
+import { DETAILED_FORM_PREFILL } from './statutoryDefaults.ts'
 
 /**
  * The form holds raw strings, exactly as typed. Nothing here interprets them —
@@ -46,6 +47,8 @@ export type ProductRow = {
   onlinePrice: string
   dailyQuantity: string
   unitProductCost: string
+  /** Percent string. Empty and 0 both leave the list price unchanged. */
+  discountRate: string
   /** `recipe` means the engine receives the recipe total, not `unitProductCost`. */
   costSource: CostSource
   recipeLines: RecipeLine[]
@@ -151,6 +154,7 @@ export function emptyProduct(): ProductRow {
     onlinePrice: '',
     dailyQuantity: '',
     unitProductCost: '',
+    discountRate: '',
     costSource: 'manual',
     recipeLines: [],
   }
@@ -175,7 +179,7 @@ export function emptyPosition(): PositionRow {
     id: makeId('position'),
     name: '',
     headcount: '',
-    employerCostPerPerson: '',
+    employerCostPerPerson: DETAILED_FORM_PREFILL.employerCostPerPerson.input,
     mealCostPerPerson: '',
     transportCostPerPerson: '',
     averageBonusPerPerson: '',
@@ -219,7 +223,10 @@ export function initialForm(): DetailedFormState {
       ownCourierCostPerDeliveryOrder: '',
     },
     positions: [],
-    owner: { monthlyAmount: '', bagKurMonthlyCost: '' },
+    owner: {
+      monthlyAmount: '',
+      bagKurMonthlyCost: DETAILED_FORM_PREFILL.bagKurMonthlyCost.input,
+    },
     occupancy: {
       monthlyRent: '',
       rentInputBasis: DETAILED_DEFAULTS.rentInputBasis,

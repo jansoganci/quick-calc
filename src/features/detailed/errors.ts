@@ -19,6 +19,7 @@ export function pathKey(path: readonly ValidationPathSegment[]): string {
 /** Fields whose limits are 0–1 fractions and must be shown as percentages. */
 const RATE_LEAVES = new Set([
   'vatRate',
+  'discountRate',
   'posCommissionRate',
   'mealCardCommissionRate',
   'platformFeeRate',

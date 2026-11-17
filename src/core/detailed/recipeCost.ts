@@ -110,8 +110,35 @@ export function remainingPerUnitDelta(deltaCost: number): number {
  * Appendix A.6. Salon selling price that restores the previous remainder after
  * a recipe-cost change. Raw; no rounding. Not called by `calculateDetailed`.
  */
-export function salonRestorePrice(normalPrice: number, deltaCost: number, vatRate: number): number {
-  return normalPrice + deltaCost * (1 + vatRate);
+export function salonRestorePrice(normalPrice: number, deltaCost: number, vatRate: number): number;
+export function salonRestorePrice(
+  normalPrice: number,
+  deltaCost: number,
+  vatRate: number,
+  discountRate: number,
+): number | null;
+export function salonRestorePrice(
+  normalPrice: number,
+  deltaCost: number,
+  vatRate: number,
+  discountRate?: number,
+): number | null {
+  // Discount 0 is the locked A.6 line, unchanged down to the arithmetic.
+  if (discountRate === undefined || discountRate === 0) {
+    return normalPrice + deltaCost * (1 + vatRate);
+  }
+  if (
+    !Number.isFinite(normalPrice) ||
+    !Number.isFinite(deltaCost) ||
+    !Number.isFinite(vatRate) ||
+    !Number.isFinite(discountRate) ||
+    discountRate < 0 ||
+    discountRate >= 1
+  ) {
+    return null;
+  }
+  const next = normalPrice + (deltaCost * (1 + vatRate)) / (1 - discountRate);
+  return Number.isFinite(next) ? next : null;
 }
 
 function push(

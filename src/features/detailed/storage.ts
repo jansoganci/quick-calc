@@ -15,7 +15,7 @@ import type { DetailedFormState, IngredientRow, ProductRow } from './formState.t
 
 export const STORAGE_KEY = 'maliyet.detailed.draft.v1'
 
-const DRAFT_VERSION = 1
+const DRAFT_VERSION = 2
 
 /**
  * What a session is worth keeping: the inputs, plus the business name the report
@@ -120,18 +120,39 @@ function isRecipeExtensionOk(form: Record<string, unknown>): boolean {
         return false
       }
     }
+    if ('discountRate' in product && product.discountRate !== undefined) {
+      if (typeof product.discountRate !== 'string') return false
+    }
     return true
   })
 }
 
 /**
- * v1 drafts already store `dailyQuantity` on each product. V2 step 4 only moves
- * that field in the UI (Satış tahmini); the stored shape and
- * `maliyet.detailed.draft.v1` do not change. This hook is identity today so a
- * draft written before the section still restores the same quantities.
+ * Payload versions 1 and 2 share the storage key. A product with no discount
+ * becomes 0. A blank Bağ-Kur or employer cost is written as explicit 0 so an
+ * old draft is not repriced at the 2026 prefill. No staff row is added.
+ * An empty discount string stays empty: it already means 0.
  */
 export function migrateDraftForm(form: DetailedFormState): DetailedFormState {
-  return form
+  return {
+    ...form,
+    products: form.products.map((product) => ({
+      ...product,
+      discountRate: typeof product.discountRate === 'string' ? product.discountRate : '0',
+    })),
+    positions: form.positions.map((position) => ({
+      ...position,
+      employerCostPerPerson: explicitZero(position.employerCostPerPerson),
+    })),
+    owner: {
+      ...form.owner,
+      bagKurMonthlyCost: explicitZero(form.owner.bagKurMonthlyCost),
+    },
+  }
+}
+
+function explicitZero(value: string): string {
+  return value.trim() === '' ? '0' : value
 }
 
 /** Fills the fields a pre-recipe draft does not have. Does not invent recipe lines. */
@@ -226,7 +247,7 @@ export function decodeDraft(raw: string | null): Draft | null {
   }
 
   if (!isObject(parsed)) return null
-  if (parsed.version !== DRAFT_VERSION) return null
+  if (parsed.version !== 1 && parsed.version !== DRAFT_VERSION) return null
   if (!isObject(parsed.form) || !isFormShape(parsed.form)) return null
   if (!isRecipeExtensionOk(parsed.form)) return null
 

@@ -1,9 +1,9 @@
 # Detailed Feasibility — Financial Specification
 
-**Version:** v1.13
+**Version:** v1.14
 **Status:** Formula contract for `src/core/detailed/`. **Not** implementation.
 **Currency:** TRY · **Country:** Turkey · **Language for v1:** Turkish-first
-**Engine:** `detailedEngineVersion` `1.0.0` (unchanged). Appendix E is the approved DF-85 contract. It is **not** implemented. The sections above this appendix still describe the engine that runs today. Where they disagree with Appendix E, Appendix E wins for the next implementation and the body wins for the current code.
+**Engine:** `detailedEngineVersion` `1.1.0`. Appendix E is implemented. Where an older sentence in the body still describes the pre-discount month, Appendix E wins.
 
 ---
 
@@ -242,7 +242,7 @@ One table, one home: `core/detailed/defaults.ts`. The form imports these; it nev
 | `rentWithholdingRate` | `0.20` | **no — system assumption** **[SPEC]** | DF-12 |
 | `rentInputBasis` | `'gross'` | yes | DF-12 |
 | `currency` | `'TRY'` | no | — |
-| `detailedEngineVersion` | `'1.0.0'` | no | — |
+| `detailedEngineVersion` | `'1.1.0'` | no | — |
 
 ### 5.1 Why the escalation defaults are 0%
 
@@ -1259,11 +1259,11 @@ No figure in §18.2 changes.
 
 ---
 
-## Appendix E — DF-85 contract (approved, not implemented)
+## Appendix E — DF-85 contract (implemented in `1.1.0`)
 
-Authority: `docs/DETAILED_FEASIBILITY_DECISIONS.md` DF-85. File-level impact and the PR split: `docs/AKIS_DF85_IMPACT.md`.
+Authority: `docs/DETAILED_FEASIBILITY_DECISIONS.md` DF-85. File-level impact: `docs/AKIS_DF85_IMPACT.md`.
 
-This appendix is not in `detailedEngineVersion` `1.0.0`. Do not treat the body of this spec as already containing a discount or a non-zero Bağ-Kur default. The implementation PR folds the rules below into §§4, 5, 7, 9, 16 and 18, then bumps the engine version. §18.2 numbers do not move: `goldenRawInput` sets employer cost and Bağ-Kur explicitly, and it has no discount.
+Implemented in `detailedEngineVersion` `1.1.0`. §18.2 numbers do not move. The engine fallback for an omitted amount stays 0.
 
 ### E.1 Product discount
 
@@ -1319,6 +1319,7 @@ Unchanged validator: `mix_not_100` when `abs(sum − 1) > 1e-6`, path `['channel
 
 | Version | Change |
 | --- | --- |
+| v1.14 | Appendix E is implemented. `detailedEngineVersion` is `1.1.0`. Product discount, the five additive month fields, list-price restore under a discount, visible 2026 prefills, and draft payload version 2 are in the engine and the form. Omitted fallback stays 0. No figure in §18.2 changed. |
 | v1.13 | Appendix E records the DF-85 contract (product discount, visible 2026 prefills with engine fallback still 0, additive month fields, draft payload version 2). Not implemented. No figure in §18.2 changed. `detailedEngineVersion` stays 1.0.0. Header version corrected from the stale v1.11 label; the body was already at v1.12. |
 | v1.12 | Appendix B.2/B.3 kira-gün senin is `operatingDaysPerMonth −` the **displayed** one-decimal shown buckets (not the unrounded sum), so the printed lines add up exactly. Same helper on Sonuç and Simülasyonlar. No figure in §18.2 changed. `detailedEngineVersion` stays 1.0.0. |
 | v1.11 | Appendix B.3 moves to the Simülasyonlar area (same draft, same formulas). Detaylı Sonuç keeps base B.2 kira-gün. Price-vs-quantity and Yiyecek / İçecek comparison are rejected, not deferred. No figure in §18.2 changed. `detailedEngineVersion` stays 1.0.0. |

@@ -81,9 +81,18 @@ export function useDetailedCalc() {
   const evaluation = useMemo(() => evaluateDetailed(form, toDetailedInput(form)), [form])
   const recipeErrors = useMemo(() => buildRecipeErrorMap(form), [form])
   const canSubmit = evaluation.ok
+  const channelMixBlocksResults =
+    hasCalculated && !evaluation.ok && evaluation.errors.channelMix !== undefined
 
   useEffect(() => {
-    if (!hasCalculated || !evaluation.ok) return
+    if (!hasCalculated) return
+    if (!evaluation.ok) {
+      if (evaluation.errors.channelMix !== undefined) {
+        previousViewKeyRef.current = null
+        setView(null)
+      }
+      return
+    }
     const key = JSON.stringify(evaluation.view)
     if (previousViewKeyRef.current === key) return
     const isFirstResult = previousViewKeyRef.current === null
@@ -212,6 +221,7 @@ export function useDetailedCalc() {
     setBusinessName,
     hasCalculated,
     canSubmit,
+    channelMixBlocksResults,
     liveFlash,
     copied,
     openSection,

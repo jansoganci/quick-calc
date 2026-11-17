@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { DETAILED_FORM_PREFILL } from './statutoryDefaults.ts'
 import {
   emptyIngredient,
   emptyLine,
@@ -103,6 +104,23 @@ describe('resetIdCounter', () => {
     expect(emptyProduct().id).toBe('product-2')
     resetIdCounter()
     expect(initialForm().products[0]?.id).toBe('product-1')
+  })
+})
+
+describe('visible 2026 prefills', () => {
+  it('shows Bağ-Kur on a new form and does not add a staff row', () => {
+    const form = initialForm()
+    expect(form.owner.bagKurMonthlyCost).toBe(DETAILED_FORM_PREFILL.bagKurMonthlyCost.input)
+    expect(form.owner.monthlyAmount).toBe('')
+    expect(form.positions).toEqual([])
+  })
+
+  it('shows the employer cost only when a position row exists', () => {
+    const position = emptyPosition()
+    expect(position.employerCostPerPerson).toBe(DETAILED_FORM_PREFILL.employerCostPerPerson.input)
+    expect(position.mealCostPerPerson).toBe('')
+    expect(position.transportCostPerPerson).toBe('')
+    expect(position.averageBonusPerPerson).toBe('')
   })
 })
 

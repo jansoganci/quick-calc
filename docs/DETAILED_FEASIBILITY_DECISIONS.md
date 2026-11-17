@@ -1719,7 +1719,7 @@ Do not point the validator’s omitted-field fallback at 40.874,63 or 11.808,23.
 
 **Modified:** DF-55, only by allowing this product discount. DF-45 gains the optional discount field. DF-15 / DF-60 and DF-59, only for the visible prefills above. No decision had locked the personnel or Bağ-Kur **engine** default at a non-zero statute; the implemented default for an omitted amount is 0 (`DETAILED_DEFAULTS.ownerBagKurMonthlyCost`, and the employer-cost fallback literal `0`). DF-85 keeps that engine fallback and changes the new-form display.
 
-The formula contract for the discount and the additive result fields is Appendix E of `docs/DETAILED_FINANCIAL_SPEC.md`. Until the implementation PR folds that appendix into the body, `detailedEngineVersion` stays `1.0.0` and the body still describes the engine as it runs today.
+The formula contract for the discount and the additive result fields is Appendix E of `docs/DETAILED_FINANCIAL_SPEC.md`. It is implemented at `detailedEngineVersion` `1.1.0`. The engine fallback for an omitted amount stays 0.
 
 ---
 

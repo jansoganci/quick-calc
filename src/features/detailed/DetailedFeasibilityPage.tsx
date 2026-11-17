@@ -1,5 +1,6 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { cn } from '../../lib/cn.ts'
+import { AkisFlow } from './components/AkisFlow.tsx'
 import { DetailedForm } from './components/DetailedForm.tsx'
 import { DetailedResults } from './components/DetailedResults.tsx'
 import { DetailedScreenChrome } from './components/DetailedScreenChrome.tsx'
@@ -40,6 +41,8 @@ export function DetailedFeasibilityPage({
 }) {
   const report = useReportPrint(calc.businessName, calc.setBusinessName)
   const sections = visibleSections(calc.form)
+  const [presentation, setPresentation] = useState<'klasik' | 'akis'>('klasik')
+  const showAkis = screen === 'results' && presentation === 'akis'
 
   useEffect(() => {
     const onThisScreen = sectionsOnScreen(screen, sections)
@@ -92,13 +95,36 @@ export function DetailedFeasibilityPage({
         className="qc-screen-only lg:grid lg:grid-cols-[minmax(0,1fr)_1px_372px]"
       >
         <DetailedScreenChrome screen={screen} onGoToScreen={onGoToScreen}>
+          <div className="qc-screen-only mb-4 max-w-[600px]">
+            <div className="qc-segment" role="group" aria-label={COPY.presentationGroup}>
+              <button
+                type="button"
+                className="qc-segment-btn"
+                aria-pressed={presentation === 'klasik'}
+                onClick={() => setPresentation('klasik')}
+              >
+                {COPY.presentationKlasik}
+              </button>
+              <button
+                type="button"
+                className="qc-segment-btn"
+                aria-pressed={presentation === 'akis'}
+                onClick={() => setPresentation('akis')}
+              >
+                {COPY.presentationAkis}
+              </button>
+            </div>
+            <p className="mt-2 text-[13px] text-qc-secondary">{COPY.presentationHint}</p>
+          </div>
           <div hidden={screen === 'results'}>
             <DetailedForm calc={calc} screen={screen} onGoToScreen={onGoToScreen} />
             <DraftNotice saved={calc.draftSaved} onReset={calc.resetForm} />
           </div>
           {screen === 'results' && calc.view === null ? (
             <div className="max-w-[600px]">
-              <p className="text-[13px] leading-relaxed text-qc-ink">{COPY.emptyResult}</p>
+              <p className="text-[13px] leading-relaxed text-qc-ink">
+                {calc.channelMixBlocksResults ? COPY.channelMixNoResult : COPY.emptyResult}
+              </p>
               <div className="mt-5 hidden lg:block">
                 <CalculateButton
                   canSubmit={calc.canSubmit}
@@ -115,11 +141,18 @@ export function DetailedFeasibilityPage({
               }
             >
               <div ref={calc.resultsRef} className={cn(calc.liveFlash && 'qc-live')}>
-                <DetailedResults
-                  view={calc.view}
-                  showMonthTable={calc.showMonthTable}
-                  onToggleMonthTable={calc.toggleMonthTable}
-                />
+                {showAkis ? (
+                  <div className="qc-screen-only">
+                    <AkisFlow view={calc.view} />
+                  </div>
+                ) : null}
+                <div className={showAkis ? 'qc-print-only' : undefined}>
+                  <DetailedResults
+                    view={calc.view}
+                    showMonthTable={calc.showMonthTable}
+                    onToggleMonthTable={calc.toggleMonthTable}
+                  />
+                </div>
                 <div className="px-0 pb-4 lg:hidden">
                   <ReportActionButton
                     variant="results"

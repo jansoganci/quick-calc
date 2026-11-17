@@ -23,6 +23,7 @@ function viableForm(mutate: (draft: DetailedFormState) => void = () => {}): Deta
         onlinePrice: '70',
         dailyQuantity: '150',
         unitProductCost: '18',
+        discountRate: '',
         costSource: 'manual',
         recipeLines: [],
       },
@@ -105,7 +106,12 @@ describe('the reconciliation bar closes exactly', () => {
 
 describe('section echo', () => {
   it('echoes only engine figures, and only for the sections that map onto one', () => {
-    const result = evaluate(viableForm((draft) => (draft.owner.monthlyAmount = '45.000')))
+    const result = evaluate(
+      viableForm((draft) => {
+        draft.owner.monthlyAmount = '45.000'
+        draft.owner.bagKurMonthlyCost = ''
+      }),
+    )
     expect(result.ok).toBe(true)
     if (!result.ok) return
     expect(Object.keys(result.view.sectionEcho).sort()).toEqual(

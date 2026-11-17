@@ -100,6 +100,7 @@ export const PRODUCT_LABELS = {
   onlinePrice: 'Online fiyat',
   dailyQuantity: 'Günlük adet',
   unitProductCost: 'Birim maliyet',
+  discount: 'İndirim',
 } as const
 
 export const POSITION_LABELS = {
@@ -217,6 +218,28 @@ export const COPY = {
 
   emptyResult:
     'Hesapla’dan önce hiçbir sayı gösterilmez. En az bir ürün girip Hesapla’ya bastığında aylık işletme sonucu, başa baş noktası ve yatırımın geri dönüşü burada görünür.',
+  channelMixNoResult:
+    'Kanal dağılımı %100 olmadığı için sonuç gösterilmiyor. Salon, al götür ve paket servis paylarını düzelt.',
+  presentationGroup: 'Görünüm',
+  presentationKlasik: 'Klasik',
+  presentationAkis: 'Akış',
+  presentationHint: 'Akış, sonuç ekranında aynı hesabı adım adım gösterir.',
+  akisTitle: 'Aylık akış',
+  akisNote:
+    'Baz senaryodaki sabit aydır. Yatırım bu aydan düşülmez. Geri ödeme, açılış rampalı birikimli sonuçtan gelir.',
+  akisGross: 'Brüt ciro',
+  akisVat: 'KDV',
+  akisNet: 'Net satış',
+  akisProductCost: 'Ürün maliyeti',
+  akisGrossProfit: 'Brüt kâr',
+  akisChannel: 'Kanal masrafları',
+  akisPayroll: 'Personel',
+  akisRent: 'Kira',
+  akisAidat: 'Aidat',
+  akisOpex: 'Diğer giderler',
+  akisOwner: 'Sahip payı',
+  akisBagKur: 'Bağ-Kur',
+  akisResult: 'İşletme sonucu',
   optionalSectionsNote:
     'Boş bıraktığın bölümler 0 TL sayılır. Yalnızca ürünler zorunlu.',
 
@@ -228,9 +251,10 @@ export const COPY = {
   starterOpex: 'Sık kullanılan giderler',
   starterCapex: 'Sık kullanılan kalemler',
   productName: 'Ürün adı',
+  discountHint: 'Boş veya 0, fiyata dokunmaz. Tüm kanallara uygulanır.',
   positionName: 'Pozisyon adı',
   employerCostInfo:
-    'İşverene aylık toplam maliyettir — çalışanın eline geçen net maaş değil. SGK işveren payı gibi kalemleri de içerir.',
+    'İşverene aylık toplam maliyettir — çalışanın eline geçen net maaş değil. SGK işveren payı gibi kalemleri de içerir. Yeni bir pozisyonda 2026 teşviksiz tutar hazır gelir; silersen 0 sayılır.',
   lineName: 'Gider adı',
   monthlyAmount: 'Aylık tutar',
   capexName: 'Kalem adı',
@@ -258,6 +282,7 @@ export const COPY = {
 
   ownerMonthlyAmount: 'Kendine ayırdığın aylık tutar',
   ownerBagKur: 'Aylık Bağ-Kur',
+  bagKurPrefillInfo: '2026 tabanı, 5 puan indirimsiz. Silersen 0 sayılır.',
   monthlyRent: 'Aylık kira',
   monthlyRentInfo:
     '"Brüt kira" girdiğin tutarın tamamı işletme çıkışıdır; stopaj bu tutardan kesilip devlete ödenir. "Net kira" ise ev sahibinin eline geçecek tutardır — gerçek nakit çıkışı bundan daha yüksek hesaplanır.',

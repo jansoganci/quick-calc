@@ -19,6 +19,12 @@ import {
   resolvedRecipeUnitCost,
 } from './recipeForm.ts'
 
+function productDiscountRate(product: ProductRow): number {
+  const parsed = parseTurkishNumber(product.discountRate)
+  if (parsed.status !== 'ok') return 0
+  return parsed.value / 100
+}
+
 export type ProductPriceSnapshot = {
   normalPrice: string
   onlinePrice: string
@@ -207,11 +213,14 @@ export function buildPricePreview(
     const liveOnline = numeric(product.onlinePrice)
     const baselineNormal = baselineAmount(opened, product, 'normalPrice')
     const baselineOnline = baselineAmount(opened, product, 'onlinePrice')
+    const discount = productDiscountRate(product)
     const salonExact =
-      costsReady && baselineNormal !== null ? salonRestorePrice(baselineNormal, delta, vat) : null
+      costsReady && baselineNormal !== null
+        ? salonRestorePrice(baselineNormal, delta, vat, discount)
+        : null
     const onlineExact =
       costsReady && baselineOnline !== null && platformFee !== null
-        ? channelRestorePrice(baselineOnline, delta, vat, platformFee)
+        ? channelRestorePrice(baselineOnline, delta, vat, platformFee, discount)
         : null
     const suggestions: PriceSuggestion[] = []
     if (salonExact !== null) {

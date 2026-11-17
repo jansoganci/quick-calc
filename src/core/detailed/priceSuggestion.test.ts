@@ -3,6 +3,18 @@ import { salonRestorePrice } from './recipeCost.ts';
 import { channelRestorePrice, esnafPrice } from './priceSuggestion.ts';
 
 describe('Appendix D channel restore and esnaf rounding', () => {
+  it('divides the list-price increase by the unsold share', () => {
+    expect(salonRestorePrice(220, 8.4, 0.1, 0.1)).toBeCloseTo(220 + (8.4 * 1.1) / 0.9, 10);
+    const netShare = 1 / 1.1 - 0.15;
+    expect(channelRestorePrice(230, 8.4, 0.1, 0.15, 0.1)).toBeCloseTo(230 + 8.4 / netShare / 0.9, 10);
+    expect(esnafPrice(salonRestorePrice(220, 8.4, 0.1, 0.1) ?? -1)).toBe(231);
+  });
+
+  it('has no suggestion when the discount is 100%', () => {
+    expect(salonRestorePrice(220, 8.4, 0.1, 1)).toBeNull();
+    expect(channelRestorePrice(230, 8.4, 0.1, 0.15, 1)).toBeNull();
+  });
+
   it('matches the locked salon helper when the fee is 0', () => {
     expect(channelRestorePrice(220, 8.4, 0.1, 0)).toBeCloseTo(
       salonRestorePrice(220, 8.4, 0.1),
