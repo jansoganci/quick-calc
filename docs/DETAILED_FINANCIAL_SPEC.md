@@ -1,9 +1,9 @@
 # Detailed Feasibility — Financial Specification
 
-**Version:** v1.11
+**Version:** v1.13
 **Status:** Formula contract for `src/core/detailed/`. **Not** implementation.
 **Currency:** TRY · **Country:** Turkey · **Language for v1:** Turkish-first
-**Engine:** `detailedEngineVersion` `1.0.0`
+**Engine:** `detailedEngineVersion` `1.0.0` (unchanged). Appendix E is the approved DF-85 contract. It is **not** implemented. The sections above this appendix still describe the engine that runs today. Where they disagree with Appendix E, Appendix E wins for the next implementation and the body wins for the current code.
 
 ---
 
@@ -1259,10 +1259,67 @@ No figure in §18.2 changes.
 
 ---
 
+## Appendix E — DF-85 contract (approved, not implemented)
+
+Authority: `docs/DETAILED_FEASIBILITY_DECISIONS.md` DF-85. File-level impact and the PR split: `docs/AKIS_DF85_IMPACT.md`.
+
+This appendix is not in `detailedEngineVersion` `1.0.0`. Do not treat the body of this spec as already containing a discount or a non-zero Bağ-Kur default. The implementation PR folds the rules below into §§4, 5, 7, 9, 16 and 18, then bumps the engine version. §18.2 numbers do not move: `goldenRawInput` sets employer cost and Bağ-Kur explicitly, and it has no discount.
+
+### E.1 Product discount
+
+One optional rate per product, `discountRate`, fraction 0 to 1 (the form shows 0 to 100). Absent, empty, or 0 is the identity.
+
+```
+effectiveNormal = normalPrice × priceFactor × (1 − discountRate)
+effectiveOnline = onlinePrice × priceFactor × (1 − discountRate)
+```
+
+Salon and takeaway use `effectiveNormal`. Delivery uses `effectiveOnline`. From there, §8 and §9.3 are unchanged except that their gross is this effective gross: VAT netting, and POS, meal-card, and platform percentages, all use it. `unitProductCost`, recipe cost, packaging, and own-courier cost do not.
+
+`discountRate = 1` yields effective gross 0. That input is valid. List-price limits still apply to `normalPrice` and `onlinePrice`, not to the effective gross.
+
+### E.2 Price suggestion
+
+`channelRestorePrice` and `salonRestorePrice` restore the list price, not the discounted gross. Take the effective-gross increase those helpers already compute, and divide by `(1 − discountRate)`. If `discountRate = 1`, or the current helper returns null, the suggestion is null. `esnafPrice` only rounds that list price. Appendix D.4’s sentence that the draft shape stays v1 is superseded for this field by E.4.
+
+### E.3 Visible 2026 prefills are not engine fallbacks
+
+| Amount | New-form prefill | Omitted or blank in `validateDetailedInput` |
+| --- | --- | --- |
+| `employerCostPerPerson` | 40874.63, on a new position row only | 0 |
+| `owner.bagKurMonthlyCost` | 11808.23, on a new form | 0 |
+
+A form with no positions still resolves `positions` to `[]` and payroll to 0. Do not change `minimalRawInput` expectations. Meal, transport, bonus, and `owner.monthlyAmount` stay omitted → 0.
+
+### E.4 Draft
+
+Storage key stays `maliyet.detailed.draft.v1` (the key string does not change). Payload `version` becomes 2. Decode still accepts version 1 and migrates it. A version 1 product with no discount stores discount 0. A blank `bagKurMonthlyCost` and a blank `employerCostPerPerson` are written as explicit 0. No staff row is added.
+
+### E.5 Additive month fields
+
+These name sums the month already has. They do not change `monthlyOperatingResult` or any §18.2 figure.
+
+| Field | Identity |
+| --- | --- |
+| `grossProfitBeforeChannel` | `netRevenue − productCogs` |
+| `channelCost` | `channelVariableCost + paymentPlatformFee` |
+| `monthlyOwnerDraw` | owner monthly amount × `fixedFactor` |
+| `monthlyBagKur` | Bağ-Kur amount × `fixedFactor` |
+| `monthlyAidat` | `monthlyOccupancyCost − rentCost` |
+
+Required identities: `monthlyOwnerCost = monthlyOwnerDraw + monthlyBagKur`, and `grossProfitBeforeChannel − channelCost = totalContribution`.
+
+### E.6 Channel mix
+
+Unchanged validator: `mix_not_100` when `abs(sum − 1) > 1e-6`, path `['channelMix']`. `calculateDetailed` is not called. The UI additionally hides any previous result. No remainder channel.
+
+---
+
 ## 19. Changelog
 
 | Version | Change |
 | --- | --- |
+| v1.13 | Appendix E records the DF-85 contract (product discount, visible 2026 prefills with engine fallback still 0, additive month fields, draft payload version 2). Not implemented. No figure in §18.2 changed. `detailedEngineVersion` stays 1.0.0. Header version corrected from the stale v1.11 label; the body was already at v1.12. |
 | v1.12 | Appendix B.2/B.3 kira-gün senin is `operatingDaysPerMonth −` the **displayed** one-decimal shown buckets (not the unrounded sum), so the printed lines add up exactly. Same helper on Sonuç and Simülasyonlar. No figure in §18.2 changed. `detailedEngineVersion` stays 1.0.0. |
 | v1.11 | Appendix B.3 moves to the Simülasyonlar area (same draft, same formulas). Detaylı Sonuç keeps base B.2 kira-gün. Price-vs-quantity and Yiyecek / İçecek comparison are rejected, not deferred. No figure in §18.2 changed. `detailedEngineVersion` stays 1.0.0. |
 | v1.10 | Appendix B.2/B.3: kira-gün and Ocak kira-gün lines stop rounding to whole days. One decimal, Turkish comma; senin = `operatingDaysPerMonth −` unrounded shown sum. Empty buckets still omitted. No figure in §18.2 changed. `detailedEngineVersion` stays 1.0.0. |
