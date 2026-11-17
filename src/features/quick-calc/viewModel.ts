@@ -107,7 +107,7 @@ export const EXAMPLE_FORM: QuickFormState = {
   monthlyRent: '85.000',
   otherMonthlyOpex: '60.000',
   employeeCount: '4',
-  averageEmployeeMonthlyCost: '32.000',
+  averageEmployeeMonthlyCost: '40.874,63',
   initialCapex: '1.500.000',
   operatingDaysPerMonth: '',
   capexRecoveryPeriodMonths: '',
