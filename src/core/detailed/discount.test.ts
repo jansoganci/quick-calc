@@ -91,6 +91,21 @@ describe('product discount', () => {
     );
   });
 
+  it('carries the 2026 figures as explicit inputs (test plan case ii)', () => {
+    // Hand total: zero-discount contribution 30.558 − 40.874,63 − 11.808,23 = −22.124,86.
+    const month = monthOf({
+      ...salesInput(0),
+      positions: [
+        { id: 'p1', name: 'Personel', headcount: 1, employerCostPerPerson: 40_874.63 },
+      ],
+      owner: { monthlyAmount: 0, bagKurMonthlyCost: 11_808.23 },
+    });
+    expect(month.monthlyPayroll).toBeCloseTo(40_874.63, MONEY);
+    expect(month.monthlyBagKur).toBeCloseTo(11_808.23, MONEY);
+    expect(month.monthlyOwnerCost).toBeCloseTo(11_808.23, MONEY);
+    expect(month.monthlyOperatingResult).toBeCloseTo(-22_124.86, MONEY);
+  });
+
   it('keeps a minimal input at zero Bağ-Kur, payroll and fixed cost', () => {
     const month = monthOf(minimalRawInput());
     expect(month.monthlyBagKur).toBe(0);
