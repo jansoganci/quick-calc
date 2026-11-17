@@ -217,9 +217,15 @@ export interface UnitEconomics {
 export interface MonthlyFixedCosts {
   monthlyPayroll: number;
   monthlyOwnerCost: number;
+  /** `owner.monthlyAmount × fixedFactor`. Sums with `monthlyBagKur` into `monthlyOwnerCost`. */
+  monthlyOwnerDraw: number;
+  /** `owner.bagKurMonthlyCost × fixedFactor`. */
+  monthlyBagKur: number;
   monthlyOccupancyCost: number;
   monthlyOpex: number;
   rentCost: number;
+  /** `monthlyOccupancyCost − rentCost`. Both sides already include `fixedFactor`. */
+  monthlyAidat: number;
   rentPaidToLandlord: number;
   rentWithholdingTax: number;
   monthlyFixedCost: number;
@@ -286,15 +292,22 @@ export interface MonthResult {
   vatAmount: number;
   netRevenue: number;
   productCogs: number;
+  /** `netRevenue − productCogs`. Names a sum; does not change the operating result. */
+  grossProfitBeforeChannel: number;
   channelVariableCost: number;
   paymentPlatformFee: number;
+  /** `channelVariableCost + paymentPlatformFee`. Both addends stay on the month. */
+  channelCost: number;
   totalVariableCost: number;
   totalContribution: number;
   monthlyPayroll: number;
   monthlyOwnerCost: number;
+  monthlyOwnerDraw: number;
+  monthlyBagKur: number;
   monthlyOccupancyCost: number;
   monthlyOpex: number;
   rentCost: number;
+  monthlyAidat: number;
   rentPaidToLandlord: number;
   rentWithholdingTax: number;
   monthlyFixedCost: number;

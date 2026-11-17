@@ -117,6 +117,8 @@ export function calculateMonth(
   const channelVariableCost = sum((line) => line.channelVariableCost);
   const paymentPlatformFee = sum((line) => line.paymentPlatformFee);
   const totalVariableCost = productCogs + channelVariableCost + paymentPlatformFee;
+  const grossProfitBeforeChannel = netRevenue - productCogs;
+  const channelCost = channelVariableCost + paymentPlatformFee;
 
   return {
     month: factors.month,
@@ -129,15 +131,20 @@ export function calculateMonth(
     vatAmount: grossCustomerSales - netRevenue,
     netRevenue,
     productCogs,
+    grossProfitBeforeChannel,
     channelVariableCost,
     paymentPlatformFee,
+    channelCost,
     totalVariableCost,
     totalContribution: sum((line) => line.contribution),
     monthlyPayroll: fixed.monthlyPayroll,
     monthlyOwnerCost: fixed.monthlyOwnerCost,
+    monthlyOwnerDraw: fixed.monthlyOwnerDraw,
+    monthlyBagKur: fixed.monthlyBagKur,
     monthlyOccupancyCost: fixed.monthlyOccupancyCost,
     monthlyOpex: fixed.monthlyOpex,
     rentCost: fixed.rentCost,
+    monthlyAidat: fixed.monthlyAidat,
     rentPaidToLandlord: fixed.rentPaidToLandlord,
     rentWithholdingTax: fixed.rentWithholdingTax,
     monthlyFixedCost: fixed.monthlyFixedCost,
