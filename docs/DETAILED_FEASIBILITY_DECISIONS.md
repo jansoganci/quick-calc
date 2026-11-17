@@ -2,7 +2,7 @@
 
 **Version scope note (10 November 2026):** This remains the Detailed v1 decision log. See [V2/V3 product roadmap](./V2_V3_PRODUCT_ROADMAP.md) for explicit later-version scope additions (recipes, food cost, simple grouping, allocation and comparison). Those additions do not retroactively alter v1 formulas or authorize implementation.
 
-**Version:** v0.12
+**Version:** v0.13
 **Status:** Decision log. Major Detailed v1 **product-scope** decisions are **locked**. Major calculation-model review blockers are **resolved**. Remaining implementation details belong in a dedicated Detailed Financial Specification. This file is still **not** that specification and **not** implementation.
 **Phase:** Planning — **not** a financial specification and **not** implementation
 **Currency:** TRY · **Country:** Turkey · **Preset context:** Coffee Shop / Cafe (same product family as Quick / Lite)
@@ -271,8 +271,9 @@ Each product has at minimum:
 - **online / delivery** selling price
 - expected **daily** sales quantity (stabilized / target — DF-66)
 - **unit product cost in TL** (Product COGS — DF-28, DF-68; not a selling price)
+- an optional **discount percent** on the price the customer pays (DF-85). Empty or 0 leaves both prices unchanged. It is not a third list price.
 
-All customer-facing selling prices are VAT-inclusive (DF-03). Net operating revenue is derived from those gross amounts (DF-65).
+All customer-facing selling prices are VAT-inclusive (DF-03). Net operating revenue is derived from those gross amounts (DF-65). Discount, when set, reduces the VAT-inclusive price before that netting (DF-85).
 
 This is not a recipe / SKU ingredient engine (DF-02). A “product” here is a selling item the owner already sells, not a bill of materials.
 
@@ -367,13 +368,13 @@ Example (illustrative, not a locked default):
 - al-götür 20%
 - paket servis 30%
 
-**The three percentages must equal 100%.**
+**The three percentages must equal 100%** (within the existing `1e-6` tolerance). DF-85 closes the enforcement UX: a channel mix that fails this check shows the existing error and shows no results. Do not auto-normalize and do not invent a remainder channel.
 
 Do **not** require a separate channel mix for every product in v1.
 
 Per-product salon / takeaway / delivery percentages were a reviewer suggestion, not an existing v1 requirement. They may be more realistic. They are **LATER** / out of v1 (DF-00a). Detailed v1 uses **one** business-level mix and applies that same mix across product quantities.
 
-**DEFERRED:** the exact default mix; how the UI enforces the 100% total.
+**DEFERRED:** the exact default mix. The 100% enforcement UX for this channel mix is closed by DF-85.
 
 Do **not** invent a delivery-volume split inside the delivery channel (DF-77).
 
@@ -895,6 +896,8 @@ Platform campaigns, Joker discounts, promotional subsidies, listing / reklam cha
 
 Do not add them to the engine or the standard input set.
 
+**Narrowed by DF-85, not reopened:** a single per-product discount on the price the customer pays is in scope. That is not a platform campaign, not a Joker, and not a subsidy. Those stay excluded.
+
 ---
 
 ### 5.5 Rent / occupancy
@@ -1021,7 +1024,7 @@ Total payroll is the **sum of all position monthly costs**.
 
 This extends the earlier DF-15 / DF-16 locks: meals, transportation, and bonus are per-person monthly fields on each position, not a later unspecified granularity.
 
-**DEFERRED:** default position roster; which per-person cost fields may start empty / zero; exact Turkish field labels.
+**DEFERRED:** default position roster; exact Turkish field labels. Meal, transport, and bonus still start empty. The visible employer-cost prefill on a new position row is DF-85. An omitted employer cost in the engine stays 0.
 
 #### DF-59 — Owner / operator section is separate **[LOCKED]**
 
@@ -1037,6 +1040,8 @@ Both are treated as **monthly operating costs**.
 Do **not** calculate personal income tax. Do **not** create a payroll engine for the owner.
 
 This replaces the earlier deferred UX for DF-17 / DF-42 (optional toggle vs. line placement). The v1 shape is this separate section with those two monthly amounts.
+
+The owner monthly amount still starts empty (effective 0). The visible Bağ-Kur prefill on a new form is DF-85. An omitted Bağ-Kur amount in the engine stays 0.
 
 Do not invent Bağ-Kur rates, brackets, or a Bağ-Kur calculator. The user enters the monthly Bağ-Kur cost.
 
@@ -1662,6 +1667,62 @@ This view is additive to the existing channel breakdown, not a replacement for i
 
 ---
 
+### 5.14 Akış view, product discount, and 2026 visible defaults
+
+#### DF-85 — Akış is a presentation of this engine **[LOCKED]**
+
+Owner decision, 17 November 2026. Implementation is authorized by this entry and by `docs/AKIS_DF85_IMPACT.md`. This entry does not change Quick / Lite.
+
+**D1. One engine.** Akış sits next to the existing Klasik presentation of Detaylı Hesap. Both read and write the same Detaylı form state and both call `calculateDetailed`. Akış has no formulas of its own. Every number it shows comes from that engine result (or from an additive field defined below, which only names a sum or difference the engine already computed).
+
+**D2. Payback stays DF-36. DF-34 stays.** Akış shows the engine’s cumulative payback, opening ramp included. Akış does **not** show “investment / months”, “yatırım payı”, “kalan”, or a simple investment / operating-result ratio. Capex stays out of the monthly result.
+
+**D3. One discount percent per product.** This narrows DF-55 for a product discount only. Platform campaigns, Joker, subsidies, and listing charges stay excluded.
+
+Semantics, confirmed against `unitEconomics.ts`:
+
+- The field is optional. Empty or 0 means both list prices are unchanged, and every current result stays put.
+- Range is 0 to 100 inclusive. It is one rate per product, not per channel.
+- It applies to the VAT-inclusive price the customer pays on every channel:
+
+```
+effectiveNormal = normalPrice × (1 − discount)
+effectiveOnline = onlinePrice × (1 − discount)
+```
+
+Salon and takeaway use `effectiveNormal`. Delivery uses `effectiveOnline` (DF-46). Escalation still multiplies those effective prices (`priceFactor`).
+
+- VAT is computed on the discounted gross: `net = effectiveGross / (1 + vatRate)`, `vat = effectiveGross − net` (DF-65). The rate stays the single editable global rate (D5). There is no per-product VAT rate.
+- Platform fee, POS commission, and meal-card commission stay percentages of the VAT-inclusive gross, and that gross is the discounted one (DF-08, DF-09, DF-53, DF-54).
+- Unit product cost, recipe cost, and packaging / own-courier amounts are not multiplied by the discount (DF-68, DF-52).
+- A 100% discount makes the effective gross 0. That is allowed. Do not reject it with the list-price minimum. Fees and VAT on that gross are 0.
+- Price suggestion (`channelRestorePrice`, `salonRestorePrice`, then `esnafPrice`) must restore the **list** price. Compute the required effective gross with the current fee and VAT, then divide by `(1 − discount)`. At a 100% discount, or when the existing helper would return null, the suggestion is null. `esnafPrice` stays a rounding of whatever list price that restore produced. It does not learn a second formula.
+
+**D4. 2026 figures are visible form defaults, not hidden engine fallbacks.**
+
+| Field | Visible default on a new form | Engine, when the field is omitted or blank |
+| --- | --- | --- |
+| Employer cost per person | 40.874,63 TL, prefilled on a **new position row** | 0 |
+| Bağ-Kur monthly cost | 11.808,23 TL, prefilled on a **new form** | 0 |
+
+Sources, valid 1 January 2026 through 31 December 2026: employer cost is the no-incentive cost of asgari ücret gross 33.030 TL (SGK employer 21.75% + unemployment 2% = 40.874,63). Bağ-Kur is 35.75% of 33.030 = 11.808,23, with no 5-point discount. The parameters module in the impact note holds these records.
+
+Do not insert a staff row into a form that has none. A business with no positions still has 0 payroll. The employer-cost figure appears when the user adds a person. Meal, transport, bonus, and the owner monthly draw still start empty.
+
+Do not point the validator’s omitted-field fallback at 40.874,63 or 11.808,23. That would reprice every old draft and every fixture that leaves the field out. Old drafts are migrated as in the impact note: a blank Bağ-Kur and a blank employer cost are written as explicit 0.
+
+**D5. VAT.** One editable global `vatRate`. Default remains 10%. Per-product VAT is out of scope.
+
+**D6. Channels.** Three explicit inputs: salon, takeaway, delivery (DF-04). They must sum to 100% within the existing `1e-6` tolerance (`MIX_TOLERANCE`). If they do not, validation returns `mix_not_100` and nothing is calculated. The UI shows the existing mix error and shows **no** results, including no previous result. No auto-normalization. No remainder channel.
+
+**Stays locked:** DF-34, DF-36, DF-46 (two list prices), DF-65 (one VAT rate, netted from gross), DF-04 / DF-04a (three channels, one business mix).
+
+**Modified:** DF-55, only by allowing this product discount. DF-45 gains the optional discount field. DF-15 / DF-60 and DF-59, only for the visible prefills above. No decision had locked the personnel or Bağ-Kur **engine** default at a non-zero statute; the implemented default for an omitted amount is 0 (`DETAILED_DEFAULTS.ownerBagKurMonthlyCost`, and the employer-cost fallback literal `0`). DF-85 keeps that engine fallback and changes the new-form display.
+
+The formula contract for the discount and the additive result fields is Appendix E of `docs/DETAILED_FINANCIAL_SPEC.md`. Until the implementation PR folds that appendix into the body, `detailedEngineVersion` stays `1.0.0` and the body still describes the engine as it runs today.
+
+---
+
 ### 5.13 Financing and working capital
 
 #### DF-40 — Financing is out of Detailed v1 **[LOCKED]**
@@ -1702,7 +1763,7 @@ These are decided exclusions, not open questions.
 | X10 | Accounting depreciation / tax useful-life machinery | CAPEX is initial investment (DF-34). |
 | X11 | Complex OPEX driver / recurrence system | Monthly amounts only (DF-39, DF-57). No annual/quarterly/per-sqm/stepped drivers. |
 | X12 | Accounting / ERP / tax-advisory product shape | DF-00. |
-| X13 | Platform campaigns / Joker / listing ads | Out of v1 (DF-55). |
+| X13 | Platform campaigns / Joker / listing ads | Out of v1 (DF-55). A per-product discount on the customer price is DF-85, not this row. |
 | X14 | Per-input scenario overrides | Scenarios scale sales quantities only (DF-37). |
 | X15 | Month-by-month ramp-up sales table | Preset-driven ramp-up only (DF-25). |
 | X16 | Extra break-even or payback inputs | Derived automatically from the business description (DF-35, DF-36, DF-61). |
@@ -1756,7 +1817,7 @@ These are known open questions. They are listed so they are not silently closed.
 | Sales VAT netting | Gross customer sales are VAT-inclusive; `netRevenue = gross / (1 + vatRate)`; default **10%**, editable (DF-65) | Full VAT accounting — out of v1 (DF-31) |
 | Product COGS boundary | `unitProductCost` is the product itself only; excludes packaging, courier, platform/card/meal-card fees (DF-68) | UI copy that prevents double-entry (later Claude Design pass) |
 | Category grouping | **Out of v1.** Product name is sufficient (DF-72) | Presentational grouping only — **LATER**, not a missing v1 input |
-| Channel mix defaults | One business-level split; must equal 100%; **not** per product (DF-04a) | The default 50/20/30-style mix; 100% enforcement UX |
+| Channel mix defaults | One business-level split; must equal 100% within `1e-6`; **not** per product (DF-04a). A failed total shows the error and no results (DF-85) | The default 50/20/30-style mix |
 | Delivery volume split | Delivery quantity is the delivery slice of the business mix; Mode 1 / Mode 2 is the deduction model (DF-10, DF-77) | No platform vs own-channel volume split — **LATER** |
 | POS default rate | Editable percentage; v1 default **3.59%**; not an immutable constant; not applied again to platform-collected delivery | — |
 | Meal-card default rate | Editable percentage; v1 default **10%**; not an immutable constant; not applied again to platform-collected delivery | — |
@@ -1765,8 +1826,8 @@ These are known open questions. They are listed so they are not silently closed.
 | Platform fee rates | Editable effective VAT-inclusive deduction; v1 defaults 15% and 38%; **0% allowed** (DF-82) | Do not treat defaults as market constants |
 | Platform commission VAT | User-entered rate is the effective total deduction, KDV dahil (DF-54) | Accounting split of service-base vs VAT — out of v1, not a remaining v1 design task |
 | Aidat default | Standard occupancy line; may start empty; **do not re-enter under OPEX** (DF-80) | Exact occupancy labels |
-| Personnel additional costs | Per-person monthly meal, transport, and average monthly bonus on each position | Default roster; which fields start empty / zero; Turkish labels |
-| Owner / operator | Separate section: owner monthly amount + Bağ-Kur monthly cost; both operating costs; no owner PIT / payroll engine; **do not also count the owner as an employee** (DF-79) | Exact labels; empty/zero start; more than one owner |
+| Personnel additional costs | Per-person monthly meal, transport, and average monthly bonus on each position. New position rows show the DF-85 employer-cost prefill. Omitted employer cost stays 0 in the engine | Default roster; Turkish labels. Meal, transport, and bonus still start empty |
+| Owner / operator | Separate section: owner monthly amount + Bağ-Kur monthly cost; both operating costs; no owner PIT / payroll engine; **do not also count the owner as an employee** (DF-79). A new form shows the DF-85 Bağ-Kur prefill. Omitted Bağ-Kur stays 0 in the engine | Exact labels; owner monthly amount still starts empty; more than one owner |
 | Standard OPEX list | Merged security line; no separate camera or water-treatment lines; monthly average amounts; `+ Gider Ekle` for business-specific costs | Exact Turkish labels; which remaining lines start empty vs suggested |
 | Custom OPEX | `+ Gider Ekle`; name + average monthly amount | — |
 | Company-type control | **Removed.** No şahıs / limited input (DF-70). Owner / Bağ-Kur remain | — |
@@ -1775,7 +1836,7 @@ These are known open questions. They are listed so they are not silently closed.
 | Scenario multipliers | Bad −25% / Base 0% / Good +25%; editable defaults; proportional to product quantities; listed assumptions stay fixed | — |
 | Scenario × ramp-up order | `stabilizedDaily × scenarioMultiplier × rampUpMultiplier`, then × `operatingDaysPerMonth` (DF-69) | — |
 | Inflation / escalation | Three annual assumptions stay in the **model**; Month 1 = entered values; CAPEX does not escalate; Channel Variable Costs escalate with Product COGS (DF-83); **not** prominent in the primary input flow (DF-74) | **Default percentages** for the three rates; exact advanced-area UI |
-| CAPEX recovery presentation | No accounting depreciation; payback uses cumulative operating profit vs. investment | Whether any other recovery-allocation figure is shown |
+| CAPEX recovery presentation | No accounting depreciation (DF-34). Payback uses cumulative operating profit vs. investment (DF-36). Akış does not show an investment share, “kalan”, or a simple investment / result ratio (DF-85) | — |
 | Operating break-even | Automatic; `fixed / weightedContributionPerSale`; CAPEX excluded; primary outputs **units/day** and **units/month**; **not customer count**; daily conversion uses `operatingDaysPerMonth`; unreachable if contribution ≤ 0 | Exact contribution weighting algebra; whether a secondary TL revenue figure is shown |
 | Payback | Automatic from projection; first month cumulative operating profit ≥ total CAPEX; ramp-up affects it; not reached / unavailable edge states; not decoupled from display horizon | — |
 | Waste modelling | Out of Detailed v1 (DF-62) | — |
@@ -1818,7 +1879,7 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 | DF-44a | Category grouping | **Superseded by DF-72.** |
 | DF-72 | No category grouping | Out of v1. No category management. Presentational grouping is LATER. |
 | DF-01a | Category price / cost / qty fields | **Superseded by DF-45** for revenue. Product unit cost is DF-28. |
-| DF-45 | Product fields | Name, normal price, online price, expected **daily** quantity, unit product cost in TL. Selling prices VAT-inclusive. Net revenue via DF-65. No category field. |
+| DF-45 | Product fields | Name, normal price, online price, expected **daily** quantity, unit product cost in TL. Selling prices VAT-inclusive. Net revenue via DF-65. Optional discount percent (DF-85). No category field. |
 | DF-02 | Recipe / SKU engine | Out of Detailed v1. |
 | DF-03 | Sales prices | VAT-inclusive as entered, including normal and online prices. Never silently grossed up. |
 | DF-65 | Sales VAT netting | Default 10%, editable. `netRevenue = grossCustomerSales / (1 + vatRate)`. Never `price × vatRate`. Percentage commissions stay on VAT-inclusive gross. Not a full VAT engine. |
@@ -1850,12 +1911,12 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 | DF-53 | Platform fee formula | `platformFee = deliveryGrossRevenue × effectivePlatformFeeRate` on VAT-inclusive gross. Not Product COGS. |
 | DF-11 | Platform VAT as open research | **Superseded for v1 by DF-54.** |
 | DF-54 | Platform fee VAT | Entered rate is effective total deduction, KDV dahil. Do not add 20% on top. Do not split service-base vs VAT in v1. |
-| DF-55 | Campaigns / Joker | Out of v1. |
+| DF-55 | Campaigns / Joker | Out of v1. Product discount on the customer price is DF-85, not this row. |
 | DF-12 | Rent | Same net/gross 20% withholding math as Lite. Gross-up is `net / 0.80`, never `net × 1.20`. Implemented later in the Detailed engine, not by importing Lite. |
 | DF-13 | Aidat | Standard occupancy expense; may start empty; no forced default. |
 | DF-80 | Aidat not in OPEX | Do not re-enter aidat under generic OPEX. UI copy/guardrails later. |
 | DF-14 | Personnel | Position-based; user-addable positions. Owner is not an employee position. |
-| DF-15 / DF-16 / DF-60 | Position cost | Name, headcount, monthly employer cost, meal, transport, average monthly bonus — all per person. `positionMonthlyCost = headcount × (employer + meal + transport + bonus)`. No payroll engine. No bonus frequency logic. |
+| DF-15 / DF-16 / DF-60 | Position cost | Name, headcount, monthly employer cost, meal, transport, average monthly bonus — all per person. `positionMonthlyCost = headcount × (employer + meal + transport + bonus)`. No payroll engine. No bonus frequency logic. New rows show the DF-85 employer-cost prefill. Omitted employer cost stays 0. |
 | DF-59 | Owner / operator | Separate section: owner monthly amount + Bağ-Kur monthly cost. Both operating costs. No owner PIT or payroll engine. |
 | DF-79 | Owner not double-counted | If owner salary is in the owner section, do not also count that person as an employee. UI copy/guardrails later. No extra calc. |
 | DF-17 / DF-42 | Owner UX / Bağ-Kur placement | **Superseded in shape by DF-59.** |
@@ -1885,6 +1946,7 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 | DF-36 | Payback | Automatic. Cumulative projected operating profit vs. total CAPEX. First month ≥ investment. Ramp-up affects it. Horizon / non-positive edge states locked. |
 | DF-61 | Analysis UX principle | User describes the business once; engine derives operating result, break-even, investment, payback, scenarios, projection. |
 | DF-84 | Product-level contribution | Derived report/UI output only — units, revenue, cost lines, contribution per product, summed across channels. No per-product channel mix (DF-04a unchanged). No category grouping (DF-72 unchanged). No new formula. |
+| DF-85 | Akış, product discount, 2026 visible defaults | Akış is a second presentation of `calculateDetailed`. No Akış formulas. Payback stays DF-36. No investment share in the month (DF-34). One optional per-product discount, 0–100, on both list prices before VAT and percentage fees. Platform / Joker stay out (DF-55 narrowed, not reopened). New forms show employer cost 40.874,63 on a new position and Bağ-Kur 11.808,23; omitted engine values stay 0. One global VAT rate. Channel mix must total 100% within `1e-6` or the UI shows the error and no results. |
 | DF-62 | Waste / fire | Out of v1. |
 | DF-40 | Financing | Out of v1. |
 | DF-41 | Working-capital timing | Out of v1. |
@@ -1949,6 +2011,7 @@ None of the above is a reason to change Lite behaviour now.
 | v0.10 | Final accepted review fixes. Break-even is units not customers. Payment mix locked to salon/takeaway only. Owner and aidat double-count are UI-guardrail rules. Own-courier cost is Mode 1 only. Platform fee may be 0%. Rejected extra payback/cash/pre-opening/COGS-% ideas. Product scope is complete enough to hand off to the Detailed Financial Specification. |
 | v0.11 | Locked DF-83: Channel Variable Costs (takeaway packaging, delivery packaging, own-courier variable payment) escalate with the Product COGS annual rate as escalation group 2. No fourth escalation category, no new input, and DF-68's cost-line separation is unchanged. Closes the last escalation-assignment gap before the Detailed Financial Specification. |
 | v0.12 | Locked DF-84: a per-product contribution breakdown (units, revenue, cost lines, contribution) is an approved engine-derived report/UI output, additive to the existing channel breakdown. No new input, no per-product channel mix, no category grouping — DF-04a and DF-72 unchanged. Confirmed the platform-vs-own-courier delivery *volume* split stays rejected (DF-77 unchanged) and recorded that city/location benchmarking is shelved, not designed. |
+| v0.13 | Locked DF-85 (owner, 17 November 2026). Akış is a presentation of the existing Detaylı engine. DF-34 and DF-36 stay. A per-product discount narrows DF-55; platform and Joker stay out. 2026 employer cost and Bağ-Kur are visible new-form prefills; omitted engine amounts stay 0. Channel-mix failure shows the error and no results. Impact, tests, and the later PR split are in `docs/AKIS_DF85_IMPACT.md`. Formula text for the unimplemented change is Appendix E of the financial spec. |
 
 ---
 
@@ -1970,7 +2033,7 @@ Major calculation-model blockers from the external review are **resolved**.
 
 Remaining implementation details should now be defined in a dedicated **Detailed Financial Specification**.
 
-This decision log should **no longer be expanded casually during implementation**. Any new feature or input proposed later is a **scope change**, not an implementation detail.
+This decision log should **no longer be expanded casually during implementation**. Any new feature or input proposed later is a **scope change**, not an implementation detail. DF-85 is an owner-requested scope change. It does not reopen that rule for the next idea.
 
 **Do not write that specification in this document or in this task.**
 
