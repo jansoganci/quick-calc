@@ -8,6 +8,25 @@ Bu dosya onların yerine geçmez, sadece ilerlemeyi takip eder.
 
 ---
 
+## 2026-11-18 — DF-85 canlıda (Akış, indirim, 2026 rakamları)
+
+`main` ve production. Ayrıntı: `V2_V3_PRODUCT_ROADMAP.md` §5 adım 8, `DETAILED_FINANCIAL_SPEC.md` Appendix E.
+
+- **Akış:** Sonuç ekranında Klasik / Akış seçimi. Akış salt-gösterim para hunisi: ürünler → toplam satış → KDV, ürün maliyeti, kanal kesintileri, personel, kira ve aidat, diğer giderler, sen ve Bağ-Kur → ayda sana kalan + geri dönüş. Input yok; «Girdilere dön». Yazdırma her zaman Klasik. (#50, #59; #57/#58'deki satır içi form #59'da kaldırıldı.)
+- **İndirim:** ürün başına %0–100, iki liste fiyatını KDV'den önce keser; fiyat önerisi liste fiyatını geri yazar (#51).
+- **2026 ön dolu değerler:** yeni formda Bağ-Kur 11.808,23, yeni pozisyonda işveren maliyeti 40.874,63; motor yedeği 0. Taslak sürümü 2, eski taslakta boşlar açık 0 (#51).
+- **Hızlı Hesap:** örnek personel maliyeti 40.874,63 (#49).
+- **Sonuç notları:** «Bu hesap yaklaşıktır…» her sonuçta; «Girdiğin ürünler…» yalnızca zararda.
+- **Kurallar:** `CLAUDE.md` §7 (merge yok, main'e push yok, formül yalnızca `src/core`).
+- Altın vektör değişmedi: 261.145,6495 TL, geri dönüş 10. ay.
+
+### Açık kalanlar
+
+1. Kabul ekranı (hukuki metin) hâlâ ertelendi; sonuç notu ara çözüm.
+2. Gerçek yazdırma diyaloğu bu turda elle denenmedi.
+
+---
+
 ## 2026-11-12 — `main` durumu (dokümantasyon)
 
 Kod yazılmadı. Aşağısı `main` üzerindeki gerçek durumdur.

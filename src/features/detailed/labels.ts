@@ -270,6 +270,10 @@ export const COPY = {
     'Hesapla’dan önce hiçbir sayı gösterilmez. En az bir ürün girip Hesapla’ya bastığında aylık işletme sonucu, başa baş noktası ve yatırımın geri dönüşü burada görünür.',
   resultHiddenInvalid:
     'Girdilerde düzeltilmesi gereken bir alan var. Düzelttiğinde sonuç burada yeniden görünür.',
+  /** Roadmap §6 "Sonuç notu": shown on every result, both views. */
+  resultApproxNote: 'Bu hesap yaklaşıktır; kendi rakamlarınla kontrol et.',
+  /** Roadmap §6 "Eksik menü": shown only when the month ends in a loss. */
+  partialMenuNote: 'Girdiğin ürünler işletmenin bütün satışı değilse bu sonuç gerçeği göstermez.',
   optionalSectionsNote:
     'Boş bıraktığın bölümler 0 TL sayılır. Yalnızca ürünler zorunlu.',
 
@@ -519,6 +523,10 @@ export const REPORT_COPY = {
     'Maliyet, yalnızca bu rapora dayanılarak alınan kararların sonuçlarından sorumlu tutulamaz.',
   ],
 
+  /** The report's last words, in plain language (owner request, 18 Nov 2026). */
+  closingNoteTitle: 'Son not',
+  closingNote:
+    'Bu rapordaki rakamlar senin girdiklerinden hesaplanan tahminlerdir; yüzde yüz doğru olduğu garanti edilmez. Resmî bir belge değildir. Bir karar vermeden önce rakamları kendi kayıtlarınla ve mali müşavirinle kontrol et.',
   meta: (engineVersion: string, date: string) =>
     `Hesap motoru ${engineVersion} · Rapor tarihi ${date} · TRY · Türkiye`,
   runningHead: (businessName: string) => `Fizibilite Raporu · ${businessName}`,

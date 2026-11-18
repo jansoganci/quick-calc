@@ -19,8 +19,6 @@ type LineRowsProps = {
   onChange: (index: number, field: keyof Omit<LineRow, 'id'>, value: string) => void
   onAdd: (name?: string) => void
   onRemove: (index: number) => void
-  /** Prefixes DOM ids so a second copy on the results screen does not collide. Error paths stay plain. */
-  idPrefix?: string
 }
 
 /**
@@ -42,7 +40,6 @@ export function LineRows({
   onChange,
   onAdd,
   onRemove,
-  idPrefix = '',
 }: LineRowsProps) {
   const used = new Set(lines.map((line) => line.name.trim()))
   const rows = useNewestRowOpen(lines.map((line) => line.id))
@@ -71,7 +68,7 @@ export function LineRows({
             className={cn('grid items-center gap-2.5 border-t border-qc-rule-row py-2', gridCols)}
           >
             <TextField
-              id={`${idPrefix}${pathPrefix}.${index}.name`}
+              id={`${pathPrefix}.${index}.name`}
               label={nameLabel}
               labelHidden="from-lg"
               value={line.name}
@@ -80,7 +77,7 @@ export function LineRows({
               error={errorFor(`${pathPrefix}.${index}.name`)}
             />
             <NumberField
-              id={`${idPrefix}${pathPrefix}.${index}.${amountField}`}
+              id={`${pathPrefix}.${index}.${amountField}`}
               label={amountLabel}
               labelHidden="from-lg"
               value={line.amount}

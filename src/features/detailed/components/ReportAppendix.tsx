@@ -36,6 +36,10 @@ export function ReportAppendix({ view }: { view: DetailedView }) {
             </p>
           ))}
         </div>
+        <div className="mt-6 max-w-[660px] border-t border-qc-rule-mid pt-4">
+          <h2 className="m-0 text-[13px] font-semibold text-qc-ink">{REPORT_COPY.closingNoteTitle}</h2>
+          <p className="m-0 mt-1.5 text-[13px] leading-[1.6] text-qc-ink">{REPORT_COPY.closingNote}</p>
+        </div>
         <div className="mt-4 border-t border-qc-rule-row pt-2.5">
           <span className="font-mono text-[10px] text-qc-subtle">
             {REPORT_COPY.meta(view.engineVersion, formatReportDate(new Date()))}
