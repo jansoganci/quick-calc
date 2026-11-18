@@ -49,7 +49,7 @@ export function MixTable({
   onBlur,
 }: MixTableProps) {
   return (
-    <div className="max-w-[600px]">
+    <div>
       <div className="hidden grid-cols-[1fr_120px_160px] gap-2.5 pb-2 lg:grid">
         <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
           {firstColumnLabel}

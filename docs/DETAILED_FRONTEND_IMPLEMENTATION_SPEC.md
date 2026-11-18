@@ -101,15 +101,17 @@ Packaging sits with the channel that incurs it; each commission rate sits beside
 
 ### 2.1 Repeating rows
 
+**Two layouts only (18 Nov 2026).** Repeating rows are a table: one header row, one item per row, inputs without their own visible labels on desktop, `Kaldır` at the row's end. Single values (owner, rent, delivery, assumptions) are a 2-up grid with the label above each field. Every table and grid runs to the same right edge (the full input column); only prose keeps a `600px` measure. On mobile a table row collapses to a summary and expands into the same 2-up grid.
+
 One pattern, three densities.
 
 | Collection | Fields | Desktop | Mobile |
 | --- | --- | --- | --- |
-| `products[]` | 4 + recipe control | Grid `1fr 120px 120px 112px 88px 48px` (Ürün · Normal fiyat · Online fiyat · Birim maliyet · Reçete · Kaldır), 11px eyebrow column headers, `#EEF0F2` between rows. The recipe block, when open, sits under the whole table — never as a sub-row. Daily quantity lives in section 02. | Collapsed summary row (name · `maliyet {tutar} TL · elle/reçeteden`) expanding inline to name + prices + cost; recipe is a full-screen layer |
+| `products[]` | 5 + recipe control | Grid `minmax(0,1fr) 104px 104px 76px 112px 52px` (Ürün · Normal fiyat · Online fiyat · İndirim · Birim maliyet · Kaldır), one 11px eyebrow header per column, `#EEF0F2` between rows. `Reçete yaz` / `Reçeteyi aç` sits on a 12px caption line under the cost cell, so no field wraps under another column's header. The recipe block, when open, sits under the whole table | Collapsed row (name, price, `maliyet … · elle/reçeteden`); expanded: name full width, then 2-up pairs Normal \| Online, İndirim \| Birim maliyet |
 | sales forecast | 1 per product | Name + `Günlük adet`. No add/remove. | Same stack, 44px quantity field |
-| `positions[]` | 6 | Two-line block: `1fr 104px 56px` (ad, kişi, Kaldır), then a 4-column per-person grid under 11px eyebrows | Same block, collapsed/expanded as products |
-| `opexLines[]` | 2 | Two-up grid, each cell `1fr 124px 52px` | Single column, 44px rows |
-| `capexItems[]` | 2 | Two-up grid, each cell `1fr 132px 52px` | Single column, 44px rows |
+| `positions[]` | 6 | One row per position: `minmax(0,1fr) 80px 112px 92px 92px 92px 52px` (Pozisyon adı · Kişi sayısı · İşveren maliyeti · Yemek · Yol · Prim · Kaldır) under one header row; the employer-cost sentence once under the table | Collapsed/expanded as products; expanded: name full width, then 2-up pairs |
+| `opexLines[]` | 2 | One item per row, `minmax(0,1fr) 160px 52px`. Never two items side by side | Single column, `1fr 124px 52px` |
+| `capexItems[]` | 2 | Same as `opexLines[]` | Same as `opexLines[]` |
 
 Remove control is the text `Kaldır` in `--qc-secondary`, never an icon — `FRONTEND_IMPLEMENTATION_SPEC.md` §7 allows no icons beyond the assumptions chevron and this design needs no amendment to it. `RECIPE_REDESIGN_SPEC.md` §3.1 (O4): muted grey is decoration only (section numbers, masthead slogan); anything the owner must read uses `--qc-secondary`.
 
