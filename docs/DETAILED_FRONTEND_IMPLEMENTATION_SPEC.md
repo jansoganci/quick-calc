@@ -279,6 +279,33 @@ These blocks are display helpers. They do not change `calculateDetailed`, Kötü
 
 Third top-level area, not a third calculator. Path `/simulations` (hash aliases `#simulations` / `#simulasyonlar`). Reads the Detaylı draft already in memory / `maliyet.detailed.draft.v1`. No new inputs besides the Ocak `%` fields. If `view` is null (never `Hesapla`), one plain line and a text link to Detaylı Menü (`/detailed`). Zam geldi stays on Malzemeler (input-time; no price history, so no restore list here).
 
+
+### 4.10 Klasik / Akış (DF-85)
+
+On **Sonuç**, after the first `Hesapla`, a `qc-segment` toggle (`aria-pressed`) switches between **Klasik** (everything in §4.1–4.8) and **Akış**. The choice is page `useState`: never in the form state or the draft. Default Klasik.
+
+**Notes above both views** (screen only): `Bu hesap yaklaşıktır; kendi rakamlarınla kontrol et.` always; `Girdiğin ürünler işletmenin bütün satışı değilse bu sonuç gerçeği göstermez.` only when the base month ends in a loss.
+
+**Invalid draft** (any validation error, including a channel mix that is not 100%): both views show `Girdilerde düzeltilmesi gereken bir alan var…` and no figures, never the previous result (DF-85 D6). Valid again: the result returns.
+
+**Akış is a read-only money funnel** (owner decision, 18 Nov 2026; replaces the inline-input form of #57/#58). No inputs. Top to bottom:
+
+1. One summary sentence: monthly brüt ciro and what is left.
+2. `Ne satıyorsun`: one row per product with `ayda {units} adet` and its brüt (`byProduct`). No price on the row: a product has two prices, so `günde × fiyat` would not match the figure.
+3. A product strip, `↓ hepsi kasaya giriyor ↓`, then the `Toplam satış` band.
+4. Seven bands, each narrower: KDV, ürün maliyeti, kanal kesintileri, personel, kira ve aidat, diğer giderler, sen ve Bağ-Kur. Beside each band: `− {tutar} TL`, its name, one plain sentence, and where it comes from. Inside the band: `kalan {tutar} TL`. Remainders: financial spec Appendix E.8. The last band is accent.
+5. `Ayda sana kalan` (accent headline), then the engine payback message only (no yatırım payı, no ratio; D2), then the initial investment.
+6. Footer: `Bu ekran yalnızca gösterir…` and `Bir rakamı değiştir: Girdilere dön` (goes to Menü).
+
+Desktop: band left, words right. Below `lg`: words first, then the band. Every amount, width and clip path comes from `akisView.ts`. Labels: `AKIS_COPY` / `AKIS_STEP_LABELS`. Akış never prints.
+
+### 4.11 PDF report
+
+The report is the browser's print of this page (`Fizibilite raporunu indir` → business-name dialog → `window.print()`). Order: cover, Klasik results (always Klasik, whichever view is open), Ek A — Girdiler, Ek B — Kapsam ve sorumluluk sınırları, then a plain `Son not` (estimates, not guaranteed, not an official document, check with your own records and an accountant).
+
+- **Must stay outside `<main>`.** `<main>` is `qc-screen-only`, so the print-only report body renders after `</main>`. The five-screen split moved it inside on 13 Nov 2026 and the PDF printed only the cover until #60. `hooks/reportPrint.test.ts` guards this.
+- The site footer (about text and FAQ in `index.html`) is `qc-screen-only`.
+- The money-flow section and the projection may break across pages (`flows`); the other sections stay whole.
 ---
 
 ## 5. States, validation and guardrails
@@ -421,7 +448,7 @@ Shared with Quick only through `lib/`, `app/` and `components/` (`NumberField`, 
 
 1. No financial formula in a React component. The bar's percentage widths and the chart's pixel coordinates are the only arithmetic allowed in the view layer, and both are pure presentation of engine figures.
 2. Every default, limit and label imported from `core/detailed/defaults.ts`, `core/detailed/limits.ts` and `features/detailed-feasibility/labels.ts` — never restated.
-3. No new form input, no new `calculateDetailed` output, no new KPI. Appendix B display helpers (salon malzeme payı, kira-gün, Ocak testi) and Appendix D price-suggestion helpers are the approved exceptions; their formulas live in the financial spec, not in React. A suggestion does not write `normalPrice` / `onlinePrice` until `Bu fiyatı yaz`.
+3. No new form input, no new `calculateDetailed` output, no new KPI, except what DF-85 approved: the per-product discount field and the visible 2026 prefills (financial spec Appendix E). Appendix B display helpers (salon malzeme payı, kira-gün, Ocak testi) and Appendix D price-suggestion helpers are the approved exceptions; their formulas live in the financial spec, not in React. A suggestion does not write `normalPrice` / `onlinePrice` until `Bu fiyatı yaz`.
 4. `depreciation`, `amortisman`, `netProfit`, `net kâr` must not appear in identifiers, types, comments or strings.
 5. Money formatting always `Intl.NumberFormat('tr-TR')`, full form, unit after a space — `1.027.350 TL`, `%3,59`. Never abbreviated (the mobile chart axis label `250b` in the mock is a **chart tick**, and is the one place an abbreviation is proposed — flag it for approval or replace it with a tick-free axis).
 

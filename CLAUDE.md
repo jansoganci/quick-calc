@@ -118,4 +118,4 @@ If something outside the current phase seems necessary, say so and wait. Do not 
 - If a task contradicts DF-85 or the PR plan, stop and report instead of improvising.
 
 Akış decisions: DF-85 in `docs/DETAILED_FEASIBILITY_DECISIONS.md`; PR plan: `docs/AKIS_DF85_IMPACT.md` section 6.
-Akış interactive UI (PR 2b, inline inputs and live recalculation): `docs/AKIS_UI_BRIEF.md`. Do not start 2b without owner confirmation.
+Akış UI: a read-only money funnel on the Sonuç screen (owner decision, 18 Nov 2026). It has no inputs; changes happen on the input screens. The inline-input "PR 2b" in `docs/AKIS_UI_BRIEF.md` is superseded; do not bring it back. UI spec: `docs/DETAILED_FRONTEND_IMPLEMENTATION_SPEC.md` §4.10–4.11. Remainders: `docs/DETAILED_FINANCIAL_SPEC.md` Appendix E.8.

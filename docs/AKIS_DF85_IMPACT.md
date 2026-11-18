@@ -260,9 +260,11 @@ Assert `validateDetailedInput` returns `ok: false` and an error `{ path: ['chann
 
 ## 6. PR plan (PRs 2–5)
 
+**Status (18 Nov 2026): all done and on `main`.** PR 4 and PR 5 shipped together in #51. Akış was an inline-input form for a short time (#57, #58); #59 replaced it with the read-only funnel. #60 fixed the PDF report and added the result notes. The PR 5 parameters module became `src/features/detailed/statutoryDefaults.ts`: the engine does not import it.
+
 PR 1 is this decision. Each later PR is shippable on its own. Hızlı Hesap is not in any of them. Run `npm run test:run`, `npm run lint`, and `npm run build` before each one merges. For PR 2 and PR 4, also check the changed screen at 390px and at desktop width.
 
-### PR 2 — Akış shell (D1, D2, D6)
+### [x] PR 2 — Akış shell (D1, D2, D6) — #50; read-only funnel #59
 
 Scope: Klasik / Akış segment on Detaylı, using the existing `qc-segment` control. Akış prints the stabilized base month in the step order, using only fields that exist today. Missing rows from §3b are omitted until PR 3, not invented in the component. Payback text is the engine’s “Nth month” / horizon message. No yatırım payı and no simple ratio. When the channel mix is invalid, clear the shown result.
 
@@ -270,7 +272,7 @@ Files: `DetailedFeasibilityPage.tsx`, a new presentational component under `src/
 
 Verify: golden tests unchanged. A mix of 90% shows the mix error and no figures. A mix of 100% matches Klasik for the same draft. Toggle state is not written into the draft.
 
-### PR 3 — Additive month fields (D1 waterfall)
+### [x] PR 3 — Additive month fields (D1 waterfall) — #47
 
 Scope: Appendix E.5 only. Assign the five fields from numbers `calculateMonth` already has. Klasik labels stay.
 
@@ -278,7 +280,7 @@ Files: `types.ts`, `calculate.ts`, `contract.test.ts`, and the Akış component 
 
 Verify: on the golden month, each new field matches its identity and `monthlyOperatingResult` is still 261_145.6495. Payback month is still 10.
 
-### PR 4 — Discount (D3, D5)
+### [x] PR 4 — Discount (D3, D5) — #51
 
 Scope: fold Appendix E.1, E.2, and E.4 into the spec body, then implement. Engine version bumps. VAT stays one global rate.
 
@@ -286,7 +288,7 @@ Files: `unitEconomics.ts`, `types.ts`, `validate.ts`, `limits.ts`, `defaults.ts`
 
 Verify: §5 case (i) matches the hand totals. The §18.2 golden vector is unchanged. A version-1 draft opens with discount 0 and the same operating result as before the migration. A 100% discount calculates and does not throw. Suggestion at a non-zero discount restores the list price, checked by hand on one product.
 
-### PR 5 — Visible 2026 defaults (D4)
+### [x] PR 5 — Visible 2026 defaults (D4) — #51
 
 Scope: form prefills from the parameters module. Migration writes explicit 0 for blank Bağ-Kur and blank employer cost. Validator fallbacks stay 0.
 
