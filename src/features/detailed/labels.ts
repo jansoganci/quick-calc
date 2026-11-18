@@ -270,6 +270,10 @@ export const COPY = {
     'Hesapla’dan önce hiçbir sayı gösterilmez. En az bir ürün girip Hesapla’ya bastığında aylık işletme sonucu, başa baş noktası ve yatırımın geri dönüşü burada görünür.',
   resultHiddenInvalid:
     'Girdilerde düzeltilmesi gereken bir alan var. Düzelttiğinde sonuç burada yeniden görünür.',
+  /** Roadmap §6 "Sonuç notu": shown on every result, both views. */
+  resultApproxNote: 'Bu hesap yaklaşıktır; kendi rakamlarınla kontrol et.',
+  /** Roadmap §6 "Eksik menü": shown only when the month ends in a loss. */
+  partialMenuNote: 'Girdiğin ürünler işletmenin bütün satışı değilse bu sonuç gerçeği göstermez.',
   optionalSectionsNote:
     'Boş bıraktığın bölümler 0 TL sayılır. Yalnızca ürünler zorunlu.',
 

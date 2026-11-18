@@ -135,6 +135,12 @@ export function DetailedFeasibilityPage({
                       </button>
                     ))}
                   </div>
+                  {calc.view ? (
+                    <div className="mt-3 max-w-[720px] text-xs leading-[18px] text-qc-secondary">
+                      <p className="m-0">{COPY.resultApproxNote}</p>
+                      {calc.view.akis.isLoss ? <p className="m-0 mt-1">{COPY.partialMenuNote}</p> : null}
+                    </div>
+                  ) : null}
                 </div>
                 {resultView === 'flow' && calc.view ? (
                   <div className="qc-screen-only">
