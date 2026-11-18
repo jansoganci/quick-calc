@@ -136,10 +136,16 @@ A refactor that changes a result is a financial product change, not a refactor. 
 
 ### Plans, batches and PRs
 
-- Multi-step work follows a plan file under `docs/`. Mark each finished step `[x]` in the plan file together with its PR link.
-- Complete the whole requested batch and open a single PR. Write a short plan (files to touch, checks to run) in the PR description and proceed without waiting for approval.
-- After opening the PR, report and stop. The report contains: PR link, head SHA, a one-line test summary, and any blocker.
-- Do not start extra work only to report CI status or to say you are waiting for a merge. Do not start the next batch on your own.
+A PR is one outcome the owner asked for. It is not one per message, plan step, cleanup, or note.
+
+- Keep working on the open PR's branch until that outcome is finished. Push more commits to it. A follow-up, a docs note, or a cleanup of the same outcome is another commit, not another PR.
+- Open a new PR only when the previous one is already on `main`, or the owner explicitly asks for a separate review.
+- Docs that explain the change go in the same PR as the code. A docs-only PR is only when the owner wants to read a decision before any code.
+- Do not stack PRs unless the owner asks for a stack.
+- Multi-step work still follows one plan file under `docs/`. Mark finished steps `[x]` there. Put the single PR link once, not once per step.
+- In the PR description, write a short plan: files to touch and checks to run. Proceed without waiting for approval.
+- After the PR is open, report and stop. The report is the PR link, head SHA, a one-line test summary, and any blocker.
+- Do not start the next outcome on your own. Do not open a PR only to report CI status or to say you are waiting for a merge.
 - If the same check fails twice after a fix attempt, stop and report the blocker instead of retrying.
 
 ### Context and reporting
