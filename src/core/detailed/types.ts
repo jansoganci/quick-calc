@@ -86,6 +86,8 @@ export interface ResolvedProduct {
   onlinePrice: number;
   dailyQuantity: number;
   unitProductCost: number;
+  /** Fraction 0–1. Absent input resolves to 0 (DF-85). */
+  discountRate: number;
 }
 
 /** One business-level split, must total 1 (DF-04a). */

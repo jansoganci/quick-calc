@@ -1,7 +1,7 @@
 # DF-85 — Impact, tests, and PR split
 
 **Status:** Implementation note for [DF-85](./DETAILED_FEASIBILITY_DECISIONS.md). Not a second formula contract. Formulas live in [Appendix E](./DETAILED_FINANCIAL_SPEC.md) of the financial spec.
-**Code:** This note changes none. Later PRs are listed in §6.
+**Code:** Implemented at `detailedEngineVersion` `1.1.0`. This note stays the impact record; it is not a second formula contract.
 
 ---
 

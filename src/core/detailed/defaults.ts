@@ -34,6 +34,8 @@ export const DETAILED_DEFAULTS = {
   ownCourierCostPerDeliveryOrder: 0,
   packagingTakeawayPerOrder: 0,
   packagingDeliveryPerOrder: 0,
+  /** DF-85. An omitted product discount changes no price. Not a form prefill. */
+  discountRate: 0,
   channelMix: { salon: 0.5, takeaway: 0.2, delivery: 0.3 } satisfies ChannelMix,
   paymentMix: { cash: 0.4, card: 0.45, mealCard: 0.15 } satisfies PaymentMix,
   /** DF-24, DF-71 — presets only. */
@@ -57,7 +59,7 @@ export const DETAILED_DEFAULTS = {
   ownerMonthlyAmount: 0,
   ownerBagKurMonthlyCost: 0,
   currency: 'TRY' as const,
-  detailedEngineVersion: '1.0.0',
+  detailedEngineVersion: '1.1.0',
 };
 
 /**

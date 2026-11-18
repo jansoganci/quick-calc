@@ -79,25 +79,22 @@ function unitMoney(value: number): string {
 }
 
 function productTable(products: readonly ResolvedProduct[], hasDelivery: boolean): ReportInputTable {
-  const columns = hasDelivery
-    ? [
-        PRODUCT_LABELS.name,
-        PRODUCT_LABELS.normalPrice,
-        PRODUCT_LABELS.onlinePrice,
-        PRODUCT_LABELS.unitProductCost,
-      ]
-    : [PRODUCT_LABELS.name, PRODUCT_LABELS.normalPrice, PRODUCT_LABELS.unitProductCost]
+  const prices = hasDelivery
+    ? [PRODUCT_LABELS.normalPrice, PRODUCT_LABELS.onlinePrice]
+    : [PRODUCT_LABELS.normalPrice]
+  const columns = [PRODUCT_LABELS.name, ...prices, PRODUCT_LABELS.discount, PRODUCT_LABELS.unitProductCost]
 
-  const rows = products.map((product) =>
-    hasDelivery
-      ? [
-          product.name,
-          unitMoney(product.normalPrice),
-          unitMoney(product.onlinePrice),
-          unitMoney(product.unitProductCost),
-        ]
-      : [product.name, unitMoney(product.normalPrice), unitMoney(product.unitProductCost)],
-  )
+  const rows = products.map((product) => {
+    const priceCells = hasDelivery
+      ? [unitMoney(product.normalPrice), unitMoney(product.onlinePrice)]
+      : [unitMoney(product.normalPrice)]
+    return [
+      product.name,
+      ...priceCells,
+      formatPercent(product.discountRate),
+      unitMoney(product.unitProductCost),
+    ]
+  })
 
   return { columns, rows }
 }

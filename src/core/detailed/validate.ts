@@ -232,6 +232,11 @@ function resolveProducts(errors: ValidationError[], value: unknown): ResolvedPro
       onlinePrice: f.required('onlinePrice', DETAILED_LIMITS.onlinePrice),
       dailyQuantity: f.required('dailyQuantity', DETAILED_LIMITS.dailyQuantity),
       unitProductCost: f.required('unitProductCost', DETAILED_LIMITS.unitProductCost),
+      discountRate: f.optional(
+        'discountRate',
+        DETAILED_LIMITS.discountRate,
+        DETAILED_DEFAULTS.discountRate,
+      ),
     };
   });
 }

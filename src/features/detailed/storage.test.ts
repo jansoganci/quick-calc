@@ -7,6 +7,7 @@ import {
   type DetailedFormState,
 } from './formState.ts'
 import { decodeDraft, encodeDraft, migrateDraftForm, type Draft } from './storage.ts'
+import { toDetailedInput } from './toInput.ts'
 
 /** A form with every optional collection populated, so nothing is exercised empty. */
 function filledForm(): DetailedFormState {
@@ -84,8 +85,32 @@ describe('decodeDraft rejects anything it did not write', () => {
   })
 
   it('returns null for another version', () => {
-    const raw = JSON.stringify({ version: 2, form: filledForm() })
+    const raw = JSON.stringify({ version: 3, form: filledForm() })
     expect(decodeDraft(raw)).toBeNull()
+  })
+
+  it('writes payload version 2 and migrates a version 1 draft', () => {
+    const encoded = JSON.parse(encodeDraft(draft(filledForm()))) as { version: number }
+    expect(encoded.version).toBe(2)
+    const legacy = JSON.parse(JSON.stringify(filledForm())) as {
+      products: Array<Record<string, unknown>>
+      owner: { bagKurMonthlyCost: string }
+      positions: Array<{ employerCostPerPerson: string }>
+    }
+    for (const product of legacy.products) delete product.discountRate
+    legacy.owner.bagKurMonthlyCost = ''
+    legacy.positions[0]!.employerCostPerPerson = ''
+    const restored = decodeDraft(JSON.stringify({ version: 1, form: legacy }))
+    expect(restored?.form.products[0]?.discountRate).toBe('0')
+    expect(restored?.form.products[1]?.discountRate).toBe('0')
+    expect(restored?.form.owner.bagKurMonthlyCost).toBe('0')
+    expect(restored?.form.positions[0]?.employerCostPerPerson).toBe('0')
+    expect(restored?.form.positions).toHaveLength(1)
+    const input = toDetailedInput(restored!.form)
+    const owner = input.owner as { bagKurMonthlyCost: number }
+    const product = (input.products as Array<{ discountRate: number }>)[0]
+    expect(owner.bagKurMonthlyCost).toBe(0)
+    expect(product?.discountRate).toBe(0)
   })
 
   it('reads a pre-report draft, which has no business name, as an empty name', () => {

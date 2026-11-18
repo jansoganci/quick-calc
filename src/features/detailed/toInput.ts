@@ -45,6 +45,7 @@ export function toDetailedInput(form: DetailedFormState): DetailedInput {
         product.costSource === 'recipe'
           ? resolvedRecipeUnitCost(form, product)
           : amount(product.unitProductCost),
+      discountRate: rate(product.discountRate),
     })),
     channelMix: {
       salon: rate(form.channelMix.salon),

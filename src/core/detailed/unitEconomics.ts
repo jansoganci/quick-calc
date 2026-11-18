@@ -39,8 +39,10 @@ export function buildUnitEconomics(
     cogsFactor;
 
   const products: ProductUnitEconomics[] = input.products.map((product) => {
-    const normalGrossPerUnit = product.normalPrice * priceFactor;
-    const onlineGrossPerUnit = product.onlinePrice * priceFactor;
+    // One discount on every channel (DF-85). 0 leaves the list price unchanged.
+    const priceKeep = 1 - product.discountRate;
+    const normalGrossPerUnit = product.normalPrice * priceFactor * priceKeep;
+    const onlineGrossPerUnit = product.onlinePrice * priceFactor * priceKeep;
     const unitProductCost = product.unitProductCost * cogsFactor;
 
     const line = (

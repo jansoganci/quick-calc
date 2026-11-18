@@ -362,6 +362,7 @@ export function DetailedForm({
             onBlur={() => calc.markTouched('owner.bagKurMonthlyCost')}
             unit="TL"
             error={calc.errorFor('owner.bagKurMonthlyCost')}
+            info={COPY.bagKurPrefillInfo}
             grouped
           />
         </div>

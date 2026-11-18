@@ -163,6 +163,18 @@ export function ProductRows({
                   grouped={column.grouped}
                 />
               ))}
+              <div className="col-span-2 lg:col-span-3">
+                <NumberField
+                  id={`products.${index}.discountRate`}
+                  label={PRODUCT_LABELS.discount}
+                  value={product.discountRate}
+                  onChange={(value) => onChange(index, 'discountRate', value)}
+                  onBlur={() => onBlur(`products.${index}.discountRate`)}
+                  unit="%"
+                  error={errorFor(`products.${index}.discountRate`)}
+                  info={COPY.discountHint}
+                />
+              </div>
               <NumberField
                 id={`products.${index}.unitProductCost`}
                 label={PRODUCT_LABELS.unitProductCost}
