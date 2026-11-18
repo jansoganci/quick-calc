@@ -189,6 +189,45 @@ export const BREAKDOWN_LABELS = {
 
 export type BreakdownKey = keyof typeof BREAKDOWN_LABELS
 
+/**
+ * Akış (DF-85): the same base-scenario engine month as Klasik, read top to
+ * bottom. Labels only — every amount comes from `akisView.ts`.
+ */
+export const AKIS_ROW_LABELS = {
+  grossSales: 'Brüt ciro',
+  vat: 'KDV',
+  netSales: 'Net satış',
+  productCogs: 'Ürün maliyeti',
+  grossProfit: 'Brüt kâr',
+  channelCost: 'Kanal masrafları',
+  channelVariableCost: 'Ambalaj ve kurye',
+  paymentPlatformFee: 'Ödeme ve platform kesintileri',
+  payroll: 'Personel',
+  rent: 'Kira',
+  aidat: 'Aidat',
+  opex: 'Diğer giderler',
+  ownerDraw: 'Sahip payı',
+  bagKur: 'Bağ-Kur',
+  operatingResult: 'İşletme sonucu',
+} as const
+
+export type AkisRowKey = keyof typeof AKIS_ROW_LABELS
+
+export const AKIS_COPY = {
+  viewGroup: 'Sonuç görünümü',
+  classic: 'Klasik',
+  flow: 'Akış',
+  title: 'Satıştan işletme sonucuna',
+  note: 'Klasik görünümdeki aylık sonucun aynısı, adım adım: temel senaryo, açılış dönemi sonrası bir ay. Tutarlar TL.',
+  productsTitle: 'Ürünlere göre brüt ciro',
+  payback: 'Yatırımın geri dönüşü',
+  payrollMissing: 'Personel girilmedi.',
+  hints: {
+    grossSales: 'Fiyatlar KDV dahil.',
+    channelCost: 'Oranlar sözleşmene göre değişir.',
+  },
+} as const
+
 export const COPY = {
   preparation: 'Hazırlık',
   baseScenario: 'Baz senaryo',
@@ -218,6 +257,8 @@ export const COPY = {
 
   emptyResult:
     'Hesapla’dan önce hiçbir sayı gösterilmez. En az bir ürün girip Hesapla’ya bastığında aylık işletme sonucu, başa baş noktası ve yatırımın geri dönüşü burada görünür.',
+  resultHiddenInvalid:
+    'Girdilerde düzeltilmesi gereken bir alan var. Düzelttiğinde sonuç burada yeniden görünür.',
   channelMixNoResult:
     'Kanal dağılımı %100 olmadığı için sonuç gösterilmiyor. Salon, al götür ve paket servis paylarını düzelt.',
   presentationGroup: 'Görünüm',

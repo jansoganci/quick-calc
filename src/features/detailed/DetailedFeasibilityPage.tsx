@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { cn } from '../../lib/cn.ts'
-import { AkisFlow } from './components/AkisFlow.tsx'
+import { AkisResults } from './components/AkisResults.tsx'
 import { DetailedForm } from './components/DetailedForm.tsx'
 import { DetailedResults } from './components/DetailedResults.tsx'
 import { DetailedScreenChrome } from './components/DetailedScreenChrome.tsx'
@@ -13,7 +13,7 @@ import { ReportNameDialog } from './components/ReportNameDialog.tsx'
 import { CalculateButton, SummaryPane } from './components/SummaryPane.tsx'
 import { useReportPrint } from './hooks/useReportPrint.ts'
 import type { DetailedCalcApi } from './hooks/useDetailedCalc.ts'
-import { COPY, RECIPE_COPY, SECTION_LABELS } from './labels.ts'
+import { AKIS_COPY, COPY, RECIPE_COPY, SECTION_LABELS } from './labels.ts'
 import {
   DETAILED_SCREENS,
   screenForSection,
@@ -22,6 +22,14 @@ import {
   type DetailedScreen,
 } from './screens.ts'
 import { visibleSections } from './sectionSummary.ts'
+
+/** Klasik / Akış (DF-85). Screen-only React state: never in the form or the draft. */
+const RESULT_VIEWS = ['classic', 'flow'] as const
+type ResultViewMode = (typeof RESULT_VIEWS)[number]
+const RESULT_VIEW_LABELS: Record<ResultViewMode, string> = {
+  classic: AKIS_COPY.classic,
+  flow: AKIS_COPY.flow,
+}
 
 /**
  * Five screens, one visible. Inputs stay in one form state so switching does not
@@ -40,9 +48,8 @@ export function DetailedFeasibilityPage({
   onGoToScreen: (screen: DetailedScreen) => void
 }) {
   const report = useReportPrint(calc.businessName, calc.setBusinessName)
+  const [resultView, setResultView] = useState<ResultViewMode>('classic')
   const sections = visibleSections(calc.form)
-  const [presentation, setPresentation] = useState<'klasik' | 'akis'>('klasik')
-  const showAkis = screen === 'results' && presentation === 'akis'
 
   useEffect(() => {
     const onThisScreen = sectionsOnScreen(screen, sections)
@@ -95,27 +102,6 @@ export function DetailedFeasibilityPage({
         className="qc-screen-only lg:grid lg:grid-cols-[minmax(0,1fr)_1px_372px]"
       >
         <DetailedScreenChrome screen={screen} onGoToScreen={onGoToScreen}>
-          <div className="qc-screen-only mb-4 max-w-[600px]">
-            <div className="qc-segment" role="group" aria-label={COPY.presentationGroup}>
-              <button
-                type="button"
-                className="qc-segment-btn"
-                aria-pressed={presentation === 'klasik'}
-                onClick={() => setPresentation('klasik')}
-              >
-                {COPY.presentationKlasik}
-              </button>
-              <button
-                type="button"
-                className="qc-segment-btn"
-                aria-pressed={presentation === 'akis'}
-                onClick={() => setPresentation('akis')}
-              >
-                {COPY.presentationAkis}
-              </button>
-            </div>
-            <p className="mt-2 text-[13px] text-qc-secondary">{COPY.presentationHint}</p>
-          </div>
           <div hidden={screen === 'results'}>
             <DetailedForm calc={calc} screen={screen} onGoToScreen={onGoToScreen} />
             <DraftNotice saved={calc.draftSaved} onReset={calc.resetForm} />
@@ -123,7 +109,7 @@ export function DetailedFeasibilityPage({
           {screen === 'results' && calc.view === null ? (
             <div className="max-w-[600px]">
               <p className="text-[13px] leading-relaxed text-qc-ink">
-                {calc.channelMixBlocksResults ? COPY.channelMixNoResult : COPY.emptyResult}
+                {calc.hasCalculated ? COPY.resultHiddenInvalid : COPY.emptyResult}
               </p>
               <div className="mt-5 hidden lg:block">
                 <CalculateButton
@@ -141,18 +127,34 @@ export function DetailedFeasibilityPage({
               }
             >
               <div ref={calc.resultsRef} className={cn(calc.liveFlash && 'qc-live')}>
-                {showAkis ? (
-                  <div className="qc-screen-only">
-                    <AkisFlow view={calc.view} />
+                <div className="qc-screen-only px-[18px] pb-4 lg:px-[30px]">
+                  <div className="qc-segment" role="group" aria-label={AKIS_COPY.viewGroup}>
+                    {RESULT_VIEWS.map((mode) => (
+                      <button
+                        key={mode}
+                        type="button"
+                        className="qc-segment-btn"
+                        aria-pressed={resultView === mode}
+                        onClick={() => setResultView(mode)}
+                      >
+                        {RESULT_VIEW_LABELS[mode]}
+                      </button>
+                    ))}
                   </div>
-                ) : null}
-                <div className={showAkis ? 'qc-print-only' : undefined}>
+                </div>
+                {/* Print always carries Klasik; Akış is screen-only. */}
+                <div className={resultView === 'flow' ? 'qc-print-only' : undefined}>
                   <DetailedResults
                     view={calc.view}
                     showMonthTable={calc.showMonthTable}
                     onToggleMonthTable={calc.toggleMonthTable}
                   />
                 </div>
+                {resultView === 'flow' ? (
+                  <div className="qc-screen-only">
+                    <AkisResults view={calc.view} />
+                  </div>
+                ) : null}
                 <div className="px-0 pb-4 lg:hidden">
                   <ReportActionButton
                     variant="results"

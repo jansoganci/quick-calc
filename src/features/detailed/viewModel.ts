@@ -19,6 +19,7 @@ import {
   type SalonMenuView,
 } from './insightsView.ts'
 import { buildReportInputGroups, type ReportInputGroup } from './reportView.ts'
+import { buildAkisView, type AkisView } from './akisView.ts'
 import { collectGuardrails, type Guardrail } from './guardrails.ts'
 import {
   COPY,
@@ -80,6 +81,8 @@ export type DetailedView = {
   scenarios: ScenarioRow[]
   sectionEcho: Partial<Record<SectionId, string>>
   breakdown: BreakdownView
+  /** Akış (DF-85): the same base month as `breakdown`, as a waterfall. */
+  akis: AkisView
   channels: ChannelRow[]
   channelTotals: Omit<ChannelRow, 'channel' | 'label'>
   products: ProductRow[]
@@ -264,6 +267,7 @@ function buildView(result: DetailedResult, input: DetailedResolvedInput): Detail
     scenarios: buildScenarioRows(result),
     sectionEcho: buildSectionEcho(result),
     breakdown: buildBreakdown(base),
+    akis: buildAkisView(base),
     channels: buildChannelRows(base),
     channelTotals: buildChannelTotals(base),
     products: buildProductRows(base),
