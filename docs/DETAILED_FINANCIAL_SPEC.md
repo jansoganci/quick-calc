@@ -1,6 +1,6 @@
 # Detailed Feasibility — Financial Specification
 
-**Version:** v1.15
+**Version:** v1.16
 **Status:** Formula contract for `src/core/detailed/`. **Not** implementation.
 **Currency:** TRY · **Country:** Turkey · **Language for v1:** Turkish-first
 **Engine:** `detailedEngineVersion` `1.1.0`. Appendix E is implemented. Where an older sentence in the body still describes the pre-discount month, Appendix E wins.
@@ -1317,12 +1317,17 @@ Unchanged validator: `mix_not_100` when `abs(sum − 1) > 1e-6`, path `['channel
 
 Akış may show `monthlyOperatingResult / netRevenue` beside the operating result, as a share of net satış. It is null when `netRevenue <= 0`. It is not an engine field and does not change `monthlyOperatingResult`. No figure in §18.2 changes.
 
+### E.8 Funnel remainders (display only)
+
+Akış shows the month as a funnel. Each step's outflow is an engine field: `vatAmount`, `productCogs`, `channelCost`, `monthlyPayroll`, `monthlyOccupancyCost`, `monthlyOpex`, `monthlyOwnerCost`. The amount left after a step is the engine's own field where one exists (`netRevenue`, `grossProfitBeforeChannel`, `totalContribution`, `monthlyOperatingResult`). After personel, kira ve aidat and diğer giderler the remainder is the previous remainder minus that step's outflow. These three are display identities, not engine fields. The last remainder equals `monthlyOperatingResult` within 1e-6. No figure in §18.2 changes. The funnel does not show E.7.
+
 ---
 
 ## 19. Changelog
 
 | Version | Change |
 | --- | --- |
+| v1.16 | Appendix E.8: Akış funnel remainders after personel, kira ve aidat and diğer giderler are display identities (previous remainder − engine outflow). Not engine fields. No figure in §18.2 changed. `detailedEngineVersion` stays `1.1.0`. |
 | v1.15 | Appendix E.7: Akış may show `monthlyOperatingResult / netRevenue` as a display share, null when net satış is not positive. Not an engine field. No figure in §18.2 changed. `detailedEngineVersion` stays `1.1.0`. |
 | v1.14 | Appendix E is implemented. `detailedEngineVersion` is `1.1.0`. Product discount, the five additive month fields, list-price restore under a discount, visible 2026 prefills, and draft payload version 2 are in the engine and the form. Omitted fallback stays 0. No figure in §18.2 changed. |
 | v1.13 | Appendix E records the DF-85 contract (product discount, visible 2026 prefills with engine fallback still 0, additive month fields, draft payload version 2). Not implemented. No figure in §18.2 changed. `detailedEngineVersion` stays 1.0.0. Header version corrected from the stale v1.11 label; the body was already at v1.12. |

@@ -1,5 +1,7 @@
 # Akış UI brief
 
+> **Superseded on 18 November 2026 (owner decision).** Akış is a read-only funnel on the Sonuç screen, not an input form. Inputs stay on the four input screens; Akış ends with "Girdilere dön". The interaction contract and field map below (inline inputs, live edits, deltas, product cards) no longer apply. Funnel order: products → toplam satış → KDV → ürün maliyeti → kanal kesintileri → personel → kira ve aidat → diğer giderler → sen ve Bağ-Kur → ayda sana kalan + engine payback. Remainders: DETAILED_FINANCIAL_SPEC.md Appendix E.8. Design reference: the owner's "Akış funnel redesign" canvas.
+
 Reference image: docs/assets/akis-prototype.png (owner's design mock).
 This is a product brief for LAYOUT and INTERACTION. Formulas stay in src/core. The mock was a throwaway HTML page with its own browser math; do not copy its math.
 
