@@ -255,7 +255,7 @@ export function DetailedForm({
 
       {sections.includes('delivery') ? (
         <SectionFrame {...frameProps('delivery')}>
-          <div className="max-w-[600px]">
+          <div>
             <span className="qc-field-label">{COPY.deliveryModeQuestion}</span>
             <div
               className={cn('qc-segment', calc.errorFor('delivery.mode') && 'border-qc-error')}
@@ -286,7 +286,7 @@ export function DetailedForm({
             )}
           </div>
 
-          <div className="mt-[18px] grid max-w-[600px] grid-cols-1 gap-x-[13px] gap-y-[15px] lg:grid-cols-2">
+          <div className="mt-[18px] grid grid-cols-1 gap-x-[13px] gap-y-[15px] lg:grid-cols-2">
             <NumberField
               id="delivery.platformFeeRate"
               label={COPY.platformFeeRate}
@@ -347,7 +347,7 @@ export function DetailedForm({
       </SectionFrame>
 
       <SectionFrame {...frameProps('owner')}>
-        <div className="grid max-w-[600px] grid-cols-1 gap-x-[13px] gap-y-[15px] lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-x-[13px] gap-y-[15px] lg:grid-cols-2">
           <NumberField
             id="owner.monthlyAmount"
             label={COPY.ownerMonthlyAmount}
@@ -373,7 +373,7 @@ export function DetailedForm({
       </SectionFrame>
 
       <SectionFrame {...frameProps('occupancy')}>
-        <div className="grid max-w-[600px] grid-cols-1 gap-x-[13px] gap-y-[15px] lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-x-[13px] gap-y-[15px] lg:grid-cols-2">
           <div>
             <NumberField
               id="occupancy.monthlyRent"
@@ -459,7 +459,7 @@ export function DetailedForm({
       </SectionFrame>
 
       <SectionFrame {...frameProps('assumptions')}>
-        <div className="grid max-w-[600px] grid-cols-1 gap-x-[13px] gap-y-[15px] lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-x-[13px] gap-y-[15px] lg:grid-cols-2">
           <NumberField
             id="assumptions.vatRate"
             label={COPY.vatRate}
@@ -480,7 +480,7 @@ export function DetailedForm({
           />
         </div>
 
-        <div className="mt-[18px] grid max-w-[600px] grid-cols-1 gap-x-[13px] gap-y-[18px] lg:grid-cols-2">
+        <div className="mt-[18px] grid grid-cols-1 gap-x-[13px] gap-y-[18px] lg:grid-cols-2">
           <div>
             <span className="qc-field-label">{COPY.projectionHorizon}</span>
             <div className="qc-segment" role="group" aria-label={COPY.projectionHorizon}>
@@ -516,7 +516,7 @@ export function DetailedForm({
           </div>
         </div>
 
-        <div className="mt-[22px] max-w-[600px]">
+        <div className="mt-[22px]">
           <span className="qc-field-label">{COPY.scenarioVolumes}</span>
           <p className="qc-hint mb-2 mt-1">{COPY.scenarioVolumesHint}</p>
           <div className="grid grid-cols-3 gap-[13px]">
@@ -547,7 +547,7 @@ export function DetailedForm({
           </div>
         </div>
 
-        <details className="mt-6 max-w-[600px] border-t border-qc-rule-row pt-4">
+        <details className="mt-6 border-t border-qc-rule-row pt-4">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-[13px] text-qc-secondary">
             <span>{COPY.advancedAssumptions}</span>
             <span className="font-mono text-[13px] tabular-nums text-qc-secondary">

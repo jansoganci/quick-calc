@@ -43,13 +43,13 @@ export function LineRows({
 }: LineRowsProps) {
   const used = new Set(lines.map((line) => line.name.trim()))
   const rows = useNewestRowOpen(lines.map((line) => line.id))
-  // Spec §2.1: opexLines cell is `1fr 124px 52px`, capexItems is `1fr 132px 52px`.
-  const gridCols = pathPrefix === 'capexItems' ? 'grid-cols-[1fr_132px_52px]' : 'grid-cols-[1fr_124px_52px]'
+  // One item per row, top to bottom (never two side by side): name · amount · Kaldır.
+  const gridCols = 'grid-cols-[minmax(0,1fr)_124px_52px] lg:grid-cols-[minmax(0,1fr)_160px_52px]'
 
   return (
     <div>
       {lines.length > 0 ? (
-        <div className={cn('hidden gap-2.5 pb-2 lg:grid', gridCols)}>
+        <div className={cn('hidden items-end gap-2.5 pb-2 lg:grid', gridCols)}>
           <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
             {nameLabel}
           </span>
@@ -60,7 +60,7 @@ export function LineRows({
         </div>
       ) : null}
 
-      <div className="lg:grid lg:grid-cols-2 lg:gap-x-[30px]">
+      <div>
         {lines.map((line, index) => (
           <div
             key={line.id}

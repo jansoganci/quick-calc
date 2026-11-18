@@ -1,3 +1,4 @@
+import { InfoTooltip } from '../../../components/InfoTooltip.tsx'
 import { NumberField } from '../../../components/NumberField.tsx'
 import { TextField } from '../../../components/TextField.tsx'
 import { cn } from '../../../lib/cn.ts'
@@ -7,7 +8,13 @@ import { COPY, GUARDRAIL_COPY, PRODUCT_LABELS, RECIPE_COPY } from '../labels.ts'
 import { useNewestRowOpen } from '../hooks/useNewestRowOpen.ts'
 import { recipeAmountText } from '../recipeForm.ts'
 
-const GRID = 'lg:grid-cols-[minmax(8rem,1fr)_minmax(5.5rem,120px)_minmax(5.5rem,120px)_minmax(5.5rem,112px)_88px_48px]'
+/**
+ * One column per field, one header per column (desktop): Ürün · Normal fiyat ·
+ * Online fiyat · İndirim · Birim maliyet · Kaldır. The recipe action sits on a
+ * caption line under the cost cell, so no field ever wraps under another
+ * column's header.
+ */
+const GRID = 'lg:grid-cols-[minmax(0,1fr)_104px_104px_76px_112px_52px]'
 
 const NUMERIC_FIELDS = [
   { field: 'normalPrice', label: PRODUCT_LABELS.normalPrice, unit: 'TL', grouped: true },
@@ -77,11 +84,12 @@ export function ProductRows({
             {column.label}
           </span>
         ))}
+        <span className="flex items-center justify-end text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
+          {PRODUCT_LABELS.discount}
+          <InfoTooltip text={COPY.discountHint} />
+        </span>
         <span className="text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
           {PRODUCT_LABELS.unitProductCost}
-        </span>
-        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">
-          {RECIPE_COPY.recipeEyebrow}
         </span>
         <span />
       </div>
@@ -132,7 +140,7 @@ export function ProductRows({
 
             <div
               className={cn(
-                'grid grid-cols-2 gap-3 pb-3 lg:grid lg:gap-2 lg:pb-0',
+                'grid grid-cols-2 gap-3 pb-3 lg:grid lg:gap-x-2 lg:gap-y-1 lg:pb-0',
                 GRID,
                 'lg:items-center',
                 open ? 'grid' : 'hidden lg:grid',
@@ -163,10 +171,11 @@ export function ProductRows({
                   grouped={column.grouped}
                 />
               ))}
-              <div className="col-span-2 lg:col-span-3">
+              <div>
                 <NumberField
                   id={`products.${index}.discountRate`}
                   label={PRODUCT_LABELS.discount}
+                  labelHidden="from-lg"
                   value={product.discountRate}
                   onChange={(value) => onChange(index, 'discountRate', value)}
                   onBlur={() => onBlur(`products.${index}.discountRate`)}
@@ -187,18 +196,6 @@ export function ProductRows({
                 grouped
                 readOnly={cost.locked}
               />
-              <div className="hidden lg:block">
-                <button
-                  type="button"
-                  className={cn(
-                    'qc-text-btn',
-                    recipeOpen && 'font-medium text-qc-ink underline decoration-2 underline-offset-4',
-                  )}
-                  onClick={() => onOpenRecipe(index)}
-                >
-                  {hasRecipe ? RECIPE_COPY.openRecipe : RECIPE_COPY.openRecipeNewDesktop}
-                </button>
-              </div>
               <button
                 type="button"
                 className="qc-text-btn col-span-2 text-left lg:col-span-1 lg:text-right"
@@ -207,6 +204,18 @@ export function ProductRows({
               >
                 {COPY.remove}
               </button>
+              <div className="hidden lg:col-span-2 lg:col-start-5 lg:block lg:text-right">
+                <button
+                  type="button"
+                  className={cn(
+                    'qc-text-btn min-h-0 text-xs',
+                    recipeOpen && 'font-medium text-qc-ink underline decoration-2 underline-offset-4',
+                  )}
+                  onClick={() => onOpenRecipe(index)}
+                >
+                  {hasRecipe ? RECIPE_COPY.openRecipe : RECIPE_COPY.openRecipeNewDesktop}
+                </button>
+              </div>
               <div className="col-span-2 border-t border-qc-rule-row pt-3 lg:hidden">
                 {hasRecipe ? (
                   <>
