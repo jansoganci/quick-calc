@@ -272,6 +272,11 @@ function sampleLine(ingredientId: string, usageQuantity: string): RecipeLine {
  * Built on `initialForm()` so every secondary assumption and mix default it
  * doesn't override stays the single source of truth in `core/detailed/defaults.ts`.
  */
+/**
+ * Test fixture: the original four-product café. The app's "örnek işletme"
+ * chooser uses `samples/` instead; several tests pin this form's figures, so it
+ * stays unchanged here.
+ */
 export function sampleCafeForm(): DetailedFormState {
   const base = initialForm()
   // One product built from a recipe, so the sample shows the shared

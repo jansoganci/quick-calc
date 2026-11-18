@@ -1723,6 +1723,18 @@ The formula contract for the discount and the additive result fields is Appendix
 
 ---
 
+#### DF-86 — Sample businesses are form data **[LOCKED]**
+
+Owner decision, 18 November 2026. The Menü screen's "Örnek bir işletmeyle başla" opens five samples: Kafe, Pastane, Hamburgerci, Kebapçı, Tatlıcı. Picking one fills the whole form.
+
+- A sample is only form input, typed the way an owner would type it (`src/features/detailed/samples/`). It adds no formula, field or default. The engine computes everything after the form is filled.
+- Each menu has 10–12 products. Every product made in-house uses a recipe; bought-in items (water, cola, ayran, şalgam, the café's croissant and cheesecake) carry a typed unit cost.
+- Figures are the owner's November 2026 estimates for a big-city, mid-range neighbourhood. They are not supplier quotes or sales data, and the screen says so after a sample loads.
+- Packaging and own-courier fuel are entered per product, because DF-67 counts each product sold as one order.
+- Waste is a fixed "Fire karşılığı" line in other expenses; the engine has no waste rate.
+- The rent deposit and opening working capital are typed as two initial-investment lines. That is a typed amount, not working-capital modelling; DF-41 is unchanged.
+- A sample may not pay back within the projection horizon; that is shown honestly. Every sample must end its stabilized base month positive (`samples.test.ts`).
+
 ### 5.13 Financing and working capital
 
 #### DF-40 — Financing is out of Detailed v1 **[LOCKED]**
