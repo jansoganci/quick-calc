@@ -68,6 +68,9 @@ export function buildMonthlyFixedCosts(
   );
 
   // Owner amount and Bağ-Kur are ordinary monthly operating costs (DF-59).
+  // Named separately. `monthlyOwnerCost` below stays their sum.
+  const monthlyOwnerDraw = input.owner.monthlyAmount * fixedFactor;
+  const monthlyBagKur = input.owner.bagKurMonthlyCost * fixedFactor;
   const baseOwnerCost = input.owner.monthlyAmount + input.owner.bagKurMonthlyCost;
 
   const rent = resolveRentCost({
@@ -85,13 +88,17 @@ export function buildMonthlyFixedCosts(
   const monthlyOwnerCost = baseOwnerCost * fixedFactor;
   const monthlyOccupancyCost = baseOccupancyCost * fixedFactor;
   const monthlyOpex = baseOpex * fixedFactor;
+  const rentCost = rent.rentCost * fixedFactor;
 
   return {
     monthlyPayroll,
     monthlyOwnerCost,
+    monthlyOwnerDraw,
+    monthlyBagKur,
     monthlyOccupancyCost,
     monthlyOpex,
-    rentCost: rent.rentCost * fixedFactor,
+    rentCost,
+    monthlyAidat: monthlyOccupancyCost - rentCost,
     rentPaidToLandlord: rent.rentPaidToLandlord * fixedFactor,
     rentWithholdingTax: rent.rentWithholdingTax * fixedFactor,
     monthlyFixedCost:
