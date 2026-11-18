@@ -1,11 +1,13 @@
-import type { MonthResult } from '../../core/detailed/index.ts'
+import type { Channel, MonthResult } from '../../core/detailed/index.ts'
 import { formatTry } from '../../lib/money.ts'
+import { formatPercent } from '../../lib/percent.ts'
 import { AKIS_COPY, AKIS_ROW_LABELS, type AkisRowKey } from './labels.ts'
 
 /**
  * Akış (DF-85 D1): the base-scenario stabilized month as a top-to-bottom
- * waterfall. Pure mapping — every amount is a `MonthResult` field the engine
- * already computed; this module adds, subtracts and recomputes nothing.
+ * waterfall. Every row amount is a `MonthResult` field. Two display-only
+ * extras sit beside that mapping and are not engine formulas: the operating
+ * share (Appendix E.7) and the reference delta (current amount − snapshot).
  *
  * - `subtotal`: a running figure (brüt ciro, net satış, brüt kâr).
  * - `deduction`: taken off the running figure on the way down.
@@ -24,6 +26,15 @@ export type AkisRow = {
   amount: number
   amountFormatted: string
   hint: string | null
+  /** Current amount minus the reference snapshot. Null when there is no snapshot or the shown TL does not move. */
+  delta: number | null
+  deltaFormatted: string | null
+}
+
+export type AkisChannelChip = {
+  channel: Channel
+  label: string
+  grossFormatted: string
 }
 
 export type AkisProduct = {
@@ -36,9 +47,18 @@ export type AkisView = {
   /** Brüt ciro per product (`byProduct[].grossCustomerSales`), in input order. */
   products: AkisProduct[]
   rows: AkisRow[]
+  /** Brüt ciro per channel (`byChannel[channel].grossCustomerSales`). */
+  channels: AkisChannelChip[]
+  /** `monthlyOperatingResult / netRevenue`. Null when net satış is not positive. Display only (E.7). */
+  operatingShare: number | null
+  operatingShareFormatted: string | null
   /** Soft note: no personnel cost entered. */
   isPayrollMissing: boolean
 }
+
+export type AkisSnapshot = Record<AkisRowKey, number>
+
+const CHANNELS = ['salon', 'takeaway', 'delivery'] as const satisfies readonly Channel[]
 
 type RowSpec = {
   key: AkisRowKey
@@ -72,6 +92,7 @@ function formatAmount(kind: AkisRowKind, amount: number): string {
 }
 
 export function buildAkisView(month: MonthResult): AkisView {
+  const share = operatingShareOf(month)
   return {
     products: month.byProduct.map((line) => ({
       productId: line.productId,
@@ -88,8 +109,60 @@ export function buildAkisView(month: MonthResult): AkisView {
         amount,
         amountFormatted: formatAmount(spec.kind, amount),
         hint: spec.hint ?? null,
+        delta: null,
+        deltaFormatted: null,
       }
     }),
+    channels: CHANNELS.map((channel) => ({
+      channel,
+      label: AKIS_COPY.channels[channel],
+      grossFormatted: `${formatTry(month.byChannel[channel].grossCustomerSales)} TL`,
+    })),
+    operatingShare: share,
+    operatingShareFormatted: share === null ? null : AKIS_COPY.shareOfNet(formatPercent(share)),
     isPayrollMissing: month.monthlyPayroll === 0,
   }
+}
+
+function operatingShareOf(month: MonthResult): number | null {
+  if (month.netRevenue <= 0) return null
+  return month.monthlyOperatingResult / month.netRevenue
+}
+
+/** Row amounts at one moment. Display state only — never written into the draft. */
+export function snapshotAkis(akis: AkisView): AkisSnapshot {
+  const snapshot = {} as AkisSnapshot
+  for (const row of akis.rows) snapshot[row.key] = row.amount
+  return snapshot
+}
+
+/**
+ * Delta is the current engine amount minus the snapshot amount.
+ * Null when there is no snapshot, or when formatting both to whole TL
+ * shows the same figure (|delta| under 0.5 TL after that rounding).
+ */
+export function withDeltas(akis: AkisView, snapshot: AkisSnapshot | null): AkisView {
+  if (snapshot === null) return akis
+  return {
+    ...akis,
+    rows: akis.rows.map((row) => {
+      const delta = row.amount - snapshot[row.key]
+      if (formatTry(row.amount) === formatTry(snapshot[row.key])) {
+        return { ...row, delta: null, deltaFormatted: null }
+      }
+      const arrow = delta > 0 ? '▲' : '▼'
+      return {
+        ...row,
+        delta,
+        deltaFormatted: `${arrow} ${formatTry(Math.abs(delta))} TL`,
+      }
+    }),
+  }
+}
+
+/** Keys whose raw amounts moved. Used to flash those rows. */
+export function changedRowKeys(prevAmounts: AkisSnapshot, nextAmounts: AkisSnapshot): AkisRowKey[] {
+  return (Object.keys(nextAmounts) as AkisRowKey[]).filter(
+    (key) => prevAmounts[key] !== nextAmounts[key],
+  )
 }

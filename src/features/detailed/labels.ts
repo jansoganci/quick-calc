@@ -226,6 +226,33 @@ export const AKIS_COPY = {
     grossSales: 'Fiyatlar KDV dahil.',
     channelCost: 'Oranlar sözleşmene göre değişir.',
   },
+  blank: '—',
+  resetReference: 'Referansı sıfırla',
+  edit: 'Düzenle',
+  editRecipe: 'Reçeteyi menüde düzenle',
+  addProduct: '+ Ürün ekle',
+  removeProduct: 'Kaldır',
+  days: 'Aylık çalışma günü',
+  channelSplit: 'Satışın kanallara dağılımı',
+  paymentTitle: 'Ödeme ve platform kesintileri',
+  packagingTitle: 'Ambalaj ve kurye',
+  initialInvestment: 'İlk yatırım',
+  shopPrice: 'Dükkan / gel al fiyatı, KDV dahil',
+  platformPrice: 'Platform fiyatı, KDV dahil',
+  discount: 'İndirim %',
+  dailyQuantity: 'Günlük adet',
+  unitCost: 'Birim maliyet',
+  channels: {
+    salon: 'Dükkan içi',
+    takeaway: 'Gel al',
+    delivery: 'Platform',
+  },
+  payments: {
+    cash: 'Nakit',
+    card: 'Kart',
+    mealCard: 'Yemek kartı',
+  },
+  shareOfNet: (share: string) => `Net satışın ${share}'i`,
 } as const
 
 export const COPY = {

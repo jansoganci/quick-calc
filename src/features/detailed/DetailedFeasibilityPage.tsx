@@ -106,11 +106,9 @@ export function DetailedFeasibilityPage({
             <DetailedForm calc={calc} screen={screen} onGoToScreen={onGoToScreen} />
             <DraftNotice saved={calc.draftSaved} onReset={calc.resetForm} />
           </div>
-          {screen === 'results' && calc.view === null ? (
+          {screen === 'results' && !calc.hasCalculated ? (
             <div className="max-w-[600px]">
-              <p className="text-[13px] leading-relaxed text-qc-ink">
-                {calc.hasCalculated ? COPY.resultHiddenInvalid : COPY.emptyResult}
-              </p>
+              <p className="text-[13px] leading-relaxed text-qc-ink">{COPY.emptyResult}</p>
               <div className="mt-5 hidden lg:block">
                 <CalculateButton
                   canSubmit={calc.canSubmit}
@@ -120,12 +118,8 @@ export function DetailedFeasibilityPage({
               </div>
             </div>
           ) : null}
-          {calc.view ? (
-            <div
-              className={
-                screen === 'results' ? 'qc-enter -mx-[18px] lg:-mx-[30px]' : 'qc-print-only'
-              }
-            >
+          {screen === 'results' && calc.hasCalculated ? (
+            <div className="qc-enter -mx-[18px] lg:-mx-[30px]">
               <div ref={calc.resultsRef} className={cn(calc.liveFlash && 'qc-live')}>
                 <div className="qc-screen-only px-[18px] pb-4 lg:px-[30px]">
                   <div className="qc-segment" role="group" aria-label={AKIS_COPY.viewGroup}>
@@ -142,28 +136,56 @@ export function DetailedFeasibilityPage({
                     ))}
                   </div>
                 </div>
-                {/* Print always carries Klasik; Akış is screen-only. */}
-                <div className={resultView === 'flow' ? 'qc-print-only' : undefined}>
-                  <DetailedResults
-                    view={calc.view}
-                    showMonthTable={calc.showMonthTable}
-                    onToggleMonthTable={calc.toggleMonthTable}
-                  />
-                </div>
                 {resultView === 'flow' ? (
                   <div className="qc-screen-only">
-                    <AkisResults view={calc.view} />
+                    <AkisResults calc={calc} onGoToScreen={onGoToScreen} />
                   </div>
                 ) : null}
-                <div className="px-0 pb-4 lg:hidden">
-                  <ReportActionButton
-                    variant="results"
-                    canPrint={report.canPrint}
-                    onOpen={report.open}
-                  />
-                </div>
-                <ReportAppendix view={calc.view} />
+                {/* Print always carries Klasik; Akış is screen-only. */}
+                {calc.view ? (
+                  <div className={resultView === 'flow' ? 'qc-print-only' : undefined}>
+                    <DetailedResults
+                      view={calc.view}
+                      showMonthTable={calc.showMonthTable}
+                      onToggleMonthTable={calc.toggleMonthTable}
+                    />
+                  </div>
+                ) : null}
+                {screen === 'results' && resultView === 'classic' && calc.view === null ? (
+                  <div className="max-w-[600px] px-[18px] lg:px-[30px]">
+                    <p className="text-[13px] leading-relaxed text-qc-ink">{COPY.resultHiddenInvalid}</p>
+                    <div className="mt-5 hidden lg:block">
+                      <CalculateButton
+                        canSubmit={calc.canSubmit}
+                        submitHint={submitHint}
+                        onCalculate={calculate}
+                      />
+                    </div>
+                  </div>
+                ) : null}
+                {calc.view ? (
+                  <>
+                    <div className="px-0 pb-4 lg:hidden">
+                      <ReportActionButton
+                        variant="results"
+                        canPrint={report.canPrint}
+                        onOpen={report.open}
+                      />
+                    </div>
+                    <ReportAppendix view={calc.view} />
+                  </>
+                ) : null}
               </div>
+            </div>
+          ) : null}
+          {screen !== 'results' && calc.view ? (
+            <div className="qc-print-only">
+              <DetailedResults
+                view={calc.view}
+                showMonthTable={calc.showMonthTable}
+                onToggleMonthTable={calc.toggleMonthTable}
+              />
+              <ReportAppendix view={calc.view} />
             </div>
           ) : null}
         </DetailedScreenChrome>

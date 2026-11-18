@@ -7,7 +7,8 @@ import {
 } from '../../core/detailed/index.ts'
 // Test fixture only (not on the engine barrel by design).
 import { goldenRawInput } from '../../core/detailed/goldenVector.ts'
-import { buildAkisView, type AkisRow } from './akisView.ts'
+import { formatTry } from '../../lib/money.ts'
+import { buildAkisView, changedRowKeys, snapshotAkis, withDeltas, type AkisRow } from './akisView.ts'
 import { AKIS_COPY, AKIS_ROW_LABELS, type AkisRowKey } from './labels.ts'
 
 const TOLERANCE = 1e-6
@@ -89,5 +90,71 @@ describe('buildAkisView', () => {
     expect(rowOf(view.rows, 'channelCost').hint).toBe(AKIS_COPY.hints.channelCost)
     expect(view.isPayrollMissing).toBe(month.monthlyPayroll === 0)
     expect(buildAkisView({ ...month, monthlyPayroll: 0 }).isPayrollMissing).toBe(true)
+  })
+
+  it('shows each channel chip as that channel’s brüt ciro', () => {
+    for (const chip of view.channels) {
+      expect(chip.grossFormatted).toBe(`${formatTry(month.byChannel[chip.channel].grossCustomerSales)} TL`)
+    }
+  })
+
+  it('shows the operating share as result ÷ net, and blank when net satış is not positive', () => {
+    expect(view.operatingShare).toBeCloseTo(month.monthlyOperatingResult / month.netRevenue, 10)
+    const none = buildAkisView({ ...month, netRevenue: 0 })
+    expect(none.operatingShare).toBeNull()
+    expect(none.operatingShareFormatted).toBeNull()
+  })
+})
+
+function monthAmount(month: MonthResult, key: AkisRowKey): number {
+  const value = month[FIELD_OF[key]]
+  if (typeof value !== 'number') throw new Error(`expected a number for ${key}`)
+  return value
+}
+
+function withFirstPriceRaised(raw: DetailedInput): DetailedInput {
+  const products = Array.isArray(raw.products) ? raw.products : []
+  const first = products[0]
+  if (!first || typeof first !== 'object' || !('normalPrice' in first) || typeof first.normalPrice !== 'number') {
+    throw new Error('golden fixture has a priced product')
+  }
+  return {
+    ...raw,
+    products: [{ ...first, normalPrice: first.normalPrice + 10 }, ...products.slice(1)],
+  }
+}
+
+describe('withDeltas', () => {
+  const before = baseMonth(goldenRawInput())
+  const after = baseMonth(withFirstPriceRaised(goldenRawInput()))
+
+  it('leaves every delta null when there is no snapshot', () => {
+    for (const row of withDeltas(buildAkisView(after), null).rows) {
+      expect(row.delta).toBeNull()
+      expect(row.deltaFormatted).toBeNull()
+    }
+  })
+
+  it('sets each row delta to the change in its MonthResult field', () => {
+    const next = withDeltas(buildAkisView(after), snapshotAkis(buildAkisView(before)))
+    for (const row of next.rows) {
+      const change = monthAmount(after, row.key) - monthAmount(before, row.key)
+      if (formatTry(monthAmount(after, row.key)) === formatTry(monthAmount(before, row.key))) {
+        expect(row.delta).toBeNull()
+      } else {
+        expect(row.delta).toBeCloseTo(change, 6)
+        expect(row.deltaFormatted).toBe(`${change > 0 ? '▲' : '▼'} ${formatTry(Math.abs(change))} TL`)
+      }
+    }
+  })
+
+  it('reports only the keys whose amounts moved', () => {
+    const prev = snapshotAkis(buildAkisView(before))
+    const next = snapshotAkis(buildAkisView(after))
+    const keys = changedRowKeys(prev, next)
+    for (const key of Object.keys(FIELD_OF) as AkisRowKey[]) {
+      const moved = monthAmount(before, key) !== monthAmount(after, key)
+      expect(keys.includes(key)).toBe(moved)
+    }
   })
 })
