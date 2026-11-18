@@ -523,6 +523,10 @@ export const REPORT_COPY = {
     'Maliyet, yalnızca bu rapora dayanılarak alınan kararların sonuçlarından sorumlu tutulamaz.',
   ],
 
+  /** The report's last words, in plain language (owner request, 18 Nov 2026). */
+  closingNoteTitle: 'Son not',
+  closingNote:
+    'Bu rapordaki rakamlar senin girdiklerinden hesaplanan tahminlerdir; yüzde yüz doğru olduğu garanti edilmez. Resmî bir belge değildir. Bir karar vermeden önce rakamları kendi kayıtlarınla ve mali müşavirinle kontrol et.',
   meta: (engineVersion: string, date: string) =>
     `Hesap motoru ${engineVersion} · Rapor tarihi ${date} · TRY · Türkiye`,
   runningHead: (businessName: string) => `Fizibilite Raporu · ${businessName}`,

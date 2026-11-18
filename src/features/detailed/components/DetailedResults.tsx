@@ -47,6 +47,7 @@ export function DetailedResults({
         note={COPY.moneyFlowNote}
         figure={view.breakdown.total}
         figureLabel={COPY.grossCustomerSales}
+        flows
       >
         <ResultBar breakdown={view.breakdown} gross={view.breakdown.total} />
         <div className="qc-screen-only mt-3.5 border-t border-qc-rule-row pt-3.5">
@@ -168,8 +169,9 @@ export function DetailedResults({
 }
 
 /**
- * `flows` marks the one section that is taller than a page — the projection with
- * its month table — so print lets it break and the others stay whole (plan T-13).
+ * `flows` marks the sections that can be taller than a page — the money flow with
+ * its always-printed Sankey, and the projection with its month table — so print
+ * lets them break and the others stay whole (plan T-13).
  */
 function ResultSection({
   title,

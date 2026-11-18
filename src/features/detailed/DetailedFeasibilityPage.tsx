@@ -147,9 +147,8 @@ export function DetailedFeasibilityPage({
                     <AkisResults view={calc.view} onGoToInputs={() => onGoToScreen('menu')} />
                   </div>
                 ) : null}
-                {/* Print always carries Klasik; Akış is screen-only. */}
-                {calc.view ? (
-                  <div className={resultView === 'flow' ? 'qc-print-only' : undefined}>
+                {resultView === 'classic' && calc.view ? (
+                  <div className="qc-screen-only">
                     <DetailedResults
                       view={calc.view}
                       showMonthTable={calc.showMonthTable}
@@ -170,28 +169,15 @@ export function DetailedFeasibilityPage({
                   </div>
                 ) : null}
                 {calc.view ? (
-                  <>
-                    <div className="px-0 pb-4 lg:hidden">
-                      <ReportActionButton
-                        variant="results"
-                        canPrint={report.canPrint}
-                        onOpen={report.open}
-                      />
-                    </div>
-                    <ReportAppendix view={calc.view} />
-                  </>
+                  <div className="px-0 pb-4 lg:hidden">
+                    <ReportActionButton
+                      variant="results"
+                      canPrint={report.canPrint}
+                      onOpen={report.open}
+                    />
+                  </div>
                 ) : null}
               </div>
-            </div>
-          ) : null}
-          {screen !== 'results' && calc.view ? (
-            <div className="qc-print-only">
-              <DetailedResults
-                view={calc.view}
-                showMonthTable={calc.showMonthTable}
-                onToggleMonthTable={calc.toggleMonthTable}
-              />
-              <ReportAppendix view={calc.view} />
             </div>
           ) : null}
         </DetailedScreenChrome>
@@ -218,6 +204,20 @@ export function DetailedFeasibilityPage({
           </div>
         </div>
       </main>
+
+      {/* The report body. It must stay OUTSIDE <main>: main is `qc-screen-only`,
+          so anything inside it never reaches paper. Print always carries Klasik,
+          whichever view or screen is open. */}
+      {calc.view ? (
+        <div className="qc-print-only">
+          <DetailedResults
+            view={calc.view}
+            showMonthTable={calc.showMonthTable}
+            onToggleMonthTable={calc.toggleMonthTable}
+          />
+          <ReportAppendix view={calc.view} />
+        </div>
+      ) : null}
 
       <ReportNameDialog
         open={report.isOpen}
