@@ -63,7 +63,7 @@ Sahibin 12 Kasım 2026 kararları. Yeni ürün kararı uydurulmaz.
 
 ## 5. Geliştirme sırası
 
-Durum sütunu, 13 Kasım 2026 itibarıyla bu dalın kodudur. Sıra, sahibin 0.4 kararıdır; adım 7, 13 Kasım 2026 gezinme / Simülasyonlar kararıdır.
+Durum sütunu, 18 Kasım 2026 itibarıyla `main`'in kodudur. Sıra, sahibin 0.4 kararıdır; adım 7, 13 Kasım 2026 gezinme / Simülasyonlar kararıdır; adım 8, DF-85 (17–18 Kasım 2026) kararıdır.
 
 | # | Adım | Durum |
 | --- | --- | --- |
@@ -74,6 +74,7 @@ Durum sütunu, 13 Kasım 2026 itibarıyla bu dalın kodudur. Sıra, sahibin 0.4 
 | 5 | **Detaylı'yı ekranlara bölme.** Menü, Malzemeler, Satış, Giderler, Sonuç. Üçüncü hesap motoru yok. | **Ekranlar.** Beş ekran, bir görünür. `/detailed` Menü’dür; diğerleri `/detailed/ingredients` `/sales` `/expenses` `/result`. Eski hash’ler çalışır. Taslak v1 aynı. Router yok. `DETAILED_FRONTEND_IMPLEMENTATION_SPEC.md` §2.0. |
 | 6 | **Otomatik fiyat tavsiyesi.** | **Zam geldi.** Salon restore A.6 durur. Online, platform kesintisi ve KDV ile (ör. 230 + 8,40 / (1/1,10 − 0,15) = 241,07 → öneri 242). Esnaf: yukarı tam lira. Öneri; fiyat ancak «Bu fiyatı yaz»a basınca yazılır. Malzemeler’de kalır (girdi anı). Formül: `DETAILED_FINANCIAL_SPEC.md` Appendix D. |
 | 7 | **Üst gezinme ve Simülasyonlar.** Üç alan: Hızlı Hesap, Detaylı Hesap, Simülasyonlar. Ocak testi Sonuç’tan Simülasyonlar’a. | **Main.** Masaüstü sol metin menü, telefon üst satır. Paths `/` `/detailed` `/simulations`. Ocak testi Simülasyonlar’da; Zam geldi Malzemeler’de kalır (fiyat geçmişi yok, restore listesi taşınmadı). |
+| 8 | **DF-85: Akış, ürün indirimi, 2026 rakamları.** Sonuç ekranında Klasik / Akış seçimi; Akış paranın yolunu huni olarak gösterir. Ürün başına indirim. 2026 Bağ-Kur ve işveren maliyeti görünür ön dolu değer. | **Main.** #46–#59. Akış salt-gösterim huni (form kaldırıldı, PR #59): ürünler → toplam satış → 7 basamak → ayda sana kalan + geri dönüş; «Girdilere dön». İndirim her iki fiyatı KDV'den önce keser (#51). Yeni formda Bağ-Kur 11.808,23, yeni pozisyonda 40.874,63; motor yedeği 0. Taslak sürümü 2. Formül: `DETAILED_FINANCIAL_SPEC.md` Appendix E (E.8 huni kalanları). Hızlı Hesap örneği 40.874,63 (#49). |
 
 Her adım bitip görüldükten sonra sıradakine geçilir. Sıra, kullanıcı kararıyla değişebilir.
 
@@ -87,7 +88,7 @@ Bunlar geliştirmeyi durdurmaz. Yanındaki not karar değildir; ilgili adıma ge
 | Hesap ve veritabanı | Park, **soru işareti**. Maliyet ve kişisel veri kurallarına dokunur. Cloudflare ücretli ürün veya hesap sistemi, ayrı sahip onayı ister |
 | Stok takibi | Açık, belki |
 | Fatura girişi | Açık, belki |
-| Eksik menü | Az ürün girilip bütün giderler girilirse aylık sonuç zararda görünür. Kısa bir not: “Girdiğin ürünler işletmenin bütün satışı değilse bu sonuç gerçeği göstermez.” |
+| Eksik menü | Az ürün girilip bütün giderler girilirse aylık sonuç zararda görünür. Kısa bir not: “Girdiğin ürünler işletmenin bütün satışı değilse bu sonuç gerçeği göstermez.” **Main:** Sonuç ekranında, Klasik ve Akış'ın üstünde; yalnızca ay zararla bitince görünür. |
 | Verim, fire, alt reçete | V3'e kalsın |
 | Malzeme fiyat esası | Tek güncel fiyat, elle güncellenir. Fiyat geçmişi tutulmaz. Son alış fiyatı alış kaydı gerektirdiği için durur |
 | Alış fiyatında KDV | Kullanıcıya sorulmasın. Faturada ödenen tutar, girildiği gibi maliyet sayılsın. Bugünkü Detaylı motor da maliyetleri böyle kullanıyor |
@@ -95,7 +96,7 @@ Bunlar geliştirmeyi durdurmaz. Yanındaki not karar değildir; ilgili adıma ge
 | Paket servis fiyatı | Satış fiyatı zorunlu; paket servis fiyatı isteğe bağlı olsun. Boşsa satış fiyatıyla aynı sayılsın. Alan yalnızca paket servis payı sıfırdan büyükse görünsün |
 | Birim dönüşümü sınırı | Yalnızca aynı tür birimler arasında dönüşüm: kilodan grama, litreden mililitreye, adetten adede. Gramdan adede geçiş olmasın |
 | “Fiyatı artırırsam ne olur?” | Son hesaplanan sonuç, yeni sonucun yanında küçük bir “önceki” satırı olarak dursun. Senaryo sistemi değildir. Ocak testi ve Zam geldi bunun yerine geçmez |
-| Sonuç notu | Her sonuç alanında kısa bir not: “Bu hesap yaklaşıktır; kendi rakamlarınla kontrol et.” Kabul ekranının yerine mi geçeceği, yoksa ara çözüm mü olacağı açık |
+| Sonuç notu | Her sonuç alanında kısa bir not: “Bu hesap yaklaşıktır; kendi rakamlarınla kontrol et.” Kabul ekranının yerine mi geçeceği, yoksa ara çözüm mü olacağı açık. **Main:** Sonuç ekranında, Klasik ve Akış'ın üstünde her zaman görünür (ara çözüm; kabul ekranı kararı hâlâ açık). |
 | Menü karşılaştırmasının sunumu | **Reddedildi** — §7. Yiyecek / İçecek karşılaştırması yapılmaz |
 | Hazırlık süresi | Açıktır. Gelişmiş gider dağıtımı ile karıştırılmaz; dağıtım park |
 
