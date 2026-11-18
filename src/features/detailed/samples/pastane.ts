@@ -21,7 +21,7 @@ export const PASTANE: SampleConcept = {
   products: [
     { name: 'Poğaça', normalPrice: '30', onlinePrice: '36', dailyQuantity: '100', recipe: [['Un', '40'], ['Tereyağı', '8'], ['Yumurta', '0,1'], ['Süt', '10'], ['Beyaz peynir', '10']] },
     { name: 'Açma', normalPrice: '30', onlinePrice: '36', dailyQuantity: '70', recipe: [['Un', '45'], ['Tereyağı', '10'], ['Süt', '15'], ['Şeker', '5']] },
-    { name: 'Kruvasan', normalPrice: '55', onlinePrice: '65', dailyQuantity: '20', recipe: [['Un', '50'], ['Tereyağı', '25'], ['Şeker', '6'], ['Süt', '15']] },
+    { name: 'Kruvasan', normalPrice: '75', onlinePrice: '90', dailyQuantity: '20', recipe: [['Un', '50'], ['Tereyağı', '25'], ['Şeker', '6'], ['Süt', '15']] },
     { name: 'Su böreği (dilim)', normalPrice: '120', onlinePrice: '140', dailyQuantity: '20', recipe: [['Un', '60'], ['Yumurta', '0,3'], ['Tereyağı', '20'], ['Beyaz peynir', '40']] },
     { name: 'Ekler', normalPrice: '35', onlinePrice: '42', dailyQuantity: '45', recipe: [['Un', '10'], ['Yumurta', '0,2'], ['Krema', '25'], ['Bitter çikolata', '10']] },
     { name: 'Profiterol', normalPrice: '160', onlinePrice: '190', dailyQuantity: '12', recipe: [['Un', '25'], ['Yumurta', '0,5'], ['Süt', '120'], ['Bitter çikolata', '30'], ['Krema', '30']] },
@@ -38,7 +38,7 @@ export const PASTANE: SampleConcept = {
   delivery: { mode: 'platformCourier', platformFeeRate: '38' },
   positions: [
     { name: 'Pasta ustası', headcount: '1', employerCost: '65.000', meal: '3.000', transport: '2.000' },
-    { name: 'Usta yardımcısı', headcount: '1', employerCost: '40.874,63', meal: '3.000', transport: '2.000' },
+    { name: 'Usta yardımcısı', headcount: '2', employerCost: '40.874,63', meal: '3.000', transport: '2.000' },
     { name: 'Tezgâh', headcount: '2', employerCost: '40.874,63', meal: '3.000', transport: '2.000' },
   ],
   owner: { amount: '30.000', bagKur: '11.808,23' },
@@ -52,6 +52,7 @@ export const PASTANE: SampleConcept = {
     ['Mali müşavir', '5.000'],
     ['Temizlik', '3.000'],
     ['Sarf malzemesi (kutu, kâğıt)', '4.000'],
+    ['Fire karşılığı', '7.950'],
   ],
   capex: [
     ['Tadilat / dekorasyon', '500.000'],
@@ -59,5 +60,7 @@ export const PASTANE: SampleConcept = {
     ['Teşhir dolabı', '180.000'],
     ['Açılış stoğu', '50.000'],
     ['Kuruluş / açılış giderleri', '40.000'],
+    ['Kira depozitosu (geri alınabilir)', '140.000'],
+    ['İşletme sermayesi (açılış nakdi)', '400.000'],
   ],
 }

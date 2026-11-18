@@ -8,7 +8,7 @@ export const TATLICI: SampleConcept = {
   ingredients: [
     { name: 'Baklava yufkası', quantity: '1', unit: 'kg', price: '220' },
     { name: 'Tereyağı', quantity: '1', unit: 'kg', price: '650' },
-    { name: 'Antep fıstığı', quantity: '1', unit: 'kg', price: '1.800' },
+    { name: 'Antep fıstığı', quantity: '1', unit: 'kg', price: '2.200' },
     { name: 'Ceviz', quantity: '1', unit: 'kg', price: '500' },
     { name: 'Şeker', quantity: '1', unit: 'kg', price: '45' },
     { name: 'Kaymak', quantity: '1', unit: 'kg', price: '600' },
@@ -25,7 +25,7 @@ export const TATLICI: SampleConcept = {
     { name: 'Cevizli baklava (porsiyon)', normalPrice: '200', onlinePrice: '240', dailyQuantity: '12', recipe: [['Baklava yufkası', '40'], ['Tereyağı', '25'], ['Ceviz', '30'], ['Şeker', '30']] },
     { name: 'Şöbiyet (porsiyon)', normalPrice: '280', onlinePrice: '320', dailyQuantity: '12', recipe: [['Baklava yufkası', '40'], ['Tereyağı', '25'], ['Antep fıstığı', '35'], ['Kaymak', '20'], ['Şeker', '30']] },
     { name: 'Kadayıf (porsiyon)', normalPrice: '180', onlinePrice: '210', dailyQuantity: '10', recipe: [['Kadayıf', '60'], ['Tereyağı', '25'], ['Ceviz', '25'], ['Şeker', '35']] },
-    { name: 'Künefe', normalPrice: '230', onlinePrice: '270', dailyQuantity: '15', recipe: [['Kadayıf', '80'], ['Künefe peyniri', '70'], ['Tereyağı', '25'], ['Şeker', '40'], ['Antep fıstığı', '5']] },
+    { name: 'Künefe', normalPrice: '250', onlinePrice: '290', dailyQuantity: '15', recipe: [['Kadayıf', '80'], ['Künefe peyniri', '70'], ['Tereyağı', '25'], ['Şeker', '40'], ['Antep fıstığı', '5']] },
     { name: 'Fıstıklı baklava (1 kg kutu)', normalPrice: '1.600', onlinePrice: '1.750', dailyQuantity: '4', recipe: [['Baklava yufkası', '330'], ['Tereyağı', '210'], ['Antep fıstığı', '250'], ['Şeker', '250']] },
     { name: 'Sütlaç', normalPrice: '110', onlinePrice: '130', dailyQuantity: '15', recipe: [['Süt', '200'], ['Pirinç', '20'], ['Şeker', '25']] },
     { name: 'Kazandibi', normalPrice: '120', onlinePrice: '140', dailyQuantity: '10', recipe: [['Süt', '200'], ['Şeker', '30'], ['Nişasta', '15']] },
@@ -39,6 +39,7 @@ export const TATLICI: SampleConcept = {
   delivery: { mode: 'platformCourier', platformFeeRate: '38' },
   positions: [
     { name: 'Tatlı ustası', headcount: '1', employerCost: '70.000', meal: '3.000', transport: '2.000' },
+    { name: 'Usta yardımcısı', headcount: '1', employerCost: '40.874,63', meal: '3.000', transport: '2.000' },
     { name: 'Servis', headcount: '3', employerCost: '40.874,63', meal: '3.000', transport: '2.000' },
   ],
   owner: { amount: '30.000', bagKur: '11.808,23' },
@@ -51,6 +52,7 @@ export const TATLICI: SampleConcept = {
     ['İnternet', '1.000'],
     ['Mali müşavir', '5.000'],
     ['Temizlik', '2.500'],
+    ['Fire karşılığı', '14.350'],
   ],
   capex: [
     ['Tadilat / dekorasyon', '500.000'],
@@ -59,5 +61,7 @@ export const TATLICI: SampleConcept = {
     ['Mobilya', '200.000'],
     ['Açılış stoğu', '80.000'],
     ['Kuruluş / açılış giderleri', '40.000'],
+    ['Kira depozitosu (geri alınabilir)', '140.000'],
+    ['İşletme sermayesi (açılış nakdi)', '400.000'],
   ],
 }

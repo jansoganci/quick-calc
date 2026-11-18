@@ -36,7 +36,7 @@ export const HAMBURGERCI: SampleConcept = {
   ],
   channelMix: ['35', '15', '50'],
   paymentMix: ['15', '75', '10'],
-  packaging: ['12', '18'],
+  packaging: ['6', '9'],
   delivery: { mode: 'platformCourier', platformFeeRate: '38' },
   positions: [
     { name: 'Izgara ustası', headcount: '1', employerCost: '55.000', meal: '3.000', transport: '2.000' },
@@ -54,6 +54,7 @@ export const HAMBURGERCI: SampleConcept = {
     ['Mali müşavir', '5.000'],
     ['Temizlik', '3.000'],
     ['Yazılım abonelikleri', '2.000'],
+    ['Fire karşılığı', '25.600'],
   ],
   capex: [
     ['Tadilat / dekorasyon', '700.000'],
@@ -62,5 +63,7 @@ export const HAMBURGERCI: SampleConcept = {
     ['Mobilya', '200.000'],
     ['Açılış stoğu', '70.000'],
     ['Kuruluş / açılış giderleri', '50.000'],
+    ['Kira depozitosu (geri alınabilir)', '190.000'],
+    ['İşletme sermayesi (açılış nakdi)', '450.000'],
   ],
 }
