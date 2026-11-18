@@ -20,6 +20,8 @@ type PositionRowsProps = {
   onChange: (index: number, field: keyof Omit<PositionRow, 'id'>, value: string) => void
   onAdd: () => void
   onRemove: (index: number) => void
+  /** Prefixes DOM ids so a second copy on the results screen does not collide. Error paths stay plain. */
+  idPrefix?: string
 }
 
 /**
@@ -35,6 +37,7 @@ export function PositionRows({
   onChange,
   onAdd,
   onRemove,
+  idPrefix = '',
 }: PositionRowsProps) {
   const rows = useNewestRowOpen(positions.map((position) => position.id))
 
@@ -79,7 +82,7 @@ export function PositionRows({
               <div className="grid grid-cols-2 items-center gap-2.5 lg:grid-cols-[1fr_104px_56px]">
                 <div className="col-span-2 lg:col-span-1">
                   <TextField
-                    id={`positions.${index}.name`}
+                    id={`${idPrefix}positions.${index}.name`}
                     label={COPY.positionName}
                     labelHidden="from-lg"
                     value={position.name}
@@ -89,7 +92,7 @@ export function PositionRows({
                   />
                 </div>
                 <NumberField
-                  id={`positions.${index}.headcount`}
+                  id={`${idPrefix}positions.${index}.headcount`}
                   label={POSITION_LABELS.headcount}
                   labelHidden="from-lg"
                   value={position.headcount}
@@ -111,7 +114,7 @@ export function PositionRows({
                 {PER_PERSON_FIELDS.map((column) => (
                   <NumberField
                     key={column.field}
-                    id={`positions.${index}.${column.field}`}
+                    id={`${idPrefix}positions.${index}.${column.field}`}
                     label={column.label}
                     value={position[column.field]}
                     onChange={(value) => onChange(index, column.field, value)}
@@ -119,13 +122,13 @@ export function PositionRows({
                     unit="TL"
                     error={errorFor(`positions.${index}.${column.field}`)}
                     grouped
-                    describedBy={column.field === 'employerCostPerPerson' ? `positions.${index}.employerCostHint` : undefined}
+                    describedBy={column.field === 'employerCostPerPerson' ? `${idPrefix}positions.${index}.employerCostHint` : undefined}
                   />
                 ))}
               </div>
               {/* A sentence, not an ⓘ: the design has no icons, and the difference
                   between employer cost and net salary is the one thing to read here. */}
-              <p id={`positions.${index}.employerCostHint`} className="mt-2 max-w-[600px] text-xs leading-relaxed text-qc-secondary">
+              <p id={`${idPrefix}positions.${index}.employerCostHint`} className="mt-2 max-w-[600px] text-xs leading-relaxed text-qc-secondary">
                 {COPY.employerCostInfo}
               </p>
 
