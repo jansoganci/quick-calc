@@ -158,3 +158,12 @@ describe('withDeltas', () => {
     }
   })
 })
+
+describe('Akış product summary line', () => {
+  it('leaves out blank parts and is empty when both are blank', () => {
+    expect(AKIS_COPY.productSummary('80', '140')).toBe('80 adet/gün · 140 TL')
+    expect(AKIS_COPY.productSummary('', '140')).toBe('140 TL')
+    expect(AKIS_COPY.productSummary('80', ' ')).toBe('80 adet/gün')
+    expect(AKIS_COPY.productSummary('', '')).toBe('')
+  })
+})

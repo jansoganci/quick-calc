@@ -647,13 +647,14 @@ function ProductCard({
   const panelId = `akis-product-panel-${product.id}`
   const hasError = PRODUCT_ERROR_FIELDS.some((field) => errorFor(path(field)) !== null)
   const name = product.name.trim() === '' ? AKIS_COPY.unnamedProduct : product.name
+  const summary = AKIS_COPY.productSummary(product.dailyQuantity, product.normalPrice)
   return (
     <div className="rounded border border-qc-rule bg-qc-surface">
       <button
         type="button"
         className="flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-left focus-visible:outline-none focus-visible:[box-shadow:0_0_0_3px_var(--qc-focus-ring)]"
         aria-expanded={open}
-        aria-controls={panelId}
+        aria-controls={open ? panelId : undefined}
         onClick={onToggle}
       >
         <span aria-hidden="true" className="w-4 shrink-0 text-qc-secondary">
@@ -661,9 +662,9 @@ function ProductCard({
         </span>
         <span className="min-w-0 flex-1">
           <span className="block truncate text-[13px] text-qc-ink">{name}</span>
-          <span className="block truncate text-xs text-qc-secondary">
-            {AKIS_COPY.productSummary(product.dailyQuantity, product.normalPrice)}
-          </span>
+          {summary ? (
+            <span className="block truncate text-xs text-qc-secondary">{summary}</span>
+          ) : null}
         </span>
         <span className="shrink-0 text-right">
           <span className="block text-[11px] text-qc-secondary">{AKIS_COPY.productGross}</span>

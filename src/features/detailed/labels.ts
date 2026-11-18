@@ -235,7 +235,11 @@ export const AKIS_COPY = {
   unnamedProduct: 'Adsız ürün',
   productGross: 'Brüt ciro',
   checkProduct: 'Kontrol et',
-  productSummary: (quantity: string, price: string) => `${quantity} adet/gün · ${price} TL`,
+  /** Typed values shown back; a blank part is left out, and both blank gives ''. */
+  productSummary: (quantity: string, price: string) =>
+    [quantity.trim() && `${quantity.trim()} adet/gün`, price.trim() && `${price.trim()} TL`]
+      .filter(Boolean)
+      .join(' · '),
   days: 'Aylık çalışma günü',
   channelSplit: 'Satışın kanallara dağılımı',
   initialInvestment: 'İlk yatırım',
