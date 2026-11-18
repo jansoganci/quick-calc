@@ -232,10 +232,16 @@ export const AKIS_COPY = {
   editRecipe: 'Reçeteyi menüde düzenle',
   addProduct: '+ Ürün ekle',
   removeProduct: 'Kaldır',
+  unnamedProduct: 'Adsız ürün',
+  productGross: 'Brüt ciro',
+  checkProduct: 'Kontrol et',
+  /** Typed values shown back; a blank part is left out, and both blank gives ''. */
+  productSummary: (quantity: string, price: string) =>
+    [quantity.trim() && `${quantity.trim()} adet/gün`, price.trim() && `${price.trim()} TL`]
+      .filter(Boolean)
+      .join(' · '),
   days: 'Aylık çalışma günü',
   channelSplit: 'Satışın kanallara dağılımı',
-  paymentTitle: 'Ödeme ve platform kesintileri',
-  packagingTitle: 'Ambalaj ve kurye',
   initialInvestment: 'İlk yatırım',
   shopPrice: 'Dükkan / gel al fiyatı, KDV dahil',
   platformPrice: 'Platform fiyatı, KDV dahil',

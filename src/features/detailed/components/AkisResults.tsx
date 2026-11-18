@@ -48,6 +48,9 @@ export function AkisResults({
   const [snapshot, setSnapshot] = useState<AkisSnapshot | null>(null)
   const [open, setOpen] = useState<'payroll' | 'opex' | 'capex' | null>(null)
   const [flash, setFlash] = useState<readonly AkisRowKey[]>([])
+  const [openProducts, setOpenProducts] = useState<ReadonlySet<string>>(() => new Set())
+  const pendingProduct = useRef(false)
+  const focusProductId = useRef<string | null>(null)
   const prevAmounts = useRef<AkisSnapshot | null>(null)
   const amountKey = view ? view.akis.rows.map((row) => row.amount).join('|') : ''
   const latestAmounts = useRef<AkisSnapshot | null>(null)
@@ -69,6 +72,29 @@ export function AkisResults({
     const timer = window.setTimeout(() => setFlash([]), 200)
     return () => window.clearTimeout(timer)
   }, [amountKey])
+
+  useEffect(() => {
+    if (!pendingProduct.current) return
+    const newest = form.products[form.products.length - 1]
+    if (!newest) return
+    pendingProduct.current = false
+    focusProductId.current = newest.id
+    setOpenProducts((current) => {
+      const next = new Set(current)
+      next.add(newest.id)
+      return next
+    })
+  }, [form.products])
+
+  useEffect(() => {
+    const id = focusProductId.current
+    if (!id || !openProducts.has(id)) return
+    const index = form.products.findIndex((product) => product.id === id)
+    const node = document.getElementById(`${ID_PREFIX}products.${index}.name`)
+    if (!node) return
+    node.focus()
+    focusProductId.current = null
+  }, [form.products, openProducts])
 
   const akis = view ? withDeltas(view.akis, snapshot) : null
   const blank = AKIS_COPY.blank
@@ -112,15 +138,39 @@ export function AkisResults({
             product={product}
             index={index}
             gross={akis?.products.find((line) => line.productId === product.id)?.amountFormatted ?? blank}
+            open={openProducts.has(product.id)}
             canRemove={form.products.length > 1}
             errorFor={calc.errorFor}
             onBlur={calc.markTouched}
             onChange={calc.setProductField}
-            onRemove={() => calc.removeProduct(index)}
+            onToggle={() =>
+              setOpenProducts((current) => {
+                const next = new Set(current)
+                if (next.has(product.id)) next.delete(product.id)
+                else next.add(product.id)
+                return next
+              })
+            }
+            onRemove={() => {
+              calc.removeProduct(index)
+              setOpenProducts((current) => {
+                if (!current.has(product.id)) return current
+                const next = new Set(current)
+                next.delete(product.id)
+                return next
+              })
+            }}
             onGoToMenu={() => onGoToScreen('menu')}
           />
         ))}
-        <button type="button" className="qc-text-btn min-h-[44px] self-start" onClick={calc.addProduct}>
+        <button
+          type="button"
+          className="qc-text-btn min-h-[44px] self-start"
+          onClick={() => {
+            pendingProduct.current = true
+            calc.addProduct()
+          }}
+        >
           {AKIS_COPY.addProduct}
         </button>
       </div>
@@ -210,9 +260,6 @@ export function AkisResults({
           delta={delta('channelCost')}
         />
 
-        <p className="mb-1 mt-2 pl-4 text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary lg:pl-6">
-          {AKIS_COPY.paymentTitle}
-        </p>
         <FlowRow
           nested
           label={AKIS_ROW_LABELS.paymentPlatformFee}
@@ -310,9 +357,6 @@ export function AkisResults({
           </>
         ) : null}
 
-        <p className="mb-1 mt-2 pl-4 text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary lg:pl-6">
-          {AKIS_COPY.packagingTitle}
-        </p>
         <FlowRow
           nested
           label={AKIS_ROW_LABELS.channelVariableCost}
@@ -504,7 +548,6 @@ export function AkisResults({
           delta={delta('ownerDraw')}
         />
         <FlowRow
-          nested
           label={AKIS_ROW_LABELS.bagKur}
           flash={flash.includes('bagKur')}
           input={
@@ -571,15 +614,19 @@ export function AkisResults({
   )
 }
 
+const PRODUCT_ERROR_FIELDS = ['name', 'normalPrice', 'onlinePrice', 'dailyQuantity', 'unitProductCost', 'discountRate'] as const
+
 function ProductCard({
   form,
   product,
   index,
   gross,
+  open,
   canRemove,
   errorFor,
   onBlur,
   onChange,
+  onToggle,
   onRemove,
   onGoToMenu,
 }: {
@@ -587,18 +634,47 @@ function ProductCard({
   product: ProductRow
   index: number
   gross: string
+  open: boolean
   canRemove: boolean
   errorFor: (path: string) => string | null
   onBlur: (path: string) => void
   onChange: (index: number, field: keyof Omit<ProductRow, 'id'>, value: string) => void
+  onToggle: () => void
   onRemove: () => void
   onGoToMenu: () => void
 }) {
   const path = (field: string) => `products.${index}.${field}`
+  const panelId = `akis-product-panel-${product.id}`
+  const hasError = PRODUCT_ERROR_FIELDS.some((field) => errorFor(path(field)) !== null)
+  const name = product.name.trim() === '' ? AKIS_COPY.unnamedProduct : product.name
+  const summary = AKIS_COPY.productSummary(product.dailyQuantity, product.normalPrice)
   return (
-    <div className="rounded border border-qc-rule bg-qc-surface p-3">
-      <div className="mb-2 flex items-baseline justify-between gap-3">
-        <span className="font-mono text-[13px] tabular-nums text-qc-ink">{gross}</span>
+    <div className="rounded border border-qc-rule bg-qc-surface">
+      <button
+        type="button"
+        className="flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-left focus-visible:outline-none focus-visible:[box-shadow:0_0_0_3px_var(--qc-focus-ring)]"
+        aria-expanded={open}
+        aria-controls={open ? panelId : undefined}
+        onClick={onToggle}
+      >
+        <span aria-hidden="true" className="w-4 shrink-0 text-qc-secondary">
+          {open ? '▾' : '▸'}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-[13px] text-qc-ink">{name}</span>
+          {summary ? (
+            <span className="block truncate text-xs text-qc-secondary">{summary}</span>
+          ) : null}
+        </span>
+        <span className="shrink-0 text-right">
+          <span className="block text-[11px] text-qc-secondary">{AKIS_COPY.productGross}</span>
+          <span className="block font-mono text-[13px] tabular-nums text-qc-ink">{gross}</span>
+        </span>
+        {hasError ? <span className="qc-error shrink-0">{AKIS_COPY.checkProduct}</span> : null}
+      </button>
+      {open ? (
+      <div id={panelId} className="border-t border-qc-rule px-3 py-3">
+      <div className="mb-2 flex justify-end">
         <button type="button" className="qc-text-btn" disabled={!canRemove} onClick={onRemove}>
           {AKIS_COPY.removeProduct}
         </button>
@@ -671,6 +747,8 @@ function ProductCard({
           />
         )}
       </div>
+      </div>
+      ) : null}
     </div>
   )
 }
