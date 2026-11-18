@@ -259,28 +259,6 @@ export const COPY = {
     'Hesapla’dan önce hiçbir sayı gösterilmez. En az bir ürün girip Hesapla’ya bastığında aylık işletme sonucu, başa baş noktası ve yatırımın geri dönüşü burada görünür.',
   resultHiddenInvalid:
     'Girdilerde düzeltilmesi gereken bir alan var. Düzelttiğinde sonuç burada yeniden görünür.',
-  channelMixNoResult:
-    'Kanal dağılımı %100 olmadığı için sonuç gösterilmiyor. Salon, al götür ve paket servis paylarını düzelt.',
-  presentationGroup: 'Görünüm',
-  presentationKlasik: 'Klasik',
-  presentationAkis: 'Akış',
-  presentationHint: 'Akış, sonuç ekranında aynı hesabı adım adım gösterir.',
-  akisTitle: 'Aylık akış',
-  akisNote:
-    'Baz senaryodaki sabit aydır. Yatırım bu aydan düşülmez. Geri ödeme, açılış rampalı birikimli sonuçtan gelir.',
-  akisGross: 'Brüt ciro',
-  akisVat: 'KDV',
-  akisNet: 'Net satış',
-  akisProductCost: 'Ürün maliyeti',
-  akisGrossProfit: 'Brüt kâr',
-  akisChannel: 'Kanal masrafları',
-  akisPayroll: 'Personel',
-  akisRent: 'Kira',
-  akisAidat: 'Aidat',
-  akisOpex: 'Diğer giderler',
-  akisOwner: 'Sahip payı',
-  akisBagKur: 'Bağ-Kur',
-  akisResult: 'İşletme sonucu',
   optionalSectionsNote:
     'Boş bıraktığın bölümler 0 TL sayılır. Yalnızca ürünler zorunlu.',
 

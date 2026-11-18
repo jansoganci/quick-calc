@@ -4,7 +4,6 @@ import {
   type DetailedInput,
   type DetailedResolvedInput,
   type DetailedResult,
-  type MonthResult,
   type ScenarioKey,
 } from '../../core/detailed/index.ts'
 import { formatCount } from '../../lib/number.ts'
@@ -98,42 +97,12 @@ export type DetailedView = {
   hasDelivery: boolean
   /** `meta.detailedEngineVersion`, which the report's colophon states. */
   engineVersion: string
-  /** Stabilized base month, formatted. Akış only prints these strings. */
-  flow: FlowLine[]
   /**
    * The report's input appendix. It rides on the view because the report is a
    * presentation of this same view model — the figures a reader audits are the
    * figures the screen shows, formatted once (plan T-07).
    */
   reportInputs: ReportInputGroup[]
-}
-
-export type FlowLine = {
-  label: string
-  amount: string
-  emphasis?: boolean
-}
-
-function flowMoney(value: number): string {
-  return `${formatTry(value)} TL`
-}
-
-function buildFlow(base: MonthResult): FlowLine[] {
-  return [
-    { label: COPY.akisGross, amount: flowMoney(base.grossCustomerSales) },
-    { label: COPY.akisVat, amount: flowMoney(base.vatAmount) },
-    { label: COPY.akisNet, amount: flowMoney(base.netRevenue) },
-    { label: COPY.akisProductCost, amount: flowMoney(base.productCogs) },
-    { label: COPY.akisGrossProfit, amount: flowMoney(base.grossProfitBeforeChannel) },
-    { label: COPY.akisChannel, amount: flowMoney(base.channelCost) },
-    { label: COPY.akisPayroll, amount: flowMoney(base.monthlyPayroll) },
-    { label: COPY.akisRent, amount: flowMoney(base.rentCost) },
-    { label: COPY.akisAidat, amount: flowMoney(base.monthlyAidat) },
-    { label: COPY.akisOpex, amount: flowMoney(base.monthlyOpex) },
-    { label: COPY.akisOwner, amount: flowMoney(base.monthlyOwnerDraw) },
-    { label: COPY.akisBagKur, amount: flowMoney(base.monthlyBagKur) },
-    { label: COPY.akisResult, amount: flowMoney(base.monthlyOperatingResult), emphasis: true },
-  ]
 }
 
 export type DetailedEvaluation =
@@ -287,7 +256,6 @@ function buildView(result: DetailedResult, input: DetailedResolvedInput): Detail
     hasDelivery,
     engineVersion: result.meta.detailedEngineVersion,
     reportInputs: buildReportInputGroups(input, result),
-    flow: buildFlow(base),
   }
 
   return { ...withoutCopy, copyText: buildCopyText(result, withoutCopy) }
