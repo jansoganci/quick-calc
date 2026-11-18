@@ -281,7 +281,40 @@ These blocks are display helpers. They do not change `calculateDetailed`, Kötü
 
 Third top-level area, not a third calculator. Path `/simulations` (hash aliases `#simulations` / `#simulasyonlar`). Reads the Detaylı draft already in memory / `maliyet.detailed.draft.v1`. No new inputs besides the Ocak `%` fields. If `view` is null (never `Hesapla`), one plain line and a text link to Detaylı Menü (`/detailed`). Zam geldi stays on Malzemeler (input-time; no price history, so no restore list here).
 
+### 4.10 Klasik / Akış (DF-85)
 
+On **Sonuç**, after the first `Hesapla`, a `qc-segment` toggle (`aria-pressed`) switches between **Klasik** (everything in §4.1–4.8) and **Akış**. The choice is page `useState`: never in the form state or the draft. Default Klasik.
+
+**Notes above both views** (screen only): `Bu hesap yaklaşıktır; kendi rakamlarınla kontrol et.` always; `Girdiğin ürünler işletmenin bütün satışı değilse bu sonuç gerçeği göstermez.` only when the base month ends in a loss.
+
+**Invalid draft** (any validation error, including a channel mix that is not 100%): both views show `Girdilerde düzeltilmesi gereken bir alan var…` and no figures, never the previous result (DF-85 D6). Valid again: the result returns.
+
+**Akış is a read-only money funnel** (owner decision, 18 Nov 2026; replaces the inline-input form of #57/#58). No inputs. Top to bottom:
+
+1. One summary sentence: monthly brüt ciro and what is left.
+2. `Ne satıyorsun`: one row per product with `ayda {units} adet` and its brüt (`byProduct`). No price on the row: a product has two prices, so `günde × fiyat` would not match the figure.
+3. A product strip, `↓ hepsi kasaya giriyor ↓`, then the `Toplam satış` band.
+4. Seven bands, each narrower: KDV, ürün maliyeti, kanal kesintileri, personel, kira ve aidat, diğer giderler, sen ve Bağ-Kur. Beside each band: `− {tutar} TL`, its name, one plain sentence, and where it comes from. Inside the band: `kalan {tutar} TL`. Remainders: financial spec Appendix E.8. The last band is accent.
+5. `Ayda sana kalan` (accent headline), then the engine payback message only (no yatırım payı, no ratio; D2), then the initial investment.
+6. Footer: `Bu ekran yalnızca gösterir…` and `Bir rakamı değiştir: Girdilere dön` (goes to Menü).
+
+Desktop: band left, words right. Below `lg`: words first, then the band. Every amount, width and clip path comes from `akisView.ts`. Labels: `AKIS_COPY` / `AKIS_STEP_LABELS`. Akış never prints.
+
+### 4.11 PDF report
+
+The report is the browser's print of this page (`Fizibilite raporunu indir` → business-name dialog → `window.print()`). Order: cover, Klasik results (always Klasik, whichever view is open), Ek A — Girdiler, Ek B — Kapsam ve sorumluluk sınırları, then a plain `Son not` (estimates, not guaranteed, not an official document, check with your own records and an accountant).
+
+- **Must stay outside `<main>`.** `<main>` is `qc-screen-only`, so the print-only report body renders after `</main>`. The five-screen split moved it inside on 13 Nov 2026 and the PDF printed only the cover until #60. `hooks/reportPrint.test.ts` guards this.
+- The site footer (about text and FAQ in `index.html`) is `qc-screen-only`.
+- The money-flow section and the projection may break across pages (`flows`); the other sections stay whole.
+
+### 4.12 Sample businesses (DF-86)
+
+At the top of Ürünler on Menü: the text button `Nereden başlayacağını bilmiyor musun? Örnek bir işletmeyle başla →` (`aria-expanded`). It opens a list under the eyebrow `ÖRNEK İŞLETMELER`: one 44px row per sample with its name and one-line summary.
+
+- Picking a sample fills the whole form and needs a fresh `Hesapla` (V6). When a saved draft would be replaced, an inline confirm appears first (`Girdiklerin tamamı örnek verilerle değiştirilecek: {ad}.` · `Evet, doldur` · `Vazgeç`). There is no browser dialog.
+- After loading, a quiet tinted note sits above the button: `Örnek: {ad}. Rakamlar Kasım 2026 için tahmindir; kendi işletmene göre değiştir.` The button then reads `Başka bir örnek seç`. The note is screen state only: it is not in the draft and disappears on `Baştan başla`.
+- Labels: `COPY.loadSample*`. Data: `samples/` (one file per sample, order in `samples/index.ts`).
 
 ---
 
