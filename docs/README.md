@@ -18,6 +18,7 @@ If two documents appear to disagree, use the authority order in [`CLAUDE.md`](..
 | [`DETAILED_FEASIBILITY_DECISIONS.md`](./DETAILED_FEASIBILITY_DECISIONS.md) | Detailed Feasibility locked decisions and v1 exclusions. Not yet a full financial specification |
 | [`DETAILED_FINANCIAL_SPEC.md`](./DETAILED_FINANCIAL_SPEC.md) | Detailed Feasibility formula contract — inputs, defaults, formulas, outputs, edge states, golden vector. Appendix E (DF-85) is implemented in engine `1.1.0` |
 | [`AKIS_DF85_IMPACT.md`](./AKIS_DF85_IMPACT.md) | Impact, migration, test plan, and PR split for DF-85. Not a second formula contract |
+| [`AKIS_UI_BRIEF.md`](./AKIS_UI_BRIEF.md) | Akış layout and interaction brief for PR 2b (inline inputs, live recalculation, deltas). Reference mock `assets/akis-prototype.png`. Not a formula source |
 | [`DETAILED_FRONTEND_IMPLEMENTATION_SPEC.md`](./DETAILED_FRONTEND_IMPLEMENTATION_SPEC.md) | Detailed Feasibility UI — information architecture, layout, results hierarchy, charts, states, mode switch |
 | [`RECIPE_REDESIGN_SPEC.md`](./RECIPE_REDESIGN_SPEC.md) | Detailed section 01 — menu, shared ingredient list, recipe editor, Zam geldi preview. Owner-approved screens and copy. Does not change Appendix A math. Salon restore price lives in the financial spec Appendix A.6; per-channel suggestion and esnaf rounding in Appendix D |
 | [`TECH_STACK_AND_CONSTRAINTS.md`](./TECH_STACK_AND_CONSTRAINTS.md) | Stack, runtime, deployment, persistence, technical exclusions |

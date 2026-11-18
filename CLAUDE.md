@@ -117,4 +117,5 @@ If something outside the current phase seems necessary, say so and wait. Do not 
 - Never claim a check you did not do (for example a visual check at 390px if you could not run the app). Say what you could not verify.
 - If a task contradicts DF-85 or the PR plan, stop and report instead of improvising.
 
-Akış decisions: DF-85 in `docs/DETAILED_FEASIBILITY_DECISIONS.md`; PR plan: `docs/AKIS_DF85_IMPACT.md` section 6. Akış layout and interaction (PR 2b, not started): `docs/AKIS_UI_BRIEF.md`.
+Akış decisions: DF-85 in `docs/DETAILED_FEASIBILITY_DECISIONS.md`; PR plan: `docs/AKIS_DF85_IMPACT.md` section 6.
+Akış interactive UI (PR 2b, inline inputs and live recalculation): `docs/AKIS_UI_BRIEF.md`. Do not start 2b without owner confirmation.
