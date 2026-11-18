@@ -136,9 +136,9 @@ export function DetailedFeasibilityPage({
                     ))}
                   </div>
                 </div>
-                {resultView === 'flow' ? (
+                {resultView === 'flow' && calc.view ? (
                   <div className="qc-screen-only">
-                    <AkisResults calc={calc} onGoToScreen={onGoToScreen} />
+                    <AkisResults view={calc.view} onGoToInputs={() => onGoToScreen('menu')} />
                   </div>
                 ) : null}
                 {/* Print always carries Klasik; Akış is screen-only. */}
@@ -151,7 +151,7 @@ export function DetailedFeasibilityPage({
                     />
                   </div>
                 ) : null}
-                {screen === 'results' && resultView === 'classic' && calc.view === null ? (
+                {calc.view === null ? (
                   <div className="max-w-[600px] px-[18px] lg:px-[30px]">
                     <p className="text-[13px] leading-relaxed text-qc-ink">{COPY.resultHiddenInvalid}</p>
                     <div className="mt-5 hidden lg:block">

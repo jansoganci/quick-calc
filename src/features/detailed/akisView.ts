@@ -1,168 +1,161 @@
-import type { Channel, MonthResult } from '../../core/detailed/index.ts'
+import type { MonthResult } from '../../core/detailed/index.ts'
 import { formatTry } from '../../lib/money.ts'
-import { formatPercent } from '../../lib/percent.ts'
-import { AKIS_COPY, AKIS_ROW_LABELS, type AkisRowKey } from './labels.ts'
+import { AKIS_COPY, AKIS_STEP_LABELS, type AkisStepKey } from './labels.ts'
 
 /**
- * Akış (DF-85 D1): the base-scenario stabilized month as a top-to-bottom
- * waterfall. Every row amount is a `MonthResult` field. Two display-only
- * extras sit beside that mapping and are not engine formulas: the operating
- * share (Appendix E.7) and the reference delta (current amount − snapshot).
- *
- * - `subtotal`: a running figure (brüt ciro, net satış, brüt kâr).
- * - `deduction`: taken off the running figure on the way down.
- * - `detail`: a component of the deduction above it, shown for reading only.
- * - `result`: the engine's `monthlyOperatingResult`.
+ * Akış (DF-85, funnel): the base-scenario stabilized month read top to bottom
+ * as a funnel. Every amount that leaves the funnel is a `MonthResult` field.
+ * The amount left after each step is an engine field too, except after
+ * personel, kira ve aidat and diğer giderler: those three are the previous
+ * remainder minus that step's engine amount, a display identity recorded in
+ * DETAILED_FINANCIAL_SPEC.md Appendix E.8. The last remainder is the engine's
+ * `monthlyOperatingResult`. Widths and clip paths are visual only.
  */
-export type AkisRowKind = 'subtotal' | 'deduction' | 'detail' | 'result'
-
-export type AkisRow = {
-  key: AkisRowKey
-  kind: AkisRowKind
-  /** Indented under the row above it (kanal sub-lines, aidat under kira). */
-  nested: boolean
-  label: string
-  /** Raw engine value, positive for costs. */
-  amount: number
-  amountFormatted: string
-  hint: string | null
-  /** Current amount minus the reference snapshot. Null when there is no snapshot or the shown TL does not move. */
-  delta: number | null
-  deltaFormatted: string | null
-}
-
-export type AkisChannelChip = {
-  channel: Channel
-  label: string
-  grossFormatted: string
-}
 
 export type AkisProduct = {
   productId: string
   name: string
-  amountFormatted: string
+  unitsFormatted: string
+  grossFormatted: string
+  /** Share of brüt ciro, 0–100. Visual only. */
+  widthPercent: number
+  /** Index into the component's fixed list of bar tones. */
+  tone: number
+}
+
+export type AkisStep = {
+  key: AkisStepKey
+  label: string
+  explain: string
+  /** Where the amount comes from, in the owner's words. Null when there is nothing to add. */
+  detail: string | null
+  /** Engine amount that leaves the funnel at this step. */
+  out: number
+  outFormatted: string
+  /** Amount left after this step. */
+  remaining: number
+  remainingFormatted: string
+  /** CSS clip-path for the funnel band: top edge = remainder before this step, bottom = after. */
+  clipPath: string
+  /** The band is too narrow to hold its label inside. */
+  isNarrow: boolean
+  isLast: boolean
 }
 
 export type AkisView = {
-  /** Brüt ciro per product (`byProduct[].grossCustomerSales`), in input order. */
+  grossSales: number
+  grossSalesFormatted: string
+  operatingDaysFormatted: string
   products: AkisProduct[]
-  rows: AkisRow[]
-  /** Brüt ciro per channel (`byChannel[channel].grossCustomerSales`). */
-  channels: AkisChannelChip[]
-  /** `monthlyOperatingResult / netRevenue`. Null when net satış is not positive. Display only (E.7). */
-  operatingShare: number | null
-  operatingShareFormatted: string | null
-  /** Soft note: no personnel cost entered. */
-  isPayrollMissing: boolean
+  steps: AkisStep[]
+  result: number
+  resultFormatted: string
+  isLoss: boolean
+  hasSales: boolean
 }
 
-export type AkisSnapshot = Record<AkisRowKey, number>
+const TONE_COUNT = 4
+/** Below this share of brüt ciro the band's label moves outside, in ink. */
+const NARROW_PERCENT = 22
 
-const CHANNELS = ['salon', 'takeaway', 'delivery'] as const satisfies readonly Channel[]
-
-type RowSpec = {
-  key: AkisRowKey
-  kind: AkisRowKind
-  nested?: boolean
-  pick: (month: MonthResult) => number
-  hint?: string
+function money(value: number): string {
+  return `${formatTry(value)} TL`
 }
 
-const ROWS: readonly RowSpec[] = [
-  { key: 'grossSales', kind: 'subtotal', pick: (m) => m.grossCustomerSales, hint: AKIS_COPY.hints.grossSales },
-  { key: 'vat', kind: 'deduction', pick: (m) => m.vatAmount },
-  { key: 'netSales', kind: 'subtotal', pick: (m) => m.netRevenue },
-  { key: 'productCogs', kind: 'deduction', pick: (m) => m.productCogs },
-  { key: 'grossProfit', kind: 'subtotal', pick: (m) => m.grossProfitBeforeChannel },
-  { key: 'channelCost', kind: 'deduction', pick: (m) => m.channelCost, hint: AKIS_COPY.hints.channelCost },
-  { key: 'channelVariableCost', kind: 'detail', nested: true, pick: (m) => m.channelVariableCost },
-  { key: 'paymentPlatformFee', kind: 'detail', nested: true, pick: (m) => m.paymentPlatformFee },
-  { key: 'payroll', kind: 'deduction', pick: (m) => m.monthlyPayroll },
-  { key: 'rent', kind: 'deduction', pick: (m) => m.rentCost },
-  { key: 'aidat', kind: 'deduction', nested: true, pick: (m) => m.monthlyAidat },
-  { key: 'opex', kind: 'deduction', pick: (m) => m.monthlyOpex },
-  { key: 'ownerDraw', kind: 'deduction', pick: (m) => m.monthlyOwnerDraw },
-  { key: 'bagKur', kind: 'deduction', pick: (m) => m.monthlyBagKur },
-  { key: 'operatingResult', kind: 'result', pick: (m) => m.monthlyOperatingResult },
+function shareOf(value: number, gross: number): number {
+  if (!(gross > 0)) return 0
+  return Math.min(100, Math.max(0, (value / gross) * 100))
+}
+
+function clipBetween(topPercent: number, bottomPercent: number): string {
+  const top = (100 - topPercent) / 2
+  const bottom = (100 - bottomPercent) / 2
+  return `polygon(${top.toFixed(2)}% 0, ${(100 - top).toFixed(2)}% 0, ${(100 - bottom).toFixed(2)}% 100%, ${bottom.toFixed(2)}% 100%)`
+}
+
+type StepSpec = {
+  key: AkisStepKey
+  out: (m: MonthResult) => number
+  /** Engine remainder after this step; omitted where Appendix E.8 applies. */
+  remaining?: (m: MonthResult) => number
+  detail?: (m: MonthResult) => string | null
+}
+
+const STEPS: readonly StepSpec[] = [
+  { key: 'vat', out: (m) => m.vatAmount, remaining: (m) => m.netRevenue },
+  {
+    key: 'productCogs',
+    out: (m) => m.productCogs,
+    remaining: (m) => m.grossProfitBeforeChannel,
+    detail: () => AKIS_COPY.details.productCogs,
+  },
+  {
+    key: 'channelCost',
+    out: (m) => m.channelCost,
+    remaining: (m) => m.totalContribution,
+    detail: (m) => AKIS_COPY.details.channelCost(money(m.paymentPlatformFee), money(m.channelVariableCost)),
+  },
+  {
+    key: 'payroll',
+    out: (m) => m.monthlyPayroll,
+    detail: (m) => (m.monthlyPayroll === 0 ? AKIS_COPY.details.payrollMissing : null),
+  },
+  {
+    key: 'occupancy',
+    out: (m) => m.monthlyOccupancyCost,
+    detail: (m) => AKIS_COPY.details.occupancy(money(m.rentCost), money(m.monthlyAidat)),
+  },
+  { key: 'opex', out: (m) => m.monthlyOpex },
+  {
+    key: 'owner',
+    out: (m) => m.monthlyOwnerCost,
+    remaining: (m) => m.monthlyOperatingResult,
+    detail: (m) => AKIS_COPY.details.owner(money(m.monthlyOwnerDraw), money(m.monthlyBagKur)),
+  },
 ]
 
-function formatAmount(kind: AkisRowKind, amount: number): string {
-  const text = `${formatTry(amount)} TL`
-  return kind === 'deduction' ? `− ${text}` : text
-}
+export function buildAkisView(month: MonthResult, operatingDaysPerMonth: number): AkisView {
+  const gross = month.grossCustomerSales
 
-export function buildAkisView(month: MonthResult): AkisView {
-  const share = operatingShareOf(month)
+  let before = gross
+  const steps = STEPS.map((spec, index): AkisStep => {
+    const out = spec.out(month)
+    // Appendix E.8: previous remainder minus this step's engine amount.
+    const remaining = spec.remaining ? spec.remaining(month) : before - out
+    const topPercent = shareOf(before, gross)
+    const bottomPercent = shareOf(remaining, gross)
+    before = remaining
+    return {
+      key: spec.key,
+      label: AKIS_STEP_LABELS[spec.key].label,
+      explain: AKIS_STEP_LABELS[spec.key].explain,
+      detail: spec.detail ? spec.detail(month) : null,
+      out,
+      outFormatted: `− ${money(out)}`,
+      remaining,
+      remainingFormatted: money(remaining),
+      clipPath: clipBetween(topPercent, bottomPercent),
+      isNarrow: bottomPercent < NARROW_PERCENT,
+      isLast: index === STEPS.length - 1,
+    }
+  })
+
   return {
-    products: month.byProduct.map((line) => ({
+    grossSales: gross,
+    grossSalesFormatted: money(gross),
+    operatingDaysFormatted: formatTry(operatingDaysPerMonth),
+    products: month.byProduct.map((line, index) => ({
       productId: line.productId,
       name: line.name,
-      amountFormatted: `${formatTry(line.grossCustomerSales)} TL`,
+      unitsFormatted: formatTry(line.units),
+      grossFormatted: money(line.grossCustomerSales),
+      widthPercent: shareOf(line.grossCustomerSales, gross),
+      tone: index % TONE_COUNT,
     })),
-    rows: ROWS.map((spec) => {
-      const amount = spec.pick(month)
-      return {
-        key: spec.key,
-        kind: spec.kind,
-        nested: spec.nested ?? false,
-        label: AKIS_ROW_LABELS[spec.key],
-        amount,
-        amountFormatted: formatAmount(spec.kind, amount),
-        hint: spec.hint ?? null,
-        delta: null,
-        deltaFormatted: null,
-      }
-    }),
-    channels: CHANNELS.map((channel) => ({
-      channel,
-      label: AKIS_COPY.channels[channel],
-      grossFormatted: `${formatTry(month.byChannel[channel].grossCustomerSales)} TL`,
-    })),
-    operatingShare: share,
-    operatingShareFormatted: share === null ? null : AKIS_COPY.shareOfNet(formatPercent(share)),
-    isPayrollMissing: month.monthlyPayroll === 0,
+    steps,
+    result: month.monthlyOperatingResult,
+    resultFormatted: money(month.monthlyOperatingResult),
+    isLoss: month.monthlyOperatingResult < 0,
+    hasSales: gross > 0,
   }
-}
-
-function operatingShareOf(month: MonthResult): number | null {
-  if (month.netRevenue <= 0) return null
-  return month.monthlyOperatingResult / month.netRevenue
-}
-
-/** Row amounts at one moment. Display state only — never written into the draft. */
-export function snapshotAkis(akis: AkisView): AkisSnapshot {
-  const snapshot = {} as AkisSnapshot
-  for (const row of akis.rows) snapshot[row.key] = row.amount
-  return snapshot
-}
-
-/**
- * Delta is the current engine amount minus the snapshot amount.
- * Null when there is no snapshot, or when formatting both to whole TL
- * shows the same figure (|delta| under 0.5 TL after that rounding).
- */
-export function withDeltas(akis: AkisView, snapshot: AkisSnapshot | null): AkisView {
-  if (snapshot === null) return akis
-  return {
-    ...akis,
-    rows: akis.rows.map((row) => {
-      const delta = row.amount - snapshot[row.key]
-      if (formatTry(row.amount) === formatTry(snapshot[row.key])) {
-        return { ...row, delta: null, deltaFormatted: null }
-      }
-      const arrow = delta > 0 ? '▲' : '▼'
-      return {
-        ...row,
-        delta,
-        deltaFormatted: `${arrow} ${formatTry(Math.abs(delta))} TL`,
-      }
-    }),
-  }
-}
-
-/** Keys whose raw amounts moved. Used to flash those rows. */
-export function changedRowKeys(prevAmounts: AkisSnapshot, nextAmounts: AkisSnapshot): AkisRowKey[] {
-  return (Object.keys(nextAmounts) as AkisRowKey[]).filter(
-    (key) => prevAmounts[key] !== nextAmounts[key],
-  )
 }

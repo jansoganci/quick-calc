@@ -190,75 +190,53 @@ export const BREAKDOWN_LABELS = {
 export type BreakdownKey = keyof typeof BREAKDOWN_LABELS
 
 /**
- * Akış (DF-85): the same base-scenario engine month as Klasik, read top to
- * bottom. Labels only — every amount comes from `akisView.ts`.
+ * Akış (DF-85, funnel): the same base-scenario engine month as Klasik, read
+ * top to bottom as a funnel. Labels only — every amount comes from `akisView.ts`.
  */
-export const AKIS_ROW_LABELS = {
-  grossSales: 'Brüt ciro',
-  vat: 'KDV',
-  netSales: 'Net satış',
-  productCogs: 'Ürün maliyeti',
-  grossProfit: 'Brüt kâr',
-  channelCost: 'Kanal masrafları',
-  channelVariableCost: 'Ambalaj ve kurye',
-  paymentPlatformFee: 'Ödeme ve platform kesintileri',
-  payroll: 'Personel',
-  rent: 'Kira',
-  aidat: 'Aidat',
-  opex: 'Diğer giderler',
-  ownerDraw: 'Sahip payı',
-  bagKur: 'Bağ-Kur',
-  operatingResult: 'İşletme sonucu',
+export const AKIS_STEP_LABELS = {
+  vat: { label: 'KDV', explain: 'Fiyatın içindeki vergi, devlete gider.' },
+  productCogs: { label: 'Ürün maliyeti', explain: 'Sattıklarının malzemesi.' },
+  channelCost: {
+    label: 'Kanal kesintileri',
+    explain: 'Kart, yemek kartı, platform komisyonu, ambalaj ve kurye.',
+  },
+  payroll: { label: 'Personel', explain: 'Çalışanlarının aylık maliyeti.' },
+  occupancy: { label: 'Kira ve aidat', explain: 'Dükkânın kirası ve aidatı.' },
+  opex: { label: 'Diğer giderler', explain: 'Elektrik, su, internet ve diğerleri.' },
+  owner: { label: 'Sen ve Bağ-Kur', explain: 'Kendine ayırdığın para ve Bağ-Kur primin.' },
 } as const
 
-export type AkisRowKey = keyof typeof AKIS_ROW_LABELS
+export type AkisStepKey = keyof typeof AKIS_STEP_LABELS
 
 export const AKIS_COPY = {
   viewGroup: 'Sonuç görünümü',
   classic: 'Klasik',
   flow: 'Akış',
-  title: 'Satıştan işletme sonucuna',
-  note: 'Klasik görünümdeki aylık sonucun aynısı, adım adım: temel senaryo, açılış dönemi sonrası bir ay. Tutarlar TL.',
-  productsTitle: 'Ürünlere göre brüt ciro',
+  title: 'Paranın yolu',
+  summaryLead: 'Ayda',
+  summaryMiddle: 'satıyorsun. Aşağı indikçe her adımda bir pay çıkıyor. En altta',
+  summaryEnd: 'sana kalıyor.',
+  summaryEndLoss: 'kalıyor: masraflar satışı geçiyor.',
+  productsTitle: 'Ne satıyorsun',
+  productUnits: (units: string) => `ayda ${units} adet`,
+  pourIn: '↓ hepsi kasaya giriyor ↓',
+  grossLabel: 'Toplam satış',
+  grossNote: (days: string) => `Müşterinin kasaya ödediği. Fiyatlar KDV dahil, ayda ${days} gün.`,
+  remaining: 'kalan',
+  details: {
+    productCogs: 'Menüdeki maliyetlerden.',
+    channelCost: (fees: string, packaging: string) =>
+      `Ödeme ve platform ${fees} + ambalaj ve kurye ${packaging}.`,
+    payrollMissing: 'Personel girilmedi.',
+    occupancy: (rent: string, aidat: string) => `Kira ${rent} + aidat ${aidat}.`,
+    owner: (draw: string, bagKur: string) => `Sana ${draw} + Bağ-Kur ${bagKur}.`,
+  },
+  resultLabel: 'Ayda sana kalan',
   payback: 'Yatırımın geri dönüşü',
-  payrollMissing: 'Personel girilmedi.',
-  hints: {
-    grossSales: 'Fiyatlar KDV dahil.',
-    channelCost: 'Oranlar sözleşmene göre değişir.',
-  },
-  blank: '—',
-  resetReference: 'Referansı sıfırla',
-  edit: 'Düzenle',
-  editRecipe: 'Reçeteyi menüde düzenle',
-  addProduct: '+ Ürün ekle',
-  removeProduct: 'Kaldır',
-  unnamedProduct: 'Adsız ürün',
-  productGross: 'Brüt ciro',
-  checkProduct: 'Kontrol et',
-  /** Typed values shown back; a blank part is left out, and both blank gives ''. */
-  productSummary: (quantity: string, price: string) =>
-    [quantity.trim() && `${quantity.trim()} adet/gün`, price.trim() && `${price.trim()} TL`]
-      .filter(Boolean)
-      .join(' · '),
-  days: 'Aylık çalışma günü',
-  channelSplit: 'Satışın kanallara dağılımı',
-  initialInvestment: 'İlk yatırım',
-  shopPrice: 'Dükkan / gel al fiyatı, KDV dahil',
-  platformPrice: 'Platform fiyatı, KDV dahil',
-  discount: 'İndirim %',
-  dailyQuantity: 'Günlük adet',
-  unitCost: 'Birim maliyet',
-  channels: {
-    salon: 'Dükkan içi',
-    takeaway: 'Gel al',
-    delivery: 'Platform',
-  },
-  payments: {
-    cash: 'Nakit',
-    card: 'Kart',
-    mealCard: 'Yemek kartı',
-  },
-  shareOfNet: (share: string) => `Net satışın ${share}'i`,
+  initialInvestment: (amount: string) => `İlk yatırım ${amount}, açılış ayları dahil.`,
+  noSales: 'Satış yok. Menüde ürünlerin günlük adedini gir.',
+  readOnlyNote: 'Bu ekran yalnızca gösterir. Rakamlar girdiklerinden hesaplandı.',
+  backToInputs: 'Bir rakamı değiştir: Girdilere dön',
 } as const
 
 export const COPY = {

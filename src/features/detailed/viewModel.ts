@@ -236,7 +236,7 @@ function buildView(result: DetailedResult, input: DetailedResolvedInput): Detail
     scenarios: buildScenarioRows(result),
     sectionEcho: buildSectionEcho(result),
     breakdown: buildBreakdown(base),
-    akis: buildAkisView(base),
+    akis: buildAkisView(base, input.assumptions.operatingDaysPerMonth),
     channels: buildChannelRows(base),
     channelTotals: buildChannelTotals(base),
     products: buildProductRows(base),
