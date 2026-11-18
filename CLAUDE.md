@@ -118,3 +118,4 @@ If something outside the current phase seems necessary, say so and wait. Do not 
 - If a task contradicts DF-85 or the PR plan, stop and report instead of improvising.
 
 Akış decisions: DF-85 in `docs/DETAILED_FEASIBILITY_DECISIONS.md`; PR plan: `docs/AKIS_DF85_IMPACT.md` section 6.
+Akış interactive UI (PR 2b, inline inputs and live recalculation): `docs/AKIS_UI_BRIEF.md`. Do not start 2b without owner confirmation.
