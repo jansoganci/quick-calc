@@ -279,6 +279,15 @@ These blocks are display helpers. They do not change `calculateDetailed`, Kötü
 
 Third top-level area, not a third calculator. Path `/simulations` (hash aliases `#simulations` / `#simulasyonlar`). Reads the Detaylı draft already in memory / `maliyet.detailed.draft.v1`. No new inputs besides the Ocak `%` fields. If `view` is null (never `Hesapla`), one plain line and a text link to Detaylı Menü (`/detailed`). Zam geldi stays on Malzemeler (input-time; no price history, so no restore list here).
 
+
+### 4.12 Sample businesses (DF-86)
+
+At the top of Ürünler on Menü: the text button `Nereden başlayacağını bilmiyor musun? Örnek bir işletmeyle başla →` (`aria-expanded`). It opens a list under the eyebrow `ÖRNEK İŞLETMELER`: one 44px row per sample with its name and one-line summary.
+
+- Picking a sample fills the whole form and needs a fresh `Hesapla` (V6). When a saved draft would be replaced, an inline confirm appears first (`Girdiklerin tamamı örnek verilerle değiştirilecek: {ad}.` · `Evet, doldur` · `Vazgeç`). There is no browser dialog.
+- After loading, a quiet tinted note sits above the button: `Örnek: {ad}. Rakamlar Kasım 2026 için tahmindir; kendi işletmene göre değiştir.` The button then reads `Başka bir örnek seç`. The note is screen state only: it is not in the draft and disappears on `Baştan başla`.
+- Labels: `COPY.loadSample*`. Data: `samples/` (one file per sample, order in `samples/index.ts`).
+
 ---
 
 ## 5. States, validation and guardrails

@@ -73,7 +73,11 @@ export function DetailedForm({
     <div>
       <div hidden={screen !== 'menu'}>
       <SectionFrame {...frameProps('products')}>
-        <SampleFillControl draftSaved={calc.draftSaved} onLoadSample={calc.loadSample} />
+        <SampleFillControl
+          draftSaved={calc.draftSaved}
+          loadedSample={calc.loadedSample}
+          onLoadSample={calc.loadSample}
+        />
         <ProductRows
           form={form}
           errorFor={calc.errorFor}

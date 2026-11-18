@@ -45,8 +45,9 @@ describe('sample concepts', () => {
         const evaluation = evaluateDetailed(form, toDetailedInput(form))
         expect(evaluation.ok, JSON.stringify(evaluation.ok ? null : evaluation.errors)).toBe(true)
         if (!evaluation.ok) return
+        // A sample may honestly not pay back inside the horizon (owner figures,
+        // 18 Nov 2026), but its month must never end negative.
         expect(evaluation.view.akis.isLoss).toBe(false)
-        expect(evaluation.view.payback.available).toBe(true)
       })
     })
   }

@@ -13,7 +13,6 @@ import {
   emptyProduct,
   initialForm,
   rateToPercentInput,
-  sampleCafeForm,
   withoutDelivery,
   type DetailedFormState,
   type LineRow,
@@ -37,6 +36,7 @@ import {
 } from '../recipeForm.ts'
 import { toDetailedInput } from '../toInput.ts'
 import { evaluateDetailed } from '../viewModel.ts'
+import { buildSampleForm, SAMPLE_CONCEPTS } from '../samples/index.ts'
 import { selectShownResult } from '../shownResult.ts'
 import { createDraftSaveQueue, registerDraftLifecycleFlush } from './draftAutosave.ts'
 import { clearDraft, loadInitialDraft, writeDraft } from './draftStorage.ts'
@@ -50,6 +50,8 @@ export function useDetailedCalc() {
   const [touched, setTouched] = useState<Record<string, boolean>>({})
   const [submitted, setSubmitted] = useState(false)
   const [hasCalculated, setHasCalculated] = useState(false)
+  /** Name of the sample business last loaded; screen state only, never in the draft. */
+  const [loadedSample, setLoadedSample] = useState<string | null>(null)
   const [liveFlash, setLiveFlash] = useState(false)
   const [copied, setCopied] = useState(false)
   const [openSection, setOpenSection] = useState<SectionId | null>('products')
@@ -163,6 +165,7 @@ export function useDetailedCalc() {
    */
   function resetForm() {
     const fresh = initialForm()
+    setLoadedSample(null)
     draftSaveQueue.reset(fresh)
     clearDraft()
     businessNameRef.current = ''
@@ -183,8 +186,11 @@ export function useDetailedCalc() {
    * — but not a `clearDraft()`: the sample becomes the new draft through the same
    * debounced autosave every other edit goes through.
    */
-  function loadSample() {
-    setForm(sampleCafeForm())
+  function loadSample(conceptId: string) {
+    const concept = SAMPLE_CONCEPTS.find((item) => item.id === conceptId)
+    if (!concept) return
+    setForm(buildSampleForm(concept))
+    setLoadedSample(concept.name)
     setTouched({})
     setSubmitted(false)
     setHasCalculated(false)
@@ -210,6 +216,7 @@ export function useDetailedCalc() {
     businessName,
     setBusinessName,
     hasCalculated,
+    loadedSample,
     canSubmit,
     liveFlash,
     copied,

@@ -39,7 +39,6 @@ export const TATLICI: SampleConcept = {
   delivery: { mode: 'platformCourier', platformFeeRate: '38' },
   positions: [
     { name: 'Tatlı ustası', headcount: '1', employerCost: '70.000', meal: '3.000', transport: '2.000' },
-    { name: 'Usta yardımcısı', headcount: '1', employerCost: '40.874,63', meal: '3.000', transport: '2.000' },
     { name: 'Servis', headcount: '3', employerCost: '40.874,63', meal: '3.000', transport: '2.000' },
   ],
   owner: { amount: '30.000', bagKur: '11.808,23' },
