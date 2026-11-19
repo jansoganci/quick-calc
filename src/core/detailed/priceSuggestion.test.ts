@@ -1,8 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { salonRestorePrice } from './recipeCost.ts';
-import { channelRestorePrice, esnafPrice } from './priceSuggestion.ts';
+import { channelRestorePrice, esnafPrice, raisedPrice } from './priceSuggestion.ts';
 
 describe('Appendix D channel restore and esnaf rounding', () => {
+  it('raises positive prices with D.3 rounding and rejects unavailable values', () => {
+    expect(raisedPrice(230, 0.1)).toBe(253);
+    expect(raisedPrice(229.24, 0.1)).toBe(253);
+    for (const price of [0, -1, Number.NaN]) expect(raisedPrice(price, 0.1)).toBeNull();
+    for (const rate of [0, -0.1, 1.5, Number.NaN]) expect(raisedPrice(230, rate)).toBeNull();
+    expect(raisedPrice(Number.MAX_VALUE, 1)).toBeNull();
+  });
   it('divides the list-price increase by the unsold share', () => {
     expect(salonRestorePrice(220, 8.4, 0.1, 0.1)).toBeCloseTo(220 + (8.4 * 1.1) / 0.9, 10);
     const netShare = 1 / 1.1 - 0.15;

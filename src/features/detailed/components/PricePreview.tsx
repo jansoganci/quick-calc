@@ -1,5 +1,6 @@
 import { cn } from '../../../lib/cn.ts'
-import { RECIPE_COPY } from '../labels.ts'
+import { BULK_PRICE_COPY, RECIPE_COPY } from '../labels.ts'
+import { pricePreviewWrites, type ProductPriceWrite } from '../bulkPriceView.ts'
 import type {
   PricePreview as PricePreviewModel,
   PricePreviewLine,
@@ -10,6 +11,9 @@ import type {
 type PricePreviewProps = {
   preview: PricePreviewModel
   onApply?: (productIndex: number, field: PriceSuggestionField, value: string) => void
+  onApplyAll?: (writes: ProductPriceWrite[]) => void
+  bulkStatus?: number | null
+  onUndo?: () => void
 }
 
 function SuggestionRow({
@@ -76,7 +80,8 @@ function ProductRestore({
   )
 }
 
-export function PricePreview({ preview, onApply }: PricePreviewProps) {
+export function PricePreview({ preview, onApply, onApplyAll, bulkStatus, onUndo }: PricePreviewProps) {
+  const writes = pricePreviewWrites(preview)
   return (
     <div className="border-t border-qc-ink pt-3">
       <p className="text-[15px] font-medium text-qc-ink">{preview.heading}</p>
@@ -133,6 +138,20 @@ export function PricePreview({ preview, onApply }: PricePreviewProps) {
         ))}
       </div>
 
+      {writes.length >= 2 && onApplyAll ? (
+        <button type="button" className="qc-text-btn is-accent mt-3 min-h-[44px] lg:min-h-0" onClick={() => onApplyAll(writes)}>
+          {BULK_PRICE_COPY.applySuggestions}
+        </button>
+      ) : null}
+      {bulkStatus !== null && bulkStatus !== undefined && onUndo ? (
+        <p className="mt-3 text-xs text-qc-secondary" role="status">
+          {BULK_PRICE_COPY.suggestionStatus(bulkStatus)}{' '}
+          <button type="button" className="qc-text-btn is-accent min-h-[44px] lg:min-h-0" onClick={onUndo}>
+            {BULK_PRICE_COPY.undo}
+          </button>
+        </p>
+      ) : null}
+
       <p className="mt-3 text-xs leading-relaxed text-qc-secondary">{preview.footnote}</p>
     </div>
   )
@@ -142,10 +161,13 @@ export function PricePreviewDesktop({
   preview,
   onDone,
   onApply,
+  onApplyAll,
+  bulkStatus,
+  onUndo,
 }: PricePreviewProps & { onDone: () => void }) {
   return (
     <div className={cn('mt-4 hidden border-y border-qc-rule-mid bg-qc-surface-result px-3 py-3 lg:block')}>
-      <PricePreview preview={preview} onApply={onApply} />
+      <PricePreview preview={preview} onApply={onApply} onApplyAll={onApplyAll} bulkStatus={bulkStatus} onUndo={onUndo} />
       <button type="button" className="qc-text-btn mt-3" onClick={onDone}>
         {RECIPE_COPY.done}
       </button>

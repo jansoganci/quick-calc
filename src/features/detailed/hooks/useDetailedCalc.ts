@@ -40,6 +40,12 @@ import { buildSampleForm, SAMPLE_CONCEPTS } from '../samples/index.ts'
 import { selectShownResult } from '../shownResult.ts'
 import { createDraftSaveQueue, registerDraftLifecycleFlush } from './draftAutosave.ts'
 import { clearDraft, loadInitialDraft, writeDraft } from './draftStorage.ts'
+import {
+  undoProductPrices,
+  writeProductPrices,
+  type ProductPriceUndo,
+  type ProductPriceWrite,
+} from '../bulkPriceView.ts'
 
 /**
  * Form state and the V6 gate: the first calculation happens only on `Hesapla`, and
@@ -57,6 +63,8 @@ export function useDetailedCalc() {
   const [openSection, setOpenSection] = useState<SectionId | null>('products')
   const [showMonthTable, setShowMonthTable] = useState(false)
   const [draftSaved, setDraftSaved] = useState(false)
+  const [bulkPriceStatus, setBulkPriceStatus] = useState<{ kind: 'suggestions' | 'menu'; count: number } | null>(null)
+  const bulkPriceUndoRef = useRef<ProductPriceUndo[]>([])
   /**
    * Report metadata, not a financial input: it titles the report and names the
    * saved file, and it is deliberately NOT part of `DetailedFormState`, so it
@@ -153,7 +161,25 @@ export function useDetailedCalc() {
   const errorSections = evaluation.ok ? [] : evaluation.errorSections
 
   function update(mutate: (draft: DetailedFormState) => DetailedFormState) {
+    bulkPriceUndoRef.current = []
+    setBulkPriceStatus(null)
     setForm((current) => mutate(current))
+  }
+
+  function applyProductPrices(writes: ProductPriceWrite[], kind: 'suggestions' | 'menu', count: number) {
+    const result = writeProductPrices(form, writes)
+    if (result.undo.length === 0) return
+    bulkPriceUndoRef.current = result.undo
+    setForm(result.form)
+    setBulkPriceStatus({ kind, count })
+  }
+
+  function undoBulkProductPrices() {
+    if (bulkPriceUndoRef.current.length === 0) return
+    const previous = bulkPriceUndoRef.current
+    setForm((current) => undoProductPrices(current, previous))
+    bulkPriceUndoRef.current = []
+    setBulkPriceStatus(null)
   }
 
   /**
@@ -164,6 +190,8 @@ export function useDetailedCalc() {
    * calculated result left beside an empty form would break V6.
    */
   function resetForm() {
+    bulkPriceUndoRef.current = []
+    setBulkPriceStatus(null)
     const fresh = initialForm()
     setLoadedSample(null)
     draftSaveQueue.reset(fresh)
@@ -189,6 +217,8 @@ export function useDetailedCalc() {
   function loadSample(conceptId: string) {
     const concept = SAMPLE_CONCEPTS.find((item) => item.id === conceptId)
     if (!concept) return
+    bulkPriceUndoRef.current = []
+    setBulkPriceStatus(null)
     setForm(buildSampleForm(concept))
     setLoadedSample(concept.name)
     setTouched({})
@@ -223,6 +253,9 @@ export function useDetailedCalc() {
     openSection,
     showMonthTable,
     draftSaved,
+    bulkPriceStatus,
+    applyProductPrices,
+    undoBulkProductPrices,
     resultsRef,
     errorFor,
     errorSections,

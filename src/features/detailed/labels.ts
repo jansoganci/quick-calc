@@ -103,6 +103,30 @@ export const PRODUCT_LABELS = {
   discount: 'İndirim',
 } as const
 
+export const BULK_PRICE_COPY = {
+  open: 'Fiyatlara toplu zam yap',
+  applySuggestions: 'Tüm önerileri yaz',
+  suggestionStatus: (count: number) => `${count} fiyat yazıldı.`,
+  menuStatus: (count: number) => `${count} ürünün fiyatı güncellendi.`,
+  undo: 'Geri al',
+  rate: 'Zam oranı',
+  channel: 'Hangi fiyat?',
+  both: 'Salon ve online',
+  normalPrice: 'Sadece salon',
+  onlinePrice: 'Sadece online',
+  selectAll: 'Tümünü seç',
+  selectNone: 'Hiçbirini seçme',
+  noPrice: 'Fiyat yok',
+  enterRate: 'Zam oranını gir',
+  /** Same words as the `Hangi fiyat?` segment, so one price never has two names. */
+  fieldLabels: { normalPrice: 'Salon', onlinePrice: 'Online' },
+  preview: (field: string, from: string, to: string) => `${field}: ${from} → ${to} TL`,
+  note: 'Yeni fiyat yukarı tam liraya yuvarlanır. İndirim oranın aynı kalır.',
+  apply: (count: number) => `${count} ürüne uygula`,
+  cancel: 'Vazgeç',
+  productSelection: (name: string) => `${name} ürününü seç`,
+} as const
+
 export const POSITION_LABELS = {
   name: 'Pozisyon',
   headcount: 'Kişi sayısı',

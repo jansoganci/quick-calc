@@ -24,7 +24,7 @@ export { buildPaybackPath } from './paybackPath.ts';
 export type { PaybackPath } from './paybackPath.ts';
 export type { JanuaryTestInput, JanuaryTestResult } from './januaryTest.ts';
 export { DETAILED_LIMITS, MIX_TOLERANCE } from './limits.ts';
-export { channelRestorePrice, esnafPrice } from './priceSuggestion.ts';
+export { channelRestorePrice, esnafPrice, raisedPrice } from './priceSuggestion.ts';
 export type { FieldLimit } from './limits.ts';
 export {
   PURCHASE_UNITS,

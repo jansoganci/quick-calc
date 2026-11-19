@@ -2,7 +2,7 @@
 
 **Version scope note (10 November 2026):** This remains the Detailed v1 decision log. See [V2/V3 product roadmap](./V2_V3_PRODUCT_ROADMAP.md) for explicit later-version scope additions (recipes, food cost, simple grouping, allocation and comparison). Those additions do not retroactively alter v1 formulas or authorize implementation.
 
-**Version:** v0.14
+**Version:** v0.15
 **Status:** Decision log. Major Detailed v1 **product-scope** decisions are **locked**. Major calculation-model review blockers are **resolved**. Remaining implementation details belong in a dedicated Detailed Financial Specification. This file is still **not** that specification and **not** implementation.
 **Phase:** Planning — **not** a financial specification and **not** implementation
 **Currency:** TRY · **Country:** Turkey · **Preset context:** Coffee Shop / Cafe (same product family as Quick / Lite)
@@ -1749,6 +1749,12 @@ When payback is not reached within the horizon, the calendar adds two display fi
 - DF-85 D2 is unchanged: Akış still shows no investment share, no "kalan" and no investment / result ratio.
 - No new input, no change to `calculateDetailed`, no §18.2 figure changes.
 
+#### DF-88 — Bulk price update **[LOCKED]**
+
+Owner decision, 19 November 2026. On Malzemeler, `Tüm önerileri yaz` applies every applicable salon and online suggestion in the open Zam geldi preview with one action. On Menü, `Fiyatlara toplu zam yap` raises selected products' salon and/or online list prices by an entered percentage, with a live preview and an undo of the last bulk write. Empty or non-positive prices are skipped. The product discount percentage is kept.
+
+Both actions write existing `normalPrice` / `onlinePrice` form fields only. They add no engine input, no `calculateDetailed` output, and no price history. Single-channel `Bu fiyatı yaz` remains available. The percentage helper and rounding are specified in financial spec Appendix D.5.
+
 ### 5.13 Financing and working capital
 
 #### DF-40 — Financing is out of Detailed v1 **[LOCKED]**
@@ -1975,6 +1981,7 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 | DF-85 | Akış, product discount, 2026 visible defaults | Akış is a second presentation of `calculateDetailed`. No Akış formulas. Payback stays DF-36. No investment share in the month (DF-34). One optional per-product discount, 0–100, on both list prices before VAT and percentage fees. Platform / Joker stay out (DF-55 narrowed, not reopened). New forms show employer cost 40.874,63 on a new position and Bağ-Kur 11.808,23; omitted engine values stay 0. One global VAT rate. Channel mix must total 100% within `1e-6` or the UI shows the error and no results. |
 | DF-86 | Sample businesses | Five samples fill the form only; no formula, field or default. Every sample ends its stabilized base month positive. |
 | DF-87 | Sonuç charts | Three question-titled sections replace the two line charts, on screen and in the PDF. Appendix E.9 adds the recovered share and an approximate month beyond the horizon, only when DF-36 payback is not reached. Payback stays DF-36; Akış (D2) unchanged. |
+| DF-88 | Bulk price update | Zam geldi applies all applicable suggestions with one action; Menü raises selected salon and/or online list prices by a percentage. Existing price form fields only; discount stays; no price history or engine result change. |
 | DF-62 | Waste / fire | Out of v1. |
 | DF-40 | Financing | Out of v1. |
 | DF-41 | Working-capital timing | Out of v1. |
@@ -2041,6 +2048,7 @@ None of the above is a reason to change Lite behaviour now.
 | v0.12 | Locked DF-84: a per-product contribution breakdown (units, revenue, cost lines, contribution) is an approved engine-derived report/UI output, additive to the existing channel breakdown. No new input, no per-product channel mix, no category grouping — DF-04a and DF-72 unchanged. Confirmed the platform-vs-own-courier delivery *volume* split stays rejected (DF-77 unchanged) and recorded that city/location benchmarking is shelved, not designed. |
 | v0.13 | Locked DF-85 (owner, 17 November 2026). Akış is a presentation of the existing Detaylı engine. DF-34 and DF-36 stay. A per-product discount narrows DF-55; platform and Joker stay out. 2026 employer cost and Bağ-Kur are visible new-form prefills; omitted engine amounts stay 0. Channel-mix failure shows the error and no results. Impact, tests, and the later PR split are in `docs/AKIS_DF85_IMPACT.md`. Formula text for the unimplemented change is Appendix E of the financial spec. |
 | v0.14 | Recorded DF-86 (sample businesses are form data, 18 November 2026) and DF-87 (Sonuç charts answer three questions, 19 November 2026). DF-87 adds two display figures beyond the horizon (financial spec Appendix E.9); DF-36 payback and DF-85 D2 are unchanged. |
+| v0.15 | Locked DF-88 (owner, 19 November 2026): bulk suggestion write and selected product percentage raise. Existing price form fields only; discount, DF-36 payback, and engine results unchanged. |
 
 ---
 

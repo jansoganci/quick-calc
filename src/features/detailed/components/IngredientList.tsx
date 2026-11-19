@@ -23,6 +23,7 @@ import {
   type PurchaseSnapshot,
 } from '../recipePreview.ts'
 import { PricePreview, PricePreviewDesktop } from './PricePreview.tsx'
+import type { ProductPriceWrite } from '../bulkPriceView.ts'
 import { UnitPicker } from './UnitPicker.tsx'
 
 type IngredientField = 'purchaseQuantity' | 'purchasePrice' | 'purchaseUnit'
@@ -41,6 +42,9 @@ type IngredientListProps = {
     field: 'normalPrice' | 'onlinePrice',
     value: string,
   ) => void
+  onApplyProductPrices: (writes: ProductPriceWrite[], kind: 'suggestions', count: number) => void
+  bulkStatus: number | null
+  onUndoBulkPrices: () => void
   requestedOpenId: string | null
   onConsumedOpen: () => void
 }
@@ -271,6 +275,9 @@ export function IngredientList({
   onDiscardBlank,
   onDelete,
   onApplyProductPrice,
+  onApplyProductPrices,
+  bulkStatus,
+  onUndoBulkPrices,
   requestedOpenId,
   onConsumedOpen,
 }: IngredientListProps) {
@@ -503,7 +510,7 @@ export function IngredientList({
 
                   {preview && open ? (
                     <div className="mt-3 lg:hidden">
-                      <PricePreview preview={preview} onApply={onApplyProductPrice} />
+                      <PricePreview preview={preview} onApply={onApplyProductPrice} onApplyAll={(writes) => onApplyProductPrices(writes, 'suggestions', writes.length)} bulkStatus={bulkStatus} onUndo={onUndoBulkPrices} />
                     </div>
                   ) : null}
 
@@ -587,6 +594,9 @@ export function IngredientList({
         <PricePreviewDesktop
           preview={desktopPreview}
           onApply={onApplyProductPrice}
+          onApplyAll={(writes) => onApplyProductPrices(writes, 'suggestions', writes.length)}
+          bulkStatus={bulkStatus}
+          onUndo={onUndoBulkPrices}
           onDone={() =>
             setSnapshots((current) => ({
               ...current,
