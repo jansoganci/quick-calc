@@ -11,12 +11,21 @@ describe('DF-88 bulk price view and one-write undo', () => {
     ]
     const view = buildBulkPriceRows(products, new Set(['one', 'empty']), 'normalPrice', bulkRate('10'))
     expect(view.rows.map((row) => row.previews[0]?.text)).toEqual([
-      'Normal fiyat: 230 → 253 TL',
+      'Salon: 230 → 253 TL',
       'Fiyat yok',
-      'Normal fiyat: 200 → 220 TL',
+      'Salon: 200 → 220 TL',
     ])
     expect(view.writes).toEqual([{ productIndex: 0, field: 'normalPrice', value: '253' }])
     expect(view.productCount).toBe(1)
+  })
+
+  it('shows a kuruş price as typed, not rounded', () => {
+    const products = [{ ...emptyProduct(), id: 'one', name: 'Hamburger', normalPrice: '229,24', onlinePrice: '240' }]
+    const view = buildBulkPriceRows(products, new Set(['one']), 'both', bulkRate('10'))
+    expect(view.rows[0]?.previews.map((preview) => preview.text)).toEqual([
+      'Salon: 229,24 → 253 TL',
+      'Online: 240 → 264 TL',
+    ])
   })
 
   it('restores exactly the previous strings of only the fields written', () => {

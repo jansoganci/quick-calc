@@ -1,7 +1,7 @@
 import { DETAILED_LIMITS, raisedPrice } from '../../core/detailed/index.ts'
-import { formatCount, parseTurkishNumber } from '../../lib/number.ts'
+import { formatCount, formatDecimal, parseTurkishNumber } from '../../lib/number.ts'
 import type { DetailedFormState, ProductRow } from './formState.ts'
-import { BULK_PRICE_COPY, PRODUCT_LABELS, RECIPE_COPY } from './labels.ts'
+import { BULK_PRICE_COPY, RECIPE_COPY } from './labels.ts'
 import type { PricePreview, PriceSuggestionField } from './recipePreview.ts'
 
 export type ProductPriceWrite = { productIndex: number; field: PriceSuggestionField; value: string }
@@ -43,7 +43,7 @@ export function buildBulkPriceRows(
         field,
         text: next === null
           ? price === null || price <= 0 ? BULK_PRICE_COPY.noPrice : BULK_PRICE_COPY.enterRate
-          : BULK_PRICE_COPY.preview(PRODUCT_LABELS[field], formatCount(price!), formatCount(next)),
+          : BULK_PRICE_COPY.preview(BULK_PRICE_COPY.fieldLabels[field], formatDecimal(price!, 2), formatCount(next)),
         write: selected && next !== null
           ? { productIndex, field, value: formatCount(next) }
           : null,
