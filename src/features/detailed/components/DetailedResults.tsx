@@ -1,14 +1,13 @@
 import { useState } from 'react'
-import { COPY } from '../labels.ts'
+import { CHART_COPY, COPY } from '../labels.ts'
 import type { DetailedView } from '../viewModel.ts'
 import { AssumptionsList } from './AssumptionsList.tsx'
 import { ChannelTable } from './ChannelTable.tsx'
 import { FixedCostDaysList } from './FixedCostDaysList.tsx'
 import { MonthTable } from './MonthTable.tsx'
-import { PaybackChart } from './PaybackChart.tsx'
 import { ProductContributionTable } from './ProductContributionTable.tsx'
-import { ProjectionChart } from './ProjectionChart.tsx'
 import { ResultBar } from './ResultBar.tsx'
+import { MonthsChart, PaybackCalendar, ScenarioBars } from './ResultCharts.tsx'
 import { SalonMenuTable } from './SalonMenuTable.tsx'
 import { SankeyBreakdown } from './SankeyBreakdown.tsx'
 import { ScenarioTable } from './ScenarioTable.tsx'
@@ -32,6 +31,7 @@ export function DetailedResults({
   // totals: both stay one tap away on screen and always print (F13).
   const [showSankey, setShowSankey] = useState(false)
   const [showProductTable, setShowProductTable] = useState(false)
+  const [showScenarioTable, setShowScenarioTable] = useState(false)
 
   return (
     <div className="qc-report-body border-t border-qc-rule px-[18px] pb-[34px] lg:px-[30px]">
@@ -65,24 +65,8 @@ export function DetailedResults({
         </div>
       </ResultSection>
 
-      <ResultSection title={COPY.scenariosTitle} note={COPY.scenariosNote}>
-        <ScenarioTable scenarios={view.scenarios} />
-      </ResultSection>
-
-      <ResultSection
-        title={`${COPY.monthlyOperatingResult} · ${view.horizonMonths} ay`}
-        note={COPY.projectionNote}
-        flows
-      >
-        <div className="qc-screen-only hidden lg:block">
-          <ProjectionChart data={view.projection} size="lg" />
-        </div>
-        <div className="qc-screen-only lg:hidden">
-          <ProjectionChart data={view.projection} size="sm" />
-        </div>
-        <div className="qc-print-only">
-          <ProjectionChart data={view.projection} size="print" />
-        </div>
+      <ResultSection title={CHART_COPY.monthsTitle} note={CHART_COPY.monthsNote} flows>
+        <MonthsChart view={view.charts.months} />
         <div className="qc-screen-only mt-3.5 border-t border-qc-rule-row pt-3.5">
           <button type="button" className="qc-text-btn is-accent" onClick={onToggleMonthTable}>
             {showMonthTable ? COPY.hideMonthTable : COPY.showMonthTable}
@@ -94,29 +78,34 @@ export function DetailedResults({
           cannot print a node that is not in the DOM. The screen toggle keeps its
           exact behaviour; print ignores it (plan T-04).
         */}
-        <div className={showMonthTable ? 'block' : 'hidden qc-print-only'}>
+        <div className={showMonthTable ? 'mt-3 block' : 'mt-3 hidden qc-print-only'}>
           <MonthTable rows={view.monthRows} />
         </div>
       </ResultSection>
 
+      <ResultSection title={CHART_COPY.scenariosTitle} note={CHART_COPY.scenariosNote}>
+        <ScenarioBars bars={view.charts.scenarios} />
+        <div className="qc-screen-only mt-3.5 border-t border-qc-rule-row pt-3.5">
+          <button
+            type="button"
+            className="qc-text-btn"
+            aria-expanded={showScenarioTable}
+            onClick={() => setShowScenarioTable((value) => !value)}
+          >
+            {showScenarioTable ? CHART_COPY.hideScenarioTable : CHART_COPY.showScenarioTable}
+          </button>
+        </div>
+        <div className={showScenarioTable ? 'mt-4 block' : 'mt-4 hidden qc-print-only'}>
+          <ScenarioTable scenarios={view.scenarios} />
+        </div>
+      </ResultSection>
+
       <ResultSection
-        title={COPY.payback}
-        note={COPY.paybackNote}
-        figure={view.payback.available ? view.payback.value : null}
-        figureLabel={COPY.baseScenario}
+        title={CHART_COPY.paybackTitle}
+        note={view.charts.payback.note}
+        figure={view.charts.payback.headline}
       >
-        <div className="qc-screen-only hidden lg:block">
-          <PaybackChart data={view.paybackChart} size="lg" />
-        </div>
-        <div className="qc-screen-only lg:hidden">
-          <PaybackChart data={view.paybackChart} size="smPayback" />
-        </div>
-        <div className="qc-print-only">
-          <PaybackChart data={view.paybackChart} size="printPayback" />
-        </div>
-        {view.payback.available ? null : (
-          <p className="mt-2.5 text-xs leading-relaxed text-qc-secondary">{view.payback.message}</p>
-        )}
+        <PaybackCalendar view={view.charts.payback} />
       </ResultSection>
 
       <ResultSection title={COPY.channelTitle} note={COPY.channelNote}>
@@ -170,7 +159,7 @@ export function DetailedResults({
 
 /**
  * `flows` marks the sections that can be taller than a page — the money flow with
- * its always-printed Sankey, and the projection with its month table — so print
+ * its always-printed Sankey, and the months chart with its month table — so print
  * lets them break and the others stay whole (plan T-13).
  */
 function ResultSection({

@@ -19,6 +19,7 @@ import {
 } from './insightsView.ts'
 import { buildReportInputGroups, type ReportInputGroup } from './reportView.ts'
 import { buildAkisView, type AkisView } from './akisView.ts'
+import { buildResultCharts, type ResultChartsView } from './chartsView.ts'
 import { collectGuardrails, type Guardrail } from './guardrails.ts'
 import {
   COPY,
@@ -36,17 +37,13 @@ import {
   buildChannelRows,
   buildChannelTotals,
   buildMonthRows,
-  buildPaybackChart,
   buildProductRows,
   buildProductTotals,
-  buildProjection,
   type AssumptionRow,
   type BreakdownView,
   type ChannelRow,
   type MonthRow,
-  type PaybackData,
   type ProductRow,
-  type ProjectionData,
 } from './resultView.ts'
 
 /**
@@ -89,8 +86,8 @@ export type DetailedView = {
   salonMenu: SalonMenuView
   fixedCostDays: FixedCostDaysView
   januaryBasis: JanuaryBasis
-  projection: ProjectionData
-  paybackChart: PaybackData
+  /** The three Sonuç charts (DF-87): months, scenarios, kumbara calendar. */
+  charts: ResultChartsView
   monthRows: MonthRow[]
   assumptions: AssumptionRow[]
   guardrails: Guardrail[]
@@ -248,8 +245,7 @@ function buildView(result: DetailedResult, input: DetailedResolvedInput): Detail
       breakEven: result.breakEven,
       operatingDaysPerMonth: input.assumptions.operatingDaysPerMonth,
     },
-    projection: buildProjection(result),
-    paybackChart: buildPaybackChart(result),
+    charts: buildResultCharts(result),
     monthRows: buildMonthRows(result),
     assumptions: buildAssumptionRows(result, hasDelivery),
     guardrails: collectGuardrails(input),
