@@ -1,6 +1,6 @@
 # Detailed Feasibility — Financial Specification
 
-**Version:** v1.16
+**Version:** v1.17
 **Status:** Formula contract for `src/core/detailed/`. **Not** implementation.
 **Currency:** TRY · **Country:** Turkey · **Language for v1:** Turkish-first
 **Engine:** `detailedEngineVersion` `1.1.0`. Appendix E is implemented. Where an older sentence in the body still describes the pre-discount month, Appendix E wins.
@@ -1321,12 +1321,26 @@ Akış may show `monthlyOperatingResult / netRevenue` beside the operating resul
 
 Akış shows the month as a funnel. Each step's outflow is an engine field: `vatAmount`, `productCogs`, `channelCost`, `monthlyPayroll`, `monthlyOccupancyCost`, `monthlyOpex`, `monthlyOwnerCost`. The amount left after a step is the engine's own field where one exists (`netRevenue`, `grossProfitBeforeChannel`, `totalContribution`, `monthlyOperatingResult`). After personel, kira ve aidat and diğer giderler the remainder is the previous remainder minus that step's outflow. These three are display identities, not engine fields. The last remainder equals `monthlyOperatingResult` within 1e-6. No figure in §18.2 changes. The funnel does not show E.7.
 
+### E.9 Payback path beyond the horizon (display only, DF-87)
+
+`buildPaybackPath(projection, totalInitialInvestment)` in `src/core/detailed/paybackPath.ts` reads the base projection that `calculateDetailed` already produced.
+
+```
+cumulative[m]        = sum of monthlyOperatingResult, months 1..m   (the §14.2 running sum)
+cumulativeAtHorizon  = cumulative[H]                                (0 for an empty projection)
+recoveredShare       = cumulativeAtHorizon / totalInitialInvestment (null when the investment is 0)
+estimatedMonth       = H + ceil((totalInitialInvestment − cumulativeAtHorizon) / monthlyOperatingResult[H])
+```
+
+`estimatedMonth` is null when the investment is 0, when `cumulativeAtHorizon ≥ totalInitialInvestment`, or when month H's result is not positive. It assumes month H repeats unchanged after the horizon: no further ramp, no further escalation. The UI calls it approximate and shows it, with `recoveredShare`, only when DF-36 payback is not reached. Payback itself is still §14.2: `cumulative` crosses the investment in the same month as `paybackFromProjection`. Not an engine field. No figure in §18.2 changes.
+
 ---
 
 ## 19. Changelog
 
 | Version | Change |
 | --- | --- |
+| v1.17 | Appendix E.9: payback path for the Sonuç kumbara (DF-87). Running sum, share of the investment recovered at the horizon, and an approximate month beyond the horizon at the last month's pace. Display helper in `src/core/detailed/paybackPath.ts`; DF-36 payback unchanged. No figure in §18.2 changed. `detailedEngineVersion` stays `1.1.0`. |
 | v1.16 | Appendix E.8: Akış funnel remainders after personel, kira ve aidat and diğer giderler are display identities (previous remainder − engine outflow). Not engine fields. No figure in §18.2 changed. `detailedEngineVersion` stays `1.1.0`. |
 | v1.15 | Appendix E.7: Akış may show `monthlyOperatingResult / netRevenue` as a display share, null when net satış is not positive. Not an engine field. No figure in §18.2 changed. `detailedEngineVersion` stays `1.1.0`. |
 | v1.14 | Appendix E is implemented. `detailedEngineVersion` is `1.1.0`. Product discount, the five additive month fields, list-price restore under a discount, visible 2026 prefills, and draft payload version 2 are in the engine and the form. Omitted fallback stays 0. No figure in §18.2 changed. |

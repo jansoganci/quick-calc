@@ -212,28 +212,32 @@ Nine segments, locked order: KDV · Ürün maliyeti · Kanal maliyetleri · Öde
 
 **Negative operating result.** The bar cannot draw a negative segment. When `monthlyOperatingResult < 0`, the final segment is omitted, the cost segments are drawn at their share of **total cost**, and a caption reads `Toplam maliyet aylık cironun %{n}'i`. The reconciling table beneath still carries the exact minus figure in ink — no colour, no arrow (V3).
 
-### 4.5 Charts — two, both about time
+### 4.5 Charts — three questions (DF-87)
 
-No chart library (architecture D-series). Both are hand-authored inline SVG in a local component.
+Owner decision, 19 November 2026. The two line charts (three-series projection and cumulative payback line) are gone. Klasik Sonuç answers three questions instead, in this order after the money flow. Each section title is the question; the answer is one sentence under the picture. Plain HTML boxes in `components/ResultCharts.tsx`; no SVG, no axis, no chart library. All figures come from `chartsView.ts`; the component only turns its percentages into CSS. The same three sections print in the PDF (`qc-print-ink` keeps the fills).
 
-| Chart | Why it earns its place |
-| --- | --- |
-| **Aylık işletme sonucu · {horizon} ay** — one line chart, three series (Kötü / Baz / İyi), zero baseline emphasised, Baz at 2.25px accent and the other two at 1.5px `--qc-subtle` | Ramp-up makes the first months materially different from the stabilized month. "You lose money for one month, then turn positive" is a shape, not a number; 24 table rows do not say it |
-| **Yatırımın geri dönüşü** — cumulative base operating result, a dashed rule at `totalInitialInvestment`, a marker at the payback month | Payback *is* a crossing. Drawing it also shows how far off an unavailable payback was, which the word "dönmüyor" cannot |
+| Section | What it shows | Edge states |
+| --- | --- | --- |
+| **Her ay elinde ne kalıyor?** | Base `monthlyOperatingResult` for the ramp-up months plus the first full month (`RAMP_UP_TABLES[preset].length + 1`: 3 / 5 / 6 columns). Positive months are accent columns above an ink zero line; a loss month is an outlined column hanging below it with its minus amount. One scale for both halves. Beside (desktop) or under (mobile): `{n}. aydan itibaren her ay` + month n's result. Then one sentence about the first loss months. `Ay ay tabloyu göster` stays here | Any annual increase ≠ 0: the caption says later months change. Month n negative: `Satış otursa da her ay cebinden para çıkar.` |
+| **Satış kötü giderse ne olur?** | One row per scenario: plain label (`Satış %25 düşerse` / `Beklendiği gibi` / `Satış %25 artarsa`, from the scenario deltas), stabilized monthly result, a bar scaled to the largest positive result, and DF-36 payback in words. Base in accent/600, others in `qc-muted`. `Ayrıntılı tabloyu göster` opens the four-row scenario table; it always prints | Negative result: no bar; the track reads `Her ay cebinden para çıkar` |
+| **Yatırımın ne zaman geri döner?** | The kumbara calendar: one box per projection month, 12 per row on desktop, 6 on mobile. States: `eksi` (loss month, outlined), paying (accent), `döndü` (the DF-36 payback month, ink border), `senin` (after payback, `rule-mid`). A legend lists only the states present. The section figure is `{n}. ay` | Not reached: a fill bar `{H} ay sonunda kumbara` with the Appendix E.9 amount and share, and the sentence `… geri dönen kısmı: %x. Bu hızla yaklaşık {m}. ayda döner.` (or `… geri dönmez.`). No investment: `Yatırım yok`, every non-loss box `senin` |
 
-**Deliberately rejected:**
+The approximate month and the recovered share (financial spec Appendix E.9) appear only here and only when payback is not reached. The verdict, the summary pane and Akış keep DF-36 payback alone (DF-85 D2).
+
+Mobile (390px): column amounts drop the ` TL` suffix so up to six columns fit; the section note and the steady figure keep it. Amounts are never abbreviated.
+
+**Still rejected:**
 
 | Rejected | Reason |
 | --- | --- |
 | Pie / donut of cost composition | The reconciliation bar already divides one quantity and reconciles exactly; a pie at these ratios is unreadable |
-| Bar chart of the three scenarios | Three numbers. The table is faster and carries four rows instead of one |
 | Channel revenue chart | Three rows. The table is already the compact form |
 | ~~Waterfall gross → operating result~~ | **Partially superseded — see below.** A second expression of the reconciliation bar was rejected as a *waterfall*. A Sankey of the same reconciliation, additive rather than a replacement, is now approved (mirrors Quick/Lite's own R7 in `DESIGN_DIRECTION.md`). |
 | Classic break-even revenue/cost cross | Implies a revenue-by-volume curve the engine does not produce; break-even here is one units/day figure |
 | Monthly revenue chart separate from result | A series with no decision attached |
 | Per-KPI sparklines, gauges, speedometers | `DESIGN_DIRECTION.md` §3 |
 
-Mobile: both charts keep full width at 200px / 180px, x-labels thinned to 1 · 6 · 12 · 18 · 24.
+The earlier rejection of a scenario bar chart is reversed by DF-87.
 
 #### Supplementary Sankey visualisation **[LOCKED / APPROVED]**
 
@@ -252,7 +256,7 @@ Rules, mirroring Quick/Lite's R7 exactly:
 | Table | Shape | Mobile |
 | --- | --- | --- |
 | Reconciliation (under the bar) | `10px 1fr auto 72px`, 9 rows + `Toplam` | `9px 1fr auto 48px`, 13px, 40px rows |
-| Senaryolar | 4 rows × 3 columns; Baz column in ink/600, the operating-result cell at 16px | Unchanged — 3 columns fit at 390px |
+| Senaryolar | 4 rows × 3 columns; Baz column in ink/600, the operating-result cell at 16px. Collapsed under the §4.5 scenario bars behind `Ayrıntılı tabloyu göster`; always printed | Unchanged — 3 columns fit at 390px |
 | Kanal ekonomisi | 3 rows × 7 columns + `Toplam` | **Transposed:** one hairline block per channel, label/value rows, `Katkı` in 600 under a rule |
 | Menü ürünleri | 4 money columns (satış fiyatı, malzeme, malzeme payı, her birinden kalan) + product name. Weakest row: remaining in 500 ink, plus a plain-text note. No red. | **Transposed:** one hairline block per product, `Her birinden kalan` in 600 under a rule |
 | Ürün bazlı katkı (DF-84) | Same columns as kanal ekonomisi, rows summed per product | Same transpose as the channel table |
@@ -378,7 +382,7 @@ Reported rather than silently resolved:
 
 1. ~~`FRONTEND_IMPLEMENTATION_SPEC.md` §2.1 says the masthead is "Not sticky".~~ **Resolved:** the masthead is sticky from `lg` and the Quick spec now records it. Both modes offset their sticky pane by `lg:top-14`.
 2. **`monthlyOperatingResult` is labelled `Aylık işletme sonucu`, where Lite says `Aylık işletme kazancı`.** Deliberate: the Detailed figure is routinely negative and the engine identifier is `…Result`, not `…Earnings`. The two modes are permitted to differ (DF-2.3); recording it so it is not later "fixed" into a false consistency.
-3. **Lite's rejected-list bans additional charts.** That list is scoped `Out of scope for Quick v1` (§1.2.2) and does not govern Detailed, whose DF-2.2 questions are time-shaped. §4.5 above states the reasoning and rejects seven chart types to keep the count at two.
+3. **Lite's rejected-list bans additional charts.** That list is scoped `Out of scope for Quick v1` (§1.2.2) and does not govern Detailed, whose DF-2.2 questions are time-shaped. §4.5 above states the reasoning; DF-87 sets the count at three question-titled sections.
 4. **The bar ramp needs two new tokens** (D-2) and **the OPEX/CAPEX starter presentation answers a DEFERRED question** (D-1). Both are flagged rather than assumed.
 
 ---
@@ -416,7 +420,7 @@ src/features/detailed/
     ResultBar.tsx  ScenarioTable.tsx  ChannelTable.tsx  MonthTable.tsx
     SalonMenuTable.tsx  FixedCostDaysList.tsx  JanuaryTest.tsx
     SimulationsPage.tsx            Ocak testi area; reads the same Detailed calc
-    AssumptionsList.tsx  ProjectionChart.tsx  PaybackChart.tsx  chartGeometry.ts
+    AssumptionsList.tsx  ResultCharts.tsx   the three §4.5 sections (DF-87)
 ```
 
 Shared with Quick only through `lib/`, `app/` and `components/` (`NumberField`, the new `TextField`). **No import crosses `features/quick-calc/ ↔ features/detailed/`, and nothing imports `core/quick/` from Detailed or vice versa.** The engine is reached solely through `core/detailed/index.ts`.
@@ -425,7 +429,7 @@ Shared with Quick only through `lib/`, `app/` and `components/` (`NumberField`, 
 
 1. No financial formula in a React component. The bar's percentage widths and the chart's pixel coordinates are the only arithmetic allowed in the view layer, and both are pure presentation of engine figures.
 2. Every default, limit and label imported from `core/detailed/defaults.ts`, `core/detailed/limits.ts` and `features/detailed-feasibility/labels.ts` — never restated.
-3. No new form input, no new `calculateDetailed` output, no new KPI, except what DF-85 approved: the per-product discount field and the visible 2026 prefills (financial spec Appendix E). Appendix B display helpers (salon malzeme payı, kira-gün, Ocak testi) and Appendix D price-suggestion helpers are the approved exceptions; their formulas live in the financial spec, not in React. A suggestion does not write `normalPrice` / `onlinePrice` until `Bu fiyatı yaz`.
+3. No new form input, no new `calculateDetailed` output, no new KPI, except what DF-85 approved: the per-product discount field and the visible 2026 prefills (financial spec Appendix E). Appendix B display helpers (salon malzeme payı, kira-gün, Ocak testi), Appendix D price-suggestion helpers and the Appendix E.9 payback path (DF-87) are the approved exceptions; their formulas live in the financial spec, not in React. A suggestion does not write `normalPrice` / `onlinePrice` until `Bu fiyatı yaz`.
 4. `depreciation`, `amortisman`, `netProfit`, `net kâr` must not appear in identifiers, types, comments or strings.
 5. Money formatting always `Intl.NumberFormat('tr-TR')`, full form, unit after a space — `1.027.350 TL`, `%3,59`. Never abbreviated (the mobile chart axis label `250b` in the mock is a **chart tick**, and is the one place an abbreviation is proposed — flag it for approval or replace it with a tick-free axis).
 
@@ -438,7 +442,7 @@ Shared with Quick only through `lib/`, `app/` and `components/` (`NumberField`, 
 | D-1 | OPEX / CAPEX starter lines as a palette of text controls, none pre-listed as a row and none carrying a suggested amount | Approved, implemented |
 | D-2 | Two new bar-ramp tokens (`bar-channel #4A515C`, `bar-owner #7C838C`) | Approved, in `tailwind.config.ts` |
 | D-3 | No router; in-page mode state, session-scoped, no confirmation on switch | Approved, `app/App.tsx` |
-| D-4 | Inline SVG charts, still no chart library — Lite's "ordinary HTML and CSS only" rule was written for Lite's bar | Approved, `components/ProjectionChart.tsx` / `PaybackChart.tsx` |
+| D-4 | Inline SVG charts, still no chart library — Lite's "ordinary HTML and CSS only" rule was written for Lite's bar | Approved. Since DF-87 the result charts are plain HTML boxes in `components/ResultCharts.tsx`; the Sankey is the remaining SVG |
 | D-5 | Correcting `FRONTEND_IMPLEMENTATION_SPEC.md` §2.1 to match the shipped sticky masthead | **Resolved.** The masthead stays sticky from `lg`; it carries the mode switch, and Detailed is a long page where a switch that scrolls away has to be hunted for. The Quick spec §2 and §2.1 now say so, and both modes offset their sticky pane by `lg:top-14` |
 | D-6 | Mobile chart axis abbreviation (`250b`) | **Withdrawn.** Both charts render at natural size, so their labels are never scaled down and no abbreviation is needed. Money on every axis stays in full Turkish form |
 

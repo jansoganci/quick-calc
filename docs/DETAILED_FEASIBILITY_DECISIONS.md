@@ -2,7 +2,7 @@
 
 **Version scope note (10 November 2026):** This remains the Detailed v1 decision log. See [V2/V3 product roadmap](./V2_V3_PRODUCT_ROADMAP.md) for explicit later-version scope additions (recipes, food cost, simple grouping, allocation and comparison). Those additions do not retroactively alter v1 formulas or authorize implementation.
 
-**Version:** v0.13
+**Version:** v0.14
 **Status:** Decision log. Major Detailed v1 **product-scope** decisions are **locked**. Major calculation-model review blockers are **resolved**. Remaining implementation details belong in a dedicated Detailed Financial Specification. This file is still **not** that specification and **not** implementation.
 **Phase:** Planning — **not** a financial specification and **not** implementation
 **Currency:** TRY · **Country:** Turkey · **Preset context:** Coffee Shop / Cafe (same product family as Quick / Lite)
@@ -1735,6 +1735,20 @@ Owner decision, 18 November 2026. The Menü screen's "Örnek bir işletmeyle ba�
 - The rent deposit and opening working capital are typed as two initial-investment lines. That is a typed amount, not working-capital modelling; DF-41 is unchanged.
 - A sample may not pay back within the projection horizon; that is shown honestly. Every sample must end its stabilized base month positive (`samples.test.ts`).
 
+#### DF-87 — Sonuç charts answer three questions **[LOCKED]**
+
+Owner decision, 19 November 2026. The two line charts on Klasik Sonuç (Aylık işletme sonucu · 24 ay, and the cumulative payback line) are replaced by three plain sections. Each title is the owner's question. Each answer is one sentence. The same three sections print in the PDF report.
+
+1. **Her ay elinde ne kalıyor?** Columns for the base opening months while sales ramp up, plus the first full month. A loss month hangs below the zero line with its minus amount. Beside it: "{n}. aydan itibaren her ay" and that month's result.
+2. **Satış kötü giderse ne olur?** One bar per scenario (Satış %25 düşerse / Beklendiği gibi / Satış %25 artarsa) with the stabilized monthly result and that scenario's DF-36 payback in words. The old scenario table stays one tap away and always prints. This reverses the earlier UI-spec rejection of a scenario bar chart.
+3. **Yatırımın ne zaman geri döner?** The kumbara calendar: one box per projection month. A loss month is an outlined "eksi" box. Boxes before the DF-36 payback month are filled; the payback month says "döndü"; later months say "senin".
+
+When payback is not reached within the horizon, the calendar adds two display figures (financial spec Appendix E.9): the share of the investment recovered by the last month, and an approximate month at which it would come back if the last month repeated unchanged. Both are labelled approximate ("bu hızla yaklaşık"). They are shown only on Klasik Sonuç and in the PDF.
+
+- Payback stays DF-36. The estimate never replaces the payback figure, the verdict, or the summary pane.
+- DF-85 D2 is unchanged: Akış still shows no investment share, no "kalan" and no investment / result ratio.
+- No new input, no change to `calculateDetailed`, no §18.2 figure changes.
+
 ### 5.13 Financing and working capital
 
 #### DF-40 — Financing is out of Detailed v1 **[LOCKED]**
@@ -1959,6 +1973,8 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 | DF-61 | Analysis UX principle | User describes the business once; engine derives operating result, break-even, investment, payback, scenarios, projection. |
 | DF-84 | Product-level contribution | Derived report/UI output only — units, revenue, cost lines, contribution per product, summed across channels. No per-product channel mix (DF-04a unchanged). No category grouping (DF-72 unchanged). No new formula. |
 | DF-85 | Akış, product discount, 2026 visible defaults | Akış is a second presentation of `calculateDetailed`. No Akış formulas. Payback stays DF-36. No investment share in the month (DF-34). One optional per-product discount, 0–100, on both list prices before VAT and percentage fees. Platform / Joker stay out (DF-55 narrowed, not reopened). New forms show employer cost 40.874,63 on a new position and Bağ-Kur 11.808,23; omitted engine values stay 0. One global VAT rate. Channel mix must total 100% within `1e-6` or the UI shows the error and no results. |
+| DF-86 | Sample businesses | Five samples fill the form only; no formula, field or default. Every sample ends its stabilized base month positive. |
+| DF-87 | Sonuç charts | Three question-titled sections replace the two line charts, on screen and in the PDF. Appendix E.9 adds the recovered share and an approximate month beyond the horizon, only when DF-36 payback is not reached. Payback stays DF-36; Akış (D2) unchanged. |
 | DF-62 | Waste / fire | Out of v1. |
 | DF-40 | Financing | Out of v1. |
 | DF-41 | Working-capital timing | Out of v1. |
@@ -2024,6 +2040,7 @@ None of the above is a reason to change Lite behaviour now.
 | v0.11 | Locked DF-83: Channel Variable Costs (takeaway packaging, delivery packaging, own-courier variable payment) escalate with the Product COGS annual rate as escalation group 2. No fourth escalation category, no new input, and DF-68's cost-line separation is unchanged. Closes the last escalation-assignment gap before the Detailed Financial Specification. |
 | v0.12 | Locked DF-84: a per-product contribution breakdown (units, revenue, cost lines, contribution) is an approved engine-derived report/UI output, additive to the existing channel breakdown. No new input, no per-product channel mix, no category grouping — DF-04a and DF-72 unchanged. Confirmed the platform-vs-own-courier delivery *volume* split stays rejected (DF-77 unchanged) and recorded that city/location benchmarking is shelved, not designed. |
 | v0.13 | Locked DF-85 (owner, 17 November 2026). Akış is a presentation of the existing Detaylı engine. DF-34 and DF-36 stay. A per-product discount narrows DF-55; platform and Joker stay out. 2026 employer cost and Bağ-Kur are visible new-form prefills; omitted engine amounts stay 0. Channel-mix failure shows the error and no results. Impact, tests, and the later PR split are in `docs/AKIS_DF85_IMPACT.md`. Formula text for the unimplemented change is Appendix E of the financial spec. |
+| v0.14 | Recorded DF-86 (sample businesses are form data, 18 November 2026) and DF-87 (Sonuç charts answer three questions, 19 November 2026). DF-87 adds two display figures beyond the horizon (financial spec Appendix E.9); DF-36 payback and DF-85 D2 are unchanged. |
 
 ---
 

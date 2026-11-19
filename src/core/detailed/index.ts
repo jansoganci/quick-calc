@@ -7,7 +7,7 @@
  * tests reach them directly as siblings (architecture R7). Appendix B display
  * helpers (`buildSalonMenuEconomics`, `buildFixedCostDays`, `applyJanuaryTest`)
  * and Appendix D price-suggestion helpers (`channelRestorePrice`, `esnafPrice`)
- * are public, like the recipe helpers; they do not change `calculateDetailed`.
+ * and the Appendix E.9 payback path (`buildPaybackPath`) are public, like the recipe helpers; they do not change `calculateDetailed`.
  */
 
 export { calculateDetailed } from './calculate.ts';
@@ -20,6 +20,8 @@ export {
 } from './foodCost.ts';
 export type { SalonMenuEconomics, SalonMenuProduct } from './foodCost.ts';
 export { applyJanuaryTest } from './januaryTest.ts';
+export { buildPaybackPath } from './paybackPath.ts';
+export type { PaybackPath } from './paybackPath.ts';
 export type { JanuaryTestInput, JanuaryTestResult } from './januaryTest.ts';
 export { DETAILED_LIMITS, MIX_TOLERANCE } from './limits.ts';
 export { channelRestorePrice, esnafPrice } from './priceSuggestion.ts';

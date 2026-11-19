@@ -2,7 +2,6 @@ import {
   type Channel,
   type DetailedResult,
   type MonthResult,
-  type ScenarioKey,
 } from '../../core/detailed/index.ts'
 import { formatCount } from '../../lib/number.ts'
 import { formatTry } from '../../lib/money.ts'
@@ -15,7 +14,6 @@ import {
   COPY,
   DELIVERY_MODE_LABELS,
   RAMP_UP_LABELS,
-  SCENARIO_LABELS,
   type BreakdownKey,
 } from './labels.ts'
 
@@ -252,64 +250,6 @@ export function buildProductRows(month: MonthResult): ProductRow[] {
 
 export function buildProductTotals(month: MonthResult): Omit<ProductRow, 'productId' | 'name'> {
   return buildChannelTotals(month)
-}
-
-export type ProjectionSeries = { key: ScenarioKey; label: string; values: number[] }
-
-export type ProjectionData = {
-  series: ProjectionSeries[]
-  min: number
-  max: number
-  months: number
-}
-
-export function buildProjection(result: DetailedResult): ProjectionData {
-  const series = SCENARIO_ORDER.map((key) => ({
-    key,
-    label: SCENARIO_LABELS[key],
-    values: result.scenarios[key].projection.map((month) => month.monthlyOperatingResult),
-  }))
-
-  const all = series.flatMap((entry) => entry.values)
-  return {
-    series,
-    min: Math.min(0, ...all),
-    max: Math.max(0, ...all),
-    months: result.meta.assumptions.projectionHorizonMonths,
-  }
-}
-
-export type PaybackData = {
-  cumulative: number[]
-  target: number
-  paybackMonth: number | null
-  min: number
-  max: number
-  months: number
-}
-
-/**
- * Cumulative base operating result against the investment line. The running sum is
- * the same quantity §14.2 defines payback on — it is not a second definition.
- */
-export function buildPaybackChart(result: DetailedResult): PaybackData {
-  const base = result.scenarios.base
-  const cumulative: number[] = []
-  let running = 0
-  for (const month of base.projection) {
-    running += month.monthlyOperatingResult
-    cumulative.push(running)
-  }
-
-  const target = result.totalInitialInvestment
-  return {
-    cumulative,
-    target,
-    paybackMonth: base.payback.available ? base.payback.month : null,
-    min: Math.min(0, ...cumulative),
-    max: Math.max(target, ...cumulative),
-    months: result.meta.assumptions.projectionHorizonMonths,
-  }
 }
 
 export type MonthRow = {

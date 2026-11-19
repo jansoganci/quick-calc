@@ -208,6 +208,7 @@ describe('public surface', () => {
         'RAMP_UP_TABLES',
         'applyJanuaryTest',
         'buildFixedCostDays',
+        'buildPaybackPath',
         'buildSalonMenuEconomics',
         'calculateDetailed',
         'channelRestorePrice',

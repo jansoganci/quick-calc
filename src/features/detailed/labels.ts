@@ -356,16 +356,11 @@ export const COPY = {
   grossCustomerSales: 'Aylık brüt ciro',
   remainingLabel: 'Kalan',
 
-  scenariosTitle: 'Senaryolar',
-  scenariosNote:
-    'Tek değişken satış hacmidir. Fiyatlar, maliyetler, personel, kira ve giderler her senaryoda aynıdır.',
   scenariosInvariantNote:
     'Başa baş noktası ve ilk yatırım senaryolara göre değişmez; ürün ve kanal dağılımı sabit olduğu için üç senaryoda da aynıdır.',
   netRevenue: 'Aylık net ciro',
   contribution: 'Ürünlerden kalan (aylık)',
 
-  projectionNote:
-    'İlk aylarda satış hacmi henüz oturmadığı için sonuç düşüktür.',
   showMonthTable: 'Ay ay tabloyu göster',
   showSankey: 'Akış şemasını göster',
   hideSankey: 'Akış şemasını gizle',
@@ -375,9 +370,6 @@ export const COPY = {
   monthColumn: 'Ay',
   unitsColumn: 'Adet',
   fixedCostColumn: 'Sabit gider',
-
-  paybackNote:
-    'Aylık sonuçların toplamı ilk yatırımı geçtiğinde yatırım geri dönmüş sayılır. Finansman gideri hesaba katılmaz.',
 
   channelTitle: 'Kanal ekonomisi',
   channelNote:
@@ -739,4 +731,62 @@ export const UNAVAILABLE_COPY = {
       'İşletme aylık zarar ettiği için yatırım geri dönmüyor.',
   },
   paybackNoInvestment: 'Yatırım tutarı girilmedi.',
+} as const
+
+/**
+ * The three Sonuç charts (DF-87, UI spec §4.5). Each title is the question an
+ * owner asks; each answer is one plain sentence under the picture.
+ */
+export const CHART_COPY = {
+  monthsTitle: 'Her ay elinde ne kalıyor?',
+  monthsNote: 'Açılışta satış yavaş başlar. İlk aylar zayıf, sonra oturur.',
+  monthLabel: (month: string) => `${month}. ay`,
+  steadyFrom: (month: string) => `${month}. aydan itibaren her ay`,
+  steadyCaption: 'satış oturduktan sonra',
+  steadyCaptionEscalated: 'bugünkü fiyatlarla; yıllık artışlar sonraki ayları değiştirir',
+  monthsFirstLoss: (amount: string, next: string) =>
+    `İlk ay ${amount} cebinden çıkar. ${next}. aydan itibaren para kalmaya başlar.`,
+  monthsLossRun: (count: string, amount: string, next: string) =>
+    `İlk ${count} ay cebinden para çıkar: toplam ${amount}. ${next}. aydan itibaren para kalmaya başlar.`,
+  monthsAllPositive: 'İlk aydan itibaren para kalır. Satış oturana kadar daha az kalır.',
+  monthsAllLoss: 'Satış otursa da her ay cebinden para çıkar.',
+
+  scenariosTitle: 'Satış kötü giderse ne olur?',
+  scenariosNote:
+    'Her şey aynı, sadece satış adedi değişiyor. Satış oturduktan sonra her ay elinde kalan:',
+  scenarioDown: (percent: string) => `Satış ${percent} düşerse`,
+  scenarioUp: (percent: string) => `Satış ${percent} artarsa`,
+  scenarioSame: 'Satış değişmezse',
+  scenarioBase: 'Beklendiği gibi',
+  scenarioLossBar: 'Her ay cebinden para çıkar',
+  scenarioPaybackMonth: (month: string) => `${month}. ayda geri döner`,
+  scenarioPaybackNotReached: (months: string) => `${months} ayda geri dönmez`,
+  scenarioPaybackLoss: 'Zararda; geri dönmez',
+  scenarioPaybackNoInvestment: 'Yatırım girilmedi',
+  showScenarioTable: 'Ayrıntılı tabloyu göster',
+  hideScenarioTable: 'Ayrıntılı tabloyu gizle',
+
+  paybackTitle: 'Yatırımın ne zaman geri döner?',
+  paybackNote: (investment: string) =>
+    `Her kutu bir ay. Kalan paran kumbaraya girer; kumbara ${investment} olunca yatırımın geri dönmüş olur. Finansman gideri hesaba katılmaz.`,
+  paybackNoteNoInvestment: 'Her kutu bir ay.',
+  paybackMonth: (month: string) => `${month}. ay`,
+  paybackNotReached: (months: string) => `${months} ayda dönmüyor`,
+  paybackNoInvestment: 'Yatırım yok',
+  boxPayback: 'döndü',
+  boxFree: 'senin',
+  boxLoss: 'eksi',
+  legendLoss: 'Cebinden para çıkan ay',
+  legendPaying: 'Yatırımı geri ödüyor',
+  legendFree: 'Artık senin',
+  progressLabel: (months: string) => `${months} ay sonunda kumbara`,
+  progressTarget: 'yatırım',
+  paybackReached: (month: string) =>
+    `Yatırımın ${month}. ayda cebine geri döner. Ondan sonra kalan para artık senin.`,
+  paybackShare: (months: string, share: string) =>
+    `${months} ay bitince yatırımın geri dönen kısmı: ${share}.`,
+  paybackEstimate: (month: string) => `Bu hızla yaklaşık ${month}. ayda döner.`,
+  paybackNever: 'Bu hızla yatırım geri dönmez.',
+  paybackEmpty: (months: string) => `${months} ay bitince kumbarada para yok.`,
+  paybackNoInvestmentSentence: 'Yatırım tutarı girilmedi; geri dönecek bir yatırım yok.',
 } as const
