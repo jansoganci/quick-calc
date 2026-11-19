@@ -78,7 +78,7 @@ Eleven sections, fixed order, **unnumbered** on screen (the `01`–`05` Mono pre
 | 10 | İlk yatırım | `capexItems[]` |
 | 11 | Varsayımlar | `assumptions.*` including `operatingDaysPerMonth` |
 
-**Malzemeler is screen 02.** Authority for this block, the recipe editor, and the price-rise preview remains `docs/RECIPE_REDESIGN_SPEC.md` (owner lock 12 November 2026), with step-6 restore/suggestion in `DETAILED_FINANCIAL_SPEC.md` Appendix D. In short: one purchase-price editor on the list; recipe lines carry only usage quantity, labelled by unit (`Kaç adet?` / `Kaç gram?` / `Kaç ml?`, never Gramaj); the recipe opens as a full-screen layer below 1024px and as a block under the menu table from 1024px; ingredients may be added from the list or born from the recipe search (Turkish-aware name match). Zam geldi shows exact salon and online restore prices plus a whole-lira-up suggestion; `Bu fiyatı yaz` writes that channel’s field and nothing else. The monthly engine still receives one `unitProductCost` per product (`DETAILED_FINANCIAL_SPEC.md` Appendix A).
+**Malzemeler is screen 02.** Authority for this block, the recipe editor, and the price-rise preview remains `docs/RECIPE_REDESIGN_SPEC.md` (owner lock 12 November 2026), with step-6 restore/suggestion in `DETAILED_FINANCIAL_SPEC.md` Appendix D. In short: one purchase-price editor on the list; recipe lines carry only usage quantity, labelled by unit (`Kaç adet?` / `Kaç gram?` / `Kaç ml?`, never Gramaj); the recipe opens as a full-screen layer below 1024px and as a block under the menu table from 1024px; ingredients may be added from the list or born from the recipe search (Turkish-aware name match). Zam geldi shows exact salon and online restore prices plus a whole-lira-up suggestion; `Bu fiyatı yaz` writes that channel’s field and nothing else. `Tüm önerileri yaz` writes all applicable suggestions at once (DF-88). The monthly engine still receives one `unitProductCost` per product (`DETAILED_FINANCIAL_SPEC.md` Appendix A).
 
 **Section 05 is model-driven progressive disclosure:** it renders only when `channelMix.delivery > 0`, which is exactly the condition under which `delivery.mode` becomes required (spec §6.4). No toggle, no "advanced" switch.
 
@@ -319,6 +319,14 @@ At the top of Ürünler on Menü: the text button `Nereden başlayacağını bil
 - Picking a sample fills the whole form and needs a fresh `Hesapla` (V6). When a saved draft would be replaced, an inline confirm appears first (`Girdiklerin tamamı örnek verilerle değiştirilecek: {ad}.` · `Evet, doldur` · `Vazgeç`). There is no browser dialog.
 - After loading, a quiet tinted note sits above the button: `Örnek: {ad}. Rakamlar Kasım 2026 için tahmindir; kendi işletmene göre değiştir.` The button then reads `Başka bir örnek seç`. The note is screen state only: it is not in the draft and disappears on `Baştan başla`.
 - Labels: `COPY.loadSample*`. Data: `samples/` (one file per sample, order in `samples/index.ts`).
+
+### 4.13 Bulk price update (DF-88)
+
+On Zam geldi, show `Tüm önerileri yaz` below the preview when at least two suggestions can be applied. One tap writes every applicable salon and online suggestion in one form update. Show `{n} fiyat yazıldı.` and `Geri al`; undo restores exactly the previous strings for those fields. A later edit dismisses this undo. Individual `Bu fiyatı yaz` actions continue to write only their channel.
+
+On Menü, `Fiyatlara toplu zam yap` is a text button above the product table. It opens an inline panel, without a card or modal. `Zam oranı` is a percent field bounded to 1–100. `Hangi fiyat?` offers `Salon ve online` (default), `Sadece salon`, and `Sadece online`. Every product starts selected; `Tümünü seç` and `Hiçbirini seçme` change selection. Each product row shows a checkbox, name, and live `old → new TL` preview for affected fields. Empty prices show `Fiyat yok` and are skipped. The note reads `Yeni fiyat yukarı tam liraya yuvarlanır. İndirim oranın aynı kalır.` Apply reads `{n} ürüne uygula` and is disabled for zero affected products or an invalid rate; `Vazgeç` closes the panel.
+
+Apply writes all selected valid prices in one form update, closes the panel, then shows `{n} ürünün fiyatı güncellendi.` and `Geri al`. Undo restores the previous strings of only the fields written and disappears on the next edit. Both status lines use `role="status"`. Below `lg`, controls have 44px touch targets and the panel is one column with wrapping preview text; on desktop, rows align in a compact grid with the Menü table. The same form fields and existing discount remain; no price history is stored.
 
 ---
 

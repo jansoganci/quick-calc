@@ -83,6 +83,9 @@ export function DetailedForm({
           errorFor={calc.errorFor}
           onBlur={calc.markTouched}
           onChange={calc.setProductField}
+          onApplyProductPrices={calc.applyProductPrices}
+          bulkStatus={calc.bulkPriceStatus?.kind === 'menu' ? calc.bulkPriceStatus.count : null}
+          onUndoBulkPrices={calc.undoBulkProductPrices}
           onAdd={calc.addProduct}
           onRemove={calc.removeProduct}
           recipeProductIndex={recipeProductIndex}
@@ -129,6 +132,9 @@ export function DetailedForm({
           onDiscardBlank={calc.discardBlankIngredient}
           onDelete={calc.deleteIngredient}
           onApplyProductPrice={calc.setProductField}
+          onApplyProductPrices={calc.applyProductPrices}
+          bulkStatus={calc.bulkPriceStatus?.kind === 'suggestions' ? calc.bulkPriceStatus.count : null}
+          onUndoBulkPrices={calc.undoBulkProductPrices}
           requestedOpenId={focusIngredientId}
           onConsumedOpen={() => setFocusIngredientId(null)}
         />

@@ -1,6 +1,6 @@
 # Detailed Feasibility — Financial Specification
 
-**Version:** v1.17
+**Version:** v1.18
 **Status:** Formula contract for `src/core/detailed/`. **Not** implementation.
 **Currency:** TRY · **Country:** Turkey · **Language for v1:** Turkish-first
 **Engine:** `detailedEngineVersion` `1.1.0`. Appendix E is implemented. Where an older sentence in the body still describes the pre-discount month, Appendix E wins.
@@ -1259,6 +1259,12 @@ No figure in §18.2 changes.
 
 ---
 
+### D.5 Bulk percentage raise
+
+`raisedPrice(price, rate) = esnafPrice(price × (1 + rate))`, where `rate` is a 0–1 fraction and `0 < rate ≤ 1`. The form accepts 1–100%. The result is a whole lira rounded up by the same rule as D.3. Empty or non-positive prices do not change; non-finite prices or rates and rates outside `(0, 1]` produce no suggestion.
+
+This is a display/form helper only. It writes an existing list-price field after an explicit action, keeps the discount percentage, and changes no §18.2 figure or `calculateDetailed` output.
+
 ## Appendix E — DF-85 contract (implemented in `1.1.0`)
 
 Authority: `docs/DETAILED_FEASIBILITY_DECISIONS.md` DF-85. File-level impact: `docs/AKIS_DF85_IMPACT.md`.
@@ -1340,6 +1346,7 @@ estimatedMonth       = H + ceil((totalInitialInvestment − cumulativeAtHorizon)
 
 | Version | Change |
 | --- | --- |
+| v1.18 | Appendix D.5 adds the bulk percentage raise display/form helper for DF-88. Whole-lira-up rounding reuses D.3; no §18.2 figure or `calculateDetailed` output changes. |
 | v1.17 | Appendix E.9: payback path for the Sonuç kumbara (DF-87). Running sum, share of the investment recovered at the horizon, and an approximate month beyond the horizon at the last month's pace. Display helper in `src/core/detailed/paybackPath.ts`; DF-36 payback unchanged. No figure in §18.2 changed. `detailedEngineVersion` stays `1.1.0`. |
 | v1.16 | Appendix E.8: Akış funnel remainders after personel, kira ve aidat and diğer giderler are display identities (previous remainder − engine outflow). Not engine fields. No figure in §18.2 changed. `detailedEngineVersion` stays `1.1.0`. |
 | v1.15 | Appendix E.7: Akış may show `monthlyOperatingResult / netRevenue` as a display share, null when net satış is not positive. Not an engine field. No figure in §18.2 changed. `detailedEngineVersion` stays `1.1.0`. |

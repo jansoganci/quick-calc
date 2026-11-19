@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { emptyProduct, initialForm, type IngredientRow } from './formState.ts'
 import { RECIPE_COPY } from './labels.ts'
 import { buildPricePreview, snapshotOf } from './recipePreview.ts'
+import { pricePreviewWrites, writeProductPrices } from './bulkPriceView.ts'
 
 function named(partial: Partial<IngredientRow> & Pick<IngredientRow, 'id' | 'name'>): IngredientRow {
   return {
@@ -129,5 +130,19 @@ describe('Zam geldi preview (O3, §7.4 fixtures)', () => {
   it('does not preview when the ingredient is unused', () => {
     const unusedForm = { ...form, products: form.products.map((product) => ({ ...product, recipeLines: [] })) }
     expect(buildPricePreview(unusedForm, kiyma, opened)).toBeNull()
+  })
+
+  it('Tüm önerileri yaz uses every applicable single-button value', () => {
+    const preview = buildPricePreview(form, kiyma, opened)
+    expect(preview).not.toBeNull()
+    const writes = pricePreviewWrites(preview!)
+    expect(writes).toEqual(preview!.lines.flatMap((line) => line.suggestions
+      .filter((suggestion) => suggestion.canApply)
+      .map((suggestion) => ({ productIndex: line.productIndex, field: suggestion.field, value: suggestion.applyValue }))))
+    expect(writes).toHaveLength(4)
+    const result = writeProductPrices(form, writes)
+    expect(result.form.products.map((product) => [product.normalPrice, product.onlinePrice])).toEqual([
+      ['230', '242'], ['168', '190'],
+    ])
   })
 })

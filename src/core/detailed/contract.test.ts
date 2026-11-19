@@ -213,6 +213,7 @@ describe('public surface', () => {
         'calculateDetailed',
         'channelRestorePrice',
         'esnafPrice',
+        'raisedPrice',
         'isPurchaseUnit',
         'purchaseFactor',
         'recipeCost',

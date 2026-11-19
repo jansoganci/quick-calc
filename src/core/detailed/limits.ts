@@ -17,6 +17,7 @@ export const DETAILED_LIMITS = {
   onlinePrice: { min: 0, max: 100_000, exclusiveMin: true },
   /** Inclusive. 100% is a valid product discount; it is not the list-price floor. */
   discountRate: { min: 0, max: 1 },
+  bulkPriceRaiseRate: { min: 0.01, max: 1 },
   dailyQuantity: { min: 0, max: 100_000 },
   unitProductCost: { min: 0, max: 100_000 },
 

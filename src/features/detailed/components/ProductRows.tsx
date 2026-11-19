@@ -7,6 +7,8 @@ import type { DetailedFormState, ProductRow } from '../formState.ts'
 import { COPY, GUARDRAIL_COPY, PRODUCT_LABELS, RECIPE_COPY } from '../labels.ts'
 import { useNewestRowOpen } from '../hooks/useNewestRowOpen.ts'
 import { recipeAmountText } from '../recipeForm.ts'
+import { BulkPriceRaise } from './BulkPriceRaise.tsx'
+import type { ProductPriceWrite } from '../bulkPriceView.ts'
 
 /**
  * One column per field, one header per column (desktop): Ürün · Normal fiyat ·
@@ -30,6 +32,9 @@ type ProductRowsProps = {
   onRemove: (index: number) => void
   recipeProductIndex: number | null
   onOpenRecipe: (index: number) => void
+  onApplyProductPrices: (writes: ProductPriceWrite[], kind: 'menu', count: number) => void
+  bulkStatus: number | null
+  onUndoBulkPrices: () => void
 }
 
 function costDisplay(form: DetailedFormState, product: ProductRow): { value: string; locked: boolean } {
@@ -57,6 +62,9 @@ export function ProductRows({
   onRemove,
   recipeProductIndex,
   onOpenRecipe,
+  onApplyProductPrices,
+  bulkStatus,
+  onUndoBulkPrices,
 }: ProductRowsProps) {
   const products = form.products
   const rows = useNewestRowOpen(products.map((product) => product.id))
@@ -71,6 +79,8 @@ export function ProductRows({
           {COPY.productCount(products.length)}
         </span>
       </div>
+
+      <BulkPriceRaise products={products} onApply={onApplyProductPrices} status={bulkStatus} onUndo={onUndoBulkPrices} />
 
       <div className={cn('hidden gap-2 pb-2 lg:grid', GRID)}>
         <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-qc-secondary">

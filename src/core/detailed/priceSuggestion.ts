@@ -52,3 +52,9 @@ export function esnafPrice(amount: number): number | null {
   const rounded = Math.ceil(amount);
   return Number.isFinite(rounded) ? rounded : null;
 }
+
+/** Appendix D.5: raise a positive list price and use the D.3 whole-lira rule. */
+export function raisedPrice(price: number, rate: number): number | null {
+  if (!Number.isFinite(price) || price <= 0 || !Number.isFinite(rate) || rate <= 0 || rate > 1) return null;
+  return esnafPrice(price * (1 + rate));
+}
