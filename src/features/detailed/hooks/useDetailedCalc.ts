@@ -46,6 +46,13 @@ import {
   type ProductPriceUndo,
   type ProductPriceWrite,
 } from '../bulkPriceView.ts'
+import {
+  undoIngredientPrices,
+  writeIngredientPrices,
+  type IngredientPriceUndo,
+  type IngredientPriceWrite,
+} from '../bulkIngredientView.ts'
+import { buildBulkCostPreview, type PriceSuggestionField } from '../recipePreview.ts'
 
 /**
  * Form state and the V6 gate: the first calculation happens only on `Hesapla`, and
@@ -63,8 +70,10 @@ export function useDetailedCalc() {
   const [openSection, setOpenSection] = useState<SectionId | null>('products')
   const [showMonthTable, setShowMonthTable] = useState(false)
   const [draftSaved, setDraftSaved] = useState(false)
-  const [bulkPriceStatus, setBulkPriceStatus] = useState<{ kind: 'suggestions' | 'menu'; count: number } | null>(null)
+  const [bulkPriceStatus, setBulkPriceStatus] = useState<{ kind: 'suggestions' | 'menu' | 'ingredient' | 'bulkCostSuggestions'; count: number } | null>(null)
   const bulkPriceUndoRef = useRef<ProductPriceUndo[]>([])
+  const bulkIngredientUndoRef = useRef<IngredientPriceUndo[]>([])
+  const [bulkCostBefore, setBulkCostBefore] = useState<DetailedFormState | null>(null)
   /**
    * Report metadata, not a financial input: it titles the report and names the
    * saved file, and it is deliberately NOT part of `DetailedFormState`, so it
@@ -93,6 +102,10 @@ export function useDetailedCalc() {
   const canSubmit = evaluation.ok
   // Derived, never stored: an invalid draft hides the last result (DF-85 D6).
   const view = selectShownResult(hasCalculated, evaluation)
+  const bulkCostPreview = useMemo(
+    () => bulkCostBefore === null ? null : buildBulkCostPreview(bulkCostBefore, form),
+    [bulkCostBefore, form],
+  )
 
   useEffect(() => {
     if (!hasCalculated || !evaluation.ok) return
@@ -162,16 +175,53 @@ export function useDetailedCalc() {
 
   function update(mutate: (draft: DetailedFormState) => DetailedFormState) {
     bulkPriceUndoRef.current = []
+    bulkIngredientUndoRef.current = []
     setBulkPriceStatus(null)
+    setBulkCostBefore(null)
     setForm((current) => mutate(current))
   }
 
-  function applyProductPrices(writes: ProductPriceWrite[], kind: 'suggestions' | 'menu', count: number) {
+  function applyProductPrices(writes: ProductPriceWrite[], kind: 'suggestions' | 'menu' | 'bulkCostSuggestions', count: number) {
     const result = writeProductPrices(form, writes)
     if (result.undo.length === 0) return
     bulkPriceUndoRef.current = result.undo
+    bulkIngredientUndoRef.current = []
+    if (kind !== 'bulkCostSuggestions') setBulkCostBefore(null)
     setForm(result.form)
     setBulkPriceStatus({ kind, count })
+  }
+
+  function applyIngredientPrices(writes: IngredientPriceWrite[], count: number) {
+    const result = writeIngredientPrices(form, writes)
+    if (result.undo.length === 0) return
+    bulkIngredientUndoRef.current = result.undo
+    bulkPriceUndoRef.current = []
+    setBulkCostBefore(buildBulkCostPreview(form, result.form) ? form : null)
+    setForm(result.form)
+    setBulkPriceStatus({ kind: 'ingredient', count })
+  }
+
+  function applyBulkCostProductPrice(index: number, field: PriceSuggestionField, value: string) {
+    bulkIngredientUndoRef.current = []
+    bulkPriceUndoRef.current = []
+    setBulkPriceStatus(null)
+    setForm((current) => ({
+      ...current,
+      products: current.products.map((product, at) => at === index ? { ...product, [field]: value } : product),
+    }))
+  }
+
+  function undoBulkIngredientPrices() {
+    if (bulkIngredientUndoRef.current.length === 0) return
+    const previous = bulkIngredientUndoRef.current
+    setForm((current) => undoIngredientPrices(current, previous))
+    bulkIngredientUndoRef.current = []
+    setBulkCostBefore(null)
+    setBulkPriceStatus(null)
+  }
+
+  function closeBulkCostPreview() {
+    setBulkCostBefore(null)
   }
 
   function undoBulkProductPrices() {
@@ -191,7 +241,9 @@ export function useDetailedCalc() {
    */
   function resetForm() {
     bulkPriceUndoRef.current = []
+    bulkIngredientUndoRef.current = []
     setBulkPriceStatus(null)
+    setBulkCostBefore(null)
     const fresh = initialForm()
     setLoadedSample(null)
     draftSaveQueue.reset(fresh)
@@ -218,7 +270,9 @@ export function useDetailedCalc() {
     const concept = SAMPLE_CONCEPTS.find((item) => item.id === conceptId)
     if (!concept) return
     bulkPriceUndoRef.current = []
+    bulkIngredientUndoRef.current = []
     setBulkPriceStatus(null)
+    setBulkCostBefore(null)
     setForm(buildSampleForm(concept))
     setLoadedSample(concept.name)
     setTouched({})
@@ -254,8 +308,13 @@ export function useDetailedCalc() {
     showMonthTable,
     draftSaved,
     bulkPriceStatus,
+    bulkCostPreview,
     applyProductPrices,
+    applyIngredientPrices,
+    applyBulkCostProductPrice,
     undoBulkProductPrices,
+    undoBulkIngredientPrices,
+    closeBulkCostPreview,
     resultsRef,
     errorFor,
     errorSections,

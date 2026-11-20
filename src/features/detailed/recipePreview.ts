@@ -11,7 +11,7 @@ import {
 import { formatTryExact } from '../../lib/money.ts'
 import { formatCount, formatDecimal, parseTurkishNumber } from '../../lib/number.ts'
 import type { DetailedFormState, IngredientRow, ProductRow } from './formState.ts'
-import { RECIPE_COPY } from './labels.ts'
+import { BULK_INGREDIENT_COPY, RECIPE_COPY } from './labels.ts'
 import {
   parseAmount,
   productDisplayName,
@@ -175,6 +175,78 @@ function usageText(product: ProductRow, ingredient: IngredientRow): string {
   return `${usage} ${unit}`.trim()
 }
 
+function buildProductPriceLine({
+  product,
+  productIndex,
+  usage,
+  oldCost,
+  newCost,
+  baselineNormal,
+  baselineOnline,
+  vat,
+  platformFee,
+  kind,
+}: {
+  product: ProductRow
+  productIndex: number
+  usage: string
+  oldCost: number | undefined
+  newCost: number | undefined
+  baselineNormal: number | null
+  baselineOnline: number | null
+  vat: number
+  platformFee: number | null
+  kind: PricePreview['kind']
+}): PricePreviewLine {
+  const delta = oldCost !== undefined && newCost !== undefined ? newCost - oldCost : 0
+  const remaining = remainingPerUnitDelta(delta)
+  const remainingAbs = formatMoneyAmount(Math.abs(remaining))
+  const costsReady = kind === 'rise' && oldCost !== undefined && newCost !== undefined
+  const liveNormal = numeric(product.normalPrice)
+  const liveOnline = numeric(product.onlinePrice)
+  const discount = productDiscountRate(product)
+  const salonExact =
+    costsReady && baselineNormal !== null
+      ? salonRestorePrice(baselineNormal, delta, vat, discount)
+      : null
+  const onlineExact =
+    costsReady && baselineOnline !== null && platformFee !== null
+      ? channelRestorePrice(baselineOnline, delta, vat, platformFee, discount)
+      : null
+  const suggestions: PriceSuggestion[] = []
+  if (salonExact !== null) {
+    const salonSuggest = buildSuggestion('normalPrice', liveNormal, salonExact)
+    if (salonSuggest) suggestions.push(salonSuggest)
+  }
+  if (onlineExact !== null) {
+    const onlineSuggest = buildSuggestion('onlinePrice', liveOnline, onlineExact)
+    if (onlineSuggest) suggestions.push(onlineSuggest)
+  }
+  return {
+    productIndex,
+    productName: productDisplayName(product, productIndex),
+    usage,
+    costFrom: oldCost === undefined ? '—' : formatMoneyAmount(oldCost),
+    costTo: newCost === undefined ? '—' : formatMoneyAmount(newCost),
+    remainingText:
+      remaining >= 0
+        ? RECIPE_COPY.priceRiseRemainingUp(remainingAbs)
+        : RECIPE_COPY.priceRiseRemainingDown(remainingAbs),
+    restoreText:
+      salonExact === null || liveNormal === null
+        ? null
+        : RECIPE_COPY.priceRiseRestore(formatMoneyAmount(salonExact), formatMoneyAmount(liveNormal)),
+    restoreOnlineText:
+      onlineExact === null || liveOnline === null
+        ? null
+        : RECIPE_COPY.priceRiseRestoreOnline(
+            formatMoneyAmount(onlineExact),
+            formatMoneyAmount(liveOnline),
+          ),
+    suggestions,
+  }
+}
+
 /**
  * D1 trigger: the open row's unit price differs from the value at open, and the
  * ingredient is used in at least one recipe. Comparison is against the snapshot;
@@ -205,55 +277,18 @@ export function buildPricePreview(
     const productIndex = form.products.indexOf(product)
     const oldCost = resolvedRecipeUnitCost(previousForm, previousForm.products[productIndex] ?? product)
     const newCost = resolvedRecipeUnitCost(form, product)
-    const delta = oldCost !== undefined && newCost !== undefined ? newCost - oldCost : 0
-    const remaining = remainingPerUnitDelta(delta)
-    const remainingAbs = formatMoneyAmount(Math.abs(remaining))
-    const costsReady = kind === 'rise' && oldCost !== undefined && newCost !== undefined
-    const liveNormal = numeric(product.normalPrice)
-    const liveOnline = numeric(product.onlinePrice)
-    const baselineNormal = baselineAmount(opened, product, 'normalPrice')
-    const baselineOnline = baselineAmount(opened, product, 'onlinePrice')
-    const discount = productDiscountRate(product)
-    const salonExact =
-      costsReady && baselineNormal !== null
-        ? salonRestorePrice(baselineNormal, delta, vat, discount)
-        : null
-    const onlineExact =
-      costsReady && baselineOnline !== null && platformFee !== null
-        ? channelRestorePrice(baselineOnline, delta, vat, platformFee, discount)
-        : null
-    const suggestions: PriceSuggestion[] = []
-    if (salonExact !== null) {
-      const salonSuggest = buildSuggestion('normalPrice', liveNormal, salonExact)
-      if (salonSuggest) suggestions.push(salonSuggest)
-    }
-    if (onlineExact !== null) {
-      const onlineSuggest = buildSuggestion('onlinePrice', liveOnline, onlineExact)
-      if (onlineSuggest) suggestions.push(onlineSuggest)
-    }
-    return {
+    return buildProductPriceLine({
+      product,
       productIndex,
-      productName: productDisplayName(product, productIndex),
       usage: RECIPE_COPY.priceRiseUsage(usageText(product, ingredient), ingredient.name.trim()),
-      costFrom: oldCost === undefined ? '—' : formatMoneyAmount(oldCost),
-      costTo: newCost === undefined ? '—' : formatMoneyAmount(newCost),
-      remainingText:
-        remaining >= 0
-          ? RECIPE_COPY.priceRiseRemainingUp(remainingAbs)
-          : RECIPE_COPY.priceRiseRemainingDown(remainingAbs),
-      restoreText:
-        salonExact === null || liveNormal === null
-          ? null
-          : RECIPE_COPY.priceRiseRestore(formatMoneyAmount(salonExact), formatMoneyAmount(liveNormal)),
-      restoreOnlineText:
-        onlineExact === null || liveOnline === null
-          ? null
-          : RECIPE_COPY.priceRiseRestoreOnline(
-              formatMoneyAmount(onlineExact),
-              formatMoneyAmount(liveOnline),
-            ),
-      suggestions,
-    }
+      oldCost,
+      newCost,
+      baselineNormal: baselineAmount(opened, product, 'normalPrice'),
+      baselineOnline: baselineAmount(opened, product, 'onlinePrice'),
+      vat,
+      platformFee,
+      kind,
+    })
   })
 
   return {
@@ -266,6 +301,52 @@ export function buildPricePreview(
       kind === 'rise'
         ? RECIPE_COPY.priceRiseSummary(purchase, fromPrice, toPrice, count)
         : RECIPE_COPY.priceDropSummary(purchase, fromPrice, toPrice, count),
+    lines,
+    footnote: RECIPE_COPY.priceRiseFoot(formatDecimal(vat * 100, 2)),
+  }
+}
+
+/** Appendix D.6: one line per product whose recipe cost changed. */
+export function buildBulkCostPreview(before: DetailedFormState, after: DetailedFormState): PricePreview | null {
+  const raised = after.ingredients.filter((ingredient) => {
+    const previous = before.ingredients.find((item) => item.id === ingredient.id)
+    const oldPrice = previous ? numeric(previous.purchasePrice) : null
+    const newPrice = numeric(ingredient.purchasePrice)
+    return oldPrice !== null && newPrice !== null && newPrice > oldPrice
+  })
+  if (raised.length === 0) return null
+  const raisedIds = new Set(raised.map((ingredient) => ingredient.id))
+  const vat = vatRateOf(after)
+  const platformFee = platformFeeRateOf(after)
+  const lines = after.products.flatMap((product, productIndex) => {
+    const previous = before.products.find((item) => item.id === product.id)
+    if (!previous) return []
+    const oldCost = resolvedRecipeUnitCost(before, previous)
+    const newCost = resolvedRecipeUnitCost(after, product)
+    if (oldCost === undefined || newCost === undefined || newCost === oldCost) return []
+    const usage = product.recipeLines
+      .filter((line) => raisedIds.has(line.ingredientId))
+      .map((line) => raised.find((ingredient) => ingredient.id === line.ingredientId)?.name.trim() ?? '')
+      .filter(Boolean)
+      .join(', ')
+    return [buildProductPriceLine({
+      product,
+      productIndex,
+      usage,
+      oldCost,
+      newCost,
+      baselineNormal: numeric(previous.normalPrice),
+      baselineOnline: numeric(previous.onlinePrice),
+      vat,
+      platformFee,
+      kind: 'rise',
+    })]
+  })
+  if (lines.length === 0) return null
+  return {
+    kind: 'rise',
+    heading: BULK_INGREDIENT_COPY.previewHeading,
+    summary: BULK_INGREDIENT_COPY.previewSummary(raised.length, lines.length),
     lines,
     footnote: RECIPE_COPY.priceRiseFoot(formatDecimal(vat * 100, 2)),
   }

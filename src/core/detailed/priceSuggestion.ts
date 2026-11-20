@@ -5,6 +5,7 @@
  * Display helpers only — `calculateDetailed` never calls these. Raw values;
  * `esnafPrice` is the only rounding, and only for the tap-to-apply suggestion.
  */
+import { DETAILED_LIMITS } from './limits.ts';
 
 /**
  * Channel selling price (KDV included) that restores the previous §9.4 remainder
@@ -57,4 +58,13 @@ export function esnafPrice(amount: number): number | null {
 export function raisedPrice(price: number, rate: number): number | null {
   if (!Number.isFinite(price) || price <= 0 || !Number.isFinite(rate) || rate <= 0 || rate > 1) return null;
   return esnafPrice(price * (1 + rate));
+}
+
+/** Appendix D.6: purchase prices retain kuruş; half-up on positive amounts. */
+export function raisedPurchasePrice(price: number, rate: number): number | null {
+  if (!Number.isFinite(price) || price <= 0 || !Number.isFinite(rate) || rate <= 0 || rate > DETAILED_LIMITS.bulkPriceRaiseRate.max) return null;
+  const raised = price * (1 + rate);
+  if (!Number.isFinite(raised)) return null;
+  const rounded = Math.round((raised + Number.EPSILON * raised) * 100) / 100;
+  return Number.isFinite(rounded) ? rounded : null;
 }

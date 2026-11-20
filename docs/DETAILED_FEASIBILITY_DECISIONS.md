@@ -2,7 +2,7 @@
 
 **Version scope note (10 November 2026):** This remains the Detailed v1 decision log. See [V2/V3 product roadmap](./V2_V3_PRODUCT_ROADMAP.md) for explicit later-version scope additions (recipes, food cost, simple grouping, allocation and comparison). Those additions do not retroactively alter v1 formulas or authorize implementation.
 
-**Version:** v0.15
+**Version:** v0.16
 **Status:** Decision log. Major Detailed v1 **product-scope** decisions are **locked**. Major calculation-model review blockers are **resolved**. Remaining implementation details belong in a dedicated Detailed Financial Specification. This file is still **not** that specification and **not** implementation.
 **Phase:** Planning — **not** a financial specification and **not** implementation
 **Currency:** TRY · **Country:** Turkey · **Preset context:** Coffee Shop / Cafe (same product family as Quick / Lite)
@@ -1755,6 +1755,12 @@ Owner decision, 19 November 2026. On Malzemeler, `Tüm önerileri yaz` applies e
 
 Both actions write existing `normalPrice` / `onlinePrice` form fields only. They add no engine input, no `calculateDetailed` output, and no price history. Single-channel `Bu fiyatı yaz` remains available. The percentage helper and rounding are specified in financial spec Appendix D.5.
 
+#### DF-89 — Bulk ingredient price rise **[LOCKED]**
+
+Owner decision, 19 November 2026. Malzemeler offers `Malzemelere toplu zam yap`: the owner raises selected ingredients' purchase prices by one percentage. Product unit costs follow through their existing recipes. A combined preview shows every affected product's old and new cost, the existing Appendix D restore prices and suggestions, and `Tüm önerileri yaz` for applicable selling prices.
+
+The first action writes existing `purchasePrice` form fields only. Selling prices (`normalPrice` / `onlinePrice`) change only after an explicit suggestion tap. There is no new engine input, no `calculateDetailed` change, and no price history. The purchase-price rounding and combined cost delta are specified in financial spec Appendix D.6; DF-85 discount and DF-36 payback remain unchanged.
+
 ### 5.13 Financing and working capital
 
 #### DF-40 — Financing is out of Detailed v1 **[LOCKED]**
@@ -1982,6 +1988,7 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 | DF-86 | Sample businesses | Five samples fill the form only; no formula, field or default. Every sample ends its stabilized base month positive. |
 | DF-87 | Sonuç charts | Three question-titled sections replace the two line charts, on screen and in the PDF. Appendix E.9 adds the recovered share and an approximate month beyond the horizon, only when DF-36 payback is not reached. Payback stays DF-36; Akış (D2) unchanged. |
 | DF-88 | Bulk price update | Zam geldi applies all applicable suggestions with one action; Menü raises selected salon and/or online list prices by a percentage. Existing price form fields only; discount stays; no price history or engine result change. |
+| DF-89 | Bulk ingredient price rise | Selected ingredient purchase prices rise by a percentage; recipes update product costs; one combined Appendix D preview offers per-channel and all-suggestion writes. Existing form fields only; no engine change or price history. |
 | DF-62 | Waste / fire | Out of v1. |
 | DF-40 | Financing | Out of v1. |
 | DF-41 | Working-capital timing | Out of v1. |
@@ -2049,6 +2056,7 @@ None of the above is a reason to change Lite behaviour now.
 | v0.13 | Locked DF-85 (owner, 17 November 2026). Akış is a presentation of the existing Detaylı engine. DF-34 and DF-36 stay. A per-product discount narrows DF-55; platform and Joker stay out. 2026 employer cost and Bağ-Kur are visible new-form prefills; omitted engine amounts stay 0. Channel-mix failure shows the error and no results. Impact, tests, and the later PR split are in `docs/AKIS_DF85_IMPACT.md`. Formula text for the unimplemented change is Appendix E of the financial spec. |
 | v0.14 | Recorded DF-86 (sample businesses are form data, 18 November 2026) and DF-87 (Sonuç charts answer three questions, 19 November 2026). DF-87 adds two display figures beyond the horizon (financial spec Appendix E.9); DF-36 payback and DF-85 D2 are unchanged. |
 | v0.15 | Locked DF-88 (owner, 19 November 2026): bulk suggestion write and selected product percentage raise. Existing price form fields only; discount, DF-36 payback, and engine results unchanged. |
+| v0.16 | Locked DF-89 (owner, 19 November 2026): selected ingredient purchase-price rise, recipe-derived product costs, and one combined Appendix D suggestion preview. No engine input, result, or price history change. |
 
 ---
 
