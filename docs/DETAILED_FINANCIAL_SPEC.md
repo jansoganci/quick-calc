@@ -1,6 +1,6 @@
 # Detailed Feasibility — Financial Specification
 
-**Version:** v1.18
+**Version:** v1.19
 **Status:** Formula contract for `src/core/detailed/`. **Not** implementation.
 **Currency:** TRY · **Country:** Turkey · **Language for v1:** Turkish-first
 **Engine:** `detailedEngineVersion` `1.1.0`. Appendix E is implemented. Where an older sentence in the body still describes the pre-discount month, Appendix E wins.
@@ -1265,6 +1265,12 @@ No figure in §18.2 changes.
 
 This is a display/form helper only. It writes an existing list-price field after an explicit action, keeps the discount percentage, and changes no §18.2 figure or `calculateDetailed` output.
 
+### D.6 Bulk purchase-price raise
+
+`raisedPurchasePrice(price, rate) = round(price × (1 + rate), 2)` to kuruş, with half-up rounding. `rate` is a 0–1 fraction with `0 < rate ≤ 1`; the form uses the same 1–100% limit as D.5. Empty, non-positive, or non-finite purchase prices do not change. Purchase prices retain kuruş (for example, 8,50 → 9,35 at 10%); D.3 whole-lira rounding applies only to selling-price suggestions.
+
+For the combined preview, each affected product has `Δcost = resolvedRecipeUnitCost(after) − resolvedRecipeUnitCost(before)`. D.1–D.3 restore and suggestion helpers use that `Δcost` and selling prices captured before the purchase-price raise. Each product appears once even when several selected ingredients contribute to its cost change. This is an input-time display/form helper, with no §18.2 figure or `calculateDetailed` output change.
+
 ## Appendix E — DF-85 contract (implemented in `1.1.0`)
 
 Authority: `docs/DETAILED_FEASIBILITY_DECISIONS.md` DF-85. File-level impact: `docs/AKIS_DF85_IMPACT.md`.
@@ -1346,6 +1352,7 @@ estimatedMonth       = H + ceil((totalInitialInvestment − cumulativeAtHorizon)
 
 | Version | Change |
 | --- | --- |
+| v1.19 | Appendix D.6 adds the DF-89 purchase-price raise (kuruş, half up) and combined recipe-cost preview using the existing D.1–D.3 restore and suggestion helpers. No §18.2 figure or engine output change. |
 | v1.18 | Appendix D.5 adds the bulk percentage raise display/form helper for DF-88. Whole-lira-up rounding reuses D.3; no §18.2 figure or `calculateDetailed` output changes. |
 | v1.17 | Appendix E.9: payback path for the Sonuç kumbara (DF-87). Running sum, share of the investment recovered at the horizon, and an approximate month beyond the horizon at the last month's pace. Display helper in `src/core/detailed/paybackPath.ts`; DF-36 payback unchanged. No figure in §18.2 changed. `detailedEngineVersion` stays `1.1.0`. |
 | v1.16 | Appendix E.8: Akış funnel remainders after personel, kira ve aidat and diğer giderler are display identities (previous remainder − engine outflow). Not engine fields. No figure in §18.2 changed. `detailedEngineVersion` stays `1.1.0`. |

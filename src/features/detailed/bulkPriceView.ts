@@ -42,7 +42,9 @@ export function buildBulkPriceRows(
       return {
         field,
         text: next === null
-          ? price === null || price <= 0 ? BULK_PRICE_COPY.noPrice : BULK_PRICE_COPY.enterRate
+          ? price === null || price <= 0
+            ? BULK_PRICE_COPY.noPrice
+            : BULK_PRICE_COPY.current(BULK_PRICE_COPY.fieldLabels[field], formatDecimal(price, 2))
           : BULK_PRICE_COPY.preview(BULK_PRICE_COPY.fieldLabels[field], formatDecimal(price!, 2), formatCount(next)),
         write: selected && next !== null
           ? { productIndex, field, value: formatCount(next) }

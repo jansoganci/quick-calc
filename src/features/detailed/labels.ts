@@ -117,14 +117,32 @@ export const BULK_PRICE_COPY = {
   selectAll: 'Tümünü seç',
   selectNone: 'Hiçbirini seçme',
   noPrice: 'Fiyat yok',
-  enterRate: 'Zam oranını gir',
   /** Same words as the `Hangi fiyat?` segment, so one price never has two names. */
   fieldLabels: { normalPrice: 'Salon', onlinePrice: 'Online' },
   preview: (field: string, from: string, to: string) => `${field}: ${from} → ${to} TL`,
+  current: (field: string, price: string) => `${field}: ${price} TL`,
   note: 'Yeni fiyat yukarı tam liraya yuvarlanır. İndirim oranın aynı kalır.',
   apply: (count: number) => `${count} ürüne uygula`,
   cancel: 'Vazgeç',
   productSelection: (name: string) => `${name} ürününü seç`,
+} as const
+
+export const BULK_INGREDIENT_COPY = {
+  open: 'Malzemelere toplu zam yap',
+  rate: 'Zam oranı',
+  selectAll: 'Tümünü seç',
+  selectNone: 'Hiçbirini seçme',
+  noPrice: 'Fiyat yok',
+  current: (purchase: string, price: string) => `${purchase}: ${price} TL`,
+  preview: (purchase: string, from: string, to: string) => `${purchase}: ${from} → ${to} TL`,
+  note: 'Ürün maliyetleri reçetelerden kendiliğinden güncellenir.',
+  apply: (count: number) => `${count} malzemeye uygula`,
+  cancel: 'Vazgeç',
+  status: (count: number) => `${count} malzemenin fiyatı güncellendi.`,
+  selection: (name: string) => `${name} malzemesini seç`,
+  previewHeading: 'Malzemelere zam geldi',
+  previewSummary: (ingredients: number, products: number) =>
+    `${ingredients} malzemenin fiyatı arttı. Bu ${products} ürünün maliyetini değiştirdi.`,
 } as const
 
 export const POSITION_LABELS = {

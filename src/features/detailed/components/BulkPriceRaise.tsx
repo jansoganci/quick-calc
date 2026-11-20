@@ -56,7 +56,7 @@ export function BulkPriceRaise({
               <p className="text-xs text-qc-secondary">{BULK_PRICE_COPY.channel}</p>
               <div className="qc-segment" role="group" aria-label={BULK_PRICE_COPY.channel}>
                 {(['both', 'normalPrice', 'onlinePrice'] as const).map((option) => (
-                  <button key={option} type="button" className="qc-segment-btn" aria-pressed={channel === option} onClick={() => setChannel(option)}>
+                  <button key={option} type="button" className="qc-segment-btn min-w-0 whitespace-normal break-words px-1 text-[11px] sm:text-xs" aria-pressed={channel === option} onClick={() => setChannel(option)}>
                     {BULK_PRICE_COPY[option]}
                   </button>
                 ))}

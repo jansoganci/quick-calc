@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { emptyProduct, initialForm, type IngredientRow } from './formState.ts'
 import { RECIPE_COPY } from './labels.ts'
-import { buildPricePreview, snapshotOf } from './recipePreview.ts'
+import { buildBulkCostPreview, buildPricePreview, snapshotOf } from './recipePreview.ts'
 import { pricePreviewWrites, writeProductPrices } from './bulkPriceView.ts'
+import { buildSampleForm, SAMPLE_CONCEPTS } from './samples/index.ts'
 
 function named(partial: Partial<IngredientRow> & Pick<IngredientRow, 'id' | 'name'>): IngredientRow {
   return {
@@ -144,5 +145,51 @@ describe('Zam geldi preview (O3, §7.4 fixtures)', () => {
     expect(result.form.products.map((product) => [product.normalPrice, product.onlinePrice])).toEqual([
       ['230', '242'], ['168', '190'],
     ])
+  })
+})
+
+describe('DF-89 combined ingredient cost preview', () => {
+  const sample = SAMPLE_CONCEPTS.find((concept) => concept.id === 'hamburgerci')!
+  const before = buildSampleForm(sample)
+  const beef = before.ingredients.find((item) => item.name === 'Dana kıyma')!
+  const bun = before.ingredients.find((item) => item.name === 'Hamburger ekmeği')!
+
+  function withPrices(beefPrice?: string, bunPrice?: string) {
+    return {
+      ...before,
+      ingredients: before.ingredients.map((item) =>
+        item.id === beef.id && beefPrice !== undefined ? { ...item, purchasePrice: beefPrice }
+          : item.id === bun.id && bunPrice !== undefined ? { ...item, purchasePrice: bunPrice }
+            : item,
+      ),
+    }
+  }
+
+  it('matches each single-ingredient cost delta and suggestion for the three beef burgers', () => {
+    const after = withPrices('900')
+    const combined = buildBulkCostPreview(before, after)
+    const single = buildPricePreview(after, after.ingredients.find((item) => item.id === beef.id)!, snapshotOf(beef, before.products))
+    expect(combined?.lines.map((line) => line.productName)).toEqual(['Klasik burger', 'Cheeseburger', 'Double burger'])
+    expect(combined?.summary).toContain('3 ürünün maliyetini değiştirdi')
+    for (const line of combined?.lines ?? []) {
+      const counterpart = single?.lines.find((item) => item.productName === line.productName)
+      expect(line.costFrom).toBe(counterpart?.costFrom)
+      expect(line.costTo).toBe(counterpart?.costTo)
+      expect(line.suggestions).toEqual(counterpart?.suggestions)
+      expect(line.usage).toBe('Dana kıyma')
+    }
+  })
+
+  it('adds two ingredient effects once per product and omits products using neither', () => {
+    const combined = buildBulkCostPreview(before, withPrices('900', '180'))
+    expect(combined?.lines.find((line) => line.productName === 'Klasik burger')).toMatchObject({
+      costFrom: '108,35', costTo: '128,85', usage: 'Hamburger ekmeği, Dana kıyma',
+    })
+    // Double: 240 g kıyma = 216; 1 ekmek = 15; 40 g cheddar = 20,8;
+    // 25 g domates = 1,125; 15 g marul = 0,75; 25 g sos = 4,5.
+    // Sum = 258,175, shown as 258,18 TL (Appendix A).
+    expect(combined?.lines.find((line) => line.productName === 'Double burger')?.costTo).toBe('258,18')
+    expect(combined?.lines.some((line) => line.productName === 'Patates (porsiyon)')).toBe(false)
+    expect(combined?.lines.some((line) => line.productName === 'Tavuk burger')).toBe(true)
   })
 })

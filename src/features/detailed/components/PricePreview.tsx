@@ -14,6 +14,7 @@ type PricePreviewProps = {
   onApplyAll?: (writes: ProductPriceWrite[]) => void
   bulkStatus?: number | null
   onUndo?: () => void
+  showApplyAll?: boolean
 }
 
 function SuggestionRow({
@@ -80,7 +81,7 @@ function ProductRestore({
   )
 }
 
-export function PricePreview({ preview, onApply, onApplyAll, bulkStatus, onUndo }: PricePreviewProps) {
+export function PricePreview({ preview, onApply, onApplyAll, bulkStatus, onUndo, showApplyAll = false }: PricePreviewProps) {
   const writes = pricePreviewWrites(preview)
   return (
     <div className="border-t border-qc-ink pt-3">
@@ -138,7 +139,7 @@ export function PricePreview({ preview, onApply, onApplyAll, bulkStatus, onUndo 
         ))}
       </div>
 
-      {writes.length >= 2 && onApplyAll ? (
+      {writes.length > 0 && (writes.length >= 2 || showApplyAll) && onApplyAll ? (
         <button type="button" className="qc-text-btn is-accent mt-3 min-h-[44px] lg:min-h-0" onClick={() => onApplyAll(writes)}>
           {BULK_PRICE_COPY.applySuggestions}
         </button>
@@ -164,10 +165,11 @@ export function PricePreviewDesktop({
   onApplyAll,
   bulkStatus,
   onUndo,
+  showApplyAll,
 }: PricePreviewProps & { onDone: () => void }) {
   return (
     <div className={cn('mt-4 hidden border-y border-qc-rule-mid bg-qc-surface-result px-3 py-3 lg:block')}>
-      <PricePreview preview={preview} onApply={onApply} onApplyAll={onApplyAll} bulkStatus={bulkStatus} onUndo={onUndo} />
+      <PricePreview preview={preview} onApply={onApply} onApplyAll={onApplyAll} bulkStatus={bulkStatus} onUndo={onUndo} showApplyAll={showApplyAll} />
       <button type="button" className="qc-text-btn mt-3" onClick={onDone}>
         {RECIPE_COPY.done}
       </button>

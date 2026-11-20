@@ -24,6 +24,9 @@ import {
 } from '../recipePreview.ts'
 import { PricePreview, PricePreviewDesktop } from './PricePreview.tsx'
 import type { ProductPriceWrite } from '../bulkPriceView.ts'
+import type { IngredientPriceWrite } from '../bulkIngredientView.ts'
+import type { PricePreview as PricePreviewModel, PriceSuggestionField } from '../recipePreview.ts'
+import { BulkIngredientRaise } from './BulkIngredientRaise.tsx'
 import { UnitPicker } from './UnitPicker.tsx'
 
 type IngredientField = 'purchaseQuantity' | 'purchasePrice' | 'purchaseUnit'
@@ -45,6 +48,14 @@ type IngredientListProps = {
   onApplyProductPrices: (writes: ProductPriceWrite[], kind: 'suggestions', count: number) => void
   bulkStatus: number | null
   onUndoBulkPrices: () => void
+  onApplyIngredientPrices: (writes: IngredientPriceWrite[], count: number) => void
+  ingredientStatus: number | null
+  onUndoIngredientPrices: () => void
+  bulkCostPreview: PricePreviewModel | null
+  onApplyBulkCostProductPrice: (index: number, field: PriceSuggestionField, value: string) => void
+  onApplyBulkCostSuggestions: (writes: ProductPriceWrite[], kind: 'bulkCostSuggestions', count: number) => void
+  bulkCostSuggestionStatus: number | null
+  onCloseBulkCostPreview: () => void
   requestedOpenId: string | null
   onConsumedOpen: () => void
 }
@@ -278,6 +289,14 @@ export function IngredientList({
   onApplyProductPrices,
   bulkStatus,
   onUndoBulkPrices,
+  onApplyIngredientPrices,
+  ingredientStatus,
+  onUndoIngredientPrices,
+  bulkCostPreview,
+  onApplyBulkCostProductPrice,
+  onApplyBulkCostSuggestions,
+  bulkCostSuggestionStatus,
+  onCloseBulkCostPreview,
   requestedOpenId,
   onConsumedOpen,
 }: IngredientListProps) {
@@ -376,6 +395,18 @@ export function IngredientList({
         </span>
       </div>
       <p className="qc-hint mt-1">{RECIPE_COPY.listHint}</p>
+      <BulkIngredientRaise
+        ingredients={ingredients}
+        onApply={onApplyIngredientPrices}
+        ingredientStatus={ingredientStatus}
+        onUndoIngredient={onUndoIngredientPrices}
+        preview={bulkCostPreview}
+        onApplyPrice={onApplyBulkCostProductPrice}
+        onApplyPrices={onApplyBulkCostSuggestions}
+        suggestionStatus={bulkCostSuggestionStatus}
+        onUndoPrices={onUndoBulkPrices}
+        onDone={onCloseBulkCostPreview}
+      />
 
       {rows.length === 0 ? (
         <div className="mt-3">

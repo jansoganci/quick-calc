@@ -135,6 +135,14 @@ export function DetailedForm({
           onApplyProductPrices={calc.applyProductPrices}
           bulkStatus={calc.bulkPriceStatus?.kind === 'suggestions' ? calc.bulkPriceStatus.count : null}
           onUndoBulkPrices={calc.undoBulkProductPrices}
+          onApplyIngredientPrices={calc.applyIngredientPrices}
+          ingredientStatus={calc.bulkPriceStatus?.kind === 'ingredient' ? calc.bulkPriceStatus.count : null}
+          onUndoIngredientPrices={calc.undoBulkIngredientPrices}
+          bulkCostPreview={calc.bulkCostPreview}
+          onApplyBulkCostProductPrice={calc.applyBulkCostProductPrice}
+          onApplyBulkCostSuggestions={calc.applyProductPrices}
+          bulkCostSuggestionStatus={calc.bulkPriceStatus?.kind === 'bulkCostSuggestions' ? calc.bulkPriceStatus.count : null}
+          onCloseBulkCostPreview={calc.closeBulkCostPreview}
           requestedOpenId={focusIngredientId}
           onConsumedOpen={() => setFocusIngredientId(null)}
         />

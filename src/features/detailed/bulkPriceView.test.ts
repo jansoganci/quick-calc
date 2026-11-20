@@ -3,6 +3,14 @@ import { emptyProduct, initialForm } from './formState.ts'
 import { buildBulkPriceRows, bulkRate, undoProductPrices, writeProductPrices } from './bulkPriceView.ts'
 
 describe('DF-88 bulk price view and one-write undo', () => {
+  it('shows current channel prices before a rate is entered', () => {
+    const products = [{ ...emptyProduct(), id: 'one', normalPrice: '320', onlinePrice: '380' }]
+    const view = buildBulkPriceRows(products, new Set(['one']), 'both', bulkRate(''))
+    expect(view.rows[0]?.previews.map((preview) => preview.text)).toEqual([
+      'Salon: 320 TL', 'Online: 380 TL',
+    ])
+    expect(view.writes).toEqual([])
+  })
   it('previews and writes selected salon prices, skipping empty and unchecked products', () => {
     const products = [
       { ...emptyProduct(), id: 'one', name: 'Hamburger', normalPrice: '230', onlinePrice: '240' },
