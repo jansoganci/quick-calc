@@ -28,4 +28,14 @@ describe('DF-89 ingredient bulk write', () => {
       .toEqual(['750,00', ''])
     expect(form.ingredients[0]?.purchasePrice).toBe('750,00')
   })
+
+  it('writes whole lira without kuruş and keeps two digits otherwise', () => {
+    const rows: IngredientRow[] = [
+      { id: 'meat', name: 'Dana kıyma', purchaseQuantity: '1', purchaseUnit: 'kg', purchasePrice: '750' },
+      { id: 'ayran', name: 'Ayran', purchaseQuantity: '1', purchaseUnit: 'adet', purchasePrice: '8,5' },
+    ]
+    const view = buildBulkIngredientRows(rows, new Set(['meat', 'ayran']), bulkRate('20'))
+    expect(view.rows.map((row) => row.preview)).toEqual(['Kilosu: 750 → 900 TL', 'Tanesi: 8,50 → 10,20 TL'])
+    expect(view.writes.map((write) => write.value)).toEqual(['900', '10,20'])
+  })
 })

@@ -1,12 +1,20 @@
 import { raisedPurchasePrice } from '../../core/detailed/index.ts'
 import { formatTryExact } from '../../lib/money.ts'
-import { formatDecimal, parseTurkishNumber } from '../../lib/number.ts'
+import { formatCount, parseTurkishNumber } from '../../lib/number.ts'
 import type { DetailedFormState, IngredientRow } from './formState.ts'
 import { BULK_INGREDIENT_COPY } from './labels.ts'
 import { purchaseWord } from './recipePreview.ts'
 
 export type IngredientPriceWrite = { ingredientId: string; value: string }
 export type IngredientPriceUndo = IngredientPriceWrite
+
+/**
+ * One format for every purchase price this panel shows or writes: whole lira
+ * stays whole (`900`), kuruş always has two digits (`862,50`, `8,50`).
+ */
+function formatPurchasePrice(value: number): string {
+  return Number.isInteger(value) ? formatCount(value) : formatTryExact(value, 2)
+}
 
 export function buildBulkIngredientRows(
   ingredients: readonly IngredientRow[],
@@ -25,10 +33,10 @@ export function buildBulkIngredientRows(
       preview: price === null
         ? BULK_INGREDIENT_COPY.noPrice
         : next === null
-          ? BULK_INGREDIENT_COPY.current(purchase, formatDecimal(price, 2))
-          : BULK_INGREDIENT_COPY.preview(purchase, formatDecimal(price, 2), formatTryExact(next, 2)),
+          ? BULK_INGREDIENT_COPY.current(purchase, formatPurchasePrice(price))
+          : BULK_INGREDIENT_COPY.preview(purchase, formatPurchasePrice(price), formatPurchasePrice(next)),
       write: selectedIds.has(ingredient.id) && next !== null
-        ? { ingredientId: ingredient.id, value: formatTryExact(next, 2) }
+        ? { ingredientId: ingredient.id, value: formatPurchasePrice(next) }
         : null,
     }
   })

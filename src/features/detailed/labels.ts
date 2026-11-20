@@ -122,7 +122,7 @@ export const BULK_PRICE_COPY = {
   preview: (field: string, from: string, to: string) => `${field}: ${from} → ${to} TL`,
   current: (field: string, price: string) => `${field}: ${price} TL`,
   note: 'Yeni fiyat yukarı tam liraya yuvarlanır. İndirim oranın aynı kalır.',
-  apply: (count: number) => `${count} ürüne uygula`,
+  apply: (count: number) => (count > 0 ? `${count} ürüne uygula` : 'Uygula'),
   cancel: 'Vazgeç',
   productSelection: (name: string) => `${name} ürününü seç`,
 } as const
@@ -136,7 +136,7 @@ export const BULK_INGREDIENT_COPY = {
   current: (purchase: string, price: string) => `${purchase}: ${price} TL`,
   preview: (purchase: string, from: string, to: string) => `${purchase}: ${from} → ${to} TL`,
   note: 'Ürün maliyetleri reçetelerden kendiliğinden güncellenir.',
-  apply: (count: number) => `${count} malzemeye uygula`,
+  apply: (count: number) => (count > 0 ? `${count} malzemeye uygula` : 'Uygula'),
   cancel: 'Vazgeç',
   status: (count: number) => `${count} malzemenin fiyatı güncellendi.`,
   selection: (name: string) => `${name} malzemesini seç`,
