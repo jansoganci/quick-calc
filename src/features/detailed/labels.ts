@@ -128,21 +128,28 @@ export const BULK_PRICE_COPY = {
 } as const
 
 export const BULK_INGREDIENT_COPY = {
-  open: 'Malzemelere toplu zam yap',
-  rate: 'Zam oranı',
-  selectAll: 'Tümünü seç',
-  selectNone: 'Hiçbirini seçme',
+  open: 'Yeni alış fiyatlarını gir',
+  nameHeader: 'Malzeme',
+  currentHeader: 'Şimdi',
+  newPriceHeader: 'Yeni fiyat',
+  newPriceLabel: (name: string) => `${name} için yeni fiyat`,
+  invalidPrice: 'Lütfen geçerli bir fiyat gir.',
   noPrice: 'Fiyat yok',
-  current: (purchase: string, price: string) => `${purchase}: ${price} TL`,
-  preview: (purchase: string, from: string, to: string) => `${purchase}: ${from} → ${to} TL`,
-  note: 'Ürün maliyetleri reçetelerden kendiliğinden güncellenir.',
-  apply: (count: number) => (count > 0 ? `${count} malzemeye uygula` : 'Uygula'),
+  current: (purchase: string, price: string) => `${purchase} ${price} TL`,
+  changePercent: (isIncrease: boolean, amount: string) => `${isIncrease ? '+' : '-'}%${amount}`,
+  note: 'Faturada ya da fişte ne yazıyorsa onu yaz: ödediğin tutar, KDV dahil. Boş bıraktığın değişmez.',
+  apply: (count: number) => (count > 0 ? `${count} malzemeyi güncelle` : 'Güncelle'),
   cancel: 'Vazgeç',
   status: (count: number) => `${count} malzemenin fiyatı güncellendi.`,
-  selection: (name: string) => `${name} malzemesini seç`,
-  previewHeading: 'Malzemelere zam geldi',
-  previewSummary: (ingredients: number, products: number) =>
-    `${ingredients} malzemenin fiyatı arttı. Bu ${products} ürünün maliyetini değiştirdi.`,
+  changedIngredient: (name: string, direction: 'up' | 'down') => `${name} ${direction === 'up' ? '↑' : '↓'}`,
+  previewHeading: 'Yeni fiyatların etkisi',
+  previewSummary: (raised: number, lowered: number, products: number) =>
+    `${raised > 0 ? `${raised} malzeme zamlandı. ` : ''}${lowered > 0 ? `${lowered} malzeme ucuzladı. ` : ''}${products} ürünün maliyeti değişti.`,
+  monthlyHeading: 'Her ay elinde kalan',
+  monthlyValues: (before: string, after: string) => `${before} → ${after} TL`,
+  monthlyChange: (change: string) => `(${change} TL)`,
+  monthlyCaption: 'Baz senaryo, satış oturduktan sonra.',
+  monthlyBeforeCalculate: 'Aylık etkiyi görmek için önce Hesapla’ya bas.',
 } as const
 
 export const POSITION_LABELS = {

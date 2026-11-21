@@ -139,6 +139,9 @@ export function DetailedForm({
           ingredientStatus={calc.bulkPriceStatus?.kind === 'ingredient' ? calc.bulkPriceStatus.count : null}
           onUndoIngredientPrices={calc.undoBulkIngredientPrices}
           bulkCostPreview={calc.bulkCostPreview}
+          bulkMonthlyEffect={calc.bulkMonthlyEffect}
+          isBulkMonthlyValid={calc.isBulkMonthlyValid}
+          hasCalculated={calc.hasCalculated}
           onApplyBulkCostProductPrice={calc.applyBulkCostProductPrice}
           onApplyBulkCostSuggestions={calc.applyProductPrices}
           bulkCostSuggestionStatus={calc.bulkPriceStatus?.kind === 'bulkCostSuggestions' ? calc.bulkPriceStatus.count : null}

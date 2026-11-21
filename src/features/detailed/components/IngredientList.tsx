@@ -25,6 +25,7 @@ import {
 import { PricePreview, PricePreviewDesktop } from './PricePreview.tsx'
 import type { ProductPriceWrite } from '../bulkPriceView.ts'
 import type { IngredientPriceWrite } from '../bulkIngredientView.ts'
+import type { IngredientMonthlyEffect } from '../bulkIngredientView.ts'
 import type { PricePreview as PricePreviewModel, PriceSuggestionField } from '../recipePreview.ts'
 import { BulkIngredientRaise } from './BulkIngredientRaise.tsx'
 import { UnitPicker } from './UnitPicker.tsx'
@@ -52,6 +53,9 @@ type IngredientListProps = {
   ingredientStatus: number | null
   onUndoIngredientPrices: () => void
   bulkCostPreview: PricePreviewModel | null
+  bulkMonthlyEffect: IngredientMonthlyEffect | null
+  isBulkMonthlyValid: boolean
+  hasCalculated: boolean
   onApplyBulkCostProductPrice: (index: number, field: PriceSuggestionField, value: string) => void
   onApplyBulkCostSuggestions: (writes: ProductPriceWrite[], kind: 'bulkCostSuggestions', count: number) => void
   bulkCostSuggestionStatus: number | null
@@ -293,6 +297,9 @@ export function IngredientList({
   ingredientStatus,
   onUndoIngredientPrices,
   bulkCostPreview,
+  bulkMonthlyEffect,
+  isBulkMonthlyValid,
+  hasCalculated,
   onApplyBulkCostProductPrice,
   onApplyBulkCostSuggestions,
   bulkCostSuggestionStatus,
@@ -401,6 +408,9 @@ export function IngredientList({
         ingredientStatus={ingredientStatus}
         onUndoIngredient={onUndoIngredientPrices}
         preview={bulkCostPreview}
+        monthlyEffect={bulkMonthlyEffect}
+        isMonthlyValid={isBulkMonthlyValid}
+        hasCalculated={hasCalculated}
         onApplyPrice={onApplyBulkCostProductPrice}
         onApplyPrices={onApplyBulkCostSuggestions}
         suggestionStatus={bulkCostSuggestionStatus}

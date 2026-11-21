@@ -308,14 +308,16 @@ export function buildPricePreview(
 
 /** Appendix D.6: one line per product whose recipe cost changed. */
 export function buildBulkCostPreview(before: DetailedFormState, after: DetailedFormState): PricePreview | null {
-  const raised = after.ingredients.filter((ingredient) => {
+  const changed = after.ingredients.flatMap((ingredient) => {
     const previous = before.ingredients.find((item) => item.id === ingredient.id)
     const oldPrice = previous ? numeric(previous.purchasePrice) : null
     const newPrice = numeric(ingredient.purchasePrice)
-    return oldPrice !== null && newPrice !== null && newPrice > oldPrice
+    return oldPrice !== null && newPrice !== null && newPrice !== oldPrice
+      ? [{ ingredient, direction: newPrice > oldPrice ? 'up' as const : 'down' as const }]
+      : []
   })
-  if (raised.length === 0) return null
-  const raisedIds = new Set(raised.map((ingredient) => ingredient.id))
+  if (changed.length === 0) return null
+  const changedIds = new Set(changed.map(({ ingredient }) => ingredient.id))
   const vat = vatRateOf(after)
   const platformFee = platformFeeRateOf(after)
   const lines = after.products.flatMap((product, productIndex) => {
@@ -325,8 +327,11 @@ export function buildBulkCostPreview(before: DetailedFormState, after: DetailedF
     const newCost = resolvedRecipeUnitCost(after, product)
     if (oldCost === undefined || newCost === undefined || newCost === oldCost) return []
     const usage = product.recipeLines
-      .filter((line) => raisedIds.has(line.ingredientId))
-      .map((line) => raised.find((ingredient) => ingredient.id === line.ingredientId)?.name.trim() ?? '')
+      .filter((line) => changedIds.has(line.ingredientId))
+      .map((line) => {
+        const item = changed.find(({ ingredient }) => ingredient.id === line.ingredientId)
+        return item ? BULK_INGREDIENT_COPY.changedIngredient(item.ingredient.name.trim(), item.direction) : ''
+      })
       .filter(Boolean)
       .join(', ')
     return [buildProductPriceLine({
@@ -339,14 +344,18 @@ export function buildBulkCostPreview(before: DetailedFormState, after: DetailedF
       baselineOnline: numeric(previous.onlinePrice),
       vat,
       platformFee,
-      kind: 'rise',
+      kind: newCost > oldCost ? 'rise' : 'drop',
     })]
   })
   if (lines.length === 0) return null
   return {
-    kind: 'rise',
+    kind: lines.some((line) => line.suggestions.length > 0) ? 'rise' : 'drop',
     heading: BULK_INGREDIENT_COPY.previewHeading,
-    summary: BULK_INGREDIENT_COPY.previewSummary(raised.length, lines.length),
+    summary: BULK_INGREDIENT_COPY.previewSummary(
+      changed.filter((item) => item.direction === 'up').length,
+      changed.filter((item) => item.direction === 'down').length,
+      lines.length,
+    ),
     lines,
     footnote: RECIPE_COPY.priceRiseFoot(formatDecimal(vat * 100, 2)),
   }

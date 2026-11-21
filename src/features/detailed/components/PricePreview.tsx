@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { cn } from '../../../lib/cn.ts'
 import { BULK_PRICE_COPY, RECIPE_COPY } from '../labels.ts'
 import { pricePreviewWrites, type ProductPriceWrite } from '../bulkPriceView.ts'
@@ -15,6 +16,7 @@ type PricePreviewProps = {
   bulkStatus?: number | null
   onUndo?: () => void
   showApplyAll?: boolean
+  topContent?: ReactNode
 }
 
 function SuggestionRow({
@@ -81,10 +83,11 @@ function ProductRestore({
   )
 }
 
-export function PricePreview({ preview, onApply, onApplyAll, bulkStatus, onUndo, showApplyAll = false }: PricePreviewProps) {
+export function PricePreview({ preview, onApply, onApplyAll, bulkStatus, onUndo, showApplyAll = false, topContent }: PricePreviewProps) {
   const writes = pricePreviewWrites(preview)
   return (
     <div className="border-t border-qc-ink pt-3">
+      {topContent}
       <p className="text-[15px] font-medium text-qc-ink">{preview.heading}</p>
       <p className="mt-1 text-xs leading-relaxed text-qc-secondary">{preview.summary}</p>
 
@@ -166,10 +169,11 @@ export function PricePreviewDesktop({
   bulkStatus,
   onUndo,
   showApplyAll,
+  topContent,
 }: PricePreviewProps & { onDone: () => void }) {
   return (
     <div className={cn('mt-4 hidden border-y border-qc-rule-mid bg-qc-surface-result px-3 py-3 lg:block')}>
-      <PricePreview preview={preview} onApply={onApply} onApplyAll={onApplyAll} bulkStatus={bulkStatus} onUndo={onUndo} showApplyAll={showApplyAll} />
+      <PricePreview preview={preview} onApply={onApply} onApplyAll={onApplyAll} bulkStatus={bulkStatus} onUndo={onUndo} showApplyAll={showApplyAll} topContent={topContent} />
       <button type="button" className="qc-text-btn mt-3" onClick={onDone}>
         {RECIPE_COPY.done}
       </button>

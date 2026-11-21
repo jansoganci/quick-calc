@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef, type KeyboardEventHandler } from 'react'
 import { cn } from '../lib/cn.ts'
 import { caretAfterFormat, formatTypedTurkishNumber } from '../lib/number.ts'
 import { InfoTooltip } from './InfoTooltip.tsx'
@@ -39,6 +39,8 @@ type NumberFieldProps = {
    * takes over: a repeating row that collapses to a stack must still be labelled.
    */
   labelHidden?: boolean | 'from-lg'
+  enterKeyHint?: 'next' | 'done'
+  onKeyDown?: KeyboardEventHandler<HTMLInputElement>
 }
 
 export function NumberField({
@@ -59,6 +61,8 @@ export function NumberField({
   describedBy,
   disabled = false,
   readOnly = false,
+  enterKeyHint,
+  onKeyDown,
 }: NumberFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const caretRef = useRef<number | null>(null)
@@ -136,6 +140,8 @@ export function NumberField({
           }}
           placeholder={placeholder}
           inputMode="decimal"
+          enterKeyHint={enterKeyHint}
+          onKeyDown={onKeyDown}
           autoComplete="off"
           aria-invalid={Boolean(error)}
           aria-describedby={

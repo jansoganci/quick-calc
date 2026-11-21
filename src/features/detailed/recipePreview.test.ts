@@ -148,11 +148,12 @@ describe('Zam geldi preview (O3, §7.4 fixtures)', () => {
   })
 })
 
-describe('DF-89 combined ingredient cost preview', () => {
+describe('DF-90 combined ingredient cost preview', () => {
   const sample = SAMPLE_CONCEPTS.find((concept) => concept.id === 'hamburgerci')!
   const before = buildSampleForm(sample)
   const beef = before.ingredients.find((item) => item.name === 'Dana kıyma')!
   const bun = before.ingredients.find((item) => item.name === 'Hamburger ekmeği')!
+  const tomato = before.ingredients.find((item) => item.name === 'Domates')!
 
   function withPrices(beefPrice?: string, bunPrice?: string) {
     return {
@@ -170,20 +171,20 @@ describe('DF-89 combined ingredient cost preview', () => {
     const combined = buildBulkCostPreview(before, after)
     const single = buildPricePreview(after, after.ingredients.find((item) => item.id === beef.id)!, snapshotOf(beef, before.products))
     expect(combined?.lines.map((line) => line.productName)).toEqual(['Klasik burger', 'Cheeseburger', 'Double burger'])
-    expect(combined?.summary).toContain('3 ürünün maliyetini değiştirdi')
+    expect(combined?.summary).toContain('3 ürünün maliyeti değişti.')
     for (const line of combined?.lines ?? []) {
       const counterpart = single?.lines.find((item) => item.productName === line.productName)
       expect(line.costFrom).toBe(counterpart?.costFrom)
       expect(line.costTo).toBe(counterpart?.costTo)
       expect(line.suggestions).toEqual(counterpart?.suggestions)
-      expect(line.usage).toBe('Dana kıyma')
+      expect(line.usage).toBe('Dana kıyma ↑')
     }
   })
 
   it('adds two ingredient effects once per product and omits products using neither', () => {
     const combined = buildBulkCostPreview(before, withPrices('900', '180'))
     expect(combined?.lines.find((line) => line.productName === 'Klasik burger')).toMatchObject({
-      costFrom: '108,35', costTo: '128,85', usage: 'Hamburger ekmeği, Dana kıyma',
+      costFrom: '108,35', costTo: '128,85', usage: 'Hamburger ekmeği ↑, Dana kıyma ↑',
     })
     // Double: 240 g kıyma = 216; 1 ekmek = 15; 40 g cheddar = 20,8;
     // 25 g domates = 1,125; 15 g marul = 0,75; 25 g sos = 4,5.
@@ -191,5 +192,52 @@ describe('DF-89 combined ingredient cost preview', () => {
     expect(combined?.lines.find((line) => line.productName === 'Double burger')?.costTo).toBe('258,18')
     expect(combined?.lines.some((line) => line.productName === 'Patates (porsiyon)')).toBe(false)
     expect(combined?.lines.some((line) => line.productName === 'Tavuk burger')).toBe(true)
+  })
+
+  it('nets a beef rise and tomato drop per recipe, with no suggestion for a drop-only product', () => {
+    const tomatoOnly = {
+      ...emptyProduct(),
+      id: 'tomato-only',
+      name: 'Domates tabağı',
+      normalPrice: '40',
+      onlinePrice: '50',
+      dailyQuantity: '1',
+      costSource: 'recipe' as const,
+      recipeLines: [{ id: 'tomato-line', ingredientId: tomato.id, usageQuantity: '25' }],
+    }
+    const oldForm = { ...before, products: [...before.products, tomatoOnly] }
+    const newForm = {
+      ...oldForm,
+      ingredients: oldForm.ingredients.map((item) => item.id === beef.id
+        ? { ...item, purchasePrice: '900' }
+        : item.id === tomato.id ? { ...item, purchasePrice: '30' } : item),
+    }
+    const preview = buildBulkCostPreview(oldForm, newForm)
+    const classic = preview?.lines.find((line) => line.productName === 'Klasik burger')
+    // 120 g × (900 − 750) / 1000 + 25 g × (30 − 45) / 1000 = +17,625 TL.
+    expect(classic?.costFrom).toBe('108,35')
+    expect(classic?.costTo).toBe('125,98')
+    expect(classic?.usage).toBe('Dana kıyma ↑, Domates ↓')
+    expect(classic?.suggestions.some((item) => item.canApply)).toBe(true)
+    expect(preview?.lines.some((line) => line.productName === 'Tavuk burger')).toBe(false)
+
+    const tomatoLine = preview?.lines.find((line) => line.productName === 'Domates tabağı')
+    expect(tomatoLine?.costFrom).toBe('1,13')
+    expect(tomatoLine?.costTo).toBe('0,75')
+    expect(tomatoLine?.remainingText).toContain('kalan 0,38 TL arttı')
+    expect(tomatoLine?.restoreText).toBeNull()
+    expect(tomatoLine?.restoreOnlineText).toBeNull()
+    expect(tomatoLine?.suggestions).toEqual([])
+    expect(preview?.summary).toBe('1 malzeme zamlandı. 1 malzeme ucuzladı. 4 ürünün maliyeti değişti.')
+  })
+
+  it('shows only the drop clause and no price suggestions for tomato alone', () => {
+    const after = {
+      ...before,
+      ingredients: before.ingredients.map((item) => item.id === tomato.id ? { ...item, purchasePrice: '30' } : item),
+    }
+    const preview = buildBulkCostPreview(before, after)
+    expect(preview?.summary).toBe('1 malzeme ucuzladı. 3 ürünün maliyeti değişti.')
+    expect(preview?.lines.every((line) => line.suggestions.length === 0 && line.restoreText === null && line.restoreOnlineText === null)).toBe(true)
   })
 })

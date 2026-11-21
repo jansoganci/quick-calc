@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   DETAILED_DEFAULTS,
   isPurchaseUnit,
+  validateDetailedInput,
   type DeliveryMode,
   type PurchaseUnit,
   type RentInputBasis,
@@ -47,6 +48,7 @@ import {
   type ProductPriceWrite,
 } from '../bulkPriceView.ts'
 import {
+  buildIngredientMonthlyEffect,
   undoIngredientPrices,
   writeIngredientPrices,
   type IngredientPriceUndo,
@@ -105,6 +107,16 @@ export function useDetailedCalc() {
   const bulkCostPreview = useMemo(
     () => bulkCostBefore === null ? null : buildBulkCostPreview(bulkCostBefore, form),
     [bulkCostBefore, form],
+  )
+  const bulkMonthlyEffect = useMemo(
+    () => bulkCostBefore !== null && hasCalculated
+      ? buildIngredientMonthlyEffect(bulkCostBefore, form)
+      : null,
+    [bulkCostBefore, form, hasCalculated],
+  )
+  const isBulkMonthlyValid = useMemo(
+    () => bulkCostBefore !== null && evaluation.ok && validateDetailedInput(toDetailedInput(bulkCostBefore)).ok,
+    [bulkCostBefore, evaluation],
   )
 
   useEffect(() => {
@@ -309,6 +321,8 @@ export function useDetailedCalc() {
     draftSaved,
     bulkPriceStatus,
     bulkCostPreview,
+    bulkMonthlyEffect,
+    isBulkMonthlyValid,
     applyProductPrices,
     applyIngredientPrices,
     applyBulkCostProductPrice,
