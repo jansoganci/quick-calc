@@ -1,6 +1,6 @@
 # Detailed Feasibility — Financial Specification
 
-**Version:** v1.19
+**Version:** v1.20
 **Status:** Formula contract for `src/core/detailed/`. **Not** implementation.
 **Currency:** TRY · **Country:** Turkey · **Language for v1:** Turkish-first
 **Engine:** `detailedEngineVersion` `1.1.0`. Appendix E is implemented. Where an older sentence in the body still describes the pre-discount month, Appendix E wins.
@@ -1265,11 +1265,11 @@ No figure in §18.2 changes.
 
 This is a display/form helper only. It writes an existing list-price field after an explicit action, keeps the discount percentage, and changes no §18.2 figure or `calculateDetailed` output.
 
-### D.6 Bulk purchase-price raise
+### D.6 Direct purchase-price update (DF-90; supersedes DF-89)
 
-`raisedPurchasePrice(price, rate) = round(price × (1 + rate), 2)` to kuruş, with half-up rounding. `rate` is a 0–1 fraction with `0 < rate ≤ 1`; the form uses the same 1–100% limit as D.5. Empty, non-positive, or non-finite purchase prices do not change. Purchase prices retain kuruş (for example, 8,50 → 9,35 at 10%); D.3 whole-lira rounding applies only to selling-price suggestions.
+**Superseded by DF-90:** the shared percentage input and `raisedPurchasePrice` helper are removed. The owner types each new purchase price directly as the amount paid, KDV dahil (Appendix A). An empty field leaves that ingredient unchanged. The existing purchase quantity and unit do not change. Whole lira is written without kuruş (`900`); otherwise two decimal places are written (`862,50`, `8,50`). D.3 whole-lira rounding applies only to selling-price suggestions.
 
-For the combined preview, each affected product has `Δcost = resolvedRecipeUnitCost(after) − resolvedRecipeUnitCost(before)`. D.1–D.3 restore and suggestion helpers use that `Δcost` and selling prices captured before the purchase-price raise. Each product appears once even when several selected ingredients contribute to its cost change. This is an input-time display/form helper, with no §18.2 figure or `calculateDetailed` output change.
+For the combined preview, each affected product has the net `Δcost = resolvedRecipeUnitCost(after) − resolvedRecipeUnitCost(before)` across all changed ingredients. For `Δcost > 0`, D.1–D.3 restore and suggestion helpers use that `Δcost` and selling prices captured before the purchase-price update. For `Δcost < 0`, show the increase in remaining per unit, with no restore or selling-price suggestion. Omit a product when `Δcost = 0`. Each product appears once even when several ingredients contribute to its cost change. This is an input-time display/form helper, with no §18.2 figure or `calculateDetailed` output change.
 
 ## Appendix E — DF-85 contract (implemented in `1.1.0`)
 
@@ -1346,12 +1346,25 @@ estimatedMonth       = H + ceil((totalInitialInvestment − cumulativeAtHorizon)
 
 `estimatedMonth` is null when the investment is 0, when `cumulativeAtHorizon ≥ totalInitialInvestment`, or when month H's result is not positive. It assumes month H repeats unchanged after the horizon: no further ramp, no further escalation. The UI calls it approximate and shows it, with `recoveredShare`, only when DF-36 payback is not reached. Payback itself is still §14.2: `cumulative` crosses the investment in the same month as `paybackFromProjection`. Not an engine field. No figure in §18.2 changes.
 
+### E.10 Monthly effect of a price update (display only)
+
+For valid before and current forms, after the owner has pressed `Hesapla` at least once:
+
+```
+before = calculateDetailed(validated before-form).scenarios.base.stabilizedMonth.monthlyOperatingResult
+after  = calculateDetailed(validated current form).scenarios.base.stabilizedMonth.monthlyOperatingResult
+change = after − before
+```
+
+The line is unavailable when either form is invalid or before the first `Hesapla` (V6). It is a display identity, not an engine field or a new engine output. No §18.2 figure changes.
+
 ---
 
 ## 19. Changelog
 
 | Version | Change |
 | --- | --- |
+| v1.20 | DF-90 supersedes D.6's shared purchase-price percentage helper. Combined preview handles net recipe-cost rises and drops. E.10 shows the base stabilized monthly result change only after Hesapla and only for valid before/current forms. No §18.2 figure or engine output changes. |
 | v1.19 | Appendix D.6 adds the DF-89 purchase-price raise (kuruş, half up) and combined recipe-cost preview using the existing D.1–D.3 restore and suggestion helpers. No §18.2 figure or engine output change. |
 | v1.18 | Appendix D.5 adds the bulk percentage raise display/form helper for DF-88. Whole-lira-up rounding reuses D.3; no §18.2 figure or `calculateDetailed` output changes. |
 | v1.17 | Appendix E.9: payback path for the Sonuç kumbara (DF-87). Running sum, share of the investment recovered at the horizon, and an approximate month beyond the horizon at the last month's pace. Display helper in `src/core/detailed/paybackPath.ts`; DF-36 payback unchanged. No figure in §18.2 changed. `detailedEngineVersion` stays `1.1.0`. |

@@ -1,9 +1,10 @@
-import { raisedPurchasePrice } from '../../core/detailed/index.ts'
-import { formatTryExact } from '../../lib/money.ts'
-import { formatCount, parseTurkishNumber } from '../../lib/number.ts'
+import { calculateDetailed, validateDetailedInput } from '../../core/detailed/index.ts'
+import { formatTry, formatTryExact } from '../../lib/money.ts'
+import { formatCount, formatDecimal, parseTurkishNumber } from '../../lib/number.ts'
 import type { DetailedFormState, IngredientRow } from './formState.ts'
 import { BULK_INGREDIENT_COPY } from './labels.ts'
 import { purchaseWord } from './recipePreview.ts'
+import { toDetailedInput } from './toInput.ts'
 
 export type IngredientPriceWrite = { ingredientId: string; value: string }
 export type IngredientPriceUndo = IngredientPriceWrite
@@ -16,33 +17,55 @@ function formatPurchasePrice(value: number): string {
   return Number.isInteger(value) ? formatCount(value) : formatTryExact(value, 2)
 }
 
-export function buildBulkIngredientRows(
+export function buildIngredientPriceRows(
   ingredients: readonly IngredientRow[],
-  selectedIds: ReadonlySet<string>,
-  rate: number | null,
+  typed: Record<string, string>,
 ) {
   const rows = ingredients.map((ingredient) => {
-    const parsed = parseTurkishNumber(ingredient.purchasePrice)
-    const price = parsed.status === 'ok' && parsed.value > 0 ? parsed.value : null
-    const next = price !== null && rate !== null ? raisedPurchasePrice(price, rate) : null
-    const purchase = purchaseWord(ingredient)
+    const oldParsed = parseTurkishNumber(ingredient.purchasePrice)
+    const oldPrice = oldParsed.status === 'ok' && oldParsed.value > 0 ? oldParsed.value : null
+    const raw = typed[ingredient.id] ?? ''
+    const parsed = parseTurkishNumber(raw)
+    const isInvalid = parsed.status === 'invalid' || (parsed.status === 'ok' && parsed.value <= 0)
+    const newPrice = parsed.status === 'ok' && parsed.value > 0 ? parsed.value : null
+    const isChanged = newPrice !== null && newPrice !== oldPrice
+    const changePercent = isChanged && oldPrice !== null ? (newPrice / oldPrice - 1) * 100 : null
+    const changeText = changePercent === null
+      ? ''
+      : BULK_INGREDIENT_COPY.changePercent(changePercent > 0, formatDecimal(Math.abs(changePercent), 1))
     return {
       id: ingredient.id,
       name: ingredient.name,
-      selected: selectedIds.has(ingredient.id),
-      preview: price === null
+      currentText: oldPrice === null
         ? BULK_INGREDIENT_COPY.noPrice
-        : next === null
-          ? BULK_INGREDIENT_COPY.current(purchase, formatPurchasePrice(price))
-          : BULK_INGREDIENT_COPY.preview(purchase, formatPurchasePrice(price), formatPurchasePrice(next)),
-      write: selectedIds.has(ingredient.id) && next !== null
-        ? { ingredientId: ingredient.id, value: formatPurchasePrice(next) }
-        : null,
+        : BULK_INGREDIENT_COPY.current(purchaseWord(ingredient), formatPurchasePrice(oldPrice)),
+      typed: raw,
+      error: isInvalid ? BULK_INGREDIENT_COPY.invalidPrice : null,
+      changeText,
+      isLargeChange: changePercent !== null && (changePercent > 100 || changePercent < -50),
+      write: isChanged && newPrice !== null ? { ingredientId: ingredient.id, value: formatPurchasePrice(newPrice) } : null,
     }
   })
   const writes = rows.flatMap((row) => row.write ? [row.write] : [])
-  return { rows, writes, ingredientCount: writes.length }
+  return { rows, writes, changedCount: writes.length }
 }
+
+/** Appendix E.10: same validated base month as evaluateDetailed, display only. */
+export function buildIngredientMonthlyEffect(before: DetailedFormState, after: DetailedFormState) {
+  const oldValidation = validateDetailedInput(toDetailedInput(before))
+  const newValidation = validateDetailedInput(toDetailedInput(after))
+  if (!oldValidation.ok || !newValidation.ok) return null
+  const oldResult = calculateDetailed(oldValidation.input).scenarios.base.stabilizedMonth.monthlyOperatingResult
+  const newResult = calculateDetailed(newValidation.input).scenarios.base.stabilizedMonth.monthlyOperatingResult
+  const change = newResult - oldResult
+  return {
+    before: formatTry(oldResult),
+    after: formatTry(newResult),
+    change: `${change > 0 ? '+' : ''}${formatTry(change)}`,
+  }
+}
+
+export type IngredientMonthlyEffect = NonNullable<ReturnType<typeof buildIngredientMonthlyEffect>>
 
 /** One immutable form update; keep exact prior strings for undo. */
 export function writeIngredientPrices(form: DetailedFormState, writes: readonly IngredientPriceWrite[]) {

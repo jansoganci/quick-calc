@@ -2,7 +2,7 @@
 
 **Version scope note (10 November 2026):** This remains the Detailed v1 decision log. See [V2/V3 product roadmap](./V2_V3_PRODUCT_ROADMAP.md) for explicit later-version scope additions (recipes, food cost, simple grouping, allocation and comparison). Those additions do not retroactively alter v1 formulas or authorize implementation.
 
-**Version:** v0.16
+**Version:** v0.17
 **Status:** Decision log. Major Detailed v1 **product-scope** decisions are **locked**. Major calculation-model review blockers are **resolved**. Remaining implementation details belong in a dedicated Detailed Financial Specification. This file is still **not** that specification and **not** implementation.
 **Phase:** Planning — **not** a financial specification and **not** implementation
 **Currency:** TRY · **Country:** Turkey · **Preset context:** Coffee Shop / Cafe (same product family as Quick / Lite)
@@ -1761,6 +1761,12 @@ Owner decision, 19 November 2026. Malzemeler offers `Malzemelere toplu zam yap`:
 
 The first action writes existing `purchasePrice` form fields only. Selling prices (`normalPrice` / `onlinePrice`) change only after an explicit suggestion tap. There is no new engine input, no `calculateDetailed` change, and no price history. The purchase-price rounding and combined cost delta are specified in financial spec Appendix D.6; DF-85 discount and DF-36 payback remain unchanged.
 
+#### DF-90 — New purchase prices, typed directly **[LOCKED]**
+
+Owner decision, 21 November 2026. This amends DF-89: the Malzemeler panel takes a new purchase price for each ingredient as bought, using its existing `purchaseQuantity` and `purchaseUnit` (kilosu, 12 adet paketi, tenekesi). There is no shared percentage input. An empty new-price box leaves that ingredient unchanged. The price is the amount paid, KDV dahil, as in financial spec Appendix A; only `purchasePrice` changes.
+
+The combined preview includes price drops as gains (`kalan arttı`) and does not offer a price-lowering suggestion. After the first `Hesapla`, it may show the base stabilized month's operating-result change from the existing engine (financial spec Appendix E.10). This line obeys V6 and is absent for an invalid before or after form. Menü's DF-88 selling-price percentage panel remains unchanged. No engine input, output, or price history is added; DF-85 discount and DF-36 payback remain unchanged.
+
 ### 5.13 Financing and working capital
 
 #### DF-40 — Financing is out of Detailed v1 **[LOCKED]**
@@ -1989,6 +1995,7 @@ Generic utilities and visual primitives may be shared later when reuse is genuin
 | DF-87 | Sonuç charts | Three question-titled sections replace the two line charts, on screen and in the PDF. Appendix E.9 adds the recovered share and an approximate month beyond the horizon, only when DF-36 payback is not reached. Payback stays DF-36; Akış (D2) unchanged. |
 | DF-88 | Bulk price update | Zam geldi applies all applicable suggestions with one action; Menü raises selected salon and/or online list prices by a percentage. Existing price form fields only; discount stays; no price history or engine result change. |
 | DF-89 | Bulk ingredient price rise | Selected ingredient purchase prices rise by a percentage; recipes update product costs; one combined Appendix D preview offers per-channel and all-suggestion writes. Existing form fields only; no engine change or price history. |
+| DF-90 | Direct new purchase prices | Amends DF-89: enter each ingredient's new KDV-inclusive purchase price directly, including decreases. Empty means unchanged. Combined preview omits lower-price suggestions and may show the E.10 monthly effect after Hesapla. Menü DF-88 unchanged. |
 | DF-62 | Waste / fire | Out of v1. |
 | DF-40 | Financing | Out of v1. |
 | DF-41 | Working-capital timing | Out of v1. |
@@ -2057,6 +2064,7 @@ None of the above is a reason to change Lite behaviour now.
 | v0.14 | Recorded DF-86 (sample businesses are form data, 18 November 2026) and DF-87 (Sonuç charts answer three questions, 19 November 2026). DF-87 adds two display figures beyond the horizon (financial spec Appendix E.9); DF-36 payback and DF-85 D2 are unchanged. |
 | v0.15 | Locked DF-88 (owner, 19 November 2026): bulk suggestion write and selected product percentage raise. Existing price form fields only; discount, DF-36 payback, and engine results unchanged. |
 | v0.16 | Locked DF-89 (owner, 19 November 2026): selected ingredient purchase-price rise, recipe-derived product costs, and one combined Appendix D suggestion preview. No engine input, result, or price history change. |
+| v0.17 | Locked DF-90 (owner, 21 November 2026): direct new ingredient purchase prices replace DF-89's common percentage; drops show gains without lower-price suggestions; E.10 adds a post-Hesapla monthly display identity. |
 
 ---
 

@@ -214,7 +214,6 @@ describe('public surface', () => {
         'channelRestorePrice',
         'esnafPrice',
         'raisedPrice',
-        'raisedPurchasePrice',
         'isPurchaseUnit',
         'purchaseFactor',
         'recipeCost',
